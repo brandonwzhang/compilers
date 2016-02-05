@@ -1,4 +1,4 @@
-
+package com.bwz6jk2227esl89ahj34;
 import java_cup.runtime.*;
 
 %%
@@ -11,11 +11,11 @@ import java_cup.runtime.*;
 %{
    StringBuffer string = new StringBuffer();
 
-   private symbol symbol(int type) {
-       return new symbol(type, yyline, yycolumn);
+   private Symbol symbol(int type) {
+       return new Symbol(type, yyline, yycolumn);
    }
-   private symbol symbol(int type, Object value) {
-       return new symbol(type, yyline, yycolumn, value);
+   private Symbol symbol(int type, Object value) {
+       return new Symbol(type, yyline, yycolumn, value);
    }
 %}
 
