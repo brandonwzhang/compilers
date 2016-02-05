@@ -49,6 +49,16 @@ DecIntegerLiteral = 0 | [1-9][0-9]*
  {DecIntegerLiteral}                { return symbol(sym.INTEGER_LITERAL); }
  \"                             	{ string.setLength(0); yybegin(STRING); }
 
+ /* terminals */
+ "("        { return symbol(sym.LEFT_PAREN); }
+ ")"        { return symbol(sym.RIGHT_PAREN); }
+ "["        { return symbol(sym.LEFT_SQUARE_BRACKET); }
+ "]"        { return symbol(sym.RIGHT_SQUARE_BRACKET); }
+ "{"        { return symbol(sym.LEFT_CURLY_BRACKET); }
+ "}"        { return symbol(sym.RIGHT_CURLY_BRACKET); }
+ "."        { return symbol(sym.PERIOD); }
+
+
  /* operators ordered by precedence */
  "!" 		{ return symbol(sym.LOGICAL_NEG); }
  "*" 		{ return symbol(sym.TIMES); }
@@ -65,6 +75,7 @@ DecIntegerLiteral = 0 | [1-9][0-9]*
  "!=" 		{ return symbol(sym.NOT_EQ); }
  "&" 		{ return symbol(sym.AND); }
  "|" 		{ return symbol(sym.OR); }
+
 
  /* comments */
  {Comment}                      { /* ignore */ }
