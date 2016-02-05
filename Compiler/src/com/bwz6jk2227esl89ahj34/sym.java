@@ -32,4 +32,12 @@ public class sym {
     public static final int OR = 25;
     public static final int STRING_LITERAL = 26;
     public static final int EOF = 27;
+    public static final int LEFT_PAREN = 28;
+    public static final int RIGHT_PAREN = 29;
+    public static final int LEFT_SQUARE_BRACKET = 30;
+    public static final int RIGHT_SQUARE_BRACKET = 31;
+    public static final int LEFT_CURLY_BRACKET = 32;
+    public static final int RIGHT_CURLY_BRACKET = 33;
+    public static final int PERIOD = 34;
+
 }
