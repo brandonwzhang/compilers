@@ -27,8 +27,10 @@ Comment = "//" {InputCharacter}* {LineTerminator}?
 Letter = [A-Za-z]
 Identifier = {Letter} ({Letter} | [0-9_'])*
 DecIntegerLiteral = 0 | [1-9][0-9]*
+CharLiteral = \'
 
 %state STRING
+%state CHAR
 %%
 
 <YYINITIAL> {
@@ -43,11 +45,17 @@ DecIntegerLiteral = 0 | [1-9][0-9]*
 "true"          	{ return symbol(sym.TRUE); }
 "false"         	{ return symbol(sym.FALSE); }
 
- {Identifier}                   	{ return symbol(sym.IDENTIFIER); }
+ {Identifier}                   	{ return symbol(sym.IDENTIFIER, yytext()); }
 
  /* literals */
- {DecIntegerLiteral}                { return symbol(sym.INTEGER_LITERAL); }
+ {DecIntegerLiteral}                { return symbol(sym.INTEGER_LITERAL, yytext()); }
  \"                             	{ string.setLength(0); yybegin(STRING); }
+
+ /* char literals */
+ \'[^\n\r]\'                        { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
+ "'\n'"                             { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
+ "'\r'"                             { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
+
 
  /* terminals */
  "("        { return symbol(sym.LEFT_PAREN); }
@@ -57,6 +65,9 @@ DecIntegerLiteral = 0 | [1-9][0-9]*
  "{"        { return symbol(sym.LEFT_CURLY_BRACKET); }
  "}"        { return symbol(sym.RIGHT_CURLY_BRACKET); }
  "."        { return symbol(sym.PERIOD); }
+ ":"        { return symbol(sym.COLON); }
+ ";"        { return symbol(sym.SEMICOLON); }
+ ","        { return symbol(sym.COMMA); }
 
 
  /* operators ordered by precedence */
@@ -75,6 +86,7 @@ DecIntegerLiteral = 0 | [1-9][0-9]*
  "!=" 		{ return symbol(sym.NOT_EQ); }
  "&" 		{ return symbol(sym.AND); }
  "|" 		{ return symbol(sym.OR); }
+ "="        { return symbol(sym.ASSIGNMENT); }
 
 
  /* comments */
@@ -97,7 +109,8 @@ DecIntegerLiteral = 0 | [1-9][0-9]*
  \\                             	{ string.append('\\'); }
 }
 
+
+
 /* error fallback */
 [^]                                 { throw new Error("Illegal character <"+
                                                    yytext()+">"); }
-
