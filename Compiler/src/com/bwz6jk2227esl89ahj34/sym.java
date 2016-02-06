@@ -39,5 +39,9 @@ public class sym {
     public static final int LEFT_CURLY_BRACKET = 32;
     public static final int RIGHT_CURLY_BRACKET = 33;
     public static final int PERIOD = 34;
+    public static final int COLON = 35;
+    public static final int COMMA = 36;
+    public static final int ASSIGNMENT = 37;
+    public static final int SEMICOLON = 38;
 
 }
