@@ -16,9 +16,10 @@ public class Main {
         try {
             while(true) {
                 java_cup.runtime.Symbol next = lexer.next_token();
+
                 if(next.sym == 27)
                     break;
-                System.out.println(next);
+                System.out.println(next.value);
             }
         } catch (Exception e) {
         }
