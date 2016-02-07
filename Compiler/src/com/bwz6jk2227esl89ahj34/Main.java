@@ -62,28 +62,36 @@ public class Main {
             System.out.println("please specify input file.");
             return;
         }
-
         try {
-            FileReader reader = new FileReader(args[1]);
-            XiLexer lexer = new XiLexer(reader);
-            StringBuilder sb;
-            while(true) {
-                java_cup.runtime.Symbol next = lexer.next_token();
+            for (int i = 1; i < args.length; i++) {
+                PrintWriter writer = new PrintWriter(args[i].substring(0,
+                        args[i].indexOf(".")) + ".lexed");
+                FileReader reader = new FileReader(args[i]);
+                XiLexer lexer = new XiLexer(reader);
+                StringBuilder sb;
+                while (true) {
+                    java_cup.runtime.Symbol next = lexer.next_token();
 
-                if(next.sym == 27)
-                    break;
-                sb = new StringBuilder((next.left+1) + ":" + (next.right+1) + " " +
-                        symbolTranslation.get(next.sym));
-                if(next.value != null) {
-                    sb.append(" "+next.value);
+                    if (next.sym == 27) {
+                        writer.close();
+                        break;
+                    }
+                    sb = new StringBuilder((next.left + 1) + ":" + (next.right +
+                            1) + " " + symbolTranslation.get(next.sym));
+                    if (next.value != null) {
+                        sb.append(" " + next.value);
+                    }
+                    writer.println(sb.toString());
+
+                    if (next.sym == 404) {
+                        writer.close();
+                        break;
+                    }
                 }
-                System.out.println(sb.toString());
-
-                if(next.sym == 404)
-                    break;
+                writer.close();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch(Exception e) {
+           e.printStackTrace();
         }
     }
 
