@@ -15,7 +15,10 @@ public class Main {
 
         try {
             while(true) {
-                System.out.println(lexer.next_token());
+                java_cup.runtime.Symbol next = lexer.next_token();
+                if(next.sym == 27)
+                    break;
+                System.out.println(next);
             }
         } catch (Exception e) {
 
