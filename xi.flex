@@ -35,6 +35,7 @@ CharLiteral = \'
 
 <YYINITIAL> {
  /* keywords */
+"use"              { return symbol(sym.USE); }
 "if"               { return symbol(sym.IF); }
 "while"            { return symbol(sym.WHILE); }
 "else"             { return symbol(sym.ELSE); }
@@ -58,7 +59,7 @@ CharLiteral = \'
 
 
  /* terminals */
- "("        { return symbol(sym.LEFT_PAREN); }
+ "("        { return symbol(sym.LEFT_PAREN, "("); }
  ")"        { return symbol(sym.RIGHT_PAREN); }
  "["        { return symbol(sym.LEFT_SQUARE_BRACKET); }
  "]"        { return symbol(sym.RIGHT_SQUARE_BRACKET); }
