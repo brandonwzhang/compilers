@@ -19,7 +19,7 @@ public class Main {
 
                 if(next.sym == 27)
                     break;
-                System.out.println(next.value);
+                System.out.println((next.left+1) + ":" + (next.right+1) + " " + next.value);
             }
         } catch (Exception e) {
         }

@@ -1,4 +1,5 @@
 use io
+
 main(args: int[][]) {
   print("Hello, Worl\x64!\n")
   c3po: int = 'x' + 47;
