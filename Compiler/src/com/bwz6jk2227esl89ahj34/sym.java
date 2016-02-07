@@ -43,5 +43,5 @@ public class sym {
     public static final int COMMA = 36;
     public static final int ASSIGNMENT = 37;
     public static final int SEMICOLON = 38;
-
+    public static final int CHAR_LITERAL = 39;
 }
