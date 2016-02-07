@@ -1,6 +1,2 @@
 # compilers
-jihun was here
-writing from my own branch
-eric wuz her
-
-andy
+Compiler for the Xi Programming Language
