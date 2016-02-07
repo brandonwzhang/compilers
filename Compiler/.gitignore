@@ -1,3 +1,4 @@
 # Make sure to ignore all configuration files for your personal machine
-.idea/workspace.xml
+*.xml
 *.class
+*.jar
