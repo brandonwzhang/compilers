@@ -1,9 +1,49 @@
 package com.bwz6jk2227esl89ahj34;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
 
     public static void main(String[] args) throws FileNotFoundException{
+        Map<Integer, String> symbolTranslation = new HashMap<Integer, String>(){{
+            put(0, "if");
+            put(1, "while");
+            put(2, "else");
+            put(3, "return");
+            put(4, "length");
+            put(5, "int");
+            put(6, "bool");
+            put(7, "true");
+            put(8, "false");
+            put(9, "id");
+            put(10, "integer");
+            put(11, "!");
+            put(12, "*");
+            put(13, "*>>");
+            put(14, "/");
+            put(15, "%");
+            put(16, "+");
+            put(17, "-");
+            put(18, "<");
+            put(19, "<=");
+            put(20, ">=");
+            put(21, ">");
+            put(22, "==");
+            put(23, "!=");
+            put(24, "&&");
+            put(25, "||");
+            put(26, "string");
+            put(27, "EOF"); //????
+            put(28, "(");
+            put(29, ")");
+            put(30, "[");
+            put(31, "]");
+            put(32, "{");
+            put(33, "}");
+            put(34, ".");
+        }};
+
         CLI cli = new CLI();
         cli.addOption("--lex", "Lex a string", a -> lex());
         cli.execute(args);
