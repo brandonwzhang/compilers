@@ -20,6 +20,10 @@ public class CLI {
         if (args.length == 0) {
             options.get("--help").action.run(args);
         } else {
+            if (!options.keySet().contains(args[0])) {
+                System.out.println(args[0] + " is not an option.");
+                return;
+            }
             options.get(args[0]).action.run(args);
         }
     }
