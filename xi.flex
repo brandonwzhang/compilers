@@ -10,6 +10,8 @@ import java_cup.runtime.*;
 
 %{
     StringBuffer string = new StringBuffer();
+    int stringStartCol = -1;
+    int stringStartRow = -1;
     StringBuffer hexBuffer = new StringBuffer();
 
     private Symbol symbol(int type) {
@@ -61,7 +63,7 @@ HexChar = \\x[2-7][0-9A-E]
 
  /* literals */
  {DecIntegerLiteral}                { return symbol(sym.INTEGER_LITERAL, yytext()); }
- \"                                 { string.setLength(0); yybegin(STRING); }
+ \"                                 { string.setLength(0); stringStartRow = yyline; stringStartCol = yycolumn; yybegin(STRING); }
 
  /* char literals */
  \'[^\n\r]\'                        { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
@@ -112,7 +114,7 @@ HexChar = \\x[2-7][0-9A-E]
 
 <STRING> {
     \"                                  { yybegin(YYINITIAL);
-                                     return symbol(sym.STRING_LITERAL,
+                                     return new Symbol(sym.STRING_LITERAL, stringStartRow, stringStartCol,
                                      string.toString()); }
     {HexChar}                         { string.append(hexToString(yytext())); }
     [^\n\r\"\\]+                      { string.append( yytext() ); }
