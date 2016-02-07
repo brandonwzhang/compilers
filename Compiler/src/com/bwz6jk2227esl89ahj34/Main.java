@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
+    static Map<Integer, String> symbolTranslation;
 
     public static void main(String[] args) throws FileNotFoundException{
-        Map<Integer, String> symbolTranslation = new HashMap<Integer, String>(){{
+        symbolTranslation = new HashMap<Integer, String>(){{
             put(0, "if");
             put(1, "while");
             put(2, "else");
@@ -52,15 +53,19 @@ public class Main {
         }};
 
         CLI cli = new CLI();
-        cli.addOption("--lex", "Lex a string", a -> lex());
+        cli.addOption("--lex", "Lex a string", a -> lex(a));
         cli.execute(args);
+    }
 
-        // get current directory
-        File file = new File("");
-        FileReader reader = new FileReader(file.getAbsolutePath() + "/src/com/bwz6jk2227esl89ahj34/test.xi");
-        XiLexer lexer = new XiLexer(reader);
+    public static void lex(String[] args) {
+        if(args.length <= 1) {
+            System.out.println("please specify input file.");
+            return;
+        }
 
         try {
+            FileReader reader = new FileReader(args[1]);
+            XiLexer lexer = new XiLexer(reader);
             StringBuilder sb;
             while(true) {
                 java_cup.runtime.Symbol next = lexer.next_token();
@@ -78,11 +83,8 @@ public class Main {
                     break;
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
-    }
-
-    public static void lex() {
-        System.out.println("Lexing is not yet implemented");
     }
 
 }
