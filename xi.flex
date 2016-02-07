@@ -22,11 +22,8 @@ import java_cup.runtime.*;
     /* Converts a char containing hex (eg. '\x64') to a string (eg. "d") */
     private String hexToString(String hex) {
         hexBuffer.setLength(0);
-        /* includes the quotes at beginning and end of string */
-        for (int i = 1; i < hex.length() - 1; i++) {
-            String str = hex.substring(i, i + 2);
-            hexBuffer.append((char)Integer.parseInt(str, 16));
-        }
+        String str = hex.substring(2, 4);
+        hexBuffer.append((char)Integer.parseInt(str, 16));
         return hexBuffer.toString();
     }
 %}
@@ -70,7 +67,7 @@ HexChar = \\x[2-7][0-9A-E]
  \'[^\n\r]\'                        { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
  "'\n'"                             { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
  "'\r'"                             { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
- \'{HexChar}\'                      { return symbol(sym.CHAR_LITERAL, hexToString(yytext())); }
+ \'{HexChar}\'                      { return symbol(sym.CHAR_LITERAL, hexToString(yytext().substring(1, yytext().length()-1))); }
 
  \'[^]*\'                           { return symbol(sym.ERROR, "Invalid character constant"); }
 
@@ -119,10 +116,10 @@ HexChar = \\x[2-7][0-9A-E]
                                      string.toString()); }
     {HexChar}                         { string.append(hexToString(yytext())); }
     [^\n\r\"\\]+                      { string.append( yytext() ); }
-    \\t                               { string.append('\t'); }
-    \\n                               { string.append('\n'); }
+    \\t                               { string.append("\\t"); }
+    \\n                               { string.append("\\n"); }
 
-    \\r                               { string.append('\r'); }
+    \\r                               { string.append("\\r"); }
  
     \\\"                              { string.append('\"'); }
     \\                                { string.append('\\'); }
