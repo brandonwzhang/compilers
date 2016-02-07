@@ -45,5 +45,5 @@ public class sym {
     public static final int SEMICOLON = 38;
     public static final int CHAR_LITERAL = 39;
     public static final int USE = 40;
-
+    public static final int ERROR = 404;
 }
