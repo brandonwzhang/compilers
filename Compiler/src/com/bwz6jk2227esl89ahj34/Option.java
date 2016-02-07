@@ -5,22 +5,22 @@ import java.util.ArrayList;
 /**
  * Created by jihunkim on 2/6/16.
  */
-public abstract class Option {
-    String option;
-    String description;
+
+public class Option {
+    public String description;
+    public Action action;
+
+    public interface Action {
+        void run(String[] args);
+    }
+
     public Option() {
-        option = null;
         description = null;
+        action = null;
     }
 
-    public Option(String option, String description) {
-        this.option = option;
+    public Option(String description, Action action) {
         this.description = description;
+        this.action = action;
     }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public abstract void action(String[] args);
 }
