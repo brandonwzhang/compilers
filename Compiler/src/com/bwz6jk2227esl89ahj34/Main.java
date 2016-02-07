@@ -34,7 +34,7 @@ public class Main {
             put(24, "&&");
             put(25, "||");
             put(26, "string");
-            put(27, "EOF"); //????
+            put(27, "EOF");
             put(28, "(");
             put(29, ")");
             put(30, "[");
@@ -42,6 +42,12 @@ public class Main {
             put(32, "{");
             put(33, "}");
             put(34, ".");
+            put(35, ":");
+            put(36, ",");
+            put(37, "="); //TODO: should we change this to eq in sym.java?
+            put(38, ";");
+            put(39, "character");
+            put(40, "use");
         }};
 
         CLI cli = new CLI();
@@ -54,12 +60,18 @@ public class Main {
         XiLexer lexer = new XiLexer(reader);
 
         try {
+            StringBuilder sb;
             while(true) {
                 java_cup.runtime.Symbol next = lexer.next_token();
 
                 if(next.sym == 27)
                     break;
-                System.out.println((next.left+1) + ":" + (next.right+1) + " " + next.value);
+                sb = new StringBuilder((next.left+1) + ":" + (next.right+1) + " " +
+                        symbolTranslation.get(next.sym));
+                if(next.value != null) {
+                    sb.append(" "+next.value);
+                }
+                System.out.println(sb.toString());
             }
         } catch (Exception e) {
         }
