@@ -695,7 +695,7 @@ class XiLexer implements java_cup.runtime.Scanner {
             }
           case 55: break;
           case 7: 
-            { return symbol(sym.LEFT_PAREN, "(");
+            { return symbol(sym.LEFT_PAREN);
             }
           case 56: break;
           case 8: 

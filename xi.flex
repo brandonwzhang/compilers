@@ -59,7 +59,7 @@ CharLiteral = \'
 
 
  /* terminals */
- "("        { return symbol(sym.LEFT_PAREN, "("); }
+ "("        { return symbol(sym.LEFT_PAREN); }
  ")"        { return symbol(sym.RIGHT_PAREN); }
  "["        { return symbol(sym.LEFT_SQUARE_BRACKET); }
  "]"        { return symbol(sym.RIGHT_SQUARE_BRACKET); }
