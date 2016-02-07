@@ -48,6 +48,7 @@ public class Main {
             put(38, ";");
             put(39, "character");
             put(40, "use");
+            put(404, "error:");
         }};
 
         CLI cli = new CLI();
@@ -72,6 +73,9 @@ public class Main {
                     sb.append(" "+next.value);
                 }
                 System.out.println(sb.toString());
+
+                if(next.sym == 404)
+                    break;
             }
         } catch (Exception e) {
         }
