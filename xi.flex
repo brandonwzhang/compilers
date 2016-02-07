@@ -53,14 +53,10 @@ CharLiteral = \'
  \"                                { string.setLength(0); yybegin(STRING); }
 
  /* char literals */
- /*
  \'[^\n\r]\'                        { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
- */
-
  "'\n'"                             { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
  "'\r'"                             { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
- \'[^']\'                           { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
- 
+ \'[^]*\'                            { return symbol(sym.ERROR, "Invalid character constant"); }
 
  /* terminals */
  "("        { return symbol(sym.LEFT_PAREN); }
