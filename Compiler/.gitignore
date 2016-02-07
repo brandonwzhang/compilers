@@ -1,4 +1,4 @@
 # Make sure to ignore all configuration files for your personal machine
 *.xml
 *.class
-*.jar
+*Compiler.jar
