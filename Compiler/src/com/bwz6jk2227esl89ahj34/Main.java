@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,6 +66,7 @@ public class Main {
         }
         try {
             for (int i = 1; i < args.length; i++) {
+                ArrayList<String> lines = new ArrayList<>();
                 PrintWriter writer = new PrintWriter(args[i].substring(0,
                         args[i].indexOf(".")) + ".lexed");
                 FileReader reader = new FileReader(args[i]);
@@ -72,20 +74,20 @@ public class Main {
                 StringBuilder sb;
                 while (true) {
                     java_cup.runtime.Symbol next = lexer.next_token();
-
                     if (next.sym == 27) {
-                        writer.close();
+                        writeAndClose(writer, lines);
                         break;
                     }
-                    sb = new StringBuilder((next.left + 1) + ":" + (next.right +
-                            1) + " " + symbolTranslation.get(next.sym));
+                    sb = new StringBuilder((next.left + 1) + ":" +
+                            (next.right + 1) + " " +
+                            symbolTranslation.get(next.sym));
                     if (next.value != null) {
                         sb.append(" " + next.value);
                     }
-                    writer.println(sb.toString());
+                    lines.add(sb.toString());
 
                     if (next.sym == 404) {
-                        writer.close();
+                        writeAndClose(writer, lines);
                         break;
                     }
                 }
@@ -94,6 +96,16 @@ public class Main {
         } catch(Exception e) {
            e.printStackTrace();
         }
+    }
+
+    public static void writeAndClose(PrintWriter writer, ArrayList<String> lines) {
+        int i = 0;
+        while ( i < lines.size() - 1) {
+            writer.println(lines.get(i));
+            i++;
+        }
+        writer.print(lines.get(i));
+        writer.close();
     }
 
 }
