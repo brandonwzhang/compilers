@@ -49,6 +49,7 @@ public class Main {
             put(38, ";");
             put(39, "character");
             put(40, "use");
+            put(41, "_");
             put(404, "error:");
         }};
 
