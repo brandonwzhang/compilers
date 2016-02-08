@@ -9,49 +9,49 @@ public class Main {
 
     public static void main(String[] args) throws FileNotFoundException{
         symbolTranslation = new HashMap<Integer, String>(){{
-            put(0, "if");
-            put(1, "while");
-            put(2, "else");
-            put(3, "return");
-            put(4, "length");
-            put(5, "int");
-            put(6, "bool");
-            put(7, "true");
-            put(8, "false");
-            put(9, "id");
-            put(10, "integer");
-            put(11, "!");
-            put(12, "*");
-            put(13, "*>>");
-            put(14, "/");
-            put(15, "%");
-            put(16, "+");
-            put(17, "-");
-            put(18, "<");
-            put(19, "<=");
-            put(20, ">=");
-            put(21, ">");
-            put(22, "==");
-            put(23, "!=");
-            put(24, "&");
-            put(25, "|");
-            put(26, "string");
-            put(27, "EOF");
-            put(28, "(");
-            put(29, ")");
-            put(30, "[");
-            put(31, "]");
-            put(32, "{");
-            put(33, "}");
-            put(34, ".");
-            put(35, ":");
-            put(36, ",");
-            put(37, "="); //TODO: should we change this to eq in sym.java?
-            put(38, ";");
-            put(39, "character");
-            put(40, "use");
-            put(41, "_");
-            put(404, "error:");
+            put(sym.IF, "if");
+            put(sym.WHILE, "while");
+            put(sym.ELSE, "else");
+            put(sym.RETURN, "return");
+            put(sym.LENGTH, "length");
+            put(sym.INT, "int");
+            put(sym.BOOL, "bool");
+            put(sym.TRUE, "true");
+            put(sym.FALSE, "false");
+            put(sym.IDENTIFIER, "id");
+            put(sym.INTEGER_LITERAL, "integer");
+            put(sym.LOGICAL_NEG, "!");
+            put(sym.TIMES, "*");
+            put(sym.HIGH_MULT, "*>>");
+            put(sym.DIVIDE, "/");
+            put(sym.MOD, "%");
+            put(sym.PLUS, "+");
+            put(sym.MINUS, "-");
+            put(sym.LESS, "<");
+            put(sym.LESS_EQ, "<=");
+            put(sym.GREATER_EQ, ">=");
+            put(sym.GREATER, ">");
+            put(sym.EQEQ, "==");
+            put(sym.NOT_EQ, "!=");
+            put(sym.AND, "&");
+            put(sym.OR, "|");
+            put(sym.STRING_LITERAL, "string");
+            put(sym.EOF, "EOF");
+            put(sym.LEFT_PAREN, "(");
+            put(sym.RIGHT_PAREN, ")");
+            put(sym.LEFT_SQUARE_BRACKET, "[");
+            put(sym.RIGHT_SQUARE_BRACKET, "]");
+            put(sym.LEFT_CURLY_BRACKET, "{");
+            put(sym.RIGHT_CURLY_BRACKET, "}");
+            put(sym.PERIOD, ".");
+            put(sym.COLON, ":");
+            put(sym.COMMA, ",");
+            put(sym.ASSIGNMENT, "="); //TODO: should we change this to eq in sym.java?
+            put(sym.SEMICOLON, ";");
+            put(sym.CHAR_LITERAL, "character");
+            put(sym.USE, "use");
+            put(sym.UNDERSCORE, "_");
+            put(sym.ERROR, "error:");
         }};
 
         CLI cli = new CLI();
@@ -74,7 +74,7 @@ public class Main {
                 StringBuilder sb;
                 while (true) {
                     java_cup.runtime.Symbol next = lexer.next_token();
-                    if (next.sym == 27) {
+                    if (next.sym == sym.EOF) {
                         writeAndClose(writer, lines);
                         break;
                     }
@@ -86,7 +86,7 @@ public class Main {
                     }
                     lines.add(sb.toString());
 
-                    if (next.sym == 404) {
+                    if (next.sym == sym.ERROR) {
                         writeAndClose(writer, lines);
                         break;
                     }
