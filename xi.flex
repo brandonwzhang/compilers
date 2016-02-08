@@ -84,7 +84,7 @@ HexChar = \\x[2-7][0-9A-E]
  ":"                                { return symbol(sym.COLON); }
  ";"                                { return symbol(sym.SEMICOLON); }
  ","                                { return symbol(sym.COMMA); }
-
+ "_"                                { return symbol(sym.UNDERSCORE); }
 
  /* operators ordered by precedence */
  "!"      { return symbol(sym.LOGICAL_NEG); }
