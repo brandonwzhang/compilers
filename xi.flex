@@ -43,7 +43,6 @@ CharLiteral = \'
 HexChar = \\x[2-7][0-9A-E]
 
 %state STRING
-%state CHAR
 %%
 
 <YYINITIAL> {
