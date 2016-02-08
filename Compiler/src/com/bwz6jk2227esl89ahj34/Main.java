@@ -32,8 +32,8 @@ public class Main {
             put(21, ">");
             put(22, "==");
             put(23, "!=");
-            put(24, "&&");
-            put(25, "||");
+            put(24, "&");
+            put(25, "|");
             put(26, "string");
             put(27, "EOF");
             put(28, "(");
