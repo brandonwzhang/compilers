@@ -4,5 +4,5 @@ Compiler for the Xi Programming Language
 Install Ant
 
 Run "./xic-build"
-#### Running xic executable
+#### Running
 Run "./xic"
