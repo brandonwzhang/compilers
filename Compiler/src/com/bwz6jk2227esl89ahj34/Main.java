@@ -61,7 +61,7 @@ public class Main {
 
     public static void lex(String[] args) {
         if(args.length <= 1) {
-            System.out.println("please specify input file.");
+            System.out.println("Please specify input file.");
             return;
         }
         try {

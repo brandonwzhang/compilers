@@ -1,2 +1,2 @@
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-java -classpath "$DIR"/Compiler/out/artifacts/Compiler_jar/Compiler.jar com.bwz6jk2227esl89ahj34.Main "$@"
+java -classpath "$DIR"/Compiler/out/production/Compiler com.bwz6jk2227esl89ahj34.Main "$@"
