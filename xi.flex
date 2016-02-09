@@ -129,5 +129,5 @@ HexChar = \\x[2-7][0-9A-E]
 
 
 /* error fallback */
-[^]                                 { throw new Error("Illegal character <"+
+[^]                                 { return symbol(sym.ERROR,"Illegal character <"+
                                                    yytext()+">"); }
