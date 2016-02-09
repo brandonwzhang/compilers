@@ -719,7 +719,7 @@ class XiLexer implements java_cup.runtime.Scanner {
             }
           case 58: break;
           case 6: 
-            { if(yytext().length() > "9223372036854775807".length() || yytext().compareTo("9223372036854775807") > 0) { return symbol(sym.ERROR, "Integer literal is too big to process"); } else {return symbol(sym.INTEGER_LITERAL, yytext()); }
+            { if(yytext().length() > "9223372036854775808".length() || yytext().compareTo("9223372036854775808") > 0) { return symbol(sym.ERROR, "Integer literal is too big to process"); } else {return symbol(sym.INTEGER_LITERAL, yytext()); }
             }
           case 59: break;
           case 7: 

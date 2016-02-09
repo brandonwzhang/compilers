@@ -61,7 +61,7 @@ HexChar = \\x[2-7][0-9A-E]
  {Identifier}                       { return symbol(sym.IDENTIFIER, yytext()); }
 
  /* literals */
- {DecIntegerLiteral}                { if(yytext().length() > "9223372036854775807".length() || yytext().compareTo("9223372036854775807") > 0) { return symbol(sym.ERROR, "Integer literal is too big to process"); } else {return symbol(sym.INTEGER_LITERAL, yytext()); } }
+ {DecIntegerLiteral}                { if(yytext().length() > "9223372036854775808".length() || yytext().compareTo("9223372036854775808") > 0) { return symbol(sym.ERROR, "Integer literal is too big to process"); } else {return symbol(sym.INTEGER_LITERAL, yytext()); } }
  \"                                 { string.setLength(0); stringStartRow = yyline; stringStartCol = yycolumn; yybegin(STRING); }
 
  /* char literals */
