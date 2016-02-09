@@ -1,3 +1,4 @@
+DIR="$( cd "$( dirname "$0" )" && pwd )"
 chmod +x xic
-cd Compiler
+cd "$DIR"/Compiler
 ant
