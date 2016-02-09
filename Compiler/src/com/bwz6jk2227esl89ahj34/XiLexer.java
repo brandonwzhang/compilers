@@ -698,7 +698,7 @@ class XiLexer implements java_cup.runtime.Scanner {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
-            { throw new Error("Illegal character <"+
+            { return symbol(sym.ERROR,"Illegal character <"+
                                                    yytext()+">");
             }
           case 54: break;
