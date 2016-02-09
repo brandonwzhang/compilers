@@ -70,7 +70,7 @@ HexChar = \\x[2-7][0-9A-E]
  "'\r'"                             { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
  \'{HexChar}\'                      { return symbol(sym.CHAR_LITERAL, hexToString(yytext().substring(1, yytext().length()-1))); }
 
- \'[^]*\'                           { return symbol(sym.ERROR, "Invalid character constant"); }
+ \'[^\']*\'                           { return symbol(sym.ERROR, "Invalid character constant"); }
 
  /* terminals */
  "("                                { return symbol(sym.LEFT_PAREN); }
