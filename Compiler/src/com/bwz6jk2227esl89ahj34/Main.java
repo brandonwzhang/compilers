@@ -8,6 +8,9 @@ public class Main {
     static Map<Integer, String> symbolTranslation;
 
     public static void main(String[] args) throws FileNotFoundException{
+        /*
+            HashMap used to map sym constants to printable tokens.
+         */
         symbolTranslation = new HashMap<Integer, String>(){{
             put(sym.IF, "if");
             put(sym.WHILE, "while");
@@ -55,7 +58,8 @@ public class Main {
         }};
 
         CLI cli = new CLI();
-        cli.addOption("--lex", "Lex a string", a -> lex(a));
+        cli.addOption("--lex", "Lex a file", a -> lex(a));
+        cli.addOption("--parse", "Parse a .xi file to a .parsed file", a -> parse(a));
         cli.execute(args);
     }
 
@@ -96,6 +100,10 @@ public class Main {
         } catch(Exception e) {
            e.printStackTrace();
         }
+    }
+
+    public static void parse(String[] args) {
+        // TODO:
     }
 
     public static void writeAndClose(PrintWriter writer, ArrayList<String> lines) {
