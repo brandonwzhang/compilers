@@ -60,6 +60,7 @@ public class Main {
         CLI cli = new CLI();
         cli.addOption("--lex", "Lex a file", a -> lex(a));
         cli.addOption("--parse", "Parse a .xi file to a .parsed file", a -> parse(a));
+        // TODO: -sourcepath, -D
         cli.execute(args);
     }
 
