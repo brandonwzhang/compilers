@@ -3,6 +3,7 @@ import java_cup.runtime.*;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.io.FileReader;
+import java.io.PrintWriter;
 
 %%
 %class XiLexer
@@ -24,38 +25,38 @@ import java.io.FileReader;
      put(sym.FALSE, "false");
      put(sym.IDENTIFIER, "id");
      put(sym.INTEGER_LITERAL, "integer");
-     put(sym.LOGICAL_NEG, "!");
+     put(sym.NOT, "!");
      put(sym.TIMES, "*");
      put(sym.HIGH_MULT, "*>>");
      put(sym.DIVIDE, "/");
-     put(sym.MOD, "%");
+     put(sym.MODULO, "%");
      put(sym.PLUS, "+");
      put(sym.MINUS, "-");
-     put(sym.LESS, "<");
-     put(sym.LESS_EQ, "<=");
-     put(sym.GREATER_EQ, ">=");
-     put(sym.GREATER, ">");
-     put(sym.EQEQ, "==");
-     put(sym.NOT_EQ, "!=");
+     put(sym.LT, "<");
+     put(sym.LEQ, "<=");
+     put(sym.GEQ, ">=");
+     put(sym.GT, ">");
+     put(sym.EQUAL, "==");
+     put(sym.NOT_EQUAL, "!=");
      put(sym.AND, "&");
      put(sym.OR, "|");
      put(sym.STRING_LITERAL, "string");
      put(sym.EOF, "EOF");
-     put(sym.LEFT_PAREN, "(");
-     put(sym.RIGHT_PAREN, ")");
-     put(sym.LEFT_SQUARE_BRACKET, "[");
-     put(sym.RIGHT_SQUARE_BRACKET, "]");
-     put(sym.LEFT_CURLY_BRACKET, "{");
-     put(sym.RIGHT_CURLY_BRACKET, "}");
+     put(sym.OPEN_PAREN, "(");
+     put(sym.CLOSE_PAREN, ")");
+     put(sym.OPEN_BRACKET, "[");
+     put(sym.CLOSE_BRACKET, "]");
+     put(sym.OPEN_BRACE, "{");
+     put(sym.CLOSE_BRACE, "}");
      put(sym.PERIOD, ".");
      put(sym.COLON, ":");
      put(sym.COMMA, ",");
-     put(sym.ASSIGNMENT, "="); //TODO: should we change this to eq in sym.java?
+     put(sym.GETS, "="); 
      put(sym.SEMICOLON, ";");
-     put(sym.CHAR_LITERAL, "character");
+     put(sym.CHARACTER_LITERAL, "character");
      put(sym.USE, "use");
      put(sym.UNDERSCORE, "_");
-     put(sym.ERROR, "error:");
+     put(sym.error, "error:");
    }};
 
    public static void lexFile(String sourcePath, String diagnosticPath, String arg) {
@@ -73,7 +74,7 @@ import java.io.FileReader;
          FileReader reader = new FileReader(files[i]);
          XiLexer lexer = new XiLexer(reader);
          Symbol next = lexer.next_token();
-         while (next.sym != sym.EOF && next.sym != sym.ERROR) {
+         while (next.sym != sym.EOF && next.sym != sym.error) {
            String line = (next.left + 1) + ":" +
                          (next.right + 1) + " " +
                          symbolTranslation.get(next.sym);
@@ -84,7 +85,7 @@ import java.io.FileReader;
          }
          String writeFile = diagnosticPath + 
                             files[i].substring(0, files[i].indexOf(".")) + ".lexed";
-         Util.writeAndClose(writeFile, lines);
+         Main.writeAndClose(new PrintWriter(writeFile), lines);
        }
      } catch(Exception e) {
        e.printStackTrace();
@@ -142,24 +143,24 @@ HexChar = \\x[2-7][0-9A-E]
  {Identifier}                       { return symbol(sym.IDENTIFIER, yytext()); }
 
  /* literals */
- {DecIntegerLiteral}                { if(yytext().length() > "9223372036854775808".length() || yytext().compareTo("9223372036854775808") > 0) { return symbol(sym.ERROR, "Integer literal is too big to process"); } else {return symbol(sym.INTEGER_LITERAL, yytext()); } }
+ {DecIntegerLiteral}                { if(yytext().length() > "9223372036854775808".length() || yytext().compareTo("9223372036854775808") > 0) { return symbol(sym.error, "Integer literal is too big to process"); } else {return symbol(sym.INTEGER_LITERAL, yytext()); } }
  \"                                 { string.setLength(0); stringStartRow = yyline; stringStartCol = yycolumn; yybegin(STRING); }
 
  /* char literals */
- \'[^\n\r]\'                        { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
- "'\n'"                             { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
- "'\r'"                             { return symbol(sym.CHAR_LITERAL, yytext().charAt(1)); }
- \'{HexChar}\'                      { return symbol(sym.CHAR_LITERAL, hexToString(yytext().substring(1, yytext().length()-1))); }
+ \'[^\n\r]\'                        { return symbol(sym.CHARACTER_LITERAL, yytext().charAt(1)); }
+ "'\n'"                             { return symbol(sym.CHARACTER_LITERAL, yytext().charAt(1)); }
+ "'\r'"                             { return symbol(sym.CHARACTER_LITERAL, yytext().charAt(1)); }
+ \'{HexChar}\'                      { return symbol(sym.CHARACTER_LITERAL, hexToString(yytext().substring(1, yytext().length()-1))); }
 
- \'[^\']*\'                           { return symbol(sym.ERROR, "Invalid character constant"); }
+ \'[^\']*\'                           { return symbol(sym.error, "Invalid character constant"); }
 
  /* terminals */
- "("                                { return symbol(sym.LEFT_PAREN); }
- ")"                                { return symbol(sym.RIGHT_PAREN); }
- "["                                { return symbol(sym.LEFT_SQUARE_BRACKET); }
- "]"                                { return symbol(sym.RIGHT_SQUARE_BRACKET); }
- "{"                                { return symbol(sym.LEFT_CURLY_BRACKET); }
- "}"                                { return symbol(sym.RIGHT_CURLY_BRACKET); }
+ "("                                { return symbol(sym.OPEN_PAREN); }
+ ")"                                { return symbol(sym.CLOSE_PAREN); }
+ "["                                { return symbol(sym.OPEN_BRACKET); }
+ "]"                                { return symbol(sym.CLOSE_BRACKET); }
+ "{"                                { return symbol(sym.OPEN_BRACE); }
+ "}"                                { return symbol(sym.CLOSE_BRACE); }
  "."                                { return symbol(sym.PERIOD); }
  ":"                                { return symbol(sym.COLON); }
  ";"                                { return symbol(sym.SEMICOLON); }
@@ -167,22 +168,22 @@ HexChar = \\x[2-7][0-9A-E]
  "_"                                { return symbol(sym.UNDERSCORE); }
 
  /* operators ordered by precedence */
- "!"      { return symbol(sym.LOGICAL_NEG); }
+ "!"      { return symbol(sym.NOT); }
  "*"      { return symbol(sym.TIMES); }
  "*>>"    { return symbol(sym.HIGH_MULT); }
  "/"      { return symbol(sym.DIVIDE); }
- "%"      { return symbol(sym.MOD); }
+ "%"      { return symbol(sym.MODULO); }
  "+"      { return symbol(sym.PLUS); }
  "-"      { return symbol(sym.MINUS); }
- "<"      { return symbol(sym.LESS); }
- "<="     { return symbol(sym.LESS_EQ); }
- ">="     { return symbol(sym.GREATER_EQ); }
- ">"      { return symbol(sym.GREATER); }
- "=="     { return symbol(sym.EQEQ); }
- "!="     { return symbol(sym.NOT_EQ); }
+ "<"      { return symbol(sym.LT); }
+ "<="     { return symbol(sym.LEQ); }
+ ">="     { return symbol(sym.GEQ); }
+ ">"      { return symbol(sym.GT); }
+ "=="     { return symbol(sym.EQUAL); }
+ "!="     { return symbol(sym.NOT_EQUAL); }
  "&"      { return symbol(sym.AND); }
  "|"      { return symbol(sym.OR); }
- "="        { return symbol(sym.ASSIGNMENT); }
+ "="        { return symbol(sym.GETS); }
 
 
     /* comments */
@@ -210,5 +211,5 @@ HexChar = \\x[2-7][0-9A-E]
 
 
 /* error fallback */
-[^]                                 { return symbol(sym.ERROR,"Illegal character <"+
+[^]                                 { return symbol(sym.error,"Illegal character <"+
                                                    yytext()+">"); }
