@@ -41,7 +41,7 @@ public class sym {
     public static final int PERIOD = 34;
     public static final int COLON = 35;
     public static final int COMMA = 36;
-    public static final int ASSIGNMENT = 37;
+    public static final int GETS = 37;
     public static final int SEMICOLON = 38;
     public static final int CHARACTER_LITERAL = 39;
     public static final int USE = 40;

@@ -342,7 +342,7 @@ class XiLexer implements java_cup.runtime.Scanner {
      put(sym.PERIOD, ".");
      put(sym.COLON, ":");
      put(sym.COMMA, ",");
-     put(sym.ASSIGNMENT, "="); //TODO: should we change this to eq in sym.java?
+     put(sym.GETS, "="); 
      put(sym.SEMICOLON, ";");
      put(sym.CHARACTER_LITERAL, "character");
      put(sym.USE, "use");
@@ -885,7 +885,7 @@ class XiLexer implements java_cup.runtime.Scanner {
             }
           case 77: break;
           case 25: 
-            { return symbol(sym.ASSIGNMENT);
+            { return symbol(sym.GETS);
             }
           case 78: break;
           case 26: 
