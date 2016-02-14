@@ -8,55 +8,6 @@ public class Main {
     static Map<Integer, String> symbolTranslation;
 
     public static void main(String[] args) throws FileNotFoundException{
-        /*
-            HashMap used to map sym constants to printable tokens.
-         */
-        symbolTranslation = new HashMap<Integer, String>(){{
-            put(sym.IF, "if");
-            put(sym.WHILE, "while");
-            put(sym.ELSE, "else");
-            put(sym.RETURN, "return");
-            put(sym.LENGTH, "length");
-            put(sym.INT, "int");
-            put(sym.BOOL, "bool");
-            put(sym.TRUE, "true");
-            put(sym.FALSE, "false");
-            put(sym.IDENTIFIER, "id");
-            put(sym.INTEGER_LITERAL, "integer");
-            put(sym.LOGICAL_NEG, "!");
-            put(sym.TIMES, "*");
-            put(sym.HIGH_MULT, "*>>");
-            put(sym.DIVIDE, "/");
-            put(sym.MOD, "%");
-            put(sym.PLUS, "+");
-            put(sym.MINUS, "-");
-            put(sym.LESS, "<");
-            put(sym.LESS_EQ, "<=");
-            put(sym.GREATER_EQ, ">=");
-            put(sym.GREATER, ">");
-            put(sym.EQEQ, "==");
-            put(sym.NOT_EQ, "!=");
-            put(sym.AND, "&");
-            put(sym.OR, "|");
-            put(sym.STRING_LITERAL, "string");
-            put(sym.EOF, "EOF");
-            put(sym.LEFT_PAREN, "(");
-            put(sym.RIGHT_PAREN, ")");
-            put(sym.LEFT_SQUARE_BRACKET, "[");
-            put(sym.RIGHT_SQUARE_BRACKET, "]");
-            put(sym.LEFT_CURLY_BRACKET, "{");
-            put(sym.RIGHT_CURLY_BRACKET, "}");
-            put(sym.PERIOD, ".");
-            put(sym.COLON, ":");
-            put(sym.COMMA, ",");
-            put(sym.ASSIGNMENT, "="); //TODO: should we change this to eq in sym.java?
-            put(sym.SEMICOLON, ";");
-            put(sym.CHAR_LITERAL, "character");
-            put(sym.USE, "use");
-            put(sym.UNDERSCORE, "_");
-            put(sym.ERROR, "error:");
-        }};
-
         CLI cli = new CLI();
         cli.addOption("--lex", "Lex a file", Main::lex);
         cli.addOption("--parse", "Parse a .xi file to a .parsed file",
@@ -86,13 +37,13 @@ public class Main {
                     }
                     sb = new StringBuilder((next.left + 1) + ":" +
                             (next.right + 1) + " " +
-                            symbolTranslation.get(next.sym));
+                            XiLexer.symbolTranslation.get(next.sym));
                     if (next.value != null) {
                         sb.append(" " + next.value);
                     }
                     lines.add(sb.toString());
 
-                    if (next.sym == sym.ERROR) {
+                    if (next.sym == sym.error) {
                         writeAndClose(writer, lines);
                         break;
                     }
