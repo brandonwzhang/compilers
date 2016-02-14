@@ -2,6 +2,7 @@ package com.bwz6jk2227esl89ahj34;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Arrays;
 
 /**
  * Created by jihunkim on 2/6/16.
@@ -11,7 +12,7 @@ public class CLI {
 
     public CLI() {
         options = new HashMap<>();
-        Option.Action helpAction = args -> printOptions();
+        Option.Action helpAction = this::printOptions;
         Option helpOption = new Option("List commands", helpAction);
         options.put("--help", helpOption);
     }
@@ -19,16 +20,17 @@ public class CLI {
     public void execute(String[] args) {
         if (args.length == 0) {
             options.get("--help").action.run(args);
-        } else {
-            if (!options.keySet().contains(args[0])) {
-                System.out.println(args[0] + " is not an option.");
-                return;
-            }
-            options.get(args[0]).action.run(args);
+            return;
         }
+        if (!options.keySet().contains(args[0])) {
+            System.out.println(args[0] + " is not an option.");
+            return;
+        }
+        options.get(args[0]).action.run(Arrays.copyOfRange(args, 1, args
+                .length));
     }
 
-    public void printOptions() {
+    public void printOptions(String[] args) {
         for (String option : options.keySet()) {
             System.out.println(option + "\t\t" +
                     options.get(option).description);

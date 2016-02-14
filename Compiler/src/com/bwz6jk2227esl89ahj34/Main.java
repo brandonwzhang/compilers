@@ -58,19 +58,20 @@ public class Main {
         }};
 
         CLI cli = new CLI();
-        cli.addOption("--lex", "Lex a file", a -> lex(a));
-        cli.addOption("--parse", "Parse a .xi file to a .parsed file", a -> parse(a));
+        cli.addOption("--lex", "Lex a file", Main::lex);
+        cli.addOption("--parse", "Parse a .xi file to a .parsed file",
+                Main::parse);
         // TODO: -sourcepath, -D
         cli.execute(args);
     }
 
     public static void lex(String[] args) {
-        if(args.length <= 1) {
+        if(args.length == 0) {
             System.out.println("Please specify input file.");
             return;
         }
         try {
-            for (int i = 1; i < args.length; i++) {
+            for (int i = 0; i < args.length; i++) {
                 ArrayList<String> lines = new ArrayList<>();
                 PrintWriter writer = new PrintWriter(args[i].substring(0,
                         args[i].indexOf(".")) + ".lexed");
