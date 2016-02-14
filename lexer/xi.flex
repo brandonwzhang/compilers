@@ -51,7 +51,7 @@ import java.io.PrintWriter;
      put(sym.PERIOD, ".");
      put(sym.COLON, ":");
      put(sym.COMMA, ",");
-     put(sym.ASSIGNMENT, "="); //TODO: should we change this to eq in sym.java?
+     put(sym.GETS, "="); 
      put(sym.SEMICOLON, ";");
      put(sym.CHARACTER_LITERAL, "character");
      put(sym.USE, "use");
@@ -183,7 +183,7 @@ HexChar = \\x[2-7][0-9A-E]
  "!="     { return symbol(sym.NOT_EQUAL); }
  "&"      { return symbol(sym.AND); }
  "|"      { return symbol(sym.OR); }
- "="        { return symbol(sym.ASSIGNMENT); }
+ "="        { return symbol(sym.GETS); }
 
 
     /* comments */
