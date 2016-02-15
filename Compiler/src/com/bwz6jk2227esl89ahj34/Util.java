@@ -3,9 +3,6 @@ package com.bwz6jk2227esl89ahj34;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-/**
- * Created by brandonzhang on 2/14/16.
- */
 public class Util {
     public static void writeAndClose(String file, ArrayList<String> lines) {
         try {

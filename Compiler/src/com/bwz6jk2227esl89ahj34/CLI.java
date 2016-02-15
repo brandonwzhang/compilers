@@ -4,9 +4,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Arrays;
 
-/**
- * Created by jihunkim on 2/6/16.
- */
 public class CLI {
     public Map<String, Option> options;
 

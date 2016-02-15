@@ -1,8 +1,5 @@
 package com.bwz6jk2227esl89ahj34;
 
-/**
- * Created by eric on 2/3/16.
- */
 public class sym {
     public static final int IF = 0;
     public static final int WHILE = 1;
