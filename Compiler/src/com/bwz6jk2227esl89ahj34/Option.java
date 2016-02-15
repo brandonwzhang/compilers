@@ -9,18 +9,15 @@ import java.util.ArrayList;
 public class Option {
     public String description;
     public Action action;
+    public int nArgs;
 
     public interface Action {
         void run(String[] args);
     }
 
-    public Option() {
-        description = null;
-        action = null;
-    }
-
-    public Option(String description, Action action) {
+    public Option(String description, Action action, int nArgs) {
         this.description = description;
         this.action = action;
+        this.nArgs = nArgs;
     }
 }
