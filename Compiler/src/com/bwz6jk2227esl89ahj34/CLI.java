@@ -17,7 +17,8 @@ public class CLI {
         options.put("--help", helpOption);
     }
 
-    /** Run the action associated with each option passed
+    /**
+     * Run the action associated with each option passed
      * @param args a String array of all arguments passed to the command
      */
     public void execute(String[] args) {
@@ -48,7 +49,8 @@ public class CLI {
         }
     }
 
-    /** Print all of the options and their descriptions
+    /**
+     * Print all of the options and their descriptions
      */
     public void printOptions() {
         for (String option : options.keySet()) {
@@ -57,7 +59,8 @@ public class CLI {
         }
     }
 
-    /** Add an option with a single name
+    /**
+     * Add an option with a single name
      * @param optionName  a String of the option's name
      * @param description a String describing the option
      * @param action      a function String[] -> void
@@ -71,7 +74,8 @@ public class CLI {
         options.put(optionName, option);
     }
 
-    /** Add an option with multiple names
+    /**
+     * Add an option with multiple names
      * @param optionNames a String[] of the option's names
      * @param description a String describing the option
      * @param action      a function String[] -> void

@@ -377,10 +377,12 @@ class XiLexer implements java_cup.runtime.Scanner {
             line += " " + next.value;
           }
           lines.add(line);
+          next = lexer.next_token();
         }
         String writeFile = diagnosticPath + 
-                           files[i].substring(0, files[i].indexOf(".")) + ".lexed";
-        Main.writeAndClose(new PrintWriter(writeFile), lines);
+                           files[i].substring(0, files[i].indexOf(".")) +
+                           ".lexed";
+        Util.writeAndClose(writeFile, lines);
       }
     } catch(Exception e) {
       e.printStackTrace();
