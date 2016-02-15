@@ -13,104 +13,108 @@ import java.io.PrintWriter;
 %column
 
 %{
-   public static final HashMap<Integer, String> symbolTranslation = new HashMap<Integer, String>(){{
-     put(sym.IF, "if");
-     put(sym.WHILE, "while");
-     put(sym.ELSE, "else");
-     put(sym.RETURN, "return");
-     put(sym.LENGTH, "length");
-     put(sym.INT, "int");
-     put(sym.BOOL, "bool");
-     put(sym.TRUE, "true");
-     put(sym.FALSE, "false");
-     put(sym.IDENTIFIER, "id");
-     put(sym.INTEGER_LITERAL, "integer");
-     put(sym.NOT, "!");
-     put(sym.TIMES, "*");
-     put(sym.HIGH_MULT, "*>>");
-     put(sym.DIVIDE, "/");
-     put(sym.MODULO, "%");
-     put(sym.PLUS, "+");
-     put(sym.MINUS, "-");
-     put(sym.LT, "<");
-     put(sym.LEQ, "<=");
-     put(sym.GEQ, ">=");
-     put(sym.GT, ">");
-     put(sym.EQUAL, "==");
-     put(sym.NOT_EQUAL, "!=");
-     put(sym.AND, "&");
-     put(sym.OR, "|");
-     put(sym.STRING_LITERAL, "string");
-     put(sym.EOF, "EOF");
-     put(sym.OPEN_PAREN, "(");
-     put(sym.CLOSE_PAREN, ")");
-     put(sym.OPEN_BRACKET, "[");
-     put(sym.CLOSE_BRACKET, "]");
-     put(sym.OPEN_BRACE, "{");
-     put(sym.CLOSE_BRACE, "}");
-     put(sym.PERIOD, ".");
-     put(sym.COLON, ":");
-     put(sym.COMMA, ",");
-     put(sym.GETS, "="); 
-     put(sym.SEMICOLON, ";");
-     put(sym.CHARACTER_LITERAL, "character");
-     put(sym.USE, "use");
-     put(sym.UNDERSCORE, "_");
-     put(sym.error, "error:");
-   }};
+  public static final HashMap<Integer, String> symbolTranslation = new HashMap<Integer, String>(){{
+    put(sym.IF, "if");
+    put(sym.WHILE, "while");
+    put(sym.ELSE, "else");
+    put(sym.RETURN, "return");
+    put(sym.LENGTH, "length");
+    put(sym.INT, "int");
+    put(sym.BOOL, "bool");
+    put(sym.TRUE, "true");
+    put(sym.FALSE, "false");
+    put(sym.IDENTIFIER, "id");
+    put(sym.INTEGER_LITERAL, "integer");
+    put(sym.NOT, "!");
+    put(sym.TIMES, "*");
+    put(sym.HIGH_MULT, "*>>");
+    put(sym.DIVIDE, "/");
+    put(sym.MODULO, "%");
+    put(sym.PLUS, "+");
+    put(sym.MINUS, "-");
+    put(sym.LT, "<");
+    put(sym.LEQ, "<=");
+    put(sym.GEQ, ">=");
+    put(sym.GT, ">");
+    put(sym.EQUAL, "==");
+    put(sym.NOT_EQUAL, "!=");
+    put(sym.AND, "&");
+    put(sym.OR, "|");
+    put(sym.STRING_LITERAL, "string");
+    put(sym.EOF, "EOF");
+    put(sym.OPEN_PAREN, "(");
+    put(sym.CLOSE_PAREN, ")");
+    put(sym.OPEN_BRACKET, "[");
+    put(sym.CLOSE_BRACKET, "]");
+    put(sym.OPEN_BRACE, "{");
+    put(sym.CLOSE_BRACE, "}");
+    put(sym.PERIOD, ".");
+    put(sym.COLON, ":");
+    put(sym.COMMA, ",");
+    put(sym.GETS, "="); 
+    put(sym.SEMICOLON, ";");
+    put(sym.CHARACTER_LITERAL, "character");
+    put(sym.USE, "use");
+    put(sym.UNDERSCORE, "_");
+    put(sym.error, "error:");
+  }};
 
-   public static void lexFile(String sourcePath, String diagnosticPath, String arg) {
-     String[] files = arg.split(":");
-     for (int i = 0; i < files.length; i++) {
-       files[i] = sourcePath + files[i];
-     }
-     if (files.length == 0) {
-       System.out.println("Please specify input file.");
-       return;
-     }
-     try {
-       for (int i = 0; i < files.length; i++) {
-         ArrayList<String> lines = new ArrayList<String>();
-         FileReader reader = new FileReader(files[i]);
-         XiLexer lexer = new XiLexer(reader);
-         Symbol next = lexer.next_token();
-         while (next.sym != sym.EOF && next.sym != sym.error) {
-           String line = (next.left + 1) + ":" +
-                         (next.right + 1) + " " +
-                         symbolTranslation.get(next.sym);
-           if (next.value != null) {
-             line += " " + next.value;
-           }
-           lines.add(line);
-         }
-         String writeFile = diagnosticPath + 
-                            files[i].substring(0, files[i].indexOf(".")) + ".lexed";
-         Main.writeAndClose(new PrintWriter(writeFile), lines);
-       }
-     } catch(Exception e) {
-       e.printStackTrace();
-     }
-   }
+  public static void lexFile(String sourcePath, String diagnosticPath, String[] args) {
+    if (args.length == 0) {
+      System.out.println("Please specify input files");
+      return;
+    }
+    if (args[0] == null) {
+      System.out.println("Please specify input files");
+      return;
+    }
+    String[] files = args[0].split(":");
+    for (int i = 0; i < files.length; i++) {
+      files[i] = sourcePath + files[i];
+    }
+    try {
+      for (int i = 0; i < files.length; i++) {
+        ArrayList<String> lines = new ArrayList<String>();
+        FileReader reader = new FileReader(files[i]);
+        XiLexer lexer = new XiLexer(reader);
+        Symbol next = lexer.next_token();
+        while (next.sym != sym.EOF && next.sym != sym.error) {
+          String line = (next.left + 1) + ":" +
+                        (next.right + 1) + " " +
+                        symbolTranslation.get(next.sym);
+          if (next.value != null) {
+            line += " " + next.value;
+          }
+          lines.add(line);
+        }
+        String writeFile = diagnosticPath + 
+                           files[i].substring(0, files[i].indexOf(".")) + ".lexed";
+        Main.writeAndClose(new PrintWriter(writeFile), lines);
+      }
+    } catch(Exception e) {
+      e.printStackTrace();
+    }
+  }
 
-   StringBuffer string = new StringBuffer();
-   int stringStartCol = -1;
-   int stringStartRow = -1;
-   StringBuffer hexBuffer = new StringBuffer();
+  StringBuffer string = new StringBuffer();
+  int stringStartCol = -1;
+  int stringStartRow = -1;
+  StringBuffer hexBuffer = new StringBuffer();
 
-   private Symbol symbol(int type) {
-     return new Symbol(type, yyline, yycolumn);
-   }
-   private Symbol symbol(int type, Object value) {
-     return new Symbol(type, yyline, yycolumn, value);
-   }
+  private Symbol symbol(int type) {
+    return new Symbol(type, yyline, yycolumn);
+  }
+  private Symbol symbol(int type, Object value) {
+    return new Symbol(type, yyline, yycolumn, value);
+  }
 
-   /* Converts a char containing hex (eg. '\x64') to a string (eg. "d") */
-   private String hexToString(String hex) {
-     hexBuffer.setLength(0);
-     String str = hex.substring(2, 4);
-     hexBuffer.append((char)Integer.parseInt(str, 16));
-     return hexBuffer.toString();
-   }
+  /* Converts a char containing hex (eg. '\x64') to a string (eg. "d") */
+  private String hexToString(String hex) {
+    hexBuffer.setLength(0);
+    String str = hex.substring(2, 4);
+    hexBuffer.append((char)Integer.parseInt(str, 16));
+    return hexBuffer.toString();
+  }
 %}
 
 LineTerminator = \r|\n|\r\n
