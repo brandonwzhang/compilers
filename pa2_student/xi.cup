@@ -19,6 +19,47 @@ terminal IF, ELSE, WHILE, BREAK, RETURN, USE, LENGTH, PLUS, MINUS, TIMES,
 nonterminal program;
 // Add more nonterminals here...
 
+// TODO: change everything away from camelcase & check the nonterminal types lol
+nonterminal empty;
+nonterminal use_block;
+
+nonterminal Integer oExpr; //expression involving arithmetic operators  
+nonterminal Boolean bExpr; //expression involing boolean operators
+nonterminal String arrayIndex; //expression involving array[index] 
+nonterminal String arrayObj;
+
+nonterminal expression; 
+nonterminal expression_list; 
+
+nonterminal String basicType;
+nonterminal String varType;
+nonterminal String varTypes;
+nonterminal String arraySized;
+nonterminal String arrayEmpty;
+
+nonterminal String type_declaration;
+nonterminal String type_declarations;
+nonterminal String type_declaration_list;
+nonterminal String function_call;
+nonterminal String assignment_lhs;
+nonterminal String assignment_lhs_list;
+nonterminal String assignment; 
+
+nonterminal String if_statement;
+nonterminal String while_statement;
+nonterminal String return_statement; 
+nonterminal String procedure_call;
+nonterminal String block; 
+nonterminal String blocks; 
+nonterminal String statement;
+nonterminal String statement_no_semicolon;
+
+
+nonterminal String function_declaration;
+nonterminal String function_declarations;
+nonterminal String function_block; 
+nonterminal String function_body;
+
 precedence nonassoc ELSE; 
 
 precedence left OR;
@@ -29,65 +70,18 @@ precedence left PLUS, MINUS;
 precedence left TIMES, HIGH_MULT, DIVIDE, MODULO;
 precedence left UMINUS, NOT;
 
-// TODO: change everything away from camelcase & check the nonterminal types lol
-nonterminal use-block;
-
-nonterminal Integer oExpr; //expression involving arithmetic operators  
-nonterminal Boolean bExpr; //expression involing boolean operators
-nonterminal String arrayIndex; //expression involving array[index] 
-nonterminal String arrayObj;
-
-nonterminal expression; 
-nonterminal expression-list; 
-
-nonterminal String basicType;
-nonterminal String varType;
-nonterminal String arraySized;
-nonterminal String arrayEmpty;
-
-nonterimanl String type-declaration;
-nontermianl String type-declarations;
-nonterminal String initialization-expression;
-nonterminal String type-declaration-list;
-nonterminal String function-call;
-nonterminal String declaration;
-nonterminal String assignment-lhs;
-nontermianl String assignment; 
-
-nonterminal String if-statement;
-nonterminal String else-if-statement;
-nonterminal String else-statement; 
-nonterminal String while-statement;
-nonterminal String return-statement; 
-nonterminal String procedure-call;
-nonterminal String block; 
-nonterminal String blocks; 
-nonterminal String statement;
-nonterminal String statements; 
-nonterminal String statement';
-
-nonterminal String args;
-nonterminal String additionalArgs;
-
-nonterminal String function-declaration;
-nonterminal String function-block; 
-
 start with program;
 
-// Recognizes "Hello World!", but not much else.
-program ::= USE IDENTIFIER IDENTIFIER OPEN_PAREN IDENTIFIER COLON
-  INT OPEN_BRACKET CLOSE_BRACKET OPEN_BRACKET CLOSE_BRACKET CLOSE_PAREN
-  OPEN_BRACE IDENTIFIER OPEN_PAREN STRING_LITERAL CLOSE_PAREN CLOSE_BRACE;
+empty ::= ;
 
-
-// TODO: check this in office hours
 oExpr ::= oExpr:e1 PLUS oExpr:e2	
 		| oExpr:e1 MINUS oExpr:e2	
 		| oExpr:e1 TIMES oExpr:e2	
 		| oExpr:e1 DIVIDE oExpr:e2 	
-		| oExpr:e1 MOD oExpr:e2 	
+		| oExpr:e1 MODULO oExpr:e2 	
+		| oExpr:e1 HIGH_MULT oExpr:e2
 		| MINUS oExpr:e %prec UMINUS	
-		| LPAREN oExpr:e RPAREN 	
+		| OPEN_PAREN oExpr:e CLOSE_PAREN 	
 		| INTEGER_LITERAL:n 		
 		; 
 
@@ -109,75 +103,76 @@ arrayIndex ::= IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET; //arr[1] arr[f(
 expression ::= IDENTIFIER 
   					 | STRING_LITERAL 
              | CHARACTER_LITERAL 
-             | INTEGER_LITERAL 
              | oExpr 
              | bExpr 
              | arrayIndex 
-             | function-call
-             | arrayObj; // TODO: is this okay? in general, fix arrays (initialization-expression)
+             | function_call
+             | arrayObj; // TODO: is this okay? in general, fix arrays (initialization_expression)
  
-expression-list ::= expression COMMA expression-list 
+expression_list ::= expression COMMA expression_list 
 							| expression; //does not end in trailing comma 
               
 //TODO: revisit for array , trailing commas 
 
-arrayObj ::= OPEN_BRACE expression-list CLOSE_BRACE; //TODO 
+arrayObj ::= OPEN_BRACE expression_list CLOSE_BRACE; //TODO 
 
 basicType ::= INT 
             | BOOL 
             ; 
 arraySized ::= OPEN_BRACKET expression CLOSE_BRACKET arraySized 
-             | empty  //[n][i][a]...[x]
+             | arrayEmpty  
              ;
 arrayEmpty ::= OPEN_BRACKET CLOSE_BRACKET arrayEmpty 
 						 | empty  //[][][][][][] 
              ;
-varType ::= basicType arraySized arrayEmpty; // does not allow [] after [n]  
+varType ::= basicType arraySized; // does not allow [] after [n]  
 varTypes ::= varType COMMA varTypes | varType; // for functions that return multiple results
 
 
 
-type-declaration ::= IDENTIFIER COLON varType //x:int
-type-declaration-list ::= type-declaration COMMA type-declaration-list | type-declaration;
+type_declaration ::= IDENTIFIER COLON varType; //x:int
+type_declaration_list ::= type_declaration COMMA type_declaration_list | type_declaration;
 
-function-call ::= IDENTIFIER OPEN_PAREN expression-list CLOSE_PAREN //f(x,y,z,...) 
-								| IDENTIFIER OPEN_PAREN CLOSE_PAREN; //f()
+function_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,...) 
+								| IDENTIFIER OPEN_PAREN CLOSE_PAREN // f()
+                | LENGTH OPEN_PAREN expression CLOSE_PAREN
+                ;
 
-assignment-lhs ::= IDENTIFIER 
-                 | type-declaration 
+assignment_lhs ::= IDENTIFIER 
+                 | type_declaration 
                  | UNDERSCORE 
                  ;
                  
-assignment-lhs-list ::= assignment-lhs COMMA assignment-lhs-list 
-											| assignment-lhs
+assignment_lhs_list ::= assignment_lhs COMMA assignment_lhs_list 
+											| assignment_lhs
                       ;
 
-assignment ::= assignment-lhs GETS expression 
-						| assignment-lhs-list GETS function-call; 
+assignment ::= assignment_lhs GETS expression 
+						| assignment_lhs_list GETS function_call; 
 
-if-statement ::= IF OPEN_PAREN expression CLOSE_PAREN block
+if_statement ::= IF OPEN_PAREN expression CLOSE_PAREN block
                | IF OPEN_PAREN expression CLOSE_PAREN block ELSE block
                ;
 
-while-statement ::= WHILE OPEN_PAREN expression CLOSE_PAREN block;
+while_statement ::= WHILE OPEN_PAREN expression CLOSE_PAREN block;
 
-return-statement ::= RETURN expression-list 
+return_statement ::= RETURN expression_list 
                    | RETURN 
                    ;
 
-statement' ::= if-statement 
-						| while-statement 
-            | procedure-call 
-            | type-declaration-list 
-            | assignment
-            ; 
+statement_no_semicolon ::= if_statement 
+             						 | while_statement 
+                         | procedure_call 
+                         | type_declaration_list 
+                         | assignment
+                         ; 
 
-statement ::= statement' | statement' SEMICOLON
+statement ::= statement_no_semicolon | statement_no_semicolon SEMICOLON;
 
-function-block ::= OPEN_BRACE blocks return-statement CLOSE_BRACE;
+function_block ::= OPEN_BRACE blocks return_statement CLOSE_BRACE;
 
 block ::= OPEN_BRACE blocks CLOSE_BRACE 
-				| function-block
+				| function_block
         | statement
         ;
 
@@ -185,12 +180,12 @@ blocks ::= block blocks
 				 | empty
          ;
 
-function-declaration ::= IDENTIFIER OPEN_PAREN type-declaration-list CLOSE_PAREN COLON varTypes function-body
-                       | IDENTIFIER OPEN_PAREN type-declaration-list CLOSE_PAREN function-body
+function_declaration ::= IDENTIFIER OPEN_PAREN type_declaration_list CLOSE_PAREN COLON varTypes function_body
+                       | IDENTIFIER OPEN_PAREN type_declaration_list CLOSE_PAREN function_body
                        ;
-function-declarations ::= function-declaration function-declarations | empty;
+function_declarations ::= function_declaration function_declarations | empty;
 
 
-use-block ::= USE IDENTIFIER use-block | empty;
+use_block ::= USE IDENTIFIER use_block | empty;
 
-program ::= use-block function-declarations;
+program ::= use_block function_declarations;
