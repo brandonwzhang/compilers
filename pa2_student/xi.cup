@@ -88,21 +88,21 @@ oExpr ::= oExpr:e1 PLUS oExpr:e2
 
 bExpr ::= bExpr:e1 AND bExpr:e2
 		| bExpr:e1 OR bExpr:e2
-    | bExpr:e1 EQUAL bExpr:e2
-    | bExpr:e1 NOT_EQUAL bExpr:e2
-    | bExpr:e1 LT bExpr:e2
-    | bExpr:e1 LEQ bExpr:e2
-    | bExpr:e1 GT bExpr:e2
-    | bExpr:e1 GEQ bExpr:e2
-    | NOT bExpr:e
-    | TRUE 
-    | FALSE
-    ;
+    	| bExpr:e1 EQUAL bExpr:e2
+    	| bExpr:e1 NOT_EQUAL bExpr:e2
+    	| bExpr:e1 LT bExpr:e2
+    	| bExpr:e1 LEQ bExpr:e2
+    	| bExpr:e1 GT bExpr:e2
+    	| bExpr:e1 GEQ bExpr:e2
+    	| NOT bExpr:e
+    	| TRUE 
+    	| FALSE
+    	;
 
 arrayIndex ::= IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET; //arr[1] arr[f(x)] TODO @223  
 
 expression ::= IDENTIFIER 
-  					 | STRING_LITERAL 
+  			 | STRING_LITERAL 
              | CHARACTER_LITERAL 
              | oExpr 
              | bExpr 
@@ -111,17 +111,17 @@ expression ::= IDENTIFIER
              | arrayObj; 
  
 expression_list ::= expression COMMA expression_list 
-							    | expression
-                  ; //does not end in trailing comma 
+				  | expression
+				  ;
 
 expression_list_trailing_comma ::= expression COMMA expression_list_trailing_comma 
 								 | expression COMMA
 								 ;
  
-//TODO: revisit for array , trailing commas 
 
 arrayObj ::= OPEN_BRACE expression_list CLOSE_BRACE 
-           |  OPEN_BRACE expression_list_trailing_comma CLOSE_BRACE;
+           |  OPEN_BRACE expression_list_trailing_comma CLOSE_BRACE
+           ;
 
 basicType ::= INT 
             | BOOL 
@@ -130,16 +130,21 @@ arraySized ::= OPEN_BRACKET expression CLOSE_BRACKET arraySized
              | arrayEmpty  
              ;
 arrayEmpty ::= OPEN_BRACKET CLOSE_BRACKET arrayEmpty 
-						 | empty  //[][][][][][] 
+			 | empty  
              ;
 varType ::= basicType arraySized; // does not allow [] after [n]  
-varTypes ::= varType COMMA varTypes | varType; // for functions that return multiple results
+
+varTypes ::= varType COMMA varTypes 
+		   | varType
+		   ; // for functions that return multiple results
 
 type_declaration ::= IDENTIFIER COLON varType; //x:int
-type_declaration_list ::= type_declaration COMMA type_declaration_list | type_declaration;
+
+type_declaration_list ::= type_declaration COMMA type_declaration_list 
+						| type_declaration;
 
 function_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,...) 
-								| IDENTIFIER OPEN_PAREN CLOSE_PAREN // f()
+				| IDENTIFIER OPEN_PAREN CLOSE_PAREN // f()
                 | LENGTH OPEN_PAREN expression CLOSE_PAREN
                 ;
 
@@ -149,11 +154,11 @@ assignment_lhs ::= IDENTIFIER
                  ;
                  
 assignment_lhs_list ::= assignment_lhs COMMA assignment_lhs_list 
-											| assignment_lhs
+					  | assignment_lhs
                       ;
 
 assignment ::= assignment_lhs GETS expression 
-						| assignment_lhs_list GETS function_call; 
+			 | assignment_lhs_list GETS function_call; 
 
 if_statement ::= IF OPEN_PAREN expression CLOSE_PAREN block
                | IF OPEN_PAREN expression CLOSE_PAREN block ELSE block
@@ -166,31 +171,36 @@ return_statement ::= RETURN expression_list
                    ;
 
 statement_no_semicolon ::= if_statement 
-             						 | while_statement 
+             			 | while_statement 
                          | procedure_call 
                          | type_declaration_list 
                          | assignment
                          ; 
 
-statement ::= statement_no_semicolon | statement_no_semicolon SEMICOLON;
+statement ::= statement_no_semicolon 
+			| statement_no_semicolon SEMICOLON
+			;
 
 function_block ::= OPEN_BRACE blocks return_statement CLOSE_BRACE;
 
 block ::= OPEN_BRACE blocks CLOSE_BRACE 
-				| function_block
+		| function_block
         | statement
         ;
 
 blocks ::= block blocks
-				 | empty
+		 | empty
          ;
 
 function_declaration ::= IDENTIFIER OPEN_PAREN type_declaration_list CLOSE_PAREN COLON varTypes function_body
                        | IDENTIFIER OPEN_PAREN type_declaration_list CLOSE_PAREN function_body
                        ;
-function_declarations ::= function_declaration function_declarations | empty;
+
+function_declarations ::= function_declaration function_declarations 
+						| empty;
 
 
-use_block ::= USE IDENTIFIER use_block | empty;
+use_block ::= USE IDENTIFIER use_block 
+			| empty;
 
 program ::= use_block function_declarations;
