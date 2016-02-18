@@ -48,7 +48,6 @@ import java.io.PrintWriter;
     put(sym.CLOSE_BRACKET, "]");
     put(sym.OPEN_BRACE, "{");
     put(sym.CLOSE_BRACE, "}");
-    put(sym.PERIOD, ".");
     put(sym.COLON, ":");
     put(sym.COMMA, ",");
     put(sym.GETS, "="); 
@@ -167,7 +166,6 @@ HexChar = \\x[2-7][0-9A-E]
  "]"                                { return symbol(sym.CLOSE_BRACKET); }
  "{"                                { return symbol(sym.OPEN_BRACE); }
  "}"                                { return symbol(sym.CLOSE_BRACE); }
- "."                                { return symbol(sym.PERIOD); }
  ":"                                { return symbol(sym.COLON); }
  ";"                                { return symbol(sym.SEMICOLON); }
  ","                                { return symbol(sym.COMMA); }

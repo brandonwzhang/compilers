@@ -28,7 +28,7 @@ public class Main {
 
     /**
      * Sets the path for source files
-     * @param args Single element String array containing the path
+     * @param args single element String array containing the path
      */
     public static void setSourcePath(String[] args) {
         if (args[0] == null) {
@@ -40,7 +40,7 @@ public class Main {
 
     /**
      * Sets the path for diagnostic files
-     * @param args Single element String array containing the path
+     * @param args single element String array containing the path
      */
     public static void setDiagnosticPath(String[] args) {
         if (args[0] == null) {
