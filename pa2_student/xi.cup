@@ -30,6 +30,7 @@ nonterminal String arrayObj;
 
 nonterminal expression; 
 nonterminal expression_list; 
+nonterminal expression_list_trailing_comma; 
 
 nonterminal String basicType;
 nonterminal String varType;
@@ -107,14 +108,20 @@ expression ::= IDENTIFIER
              | bExpr 
              | arrayIndex 
              | function_call
-             | arrayObj; // TODO: is this okay? in general, fix arrays (initialization_expression)
+             | arrayObj; 
  
 expression_list ::= expression COMMA expression_list 
-							| expression; //does not end in trailing comma 
-              
+							    | expression
+                  ; //does not end in trailing comma 
+
+expression_list_trailing_comma ::= expression COMMA expression_list_trailing_comma 
+								 | expression COMMA
+								 ;
+ 
 //TODO: revisit for array , trailing commas 
 
-arrayObj ::= OPEN_BRACE expression_list CLOSE_BRACE; //TODO 
+arrayObj ::= OPEN_BRACE expression_list CLOSE_BRACE 
+           |  OPEN_BRACE expression_list_trailing_comma CLOSE_BRACE;
 
 basicType ::= INT 
             | BOOL 
@@ -127,8 +134,6 @@ arrayEmpty ::= OPEN_BRACKET CLOSE_BRACKET arrayEmpty
              ;
 varType ::= basicType arraySized; // does not allow [] after [n]  
 varTypes ::= varType COMMA varTypes | varType; // for functions that return multiple results
-
-
 
 type_declaration ::= IDENTIFIER COLON varType; //x:int
 type_declaration_list ::= type_declaration COMMA type_declaration_list | type_declaration;
