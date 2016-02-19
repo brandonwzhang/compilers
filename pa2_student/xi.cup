@@ -1,8 +1,6 @@
-// TODO: Style!!!!!! https://www.lysator.liu.se/c/ANSI-C-grammar-y.html
 
 package com.bwz6jk2227esl89ahj34;
 
-// You might want to add types to these declarations.
 terminal String IDENTIFIER;
 terminal String STRING_LITERAL;
 terminal String CHARACTER_LITERAL;
@@ -15,11 +13,8 @@ terminal IF, ELSE, WHILE, BREAK, RETURN, USE, LENGTH, PLUS, MINUS, TIMES,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
   COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, UMINUS;
 
-// You might want to add types to these declarations.
 nonterminal program;
-// Add more nonterminals here...
 
-// TODO: change everything away from camelcase & check the nonterminal types lol
 nonterminal empty;
 nonterminal use_block;
 
@@ -49,7 +44,6 @@ nonterminal String assignment;
 nonterminal String if_statement;
 nonterminal String while_statement;
 nonterminal String return_statement; 
-nonterminal String procedure_call;
 nonterminal String block; 
 nonterminal String blocks; 
 nonterminal String statement;
@@ -99,7 +93,7 @@ bExpr ::= bExpr:e1 AND bExpr:e2
     	| FALSE
     	;
 
-arrayIndex ::= IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET; //arr[1] arr[f(x)] TODO @223  
+arrayIndex ::= expression OPEN_BRACKET expression CLOSE_BRACKET; 
 
 expression ::= IDENTIFIER 
   			 | STRING_LITERAL 
@@ -172,7 +166,6 @@ return_statement ::= RETURN expression_list
 
 statement_no_semicolon ::= if_statement 
              			 | while_statement 
-                         | procedure_call 
                          | type_declaration_list 
                          | assignment
                          ; 
