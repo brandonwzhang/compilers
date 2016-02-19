@@ -18,8 +18,12 @@ nonterminal program;
 nonterminal empty;
 nonterminal use_block;
 
-nonterminal Integer oExpr; //expression involving arithmetic operators  
-nonterminal Boolean bExpr; //expression involing boolean operators
+nonterminal String binary_operator; 
+nonterminal String unary_operator; 
+nonterminal String binary_operator_expression;
+nonterminal String unary_operator_expression; 
+
+nonterminal String boolean_literal; 
 nonterminal String array_index; //expression involving array[index] 
 nonterminal String array_literal;
 
@@ -54,6 +58,8 @@ nonterminal String function_declarations;
 nonterminal String function_block; 
 nonterminal String function_body;
 
+nonterminal String procedure_call;
+
 precedence nonassoc ELSE; 
 
 precedence left OR;
@@ -63,45 +69,56 @@ precedence left LT, LEQ, GEQ, GT;
 precedence left PLUS, MINUS;
 precedence left TIMES, HIGH_MULT, DIVIDE, MODULO;
 precedence left UMINUS, NOT;
+precedence left OPEN_BRACKET; 
 
 start with program;
 
 empty ::= ;
 
-oExpr ::= expression:e1 PLUS expression:e2	
-		| expression:e1 MINUS expression:e2	
-		| expression:e1 TIMES expression:e2	
-		| expression:e1 DIVIDE expression:e2 	
-		| expression:e1 MODULO expression:e2 	
-		| expression:e1 HIGH_MULT expression:e2
-		| MINUS expression:e %prec UMINUS	
-		| OPEN_PAREN expression:e CLOSE_PAREN 	
-		| INTEGER_LITERAL:n 		
-		; 
+boolean_literal ::= TRUE 
+				  | FALSE
+				  ;  
 
-bExpr ::= expression:e1 AND expression:e2
-		| expression:e1 OR expression:e2
-    	| expression:e1 EQUAL expression:e2
-    	| expression:e1 NOT_EQUAL expression:e2
-    	| expression:e1 LT expression:e2
-    	| expression:e1 LEQ expression:e2
-    	| expression:e1 GT expression:e2
-    	| expression:e1 GEQ expression:e2
-    	| NOT expression:e
-    	| TRUE 
-    	| FALSE
-    	;
+binary_operator ::= PLUS
+				  | MINUS
+				  | TIMES
+				  | DIVIDE
+				  | MODULO
+				  | HIGH_MULT
+				  | AND
+				  | OR 
+				  | EQUAL
+				  | NOT_EQUAL
+				  | LT
+				  | LEQ 
+				  | GT 
+				  | GEQ 
+				  ;
 
-array_index ::= expression OPEN_BRACKET expression CLOSE_BRACKET; 
+unary_operator ::= NOT 
+				 | MINUS 
+				 ;
+
+binary_operator_expression ::= expression:e1 binary_operator expression:e2;
+
+unary_operator_expression ::= NOT expression:e
+							| MINUS expression:e %prec UMINUS 
+							;
+
+
+array_index ::= expression OPEN_BRACKET expression CLOSE_BRACKET;  //TODO lol
 
 expression ::= IDENTIFIER 
   			 | STRING_LITERAL 
              | CHARACTER_LITERAL 
-             | oExpr 
-             | bExpr 
              | array_index 
              | function_call
-             | array_literal; 
+             | array_literal 
+             | boolean_literal 
+             | INTEGER_LITERAL 
+             | binary_operator_expression
+             | unary_operator_expression
+             ; 
  
 expression_list ::= expression COMMA expression_list 
 				  | expression
@@ -119,6 +136,7 @@ array_literal ::= OPEN_BRACE expression_list CLOSE_BRACE
 basic_type ::= INT 
             | BOOL 
             ; 
+
 array_sized ::= OPEN_BRACKET expression CLOSE_BRACKET array_sized 
              | array_empty  
              ;
@@ -165,6 +183,7 @@ return_statement ::= RETURN expression_list
 
 statement_no_semicolon ::= if_statement 
              			 | while_statement 
+             			 | procedure_call
                          | typed_declaration_list 
                          | assignment
                          ; 
@@ -191,6 +210,9 @@ function_declaration ::= IDENTIFIER OPEN_PAREN typed_declaration_list CLOSE_PARE
 function_declarations ::= function_declaration function_declarations 
 						| empty;
 
+procedure_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,...) 
+				| IDENTIFIER OPEN_PAREN CLOSE_PAREN // f()
+				;
 
 use_block ::= USE IDENTIFIER use_block 
 			| empty;
