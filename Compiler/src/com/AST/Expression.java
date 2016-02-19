@@ -36,6 +36,11 @@ public @Data class Expression extends Node {
         List<Expression> values;
     }
 
+    public static @Data class ArrayIndex extends Expression {
+        Expression id;
+        Expression index;
+    }
+
     public static @Data class FunctionCall extends Expression {
         private Identifier identifier;
         private List<Expression> arguments;
