@@ -1,4 +1,8 @@
 package com.bwz6jk2227esl89ahj34;
+import com.AST.*;
+import java.io.*;
+import java_cup.runtime.*;
+import java.util.*;
 
 public class Main {
     private static String sourcePath = "./";
@@ -13,7 +17,7 @@ public class Main {
                       1);
         cli.addOption("--parse",
                       "Parse a .xi file to a .parsed file",
-                      Main::parse,
+                      files -> Main.parse(sourcePath, diagnosticPath, files),
                       1);
         cli.addOption("-sourcepath",
                       "Set the path for source files",
@@ -50,7 +54,33 @@ public class Main {
         diagnosticPath = args[0];
     }
 
-    public static void parse(String[] args) {
-        // TODO:
+    public static void parse(String sourcePath, String diagnosticPath, String[] args) {
+        if (args.length == 0) {
+            System.out.println("Please specify input files");
+            return;
+        }
+        if (args[0] == null) {
+            System.out.println("Please specify input files");
+            return;
+        }
+        String[] files = args[0].split(":");
+        for (int i = 0; i < files.length; i++) {
+            files[i] = sourcePath + files[i];
+        }
+        try {
+            for (int i = 0; i < files.length; i++) {
+                ArrayList<String> lines = new ArrayList<String>();
+                FileReader reader = new FileReader(files[i]);
+                XiLexer lexer = new XiLexer(reader);
+                ComplexSymbolFactory csf = new ComplexSymbolFactory();
+                parser parser = new parser(lexer, csf);
+                Symbol result = parser.parse();
+
+                NodeVisitor visitor = new NodeVisitor(); // TODO: pass vars
+                ((Program)(result.value)).accept(visitor);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 }
