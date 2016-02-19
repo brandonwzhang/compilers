@@ -11,6 +11,10 @@ public @Data class Statement extends Block {
     }
     public static @Data class IfStatement extends Statement {
         private Expression guard;
+        private Block block;
+    }
+    public static @Data class IfElseStatement extends Statement {
+        private Expression guard;
         private Block trueBlock;
         private Block falseBlock;
     }
