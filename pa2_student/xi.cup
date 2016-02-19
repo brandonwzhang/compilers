@@ -20,22 +20,21 @@ nonterminal use_block;
 
 nonterminal Integer oExpr; //expression involving arithmetic operators  
 nonterminal Boolean bExpr; //expression involing boolean operators
-nonterminal String arrayIndex; //expression involving array[index] 
-nonterminal String arrayObj;
+nonterminal String array_index; //expression involving array[index] 
+nonterminal String array_literal;
 
 nonterminal expression; 
 nonterminal expression_list; 
 nonterminal expression_list_trailing_comma; 
 
-nonterminal String basicType;
-nonterminal String varType;
-nonterminal String varTypes;
-nonterminal String arraySized;
-nonterminal String arrayEmpty;
+nonterminal String basic_type;
+nonterminal String type;
+nonterminal String types;
+nonterminal String array_sized;
+nonterminal String array_empty;
 
-nonterminal String type_declaration;
-nonterminal String type_declarations;
-nonterminal String type_declaration_list;
+nonterminal String typed_declaration; //TODO: chang to typed_declaration 
+nonterminal String typed_declaration_list;
 nonterminal String function_call;
 nonterminal String assignment_lhs;
 nonterminal String assignment_lhs_list;
@@ -93,16 +92,16 @@ bExpr ::= bExpr:e1 AND bExpr:e2
     	| FALSE
     	;
 
-arrayIndex ::= expression OPEN_BRACKET expression CLOSE_BRACKET; 
+array_index ::= expression OPEN_BRACKET expression CLOSE_BRACKET; 
 
 expression ::= IDENTIFIER 
   			 | STRING_LITERAL 
              | CHARACTER_LITERAL 
              | oExpr 
              | bExpr 
-             | arrayIndex 
+             | array_index 
              | function_call
-             | arrayObj; 
+             | array_literal; 
  
 expression_list ::= expression COMMA expression_list 
 				  | expression
@@ -113,29 +112,29 @@ expression_list_trailing_comma ::= expression COMMA expression_list_trailing_com
 								 ;
  
 
-arrayObj ::= OPEN_BRACE expression_list CLOSE_BRACE 
+array_literal ::= OPEN_BRACE expression_list CLOSE_BRACE 
            |  OPEN_BRACE expression_list_trailing_comma CLOSE_BRACE
            ;
 
-basicType ::= INT 
+basic_type ::= INT 
             | BOOL 
             ; 
-arraySized ::= OPEN_BRACKET expression CLOSE_BRACKET arraySized 
-             | arrayEmpty  
+array_sized ::= OPEN_BRACKET expression CLOSE_BRACKET array_sized 
+             | array_empty  
              ;
-arrayEmpty ::= OPEN_BRACKET CLOSE_BRACKET arrayEmpty 
+array_empty ::= OPEN_BRACKET CLOSE_BRACKET array_empty 
 			 | empty  
              ;
-varType ::= basicType arraySized; // does not allow [] after [n]  
+type ::= basic_type array_sized; // does not allow [] after [n]  
 
-varTypes ::= varType COMMA varTypes 
-		   | varType
+types ::= type COMMA types 
+		   | type
 		   ; // for functions that return multiple results
 
-type_declaration ::= IDENTIFIER COLON varType; //x:int
+typed_declaration ::= IDENTIFIER COLON type; //x:int
 
-type_declaration_list ::= type_declaration COMMA type_declaration_list 
-						| type_declaration;
+typed_declaration_list ::= typed_declaration COMMA typed_declaration_list 
+						| typed_declaration;
 
 function_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,...) 
 				| IDENTIFIER OPEN_PAREN CLOSE_PAREN // f()
@@ -143,7 +142,7 @@ function_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,..
                 ;
 
 assignment_lhs ::= IDENTIFIER 
-                 | type_declaration 
+                 | typed_declaration 
                  | UNDERSCORE 
                  ;
                  
@@ -166,7 +165,7 @@ return_statement ::= RETURN expression_list
 
 statement_no_semicolon ::= if_statement 
              			 | while_statement 
-                         | type_declaration_list 
+                         | typed_declaration_list 
                          | assignment
                          ; 
 
@@ -185,8 +184,8 @@ blocks ::= block blocks
 		 | empty
          ;
 
-function_declaration ::= IDENTIFIER OPEN_PAREN type_declaration_list CLOSE_PAREN COLON varTypes function_body
-                       | IDENTIFIER OPEN_PAREN type_declaration_list CLOSE_PAREN function_body
+function_declaration ::= IDENTIFIER OPEN_PAREN typed_declaration_list CLOSE_PAREN COLON types function_body
+                       | IDENTIFIER OPEN_PAREN typed_declaration_list CLOSE_PAREN function_body
                        ;
 
 function_declarations ::= function_declaration function_declarations 
