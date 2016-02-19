@@ -189,6 +189,7 @@ statement_no_semicolon ::= if_statement
              			 | while_statement 
              			 | procedure_call
                          | typed_declaration_list 
+                         | typed_declaration
                          | assignment
                          ; 
 
