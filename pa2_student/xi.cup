@@ -68,26 +68,26 @@ start with program;
 
 empty ::= ;
 
-oExpr ::= oExpr:e1 PLUS oExpr:e2	
-		| oExpr:e1 MINUS oExpr:e2	
-		| oExpr:e1 TIMES oExpr:e2	
-		| oExpr:e1 DIVIDE oExpr:e2 	
-		| oExpr:e1 MODULO oExpr:e2 	
-		| oExpr:e1 HIGH_MULT oExpr:e2
-		| MINUS oExpr:e %prec UMINUS	
-		| OPEN_PAREN oExpr:e CLOSE_PAREN 	
+oExpr ::= expression:e1 PLUS expression:e2	
+		| expression:e1 MINUS expression:e2	
+		| expression:e1 TIMES expression:e2	
+		| expression:e1 DIVIDE expression:e2 	
+		| expression:e1 MODULO expression:e2 	
+		| expression:e1 HIGH_MULT expression:e2
+		| MINUS expression:e %prec UMINUS	
+		| OPEN_PAREN expression:e CLOSE_PAREN 	
 		| INTEGER_LITERAL:n 		
 		; 
 
-bExpr ::= bExpr:e1 AND bExpr:e2
-		| bExpr:e1 OR bExpr:e2
-    	| bExpr:e1 EQUAL bExpr:e2
-    	| bExpr:e1 NOT_EQUAL bExpr:e2
-    	| bExpr:e1 LT bExpr:e2
-    	| bExpr:e1 LEQ bExpr:e2
-    	| bExpr:e1 GT bExpr:e2
-    	| bExpr:e1 GEQ bExpr:e2
-    	| NOT bExpr:e
+bExpr ::= expression:e1 AND expression:e2
+		| expression:e1 OR expression:e2
+    	| expression:e1 EQUAL expression:e2
+    	| expression:e1 NOT_EQUAL expression:e2
+    	| expression:e1 LT expression:e2
+    	| expression:e1 LEQ expression:e2
+    	| expression:e1 GT expression:e2
+    	| expression:e1 GEQ expression:e2
+    	| NOT expression:e
     	| TRUE 
     	| FALSE
     	;
