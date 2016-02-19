@@ -2,5 +2,5 @@ package com.AST;
 
 import lombok.Data;
 
-public @Data class TypedDeclaration {
+public @Data class TypedDeclaration extends Node {
 }

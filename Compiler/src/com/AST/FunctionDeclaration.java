@@ -8,5 +8,5 @@ public @Data class FunctionDeclaration extends Node {
     private Identifier identifier;
     private List<TypedDeclaration> typedDeclarationList;
     private List<Type> typeList;
-    private FunctionBlock functionBlock;
+    private Block.FunctionBlock functionBlock;
 }
