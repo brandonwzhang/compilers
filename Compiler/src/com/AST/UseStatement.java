@@ -1,5 +1,7 @@
 package com.AST;
 
-public class UseStatement {
+import lombok.Data;
+
+public @Data class UseStatement {
     private Identifier id;
 }

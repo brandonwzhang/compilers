@@ -1,4 +1,6 @@
 package com.AST;
 
-public class FunctionBlock {
+import lombok.Data;
+
+public @Data class FunctionBlock {
 }

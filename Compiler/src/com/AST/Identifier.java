@@ -1,5 +1,7 @@
 package com.AST;
 
-public class Identifier {
+import lombok.Data;
+
+public @Data class Identifier {
     private String name;
 }

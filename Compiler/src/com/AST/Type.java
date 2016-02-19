@@ -1,4 +1,6 @@
 package com.AST;
 
-public class Type {
+import lombok.Data;
+
+public @Data class Type {
 }

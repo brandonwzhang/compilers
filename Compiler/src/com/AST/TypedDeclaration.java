@@ -1,4 +1,6 @@
 package com.AST;
 
-public class TypedDeclaration {
+import lombok.Data;
+
+public @Data class TypedDeclaration {
 }
