@@ -67,12 +67,12 @@ public class parser
   protected static final short[][] _action_table = 
     unpackFromStrings(new String[] {
     "\000\227\000\010\002\000\004\000\021\005\001\002\000" +
-    "\006\002\000\004\013\001\002\000\004\004\011\001\002" +
+    "\006\002\000\004\014\001\002\000\004\004\011\001\002" +
     "\000\004\002\010\001\002\000\006\002\uffa9\004\uffa9\001" +
     "\002\000\004\002\001\001\002\000\010\002\000\004\000" +
     "\021\005\001\002\000\006\002\uffaa\004\uffaa\001\002\000" +
-    "\004\044\020\001\002\000\004\002\uffa8\001\002\000\004" +
-    "\002\uffad\001\002\000\006\002\000\004\013\001\002\000" +
+    "\004\002\uffa8\001\002\000\004\044\020\001\002\000\004" +
+    "\002\uffad\001\002\000\006\002\000\004\014\001\002\000" +
     "\004\002\uffae\001\002\000\004\004\021\001\002\000\004" +
     "\050\177\001\002\000\004\051\163\001\002\000\004\045" +
     "\024\001\002\000\006\046\026\050\027\001\002\000\006" +
@@ -348,7 +348,7 @@ public class parser
   protected static final short[][] _reduce_table = 
     unpackFromStrings(new String[] {
     "\000\227\000\010\002\005\003\006\004\003\001\001\000" +
-    "\010\003\014\041\015\042\013\001\001\000\002\001\001" +
+    "\010\003\014\041\015\042\012\001\001\000\002\001\001" +
     "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
     "\006\003\006\004\011\001\001\000\002\001\001\000\002" +
     "\001\001\000\002\001\001\000\002\001\001\000\010\003" +
@@ -1263,20 +1263,20 @@ class CUP$parser$actions {
             return CUP$parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 83: // function_declarations ::= function_declaration function_declarations 
+        case 83: // function_declaration_list ::= function_declaration function_declaration_list 
             {
                 String RESULT = null;
 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declarations",32, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
+                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",32, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
             }
             return CUP$parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 84: // function_declarations ::= empty 
+        case 84: // function_declaration_list ::= empty 
             {
                 String RESULT = null;
 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declarations",32, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",32, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
             }
             return CUP$parser$result;
 
@@ -1317,7 +1317,7 @@ class CUP$parser$actions {
             return CUP$parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 89: // program ::= use_block function_declarations 
+        case 89: // program ::= use_block function_declaration_list 
             {
                 Object RESULT = null;
 

@@ -54,7 +54,7 @@ nonterminal String statement_no_semicolon;
 
 
 nonterminal String function_declaration;
-nonterminal String function_declarations;
+nonterminal String function_declaration_list;
 nonterminal String function_block; 
 
 nonterminal String procedure_call;
@@ -142,6 +142,7 @@ array_sized ::= OPEN_BRACKET expression CLOSE_BRACKET array_sized
 array_empty ::= OPEN_BRACKET CLOSE_BRACKET array_empty 
 			 | empty  
              ;
+
 type ::= basic_type array_sized; // does not allow [] after [n]  
 
 types ::= type COMMA types 
@@ -163,13 +164,13 @@ assignment_lhs ::= IDENTIFIER
                  ;
                  
 assignment_lhs_list ::= assignment_lhs COMMA assignment_lhs_list 
-					  | assignment_lhs COMMA assignment_lhs
-					  | typed_declaration_list
+					  | assignment_lhs COMMA assignment_lhs //enforce multiple things on LHS
+					  | typed_declaration_list //allow x:int, y:int, ... to be on lhs of assignment
                       ;
 
-assignment ::= assignment_lhs GETS expression 
-			 | assignment_lhs_list GETS function_call
-			 | typed_declaration GETS expression
+assignment ::= assignment_lhs GETS expression // x = expression
+			 | assignment_lhs_list GETS function_call // x,y,z,... = f(x) as well as x:int,y:int,... = f(x)
+			 | typed_declaration GETS expression //allow x:int = expression 
 			 ;
 
 if_statement ::= IF OPEN_PAREN expression CLOSE_PAREN block
@@ -189,7 +190,8 @@ statement_no_semicolon ::= if_statement
                          | assignment
                          ; 
 
-statement ::= statement_no_semicolon %prec OPTIONAL_SEMICOLON
+//this should be okay since semicolon doesn't actually matter
+statement ::= statement_no_semicolon %prec OPTIONAL_SEMICOLON 
 			| statement_no_semicolon SEMICOLON 
 			;
 
@@ -208,7 +210,7 @@ function_declaration ::= IDENTIFIER OPEN_PAREN typed_declaration_list CLOSE_PARE
                        | IDENTIFIER OPEN_PAREN typed_declaration_list CLOSE_PAREN function_block
                        ;
 
-function_declarations ::= function_declaration function_declarations 
+function_declaration_list ::= function_declaration function_declaration_list
 						| empty;
 
 procedure_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,...) 
@@ -218,4 +220,4 @@ procedure_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,.
 use_block ::= USE IDENTIFIER use_block 
 			| empty;
 
-program ::= use_block function_declarations;
+program ::= use_block function_declaration_list;
