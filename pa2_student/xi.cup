@@ -37,7 +37,7 @@ nonterminal String types;
 nonterminal String array_sized;
 nonterminal String array_empty;
 
-nonterminal String typed_declaration; //TODO: chang to typed_declaration 
+nonterminal String typed_declaration; 
 nonterminal String typed_declaration_list;
 nonterminal String function_call;
 nonterminal String assignment_lhs;
@@ -106,7 +106,7 @@ unary_operator_expression ::= NOT expression:e
 							;
 
 
-array_index ::= expression OPEN_BRACKET expression CLOSE_BRACKET;  //TODO lol
+array_index ::= expression OPEN_BRACKET expression CLOSE_BRACKET;  
 
 expression ::= IDENTIFIER 
   			 | STRING_LITERAL 
