@@ -3,6 +3,6 @@ package com.AST;
 import lombok.Data;
 import java.util.List;
 
-public @Data class ReturnStatement extends Node {
+public @Data class ArrayLiteral extends Expression {
     List<Expression> values;
 }
