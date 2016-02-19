@@ -152,7 +152,9 @@ types ::= type COMMA types
 typed_declaration ::= IDENTIFIER COLON type; //x:int
 
 typed_declaration_list ::= typed_declaration COMMA typed_declaration_list 
-						| typed_declaration COMMA typed_declaration;
+						| typed_declaration COMMA typed_declaration
+						; 
+						//enforce more than one to not get confused with typed_declaration
 
 function_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,...) 
 				| IDENTIFIER OPEN_PAREN CLOSE_PAREN // f()
