@@ -1,8 +1,5 @@
 package com.AST;
 
-/**
- * Created by eric on 2/18/16.
- */
 public class NodeVisitor {
     public NodeVisitor(){
 
