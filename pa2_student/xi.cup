@@ -11,7 +11,7 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, LENGTH, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, UMINUS;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, UMINUS, OPTIONAL_SEMICOLON;
 
 nonterminal program;
 
@@ -56,7 +56,6 @@ nonterminal String statement_no_semicolon;
 nonterminal String function_declaration;
 nonterminal String function_declarations;
 nonterminal String function_block; 
-nonterminal String function_body;
 
 nonterminal String procedure_call;
 
@@ -69,7 +68,7 @@ precedence left LT, LEQ, GEQ, GT;
 precedence left PLUS, MINUS;
 precedence left TIMES, HIGH_MULT, DIVIDE, MODULO;
 precedence left UMINUS, NOT;
-precedence left OPEN_BRACKET; 
+precedence left OPEN_BRACKET, OPTIONAL_SEMICOLON; 
 
 start with program;
 
@@ -106,7 +105,7 @@ unary_operator_expression ::= NOT expression:e
 							;
 
 
-array_index ::= expression OPEN_BRACKET expression CLOSE_BRACKET;  
+array_index ::= expression OPEN_BRACKET expression CLOSE_BRACKET;  //TODO lol
 
 expression ::= IDENTIFIER 
   			 | STRING_LITERAL 
@@ -152,7 +151,7 @@ types ::= type COMMA types
 typed_declaration ::= IDENTIFIER COLON type; //x:int
 
 typed_declaration_list ::= typed_declaration COMMA typed_declaration_list 
-						| typed_declaration;
+						| typed_declaration COMMA typed_declaration;
 
 function_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,...) 
 				| IDENTIFIER OPEN_PAREN CLOSE_PAREN // f()
@@ -160,16 +159,18 @@ function_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,..
                 ;
 
 assignment_lhs ::= IDENTIFIER 
-                 | typed_declaration 
                  | UNDERSCORE 
                  ;
                  
 assignment_lhs_list ::= assignment_lhs COMMA assignment_lhs_list 
-					  | assignment_lhs
+					  | assignment_lhs COMMA assignment_lhs
+					  | typed_declaration_list
                       ;
 
 assignment ::= assignment_lhs GETS expression 
-			 | assignment_lhs_list GETS function_call; 
+			 | assignment_lhs_list GETS function_call
+			 | typed_declaration GETS expression
+			 ;
 
 if_statement ::= IF OPEN_PAREN expression CLOSE_PAREN block
                | IF OPEN_PAREN expression CLOSE_PAREN block ELSE block
@@ -188,8 +189,8 @@ statement_no_semicolon ::= if_statement
                          | assignment
                          ; 
 
-statement ::= statement_no_semicolon 
-			| statement_no_semicolon SEMICOLON
+statement ::= statement_no_semicolon %prec OPTIONAL_SEMICOLON
+			| statement_no_semicolon SEMICOLON 
 			;
 
 function_block ::= OPEN_BRACE blocks return_statement CLOSE_BRACE;
@@ -203,8 +204,8 @@ blocks ::= block blocks
 		 | empty
          ;
 
-function_declaration ::= IDENTIFIER OPEN_PAREN typed_declaration_list CLOSE_PAREN COLON types function_body
-                       | IDENTIFIER OPEN_PAREN typed_declaration_list CLOSE_PAREN function_body
+function_declaration ::= IDENTIFIER OPEN_PAREN typed_declaration_list CLOSE_PAREN COLON types function_block
+                       | IDENTIFIER OPEN_PAREN typed_declaration_list CLOSE_PAREN function_block
                        ;
 
 function_declarations ::= function_declaration function_declarations 
