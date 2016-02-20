@@ -1,7 +1,10 @@
 package com.AST;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-public @Data class CharacterLiteral extends Expression {
+@AllArgsConstructor
+@Data
+public class CharacterLiteral extends Expression {
     private char value;
 }

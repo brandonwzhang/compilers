@@ -1,7 +1,10 @@
 package com.AST;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-public @Data class IntegerLiteral extends Expression {
+@AllArgsConstructor
+@Data
+public class IntegerLiteral extends Expression {
     private String value;
 }

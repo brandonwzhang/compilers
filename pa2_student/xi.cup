@@ -1,10 +1,12 @@
 
 package com.bwz6jk2227esl89ahj34;
+import com.AST.*;
+import java.util.*;
 
 terminal String IDENTIFIER;
 terminal String STRING_LITERAL;
-terminal String CHARACTER_LITERAL;
-terminal Integer INTEGER_LITERAL;
+terminal Character CHARACTER_LITERAL;
+terminal String INTEGER_LITERAL;
 terminal TRUE, FALSE;
 terminal INT, BOOL;
 
@@ -13,55 +15,54 @@ terminal IF, ELSE, WHILE, BREAK, RETURN, USE, LENGTH, PLUS, MINUS, TIMES,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
   COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, UMINUS, OPTIONAL_SEMICOLON;
 
-nonterminal program;
+nonterminal Program program;
 
 nonterminal empty;
-nonterminal use_block;
+nonterminal List<UseStatement> use_block;
 
-nonterminal binary_operator; 
-nonterminal unary_operator; 
-nonterminal binary_operator_expression;
-nonterminal unary_operator_expression; 
+nonterminal BinaryOperator binary_operator; 
+nonterminal Binary binary_operator_expression;
+nonterminal Unary unary_operator_expression; 
 
-nonterminal boolean_literal; 
-nonterminal array_index; //expression involving array[index] 
-nonterminal array_literal;
+nonterminal BooleanLiteral boolean_literal; 
+nonterminal ArrayIndex array_index; //expression involving array[index] 
+nonterminal ArrayLiteral array_literal;
 
-nonterminal expression; 
-nonterminal expression_list; 
-nonterminal expression_list_trailing_comma; 
+nonterminal Expression expression; 
+nonterminal List<Expression> expression_list; 
+nonterminal List<Expression> expression_list_trailing_comma; 
 
-nonterminal basic_type;
-nonterminal type;
-nonterminal types;
-nonterminal array_sized;
-nonterminal array_empty;
+nonterminal Type.PrimitiveType primitive_type;
+nonterminal Type type;
+nonterminal List<Type> types;
+nonterminal List<Optional<Expression>> array_sized;
+nonterminal List<Optional<Expression>> array_empty;
 
-nonterminal typed_declaration; 
-nonterminal typed_declaration_list;
-nonterminal function_call;
-nonterminal assignment_lhs;
-nonterminal assignment_lhs_list;
-nonterminal assignment; 
+nonterminal TypedDeclaration typed_declaration; 
+nonterminal List<TypedDeclaration> typed_declaration_list;
+nonterminal FunctionCall function_call;
+nonterminal Assignable assignment_lhs;
+nonterminal List<Assignable> assignment_lhs_list;
+nonterminal Assignment assignment; 
 
-nonterminal if_statement;
-nonterminal while_statement;
-nonterminal return_statement; 
-nonterminal block; 
-nonterminal blocks; 
-nonterminal statement;
-nonterminal statement_no_semicolon;
+nonterminal IfStatement if_statement;  
+nonterminal WhileStatement while_statement;
+nonterminal ReturnStatement return_statement;   //TODO
+nonterminal Block block; 
+nonterminal BlockList block_list; 
+nonterminal Statement statement;
+nonterminal Statement statement_no_semicolon;
 
-nonterminal function_declaration_argument_type;
-nonterminal function_declaration_argument_single; 
-nonterminal function_declaration_argument_list;
-nonterminal function_declaration_argument;
+nonterminal Type function_declaration_argument_type;
+nonterminal TypedDeclaration function_declaration_argument_single; 
+nonterminal List<TypedDeclaration> function_declaration_argument_list;
+nonterminal List<TypedDeclaration> function_declaration_argument;
 
-nonterminal function_declaration;
-nonterminal function_declaration_list;
-nonterminal function_block; 
+nonterminal FunctionDeclaration function_declaration;
+nonterminal List<FunctionDeclaration> function_declaration_list;
+nonterminal FunctionBlock function_block; 
 
-nonterminal procedure_call;
+nonterminal ProcedureCall procedure_call;
 
 precedence nonassoc ELSE; 
 
@@ -78,174 +79,172 @@ start with program;
 
 empty ::= ;
 
-boolean_literal ::= TRUE 
-				  | FALSE
+boolean_literal ::= TRUE 	{: RESULT = new BooleanLiteral(true); :}
+				  | FALSE				{: RESULT = new BooleanLiteral(false); :}
 				  ;  
 
-binary_operator ::= PLUS
-				  | MINUS
-				  | TIMES
-				  | DIVIDE
-				  | MODULO
-				  | HIGH_MULT
-				  | AND
-				  | OR 
-				  | EQUAL
-				  | NOT_EQUAL
-				  | LT
-				  | LEQ 
-				  | GT 
-				  | GEQ 
+binary_operator ::= PLUS {: RESULT = BinaryOperator.PLUS; :}
+				  | MINUS	{: RESULT = BinaryOperator.MINUS; :}
+				  | TIMES {: RESULT = BinaryOperator.TIMES; :}
+				  | DIVIDE {: RESULT = BinaryOperator.DIVIDE; :}
+				  | MODULO {: RESULT = BinaryOperator.MODULO; :}
+				  | HIGH_MULT {: RESULT = BinaryOperator.HIGH_MULT; :}
+				  | AND {: RESULT = BinaryOperator.AND; :}
+				  | OR {: RESULT = BinaryOperator.OR; :}
+				  | EQUAL {: RESULT = BinaryOperator.EQUAL; :}
+				  | NOT_EQUAL {: RESULT = BinaryOperator.NOT_EQUAL; :}
+				  | LT {: RESULT = BinaryOperator.LT; :}
+				  | LEQ {: RESULT = BinaryOperator.LEQ; :}
+				  | GT {: RESULT = BinaryOperator.GT; :}
+				  | GEQ {: RESULT = BinaryOperator.GEQ; :}
 				  ;
 
-unary_operator ::= NOT 
-				 | MINUS 
-				 ;
+binary_operator_expression ::= expression:e1 binary_operator:bop expression:e2 {: RESULT = new Binary(bop,e1,e2); :}
+														 ;
 
-binary_operator_expression ::= expression:e1 binary_operator expression:e2;
-
-unary_operator_expression ::= NOT expression:e
-							| MINUS expression:e %prec UMINUS 
+unary_operator_expression ::= NOT expression:e {: RESULT = new Unary(UnaryOperator.NOT, e); :}
+							| MINUS expression:e {: RESULT = new Unary(UnaryOperator.MINUS, e); :} %prec UMINUS
 							;
 
+array_index ::= expression:e1 OPEN_BRACKET expression:e2 CLOSE_BRACKET {: RESULT = new ArrayIndex(e1, e2); :}
+							;  
 
-array_index ::= expression OPEN_BRACKET expression CLOSE_BRACKET;  
-
-expression ::= IDENTIFIER 
-  			 | STRING_LITERAL 
-             | CHARACTER_LITERAL 
-             | array_index 
-             | function_call
-             | array_literal 
-             | boolean_literal 
-             | INTEGER_LITERAL 
-             | binary_operator_expression
-             | unary_operator_expression
+expression ::= IDENTIFIER:i	{: RESULT = new Identifier(i); :}
+  			 | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
+             | CHARACTER_LITERAL:c {: RESULT = CharacterLiteral(c); :}
+             | array_index:ai {: RESULT = ai; :}
+             | function_call:fc {: RESULT = fc; :}
+             | array_literal:al {: RESULT = al; :}
+             | boolean_literal:bl {: RESULT = bl; :}
+             | INTEGER_LITERAL:i {: RESULT = new IntegerLiteral(i); :}
+             | binary_operator_expression:boe {: RESULT = boe; :}
+             | unary_operator_expression:uoe {: RESULT = uoe; :}
              ; 
  
-expression_list ::= expression COMMA expression_list 
-				  | expression
+expression_list ::= expression:e COMMA expression_list:lst {: lst.add(e); RESULT = lst; :} 
+				  | expression:e {: List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = lst; :}
 				  ;
 
-expression_list_trailing_comma ::= expression COMMA expression_list_trailing_comma 
-								 | expression COMMA
+expression_list_trailing_comma ::= expression:e COMMA expression_list_trailing_comma:lst {: lst.add(e); RESULT = lst; :} 
+								 | expression:e COMMA {: List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = lst; :}
 								 ;
  
-
-array_literal ::= OPEN_BRACE expression_list CLOSE_BRACE 
-           |  OPEN_BRACE expression_list_trailing_comma CLOSE_BRACE
+array_literal ::= OPEN_BRACE expression_list:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); :}
+           |  OPEN_BRACE expression_list_trailing_comma:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); :}
            ;
 
-basic_type ::= INT 
-            | BOOL 
+primitive_type ::= INT {: RESULT = Type.PrimitiveType.INT; :}
+            | BOOL {: RESULT = Type.PrimitiveType.BOOL; :}
             ; 
 
-array_sized ::= OPEN_BRACKET expression CLOSE_BRACKET array_sized 
-             | array_empty  
+array_sized ::= OPEN_BRACKET expression:e CLOSE_BRACKET array_sized:lst {: lst.add(e); RESULT = lst; :}
+             | array_empty:ae {: RESULT = ae; :}    
              ;
              
-array_empty ::= OPEN_BRACKET CLOSE_BRACKET array_empty 
-			 | empty  
+array_empty ::= OPEN_BRACKET CLOSE_BRACKET array_empty:lst {: lst.add(Optional.empty()); RESULT = lst; :} 
+			 | empty {: RESULT = new LinkedList<Optional<Expression>>(); :}
              ;
 
-type ::= basic_type array_sized // does not allow [] after [n]  
+// does not allow [] after [n]  
+type ::= primitive_type:pt array_sized:as {: RESULT = new Type(pt, as); :}
        ;
+       
 types ::= type COMMA types 
-		   | type
+		   | type:t  {: List<Type> lst = new LinkedList<>(); lst.add(t); RESULT = lst; :}
 		   ; // for functions that return multiple results
 
-typed_declaration ::= IDENTIFIER COLON type //x:int
+typed_declaration ::= IDENTIFIER:id COLON type:t {: RESULT = new TypedDeclaration(id,t); :} //x:int
 										;
 
-typed_declaration_list ::= typed_declaration COMMA typed_declaration_list 
-						| typed_declaration COMMA typed_declaration
+typed_declaration_list ::= typed_declaration:td COMMA typed_declaration_list:lst {: lst.add(td); RESULT = lst; :}
+						| typed_declaration:td1 COMMA typed_declaration:td2 {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(td1); lst.add(td2); RESULT = lst; :}
 						; 
 						//enforce more than one to not get confused with typed_declaration
 
-function_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,...) 
-				| IDENTIFIER OPEN_PAREN CLOSE_PAREN // f()
-                | LENGTH OPEN_PAREN expression CLOSE_PAREN
+function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(id, lst); :}//f(x,y,z,...) 
+				| IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(id, new LinkedList<Expression>()); :} // f()
+                | LENGTH OPEN_PAREN expression:e CLOSE_PAREN {: List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = new FunctionCall(new Identifier("length"), lst); :}
                 ;
 
-assignment_lhs ::= IDENTIFIER 
-                 | UNDERSCORE 
+assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
+                 | UNDERSCORE {: RESULT = new Underscore(); :}
                  ;
                  
-assignment_lhs_list ::= assignment_lhs COMMA assignment_lhs_list 
-					  | assignment_lhs COMMA assignment_lhs //enforce multiple things on LHS
-					  | typed_declaration_list //allow x:int, y:int, ... to be on lhs of assignment
+assignment_lhs_list ::= assignment_lhs:al COMMA assignment_lhs_list:all {: all.add(al); RESULT = all; :} 
+					  | assignment_lhs:al1 COMMA assignment_lhs:al2 {: List<Assignable> aList = new LinkedList<Assignable>(); aList.add(al1); aList.add(al2); RESULT = aList; :} //enforce multiple things on LHS
+					  | typed_declaration_list:tdl {: RESULT = tdl; :} //allow x:int, y:int, ... to be on lhs of assignment
                       ;
 
-assignment ::= assignment_lhs GETS expression // x = expression
-			 | assignment_lhs_list GETS function_call // x,y,z,... = f(x) as well as x:int,y:int,... = f(x)
-			 | typed_declaration GETS expression //allow x:int = expression 
+assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new LinkedList<>(); lst.add(al); RESULT = new Assignment(lst, e); :}// x = expression
+			 | assignment_lhs_list:all GETS function_call:fc {: RESULT = new Assignment(all, fc); :}// x,y,z,... = f(x) as well as x:int,y:int,... = f(x)
+			 | typed_declaration:td GETS expression:e {: RESULT = new Assignment(new ArrayList<Assignable>(Arrays.asList(td)), e); :}//allow x:int = expression 
 			 ;
 
-if_statement ::= IF OPEN_PAREN expression CLOSE_PAREN block
-               | IF OPEN_PAREN expression CLOSE_PAREN block ELSE block
+if_statement ::= IF OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new IfStatement(e, b, Optional.empty()); :}
+               | IF OPEN_PAREN expression:e CLOSE_PAREN block:b1 ELSE block:b2 {: RESULT = new IfStatement(e, b1, b2); :}
                ;
 
-while_statement ::= WHILE OPEN_PAREN expression CLOSE_PAREN block
+while_statement ::= WHILE OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new WhileStatement(e,b); :}
                   ;
 
-return_statement ::= RETURN expression_list 
-                   | RETURN 
+return_statement ::= RETURN expression_list:lst {: RESULT = new ReturnStatement(lst); :}
+                   | RETURN {: RESULT = new ReturnStatement(new LinkedList<Expression>()); :}
                    ;
 
-statement_no_semicolon ::= if_statement 
-             			 | while_statement 
-             			 | procedure_call
-                         | typed_declaration_list 
-                         | typed_declaration
-                         | assignment
+statement_no_semicolon ::= if_statement:s {: RESULT = s; :} 
+                         | while_statement:s {: RESULT = s; :}
+             			 | procedure_call:pc {: RESULT = pc; :}
+                         | typed_declaration:td {: RESULT = td; :}
+                         | assignment:a {: RESULT = a; :}
                          ; 
 
 //this should be okay since semicolon doesn't actually matter
-statement ::= statement_no_semicolon %prec OPTIONAL_SEMICOLON 
-			| statement_no_semicolon SEMICOLON 
+statement ::= statement_no_semicolon:s {: RESULT = s; :} %prec OPTIONAL_SEMICOLON 
+			| statement_no_semicolon:s SEMICOLON {: RESULT = s; :}
 			;
 
-function_block ::= OPEN_BRACE blocks return_statement CLOSE_BRACE
+function_block ::= OPEN_BRACE block_list:bl return_statement:r CLOSE_BRACE {: RESULT = new FunctionBlock(bl, r); :}
 								 ;
 
-block ::= OPEN_BRACE blocks CLOSE_BRACE 
-		| function_block
-        | statement
+block ::= OPEN_BRACE block_list:bl CLOSE_BRACE 	{: RESULT = bl; :}
+		| function_block:fb {: RESULT = fb; :}
+        | statement:s {: RESULT = s; :}
         ;
 
-blocks ::= block blocks
-		 | empty
+block_list ::= block:b block_list:bl {: bl.getBlockList().add(b); RESULT = bl; :}
+		 | empty	{: RESULT = new BlockList(new LinkedList<Block>); :}
          ;
 
-function_declaration_argument_type ::= basic_type array_empty 
+function_declaration_argument_type ::= primitive_type array_empty //define result after Andy finishes Type class
 									 ;
 
-function_declaration_argument_single ::= IDENTIFIER COLON function_declaration_argument_type
+function_declaration_argument_single ::= IDENTIFIER:i COLON function_declaration_argument_type:t {: RESULT = new TypedDeclaration(i, t);  :}
 									   ;
 
-function_declaration_argument_list ::= function_declaration_argument_single COMMA function_declaration_argument_list
-									 | function_declaration_argument_single 
+function_declaration_argument_list ::= function_declaration_argument_single:fdas COMMA function_declaration_argument_list:lst {: lst.add(fdas); RESULT = lst; :}
+									 | function_declaration_argument_single:fdas {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(fdas); RESULT = lst; :}
 									 ;
 
-function_declaration_argument ::= function_declaration_argument_list
-								| empty 
+function_declaration_argument ::= function_declaration_argument_list:lst {: RESULT = lst; :}
+								| empty {: RESULT = new LinkedList<TypedDeclaration>(); :}
 								;
 
-function_declaration ::= IDENTIFIER OPEN_PAREN function_declaration_argument CLOSE_PAREN COLON types function_block
-                       | IDENTIFIER OPEN_PAREN function_declaration_argument CLOSE_PAREN function_block
+function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:args CLOSE_PAREN COLON types:t function_block:fb {: RESULT = new FunctionDeclaration(id, args, types, fb); :}
+                       | IDENTIFIER:id OPEN_PAREN function_declaration_argument:args CLOSE_PAREN function_block:fb {: RESULT = new FunctionDeclaration(id,args,new LinkedList<Type>(),fb); :}
                        ;
 
-function_declaration_list ::= function_declaration function_declaration_list
-						| empty;
+function_declaration_list ::= function_declaration:fd function_declaration_list:lst {: lst.add(fd); RESULT = lst; :}
+						| empty	{: RESULT = new LinkedList<FunctionDeclaration>(); :}
+            ;
 
-procedure_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,...) 
-				| IDENTIFIER OPEN_PAREN CLOSE_PAREN // f()
+procedure_call ::= IDENTIFIER:id OPEN_PAREN expression_list:elist CLOSE_PAREN {: RESULT = new ProcedureCall(id, elist); :} //f(x,y,z,...) 
+				| IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new ProcedureCall(id, new LinkedList<Expression>()); :}// f()
 				;
 
-use_block ::= USE IDENTIFIER use_block 
-			| empty
+use_block ::= USE IDENTIFIER:id use_block:u {: u.add(id); RESULT = u; :} 
+			| empty		{:RESULT = new LinkedList<UseStatement>(); }
       ;
       
 
-program ::= use_block function_declaration_list
+program ::= use_block:u function_declaration_list:l		{: RESULT = new Program(u,l); :}
 					;	

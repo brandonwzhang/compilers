@@ -1,8 +1,13 @@
 package com.AST;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
+@Data
 public class ArrayBrackets {
-    List<Optional<Expression>> indices;
-}E
+    private List<Optional<Expression>> indices;
+}

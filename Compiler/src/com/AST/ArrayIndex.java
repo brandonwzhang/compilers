@@ -1,8 +1,11 @@
 package com.AST;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-public @Data class ArrayIndex extends Expression {
-    Expression id;
-    Expression index;
+@AllArgsConstructor
+@Data
+public class ArrayIndex extends Expression {
+    private Expression id;
+    private Expression index;
 }

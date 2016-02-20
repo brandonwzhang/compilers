@@ -1,16 +1,19 @@
 package com.AST;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import java.util.List;
 
-public @Data class Type extends Node {
+@AllArgsConstructor
+@Data
+public class Type extends Node {
 
     public enum PrimitiveType {
         INT,
         BOOL
     }
 
-    PrimitiveType basicType;
+    private PrimitiveType basicType;
 
-    ArrayBrackets arrayBrackets;
+    private ArrayBrackets arrayBrackets;
 }
