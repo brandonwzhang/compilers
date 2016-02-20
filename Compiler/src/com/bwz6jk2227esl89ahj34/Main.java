@@ -71,13 +71,14 @@ public class Main {
             for (int i = 0; i < files.length; i++) {
                 FileReader reader = new FileReader(files[i]);
                 Lexer lexer = new Lexer(reader);
-                ComplexSymbolFactory csf = new ComplexSymbolFactory();
-                Parser Parser = new Parser(lexer, csf);
+                //ComplexSymbolFactory csf = new ComplexSymbolFactory();
+                Parser Parser = new Parser(lexer);
                 Symbol result = Parser.parse();
 
                 CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(System.out);
                 NodeVisitor visitor = new PrintVisitor(printer); // TODO: pass vars
                 ((Program)(result.value)).accept(visitor);
+                printer.flush();
             }
         } catch(Exception e) {
             e.printStackTrace();
