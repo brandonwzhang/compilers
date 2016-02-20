@@ -18,7 +18,6 @@ public interface NodeVisitor {
     void visit(ProcedureCall node);
     void visit(Program node);
     void visit(ReturnStatement node);
-    void visit(Statement node);
     void visit(StringLiteral node);
     void visit(Type node);
     void visit(TypedDeclaration node);
