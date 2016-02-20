@@ -10,7 +10,7 @@ public @Data class Type extends Node {
         BOOL
     }
 
-    PrimitiveType basicType;
+    private PrimitiveType basicType;
 
-    ArrayBrackets arrayBrackets;
+    private ArrayBrackets arrayBrackets;
 }

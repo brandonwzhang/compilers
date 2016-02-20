@@ -4,5 +4,5 @@ import lombok.Data;
 import java.util.List;
 
 public @Data class ArrayLiteral extends Expression {
-    List<Expression> values;
+    private List<Expression> values;
 }
