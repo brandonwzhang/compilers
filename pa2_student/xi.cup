@@ -110,8 +110,8 @@ array_index ::= expression:e1 OPEN_BRACKET expression:e2 CLOSE_BRACKET {: RESULT
 							;  
 
 expression ::= IDENTIFIER:i	{: RESULT = new Identifier(i); :}
-  			 | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
-             | CHARACTER_LITERAL:c {: RESULT = CharacterLiteral(c); :}
+  			 		 | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
+             | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); :}
              | array_index:ai {: RESULT = ai; :}
              | function_call:fc {: RESULT = fc; :}
              | array_literal:al {: RESULT = al; :}
@@ -137,7 +137,7 @@ primitive_type ::= INT {: RESULT = Type.PrimitiveType.INT; :}
             | BOOL {: RESULT = Type.PrimitiveType.BOOL; :}
             ; 
 
-array_sized ::= OPEN_BRACKET expression:e CLOSE_BRACKET array_sized:lst {: lst.add(e); RESULT = lst; :}
+array_sized ::= OPEN_BRACKET expression:e CLOSE_BRACKET array_sized:lst {: lst.add(Optional.of(e)); RESULT = lst; :}
              | array_empty:ae {: RESULT = ae; :}    
              ;
              
@@ -146,14 +146,14 @@ array_empty ::= OPEN_BRACKET CLOSE_BRACKET array_empty:lst {: lst.add(Optional.e
              ;
 
 // does not allow [] after [n]  
-type ::= primitive_type:pt array_sized:as {: RESULT = new Type(pt, as); :}
+type ::= primitive_type:pt array_sized:as {: RESULT = new Type(pt, new ArrayBrackets(as)); :}
        ;
        
 types ::= type COMMA types 
 		   | type:t  {: List<Type> lst = new LinkedList<>(); lst.add(t); RESULT = lst; :}
 		   ; // for functions that return multiple results
 
-typed_declaration ::= IDENTIFIER:id COLON type:t {: RESULT = new TypedDeclaration(id,t); :} //x:int
+typed_declaration ::= IDENTIFIER:id COLON type:t {: RESULT = new TypedDeclaration(new Identifier(id),t); :} //x:int
 										;
 
 typed_declaration_list ::= typed_declaration:td COMMA typed_declaration_list:lst {: lst.add(td); RESULT = lst; :}
@@ -161,8 +161,8 @@ typed_declaration_list ::= typed_declaration:td COMMA typed_declaration_list:lst
 						; 
 						//enforce more than one to not get confused with typed_declaration
 
-function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(id, lst); :}//f(x,y,z,...) 
-				| IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(id, new LinkedList<Expression>()); :} // f()
+function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), lst); :}//f(x,y,z,...) 
+				| IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), new LinkedList<Expression>()); :} // f()
                 | LENGTH OPEN_PAREN expression:e CLOSE_PAREN {: List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = new FunctionCall(new Identifier("length"), lst); :}
                 ;
 
@@ -172,7 +172,7 @@ assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
                  
 assignment_lhs_list ::= assignment_lhs:al COMMA assignment_lhs_list:all {: all.add(al); RESULT = all; :} 
 					  | assignment_lhs:al1 COMMA assignment_lhs:al2 {: List<Assignable> aList = new LinkedList<Assignable>(); aList.add(al1); aList.add(al2); RESULT = aList; :} //enforce multiple things on LHS
-					  | typed_declaration_list:tdl {: RESULT = tdl; :} //allow x:int, y:int, ... to be on lhs of assignment
+					  | typed_declaration_list:tdl {: RESULT = new LinkedList<Assignable>(tdl); :} //allow x:int, y:int, ... to be on lhs of assignment
                       ;
 
 assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new LinkedList<>(); lst.add(al); RESULT = new Assignment(lst, e); :}// x = expression
@@ -181,7 +181,7 @@ assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new
 			 ;
 
 if_statement ::= IF OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new IfStatement(e, b, Optional.empty()); :}
-               | IF OPEN_PAREN expression:e CLOSE_PAREN block:b1 ELSE block:b2 {: RESULT = new IfStatement(e, b1, b2); :}
+               | IF OPEN_PAREN expression:e CLOSE_PAREN block:b1 ELSE block:b2 {: RESULT = new IfStatement(e, b1, Optional.of(b2)); :}
                ;
 
 while_statement ::= WHILE OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new WhileStatement(e,b); :}
@@ -212,13 +212,13 @@ block ::= OPEN_BRACE block_list:bl CLOSE_BRACE 	{: RESULT = bl; :}
         ;
 
 block_list ::= block:b block_list:bl {: bl.getBlockList().add(b); RESULT = bl; :}
-		 | empty	{: RESULT = new BlockList(new LinkedList<Block>); :}
+		 | empty	{: RESULT = new BlockList(new LinkedList<Block>()); :}
          ;
 
 function_declaration_argument_type ::= primitive_type array_empty //define result after Andy finishes Type class
 									 ;
 
-function_declaration_argument_single ::= IDENTIFIER:i COLON function_declaration_argument_type:t {: RESULT = new TypedDeclaration(i, t);  :}
+function_declaration_argument_single ::= IDENTIFIER:i COLON function_declaration_argument_type:t {: RESULT = new TypedDeclaration(new Identifier(i), t);  :}
 									   ;
 
 function_declaration_argument_list ::= function_declaration_argument_single:fdas COMMA function_declaration_argument_list:lst {: lst.add(fdas); RESULT = lst; :}
@@ -229,20 +229,20 @@ function_declaration_argument ::= function_declaration_argument_list:lst {: RESU
 								| empty {: RESULT = new LinkedList<TypedDeclaration>(); :}
 								;
 
-function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:args CLOSE_PAREN COLON types:t function_block:fb {: RESULT = new FunctionDeclaration(id, args, types, fb); :}
-                       | IDENTIFIER:id OPEN_PAREN function_declaration_argument:args CLOSE_PAREN function_block:fb {: RESULT = new FunctionDeclaration(id,args,new LinkedList<Type>(),fb); :}
+function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:args CLOSE_PAREN COLON types:t function_block:fb {: RESULT = new FunctionDeclaration(new Identifier(id), args, t, fb); :}
+                       | IDENTIFIER:id OPEN_PAREN function_declaration_argument:args CLOSE_PAREN function_block:fb {: RESULT = new FunctionDeclaration(new Identifier(id),args,new LinkedList<Type>(),fb); :}
                        ;
 
 function_declaration_list ::= function_declaration:fd function_declaration_list:lst {: lst.add(fd); RESULT = lst; :}
 						| empty	{: RESULT = new LinkedList<FunctionDeclaration>(); :}
             ;
 
-procedure_call ::= IDENTIFIER:id OPEN_PAREN expression_list:elist CLOSE_PAREN {: RESULT = new ProcedureCall(id, elist); :} //f(x,y,z,...) 
-				| IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new ProcedureCall(id, new LinkedList<Expression>()); :}// f()
+procedure_call ::= IDENTIFIER:id OPEN_PAREN expression_list:elist CLOSE_PAREN {: RESULT = new ProcedureCall(new Identifier(id), elist); :} //f(x,y,z,...) 
+				| IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new ProcedureCall(new Identifier(id), new LinkedList<Expression>()); :}// f()
 				;
 
-use_block ::= USE IDENTIFIER:id use_block:u {: u.add(id); RESULT = u; :} 
-			| empty		{:RESULT = new LinkedList<UseStatement>(); }
+use_block ::= USE IDENTIFIER:id use_block:u {: u.add(new UseStatement(new Identifier(id))); RESULT = u; :} 
+			| empty		{:RESULT = new LinkedList<UseStatement>(); :}
       ;
       
 

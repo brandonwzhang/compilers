@@ -1,7 +1,9 @@
 package com.AST;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-public @Data class Identifier extends Node implements Assignable {
+@AllArgsConstructor
+@Data
+public class Identifier extends Expression implements Assignable {
     private String name;
 }
