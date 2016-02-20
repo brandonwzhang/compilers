@@ -1,7 +1,10 @@
 package com.AST;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-public @Data class BooleanLiteral extends Expression {
+@AllArgsConstructor
+@Data
+public class BooleanLiteral extends Expression {
     private boolean value;
 }
