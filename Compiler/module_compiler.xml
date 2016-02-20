@@ -17,24 +17,28 @@
   
   <path id="compiler.module.production.classpath">
     <path refid="${module.jdk.classpath.compiler}"/>
-    <path refid="library.java-cup-11b.classpath"/>
+    <pathelement location="${basedir}/java_cup.jar"/>
+    <pathelement location="${basedir}/lombok.jar"/>
   </path>
   
   <path id="compiler.runtime.production.module.classpath">
     <pathelement location="${compiler.output.dir}"/>
-    <path refid="library.java-cup-11b.classpath"/>
+    <pathelement location="${basedir}/java_cup.jar"/>
+    <pathelement location="${basedir}/lombok.jar"/>
   </path>
   
   <path id="compiler.module.classpath">
     <path refid="${module.jdk.classpath.compiler}"/>
     <pathelement location="${compiler.output.dir}"/>
-    <path refid="library.java-cup-11b.classpath"/>
+    <pathelement location="${basedir}/java_cup.jar"/>
+    <pathelement location="${basedir}/lombok.jar"/>
   </path>
   
   <path id="compiler.runtime.module.classpath">
     <pathelement location="${compiler.testoutput.dir}"/>
     <pathelement location="${compiler.output.dir}"/>
-    <path refid="library.java-cup-11b.classpath"/>
+    <pathelement location="${basedir}/java_cup.jar"/>
+    <pathelement location="${basedir}/lombok.jar"/>
   </path>
   
   
