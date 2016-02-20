@@ -15,16 +15,21 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, LENGTH, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, UMINUS;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT;
 
 nonterminal Program program;
 
 nonterminal empty;
 nonterminal List<UseStatement> use_block;
 
-nonterminal BinaryOperator binary_operator; 
-nonterminal Binary binary_operator_expression;
-nonterminal Unary unary_operator_expression; 
+nonterminal Expression A;
+nonterminal Expression B;
+nonterminal Expression C;
+nonterminal Expression D;
+nonterminal Expression E;
+nonterminal Expression F;
+nonterminal Expression G;
+nonterminal Expression H;
 
 nonterminal BooleanLiteral boolean_literal; 
 nonterminal ArrayIndex array_index; //expression involving array[index] 
@@ -70,13 +75,6 @@ nonterminal ProcedureCall procedure_call;
 
 precedence nonassoc ELSE; 
 precedence nonassoc SEMICOLON;
-precedence left OR;
-precedence left AND;
-precedence left EQUAL, NOT_EQUAL; 
-precedence left LT, LEQ, GEQ, GT; 
-precedence left PLUS, MINUS;
-precedence left TIMES, HIGH_MULT, DIVIDE, MODULO;
-precedence left UMINUS, NOT;
 precedence left OPEN_BRACKET; 
 
 start with program;
@@ -87,28 +85,48 @@ boolean_literal ::= TRUE  {: RESULT = new BooleanLiteral(true); :}
           | FALSE       {: RESULT = new BooleanLiteral(false); :}
           ;  
 
-binary_operator ::= PLUS {: RESULT = BinaryOperator.PLUS; :}
-                  | MINUS {: RESULT = BinaryOperator.MINUS; :}
-                  | TIMES {: RESULT = BinaryOperator.TIMES; :}
-                  | DIVIDE {: RESULT = BinaryOperator.DIVIDE; :}
-                  | MODULO {: RESULT = BinaryOperator.MODULO; :}
-                  | HIGH_MULT {: RESULT = BinaryOperator.HIGH_MULT; :}
-                  | AND {: RESULT = BinaryOperator.AND; :}
-                  | OR {: RESULT = BinaryOperator.OR; :}
-                  | EQUAL {: RESULT = BinaryOperator.EQUAL; :}
-                  | NOT_EQUAL {: RESULT = BinaryOperator.NOT_EQUAL; :}
-                  | LT {: RESULT = BinaryOperator.LT; :}
-                  | LEQ {: RESULT = BinaryOperator.LEQ; :}
-                  | GT {: RESULT = BinaryOperator.GT; :}
-                  | GEQ {: RESULT = BinaryOperator.GEQ; :}
-                  ;
-       
-binary_operator_expression ::= expression:e1 binary_operator:bop expression:e2 {: RESULT = new Binary(bop,e1,e2); :}
-                             ;
+A ::= B:b {: RESULT = b; :}
+    | A:a OR B:b {: RESULT = new Binary(BinaryOperator.OR, a,b); :}
+    ;
 
-unary_operator_expression ::= NOT expression:e {: RESULT = new Unary(UnaryOperator.NOT, e); :}
-              | MINUS expression:e {: RESULT = new Unary(UnaryOperator.MINUS, e); :} %prec UMINUS
-              ;
+B ::= C:c {: RESULT = c; :}
+    | B:b AND C:c {: RESULT = new Binary(BinaryOperator.AND, b,c); :}
+    ;
+
+C ::= D:d {: RESULT = d; :}
+    | C:c EQUAL D:d {: RESULT = new Binary(BinaryOperator.EQUAL, c,d); :}
+    | C:c NOT_EQUAL D:d  {: RESULT = new Binary(BinaryOperator.NOT_EQUAL,c,d); :}
+    ;
+
+D ::= E:e {: RESULT = e; :}
+    | D:d LT E:e {: RESULT = new Binary(BinaryOperator.LT, d,e); :}
+    | D:d LEQ E:e {: RESULT = new Binary(BinaryOperator.LEQ, d,e); :}
+    | D:d GT E:e {: RESULT = new Binary(BinaryOperator.GT, d,e); :}
+    | D:d GEQ E:e  {: RESULT = new Binary(BinaryOperator.GEQ, d,e); :}
+    ;
+
+E ::= F:f {: RESULT = f;:}
+    | E:e PLUS F:f {: RESULT = new Binary(BinaryOperator.PLUS, e,f); :}
+    | E:e MINUS F:f {: RESULT = new Binary(BinaryOperator.MINUS,e,f); :}
+    ; 
+
+F ::= G:g {: RESULT = g; :}
+    | F:f TIMES G:g {: RESULT = new Binary(BinaryOperator.TIMES, f,g); :}
+    | F:f HIGH_MULT G:g  {: RESULT = new Binary(BinaryOperator.HIGH_MULT, f,g); :}
+    | F:f DIVIDE G:g  {: RESULT = new Binary(BinaryOperator.DIVIDE, f,g); :}
+    | F:f MODULO G:g  {: RESULT = new Binary(BinaryOperator.MODULO, f,g); :}
+    ;  
+
+G ::= H:h {: RESULT = h; :}
+    | NOT H:h {: RESULT = new Unary(UnaryOperator.NOT, h); :}
+    | MINUS H:h {: RESULT = new Unary(UnaryOperator.MINUS, h); :}
+    ;
+
+H ::= boolean_literal:b {: RESULT = b; :}
+    | INTEGER_LITERAL:i {: RESULT = new IntegerLiteral(i); :}
+    | OPEN_PAREN A:a CLOSE_PAREN {: RESULT = a; :}
+    ;
+
 
 array_index ::= expression:e1 OPEN_BRACKET expression:e2 CLOSE_BRACKET {: RESULT = new ArrayIndex(e1, e2); :}
               ;  
@@ -119,10 +137,7 @@ expression ::= IDENTIFIER:i {: RESULT = new Identifier(i); :}
              | array_index:ai {: RESULT = ai; :}
              | function_call:fc {: RESULT = fc; :}
              | array_literal:al {: RESULT = al; :}
-             | boolean_literal:bl {: RESULT = bl; :}
-             | INTEGER_LITERAL:i {: RESULT = new IntegerLiteral(i); :}
-             | binary_operator_expression:boe {: RESULT = boe; :}
-             | unary_operator_expression:uoe {: RESULT = uoe; :}
+             | A:a {: RESULT = a; :}
              ; 
  
 expression_list ::= expression:e COMMA expression_list:lst {: lst.add(0, e); RESULT = lst; :} 
