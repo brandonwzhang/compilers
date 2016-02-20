@@ -5,7 +5,7 @@ import java.util.List;
 
 public @Data class Type extends Node {
 
-    enum BasicType {
+    public enum BasicType {
         INT,
         BOOL
     }
