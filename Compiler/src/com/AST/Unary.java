@@ -1,8 +1,11 @@
 package com.AST;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-public @Data class Unary extends Expression {
+@AllArgsConstructor
+@Data
+public class Unary extends Expression {
     private UnaryOperator op;
     private Expression expr;
 }

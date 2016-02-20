@@ -1,8 +1,11 @@
 package com.AST;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import java.util.List;
 
-public @Data class ReturnStatement extends Node {
+@AllArgsConstructor
+@Data
+public class ReturnStatement extends Node {
     private List<Expression> values;
 }
