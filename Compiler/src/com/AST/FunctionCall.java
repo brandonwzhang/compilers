@@ -11,4 +11,8 @@ import java.util.List;
 public class FunctionCall extends Expression {
     private Identifier identifier;
     private List<Expression> arguments;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

@@ -9,4 +9,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class CharacterLiteral extends Expression {
     private char value;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

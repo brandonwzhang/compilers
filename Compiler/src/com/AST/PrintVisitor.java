@@ -62,7 +62,7 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(CharacterLiteral node) {
-        printer.printAtom("" + node.getValue());
+        printer.printAtom("'" + node.getValue() + "'");
     }
 
     public void visit(FunctionBlock node) {
@@ -114,8 +114,7 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(Node node) {
-        //throw new Exception("visit should not be called on a node with " +
-        //        "compile-time type Node");
+        System.out.println("fuck you");
     }
 
     public void visit(ProcedureBlock node) {
@@ -145,6 +144,7 @@ public class PrintVisitor implements NodeVisitor {
             funcDec.accept(this);
         }
         printer.endList();
+        printer.endList();
     }
 
     public void visit(ReturnStatement node) {
@@ -157,7 +157,7 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(StringLiteral node) {
-        printer.printAtom(node.getValue());
+        printer.printAtom("\"" + node.getValue() + "\"");
     }
 
     public void visit(Type node) {

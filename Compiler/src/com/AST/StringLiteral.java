@@ -9,4 +9,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class StringLiteral extends Expression {
     private String value;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

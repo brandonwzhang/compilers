@@ -10,4 +10,8 @@ import lombok.EqualsAndHashCode;
 public class ArrayIndex extends Expression {
     private Expression arrayRef;
     private Expression index;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

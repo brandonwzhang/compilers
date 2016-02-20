@@ -11,4 +11,8 @@ import java.util.List;
 public class ProcedureCall extends Statement {
     private Identifier identifier;
     private List<Expression> arguments;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

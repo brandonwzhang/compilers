@@ -11,4 +11,8 @@ import java.util.List;
 public class TypedDeclaration extends Statement implements Assignable {
     private Identifier identifier;
     private Type type;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }
