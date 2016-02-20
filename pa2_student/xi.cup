@@ -13,55 +13,55 @@ terminal IF, ELSE, WHILE, BREAK, RETURN, USE, LENGTH, PLUS, MINUS, TIMES,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
   COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, UMINUS, OPTIONAL_SEMICOLON;
 
-nonterminal Program program;
+nonterminal program;
 
 nonterminal empty;
 nonterminal use_block;
 
-nonterminal String binary_operator; 
-nonterminal String unary_operator; 
-nonterminal String binary_operator_expression;
-nonterminal String unary_operator_expression; 
+nonterminal binary_operator; 
+nonterminal unary_operator; 
+nonterminal binary_operator_expression;
+nonterminal unary_operator_expression; 
 
-nonterminal String boolean_literal; 
-nonterminal String array_index; //expression involving array[index] 
-nonterminal String array_literal;
+nonterminal boolean_literal; 
+nonterminal array_index; //expression involving array[index] 
+nonterminal array_literal;
 
 nonterminal expression; 
 nonterminal expression_list; 
 nonterminal expression_list_trailing_comma; 
 
-nonterminal String basic_type;
-nonterminal String type;
-nonterminal String types;
-nonterminal String array_sized;
-nonterminal String array_empty;
+nonterminal basic_type;
+nonterminal type;
+nonterminal types;
+nonterminal array_sized;
+nonterminal array_empty;
 
-nonterminal String typed_declaration; 
-nonterminal String typed_declaration_list;
-nonterminal String function_call;
-nonterminal String assignment_lhs;
-nonterminal String assignment_lhs_list;
-nonterminal String assignment; 
+nonterminal typed_declaration; 
+nonterminal typed_declaration_list;
+nonterminal function_call;
+nonterminal assignment_lhs;
+nonterminal assignment_lhs_list;
+nonterminal assignment; 
 
-nonterminal String if_statement;
-nonterminal String while_statement;
-nonterminal String return_statement; 
-nonterminal String block; 
-nonterminal String blocks; 
-nonterminal String statement;
-nonterminal String statement_no_semicolon;
+nonterminal if_statement;
+nonterminal while_statement;
+nonterminal return_statement; 
+nonterminal block; 
+nonterminal blocks; 
+nonterminal statement;
+nonterminal statement_no_semicolon;
 
-nonterminal String function_declaration_argument_type;
-nonterminal String function_declaration_argument_single; 
-nonterminal String function_declaration_argument_list;
-nonterminal String function_declaration_argument;
+nonterminal function_declaration_argument_type;
+nonterminal function_declaration_argument_single; 
+nonterminal function_declaration_argument_list;
+nonterminal function_declaration_argument;
 
-nonterminal String function_declaration;
-nonterminal String function_declaration_list;
-nonterminal String function_block; 
+nonterminal function_declaration;
+nonterminal function_declaration_list;
+nonterminal function_block; 
 
-nonterminal String procedure_call;
+nonterminal procedure_call;
 
 precedence nonassoc ELSE; 
 
@@ -224,11 +224,10 @@ function_declaration_argument_single ::= IDENTIFIER COLON function_declaration_a
 									   ;
 
 function_declaration_argument_list ::= function_declaration_argument_single COMMA function_declaration_argument_list
-									 | function_declaration_argument_single COMMA function_declaration_argument_single
+									 | function_declaration_argument_single 
 									 ;
 
-function_declaration_argument ::= function_declaration_argument_single
-								| function_declaration_argument_list
+function_declaration_argument ::= function_declaration_argument_list
 								| empty 
 								;
 

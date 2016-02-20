@@ -1,8 +1,8 @@
 package com.AST;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ArrayBrackets {
-    List<Expression> indicesOfSizedBrackets;
-    int emptyBrackets;
-}
+    List<Optional<Expression>> indices;
+}E
