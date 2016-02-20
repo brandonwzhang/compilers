@@ -1124,7 +1124,7 @@ class CUP$Parser$actions {
                 int td2left = CUP$Parser$stack.peek().left;
                 int td2right = CUP$Parser$stack.peek().right;
                 TypedDeclaration td2 = CUP$Parser$stack.peek().<TypedDeclaration> value();
-                 List<TypedDeclaration> lst = new LinkedList<>(); lst.add(0, td1); lst.add(0, td2); RESULT = lst; 
+                 List<TypedDeclaration> lst = new LinkedList<>(); lst.add(0, td2); lst.add(0, td1); RESULT = lst; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("typed_declaration_list",19, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1214,7 +1214,7 @@ class CUP$Parser$actions {
                 int al2left = CUP$Parser$stack.peek().left;
                 int al2right = CUP$Parser$stack.peek().right;
                 Assignable al2 = CUP$Parser$stack.peek().<Assignable> value();
-                 List<Assignable> aList = new LinkedList<Assignable>(); aList.add(0, al1); aList.add(0, al2); RESULT = aList; 
+                 List<Assignable> aList = new LinkedList<Assignable>(); aList.add(0, al2); aList.add(0, al1); RESULT = aList; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs_list",22, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;

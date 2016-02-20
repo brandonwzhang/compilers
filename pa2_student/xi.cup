@@ -166,7 +166,7 @@ typed_declaration ::= IDENTIFIER:id COLON type:t {: RESULT = new TypedDeclaratio
                     ;
 
 typed_declaration_list ::= typed_declaration:td COMMA typed_declaration_list:lst {: lst.add(0, td); RESULT = lst; :}
-                        | typed_declaration:td1 COMMA typed_declaration:td2 {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(0, td1); lst.add(0, td2); RESULT = lst; :}
+                        | typed_declaration:td1 COMMA typed_declaration:td2 {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(0, td2); lst.add(0, td1); RESULT = lst; :}
                         ; 
                         //enforce more than one to not get confused with typed_declaration
              
@@ -180,7 +180,7 @@ assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
                  ;
                  
 assignment_lhs_list ::= assignment_lhs:al COMMA assignment_lhs_list:all {: all.add(0, al); RESULT = all; :} 
-                      | assignment_lhs:al1 COMMA assignment_lhs:al2 {: List<Assignable> aList = new LinkedList<Assignable>(); aList.add(0, al1); aList.add(0, al2); RESULT = aList; :} //enforce multiple things on LHS
+                      | assignment_lhs:al1 COMMA assignment_lhs:al2 {: List<Assignable> aList = new LinkedList<Assignable>(); aList.add(0, al2); aList.add(0, al1); RESULT = aList; :} //enforce multiple things on LHS
                       | typed_declaration_list:tdl {: RESULT = new LinkedList<Assignable>(tdl); :} //allow x:int, y:int, ... to be on lhs of assignment
                       ;
 

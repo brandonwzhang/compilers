@@ -40,9 +40,11 @@ public class PrintVisitor implements NodeVisitor {
     public void visit(Assignment node) {
         printer.startList();
         printer.printAtom("=");
+        printer.startList();
         for(Assignable a : node.getVariables()){
             a.accept(this);
         }
+        printer.endList();
         node.getExpression().accept(this);
         printer.endList();
     }
