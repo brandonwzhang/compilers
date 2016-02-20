@@ -171,7 +171,7 @@ function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RE
                 ;
 
 assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
-                 | typed_declaration:td {: RESULT = new TypedDeclaration(td); :
+                 | typed_declaration:td {: RESULT = new TypedDeclaration(td); :}
                  | UNDERSCORE {: RESULT = new Underscore(); :}
                  ;
 
