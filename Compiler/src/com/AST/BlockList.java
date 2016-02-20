@@ -1,8 +1,11 @@
 package com.AST;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import java.util.List;
 
-public @Data class BlockList extends Block {
+@AllArgsConstructor
+@Data
+public class BlockList extends Block {
     private List<Block> blockList;
 }

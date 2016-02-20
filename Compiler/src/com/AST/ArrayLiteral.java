@@ -1,8 +1,11 @@
 package com.AST;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import java.util.List;
 
-public @Data class ArrayLiteral extends Expression {
+@AllArgsConstructor
+@Data
+public class ArrayLiteral extends Expression {
     private List<Expression> values;
 }
