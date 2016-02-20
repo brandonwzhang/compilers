@@ -10,4 +10,8 @@ import lombok.EqualsAndHashCode;
 public class WhileStatement extends Statement {
     private Expression guard;
     private Block block;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

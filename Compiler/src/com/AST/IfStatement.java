@@ -13,4 +13,8 @@ public class IfStatement extends Statement {
     private Expression guard;
     private Block trueBlock;
     private Optional<Block> falseBlock;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

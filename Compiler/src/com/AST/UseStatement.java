@@ -9,4 +9,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class UseStatement extends Node {
     private Identifier identifier;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

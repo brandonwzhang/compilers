@@ -12,4 +12,8 @@ import java.util.List;
 public class FunctionBlock extends Block {
     private BlockList blockList;
     private ReturnStatement returnStatement;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

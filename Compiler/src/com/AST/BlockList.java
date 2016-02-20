@@ -11,4 +11,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class BlockList extends Block {
     private List<Block> blockList;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

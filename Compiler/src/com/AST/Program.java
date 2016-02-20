@@ -12,5 +12,7 @@ public class Program extends Node {
     private List<UseStatement> useBlock;
     private List<FunctionDeclaration> funcDecs;
 
-
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

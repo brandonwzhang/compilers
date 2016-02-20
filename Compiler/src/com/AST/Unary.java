@@ -10,4 +10,8 @@ import lombok.EqualsAndHashCode;
 public class Unary extends Expression {
     private UnaryOperator op;
     private Expression expression;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

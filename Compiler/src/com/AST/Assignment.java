@@ -12,4 +12,8 @@ import java.util.List;
 public class Assignment extends Statement {
     private List<Assignable> variables;
     private Expression expression;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

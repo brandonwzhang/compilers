@@ -11,4 +11,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class ReturnStatement extends Node {
     private List<Expression> values;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

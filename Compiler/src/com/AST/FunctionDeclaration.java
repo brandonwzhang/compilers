@@ -14,4 +14,8 @@ public class FunctionDeclaration extends Node {
     private List<TypedDeclaration> typedDeclarationList;
     private List<Type> typeList;
     private FunctionBlock functionBlock;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }
