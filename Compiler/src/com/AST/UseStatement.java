@@ -8,5 +8,5 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class UseStatement extends Node {
-    private Identifier id;
+    private Identifier identifier;
 }

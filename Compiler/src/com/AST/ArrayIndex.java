@@ -8,6 +8,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class ArrayIndex extends Expression {
-    private Expression id;
+    private Expression arrayRef;
     private Expression index;
 }
