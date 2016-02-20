@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class ProcedureBlock extends Block {
+public class ProcedureBlock extends MethodBlock {
     private BlockList blockList;
 
     public void accept(NodeVisitor v){
