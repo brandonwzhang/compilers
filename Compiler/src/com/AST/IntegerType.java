@@ -7,6 +7,9 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class IntegerType extends PrimitiveType{
+public class IntegerType extends PrimitiveType {
 
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
 }

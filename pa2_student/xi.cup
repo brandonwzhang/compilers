@@ -34,7 +34,7 @@ nonterminal Expression expression;
 nonterminal List<Expression> expression_list; 
 nonterminal List<Expression> expression_list_trailing_comma; 
 
-nonterminal Type.PrimitiveType primitive_type;
+nonterminal PrimitiveType primitive_type;
 nonterminal Type type;
 nonterminal List<Type> types;
 nonterminal ArrayType array_size_type;
@@ -83,38 +83,38 @@ start with program;
 
 empty ::= ;
 
-boolean_literal ::= TRUE 	{: RESULT = new BooleanLiteral(true); :}
-				  | FALSE				{: RESULT = new BooleanLiteral(false); :}
-				  ;  
+boolean_literal ::= TRUE  {: RESULT = new BooleanLiteral(true); :}
+          | FALSE       {: RESULT = new BooleanLiteral(false); :}
+          ;  
 
 binary_operator ::= PLUS {: RESULT = BinaryOperator.PLUS; :}
-        				  | MINUS	{: RESULT = BinaryOperator.MINUS; :}
-        				  | TIMES {: RESULT = BinaryOperator.TIMES; :}
-        				  | DIVIDE {: RESULT = BinaryOperator.DIVIDE; :}
-        				  | MODULO {: RESULT = BinaryOperator.MODULO; :}
-        				  | HIGH_MULT {: RESULT = BinaryOperator.HIGH_MULT; :}
-        				  | AND {: RESULT = BinaryOperator.AND; :}
-        				  | OR {: RESULT = BinaryOperator.OR; :}
-        				  | EQUAL {: RESULT = BinaryOperator.EQUAL; :}
-        				  | NOT_EQUAL {: RESULT = BinaryOperator.NOT_EQUAL; :}
-        				  | LT {: RESULT = BinaryOperator.LT; :}
-        				  | LEQ {: RESULT = BinaryOperator.LEQ; :}
-        				  | GT {: RESULT = BinaryOperator.GT; :}
-        				  | GEQ {: RESULT = BinaryOperator.GEQ; :}
-        				  ;
+                  | MINUS {: RESULT = BinaryOperator.MINUS; :}
+                  | TIMES {: RESULT = BinaryOperator.TIMES; :}
+                  | DIVIDE {: RESULT = BinaryOperator.DIVIDE; :}
+                  | MODULO {: RESULT = BinaryOperator.MODULO; :}
+                  | HIGH_MULT {: RESULT = BinaryOperator.HIGH_MULT; :}
+                  | AND {: RESULT = BinaryOperator.AND; :}
+                  | OR {: RESULT = BinaryOperator.OR; :}
+                  | EQUAL {: RESULT = BinaryOperator.EQUAL; :}
+                  | NOT_EQUAL {: RESULT = BinaryOperator.NOT_EQUAL; :}
+                  | LT {: RESULT = BinaryOperator.LT; :}
+                  | LEQ {: RESULT = BinaryOperator.LEQ; :}
+                  | GT {: RESULT = BinaryOperator.GT; :}
+                  | GEQ {: RESULT = BinaryOperator.GEQ; :}
+                  ;
        
 binary_operator_expression ::= expression:e1 binary_operator:bop expression:e2 {: RESULT = new Binary(bop,e1,e2); :}
-														 ;
+                             ;
 
 unary_operator_expression ::= NOT expression:e {: RESULT = new Unary(UnaryOperator.NOT, e); :}
-							| MINUS expression:e {: RESULT = new Unary(UnaryOperator.MINUS, e); :} %prec UMINUS
-							;
+              | MINUS expression:e {: RESULT = new Unary(UnaryOperator.MINUS, e); :} %prec UMINUS
+              ;
 
 array_index ::= expression:e1 OPEN_BRACKET expression:e2 CLOSE_BRACKET {: RESULT = new ArrayIndex(e1, e2); :}
-							;  
+              ;  
 
-expression ::= IDENTIFIER:i	{: RESULT = new Identifier(i); :}
-  			 		 | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
+expression ::= IDENTIFIER:i {: RESULT = new Identifier(i); :}
+             | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
              | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); :}
              | array_index:ai {: RESULT = ai; :}
              | function_call:fc {: RESULT = fc; :}
@@ -126,12 +126,12 @@ expression ::= IDENTIFIER:i	{: RESULT = new Identifier(i); :}
              ; 
  
 expression_list ::= expression:e COMMA expression_list:lst {: lst.add(e); RESULT = lst; :} 
-				  | expression:e {: List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = lst; :}
-				  ;
+          | expression:e {: List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = lst; :}
+          ;
 
 expression_list_trailing_comma ::= expression:e COMMA expression_list_trailing_comma:lst {: lst.add(e); RESULT = lst; :} 
-                								 | expression:e COMMA {: List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = lst; :}
-                								 ;
+                                 | expression:e COMMA {: List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = lst; :}
+                                 ;
  
 array_literal ::= OPEN_BRACE expression_list:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); :}
                 |  OPEN_BRACE expression_list_trailing_comma:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); :}
@@ -154,24 +154,24 @@ array_type ::= type:t OPEN_BRACKET CLOSE_BRACKET {: RESULT = new ArrayType(t, Op
 
 // does not allow [] after [n]  
 type ::= primitive_type:pt {: RESULT = new Type(pt, new ArrayBrackets(as)); :}
-			 | array_size_type:as {: RESULT = as; :}
+       | array_size_type:as {: RESULT = as; :}
        | array_type:ae {: RESULT = ae; :}
        ;
        
 types ::= type COMMA types 
-		   | type:t  {: List<Type> lst = new LinkedList<>(); lst.add(t); RESULT = lst; :}
-		   ; // for functions that return multiple results
+       | type:t  {: List<Type> lst = new LinkedList<>(); lst.add(t); RESULT = lst; :}
+       ; // for functions that return multiple results
 
 typed_declaration ::= IDENTIFIER:id COLON type:t {: RESULT = new TypedDeclaration(new Identifier(id),t); :} //x:int
-										;
+                    ;
 
 typed_declaration_list ::= typed_declaration:td COMMA typed_declaration_list:lst {: lst.add(td); RESULT = lst; :}
-             						| typed_declaration:td1 COMMA typed_declaration:td2 {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(td1); lst.add(td2); RESULT = lst; :}
-             						; 
-             						//enforce more than one to not get confused with typed_declaration
+                        | typed_declaration:td1 COMMA typed_declaration:td2 {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(td1); lst.add(td2); RESULT = lst; :}
+                        ; 
+                        //enforce more than one to not get confused with typed_declaration
              
 function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), lst); :}//f(x,y,z,...) 
-        				| IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), new LinkedList<Expression>()); :} // f()
+                | IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), new LinkedList<Expression>()); :} // f()
                 | LENGTH OPEN_PAREN expression:e CLOSE_PAREN {: List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = new FunctionCall(new Identifier("length"), lst); :}
                 ;
 
@@ -180,14 +180,14 @@ assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
                  ;
                  
 assignment_lhs_list ::= assignment_lhs:al COMMA assignment_lhs_list:all {: all.add(al); RESULT = all; :} 
-          					  | assignment_lhs:al1 COMMA assignment_lhs:al2 {: List<Assignable> aList = new LinkedList<Assignable>(); aList.add(al1); aList.add(al2); RESULT = aList; :} //enforce multiple things on LHS
-          					  | typed_declaration_list:tdl {: RESULT = new LinkedList<Assignable>(tdl); :} //allow x:int, y:int, ... to be on lhs of assignment
+                      | assignment_lhs:al1 COMMA assignment_lhs:al2 {: List<Assignable> aList = new LinkedList<Assignable>(); aList.add(al1); aList.add(al2); RESULT = aList; :} //enforce multiple things on LHS
+                      | typed_declaration_list:tdl {: RESULT = new LinkedList<Assignable>(tdl); :} //allow x:int, y:int, ... to be on lhs of assignment
                       ;
 
 assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new LinkedList<>(); lst.add(al); RESULT = new Assignment(lst, e); :}// x = expression
-      			 | assignment_lhs_list:all GETS function_call:fc {: RESULT = new Assignment(all, fc); :}// x,y,z,... = f(x) as well as x:int,y:int,... = f(x)
-      			 | typed_declaration:td GETS expression:e {: RESULT = new Assignment(new ArrayList<Assignable>(Arrays.asList(td)), e); :}//allow x:int = expression 
-      			 ;
+             | assignment_lhs_list:all GETS function_call:fc {: RESULT = new Assignment(all, fc); :}// x,y,z,... = f(x) as well as x:int,y:int,... = f(x)
+             | typed_declaration:td GETS expression:e {: RESULT = new Assignment(new ArrayList<Assignable>(Arrays.asList(td)), e); :}//allow x:int = expression 
+             ;
 
 if_statement ::= IF OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new IfStatement(e, b, Optional.empty()); :}
                | IF OPEN_PAREN expression:e CLOSE_PAREN block:b1 ELSE block:b2 {: RESULT = new IfStatement(e, b1, Optional.of(b2)); :}
@@ -201,63 +201,63 @@ return_statement ::= RETURN expression_list:lst {: RESULT = new ReturnStatement(
 
 statement_no_semicolon ::= if_statement:s {: RESULT = s; :} 
                          | while_statement:s {: RESULT = s; :}
-                  			 | procedure_call:pc {: RESULT = pc; :}
+                         | procedure_call:pc {: RESULT = pc; :}
                          | typed_declaration:td {: RESULT = td; :}
                          | assignment:a {: RESULT = a; :}
                          ; 
 
 //this should be okay since semicolon doesn't actually matter
 statement ::= statement_no_semicolon:s {: RESULT = s; :}
-      			| statement_no_semicolon:s SEMICOLON {: RESULT = s; :}
-      			;
+            | statement_no_semicolon:s SEMICOLON {: RESULT = s; :}
+            ;
 
 function_block ::= OPEN_BRACE block_list:bl return_statement:r CLOSE_BRACE {: RESULT = new FunctionBlock(bl, r); :}
-								 ;
+                 ;
 
-block ::= OPEN_BRACE block_list:bl CLOSE_BRACE 	{: RESULT = bl; :}
-    		| function_block:fb {: RESULT = fb; :}
+block ::= OPEN_BRACE block_list:bl CLOSE_BRACE  {: RESULT = bl; :}
+        | function_block:fb {: RESULT = fb; :}
         | statement:s {: RESULT = s; :}
         ;
 
 block_list ::= block:b block_list:bl {: bl.getBlockList().add(b); RESULT = bl; :}
-        		 | empty	{: RESULT = new BlockList(new LinkedList<Block>()); :}
+             | empty  {: RESULT = new BlockList(new LinkedList<Block>()); :}
              ;
 
 function_declaration_argument_type ::= array_no_size_type:a {: RESULT = a; :}
                                      | primitive_type:p {: RESULT = p; :}
-                  									 ;
+                                     ;
 function_declaration_argument_single ::= IDENTIFIER:i COLON function_declaration_argument_type:t {: RESULT = new TypedDeclaration(new Identifier(i), t);  :}
-                  									   ;
+                                       ;
 
 function_declaration_argument_list ::= function_declaration_argument_single:fdas COMMA function_declaration_argument_list:lst {: lst.add(fdas); RESULT = lst; :}
-                  									 | function_declaration_argument_single:fdas {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(fdas); RESULT = lst; :}
-                  									 ;
+                                     | function_declaration_argument_single:fdas {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(fdas); RESULT = lst; :}
+                                     ;
 
 function_declaration_argument ::= function_declaration_argument_list:lst {: RESULT = lst; :}
-                								| empty {: RESULT = new LinkedList<TypedDeclaration>(); :}
-                								;
+                                | empty {: RESULT = new LinkedList<TypedDeclaration>(); :}
+                                ;
                 
 function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:args CLOSE_PAREN COLON types:t function_block:fb {: RESULT = new FunctionDeclaration(new Identifier(id), args, t, fb); :}
                        | IDENTIFIER:id OPEN_PAREN function_declaration_argument:args CLOSE_PAREN procedure_block:fb {: RESULT = new FunctionDeclaration(new Identifier(id),args,new LinkedList<Type>(),fb); :}
                        ;
 
 function_declaration_list ::= function_declaration:fd function_declaration_list:lst {: lst.add(fd); RESULT = lst; :}
-                						| empty	{: RESULT = new LinkedList<FunctionDeclaration>(); :}
+                            | empty {: RESULT = new LinkedList<FunctionDeclaration>(); :}
                             ;
                 
 procedure_block ::=  OPEN_BRACE block_list:b CLOSE_BRACE {: RESULT = new ProcedureBlock(b); :}
                   | OPEN_BRACE block_list:b RETURN CLOSE_BRACE {: RESULT = new ProcedureBlock(b); :}
- 								  ;
+                  ;
                  
 procedure_call ::= IDENTIFIER:id OPEN_PAREN expression_list:elist CLOSE_PAREN {: RESULT = new ProcedureCall(new Identifier(id), elist); :} //f(x,y,z,...) 
-				         | IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new ProcedureCall(new Identifier(id), new LinkedList<Expression>()); :}// f()
-				         ;
+                 | IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new ProcedureCall(new Identifier(id), new LinkedList<Expression>()); :}// f()
+                 ;
 
 use_block ::= USE IDENTIFIER:id use_block:u {: u.add(new UseStatement(new Identifier(id))); RESULT = u; :} 
-      			| empty		{: RESULT = new LinkedList<UseStatement>(); :}
+            | empty   {: RESULT = new LinkedList<UseStatement>(); :}
             ;
       
 
-program ::= use_block:u function_declaration_list:l		{: RESULT = new Program(u,l); :}
-					;	
+program ::= use_block:u function_declaration_list:l   {: RESULT = new Program(u,l); :}
+          ; 
           

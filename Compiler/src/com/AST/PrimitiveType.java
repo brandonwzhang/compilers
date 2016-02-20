@@ -7,6 +7,6 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public abstract class PrimitiveType extends Type{
+public abstract class PrimitiveType extends Type {
 
 }

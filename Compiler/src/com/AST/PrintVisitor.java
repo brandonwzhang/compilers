@@ -11,10 +11,6 @@ public class PrintVisitor implements NodeVisitor {
         this.printer = printer;
     }
 
-    public void visit(ArrayBrackets node) {
-        /**taken care of in Type so never visited*/
-    }
-
     public void visit(ArrayIndex node) {  //TODO: Ji Hun
         printer.startList();
         printer.printAtom("[]");
@@ -60,6 +56,8 @@ public class PrintVisitor implements NodeVisitor {
     public void visit(BooleanLiteral node) {
         printer.printAtom(node.getValue().toString());
     }
+
+    public void visit(BooleanType node) { }
 
     public void visit(CharacterLiteral node) {
         printer.printAtom("'" + node.getValue() + "'");
@@ -114,8 +112,10 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom(node.getValue());
     }
 
+    public void visit(IntegerType node) { }
+
     public void visit(Node node) {
-        System.out.println("fuck you");
+        System.out.println("something is wrong");
     }
 
     public void visit(ProcedureBlock node) {
