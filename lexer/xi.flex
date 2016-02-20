@@ -6,56 +6,60 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 
 %%
-%class XiLexer
+%class Lexer
 %unicode
 %cup
 %line
 %column
 
+%eofval{
+    return symbol(ParserSym.EOF);
+%eofval}
+
 %{
   public static final HashMap<Integer, String> symbolTranslation = new HashMap<Integer, String>(){{
-    put(sym.IF, "if");
-    put(sym.WHILE, "while");
-    put(sym.ELSE, "else");
-    put(sym.RETURN, "return");
-    put(sym.LENGTH, "length");
-    put(sym.INT, "int");
-    put(sym.BOOL, "bool");
-    put(sym.TRUE, "true");
-    put(sym.FALSE, "false");
-    put(sym.IDENTIFIER, "id");
-    put(sym.INTEGER_LITERAL, "integer");
-    put(sym.NOT, "!");
-    put(sym.TIMES, "*");
-    put(sym.HIGH_MULT, "*>>");
-    put(sym.DIVIDE, "/");
-    put(sym.MODULO, "%");
-    put(sym.PLUS, "+");
-    put(sym.MINUS, "-");
-    put(sym.LT, "<");
-    put(sym.LEQ, "<=");
-    put(sym.GEQ, ">=");
-    put(sym.GT, ">");
-    put(sym.EQUAL, "==");
-    put(sym.NOT_EQUAL, "!=");
-    put(sym.AND, "&");
-    put(sym.OR, "|");
-    put(sym.STRING_LITERAL, "string");
-    put(sym.EOF, "EOF");
-    put(sym.OPEN_PAREN, "(");
-    put(sym.CLOSE_PAREN, ")");
-    put(sym.OPEN_BRACKET, "[");
-    put(sym.CLOSE_BRACKET, "]");
-    put(sym.OPEN_BRACE, "{");
-    put(sym.CLOSE_BRACE, "}");
-    put(sym.COLON, ":");
-    put(sym.COMMA, ",");
-    put(sym.GETS, "="); 
-    put(sym.SEMICOLON, ";");
-    put(sym.CHARACTER_LITERAL, "character");
-    put(sym.USE, "use");
-    put(sym.UNDERSCORE, "_");
-    put(sym.error, "error:");
+    put(ParserSym.IF, "if");
+    put(ParserSym.WHILE, "while");
+    put(ParserSym.ELSE, "else");
+    put(ParserSym.RETURN, "return");
+    put(ParserSym.LENGTH, "length");
+    put(ParserSym.INT, "int");
+    put(ParserSym.BOOL, "bool");
+    put(ParserSym.TRUE, "true");
+    put(ParserSym.FALSE, "false");
+    put(ParserSym.IDENTIFIER, "id");
+    put(ParserSym.INTEGER_LITERAL, "integer");
+    put(ParserSym.NOT, "!");
+    put(ParserSym.TIMES, "*");
+    put(ParserSym.HIGH_MULT, "*>>");
+    put(ParserSym.DIVIDE, "/");
+    put(ParserSym.MODULO, "%");
+    put(ParserSym.PLUS, "+");
+    put(ParserSym.MINUS, "-");
+    put(ParserSym.LT, "<");
+    put(ParserSym.LEQ, "<=");
+    put(ParserSym.GEQ, ">=");
+    put(ParserSym.GT, ">");
+    put(ParserSym.EQUAL, "==");
+    put(ParserSym.NOT_EQUAL, "!=");
+    put(ParserSym.AND, "&");
+    put(ParserSym.OR, "|");
+    put(ParserSym.STRING_LITERAL, "string");
+    put(ParserSym.EOF, "EOF");
+    put(ParserSym.OPEN_PAREN, "(");
+    put(ParserSym.CLOSE_PAREN, ")");
+    put(ParserSym.OPEN_BRACKET, "[");
+    put(ParserSym.CLOSE_BRACKET, "]");
+    put(ParserSym.OPEN_BRACE, "{");
+    put(ParserSym.CLOSE_BRACE, "}");
+    put(ParserSym.COLON, ":");
+    put(ParserSym.COMMA, ",");
+    put(ParserSym.GETS, "="); 
+    put(ParserSym.SEMICOLON, ";");
+    put(ParserSym.CHARACTER_LITERAL, "character");
+    put(ParserSym.USE, "use");
+    put(ParserSym.UNDERSCORE, "_");
+    put(ParserSym.error, "error:");
   }};
 
   public static void lexFile(String sourcePath, String diagnosticPath, String[] args) {
@@ -75,9 +79,9 @@ import java.io.PrintWriter;
       for (int i = 0; i < files.length; i++) {
         ArrayList<String> lines = new ArrayList<String>();
         FileReader reader = new FileReader(files[i]);
-        XiLexer lexer = new XiLexer(reader);
+        Lexer lexer = new Lexer(reader);
         Symbol next = lexer.next_token();
-        while (next.sym != sym.EOF && next.sym != sym.error) {
+        while (next.sym != ParserSym.EOF && next.sym != ParserSym.error) {
           String line = (next.left + 1) + ":" +
                         (next.right + 1) + " " +
                         symbolTranslation.get(next.sym);
@@ -134,60 +138,60 @@ HexChar = \\x[2-7][0-9A-E]
 
 <YYINITIAL> {
  /* keywords */
-"use"                               { return symbol(sym.USE); }
-"if"                                { return symbol(sym.IF); }
-"while"                             { return symbol(sym.WHILE); }
-"else"                              { return symbol(sym.ELSE); }
-"return"                            { return symbol(sym.RETURN); }
-"length"                            { return symbol(sym.LENGTH); }
-"int"                               { return symbol(sym.INT); }
-"bool"                              { return symbol(sym.BOOL); }
-"true"                              { return symbol(sym.TRUE); }
-"false"                             { return symbol(sym.FALSE); }
+"use"                               { return symbol(ParserSym.USE); }
+"if"                                { return symbol(ParserSym.IF); }
+"while"                             { return symbol(ParserSym.WHILE); }
+"else"                              { return symbol(ParserSym.ELSE); }
+"return"                            { return symbol(ParserSym.RETURN); }
+"length"                            { return symbol(ParserSym.LENGTH); }
+"int"                               { return symbol(ParserSym.INT); }
+"bool"                              { return symbol(ParserSym.BOOL); }
+"true"                              { return symbol(ParserSym.TRUE); }
+"false"                             { return symbol(ParserSym.FALSE); }
 
- {Identifier}                       { return symbol(sym.IDENTIFIER, yytext()); }
+ {Identifier}                       { return symbol(ParserSym.IDENTIFIER, yytext()); }
 
  /* literals */
- {DecIntegerLiteral}                { if(yytext().length() > "9223372036854775808".length() || yytext().compareTo("9223372036854775808") > 0) { return symbol(sym.error, "Integer literal is too big to process"); } else {return symbol(sym.INTEGER_LITERAL, yytext()); } }
+ {DecIntegerLiteral}                { if(yytext().length() > "9223372036854775808".length() || yytext().compareTo("9223372036854775808") > 0) { return symbol(ParserSym.error, "Integer literal is too big to process"); } else {return symbol(ParserSym.INTEGER_LITERAL, yytext()); } }
  \"                                 { string.setLength(0); stringStartRow = yyline; stringStartCol = yycolumn; yybegin(STRING); }
 
  /* char literals */
- \'[^\n\r]\'                        { return symbol(sym.CHARACTER_LITERAL, yytext().charAt(1)); }
- "'\n'"                             { return symbol(sym.CHARACTER_LITERAL, yytext().charAt(1)); }
- "'\r'"                             { return symbol(sym.CHARACTER_LITERAL, yytext().charAt(1)); }
- \'{HexChar}\'                      { return symbol(sym.CHARACTER_LITERAL, hexToString(yytext().substring(1, yytext().length()-1))); }
+ \'[^\n\r]\'                        { return symbol(ParserSym.CHARACTER_LITERAL, yytext().charAt(1)); }
+ "'\n'"                             { return symbol(ParserSym.CHARACTER_LITERAL, yytext().charAt(1)); }
+ "'\r'"                             { return symbol(ParserSym.CHARACTER_LITERAL, yytext().charAt(1)); }
+ \'{HexChar}\'                      { return symbol(ParserSym.CHARACTER_LITERAL, hexToString(yytext().substring(1, yytext().length()-1))); }
 
- \'[^\']*\'                           { return symbol(sym.error, "Invalid character constant"); }
+ \'[^\']*\'                           { return symbol(ParserSym.error, "Invalid character constant"); }
 
  /* terminals */
- "("                                { return symbol(sym.OPEN_PAREN); }
- ")"                                { return symbol(sym.CLOSE_PAREN); }
- "["                                { return symbol(sym.OPEN_BRACKET); }
- "]"                                { return symbol(sym.CLOSE_BRACKET); }
- "{"                                { return symbol(sym.OPEN_BRACE); }
- "}"                                { return symbol(sym.CLOSE_BRACE); }
- ":"                                { return symbol(sym.COLON); }
- ";"                                { return symbol(sym.SEMICOLON); }
- ","                                { return symbol(sym.COMMA); }
- "_"                                { return symbol(sym.UNDERSCORE); }
+ "("                                { return symbol(ParserSym.OPEN_PAREN); }
+ ")"                                { return symbol(ParserSym.CLOSE_PAREN); }
+ "["                                { return symbol(ParserSym.OPEN_BRACKET); }
+ "]"                                { return symbol(ParserSym.CLOSE_BRACKET); }
+ "{"                                { return symbol(ParserSym.OPEN_BRACE); }
+ "}"                                { return symbol(ParserSym.CLOSE_BRACE); }
+ ":"                                { return symbol(ParserSym.COLON); }
+ ";"                                { return symbol(ParserSym.SEMICOLON); }
+ ","                                { return symbol(ParserSym.COMMA); }
+ "_"                                { return symbol(ParserSym.UNDERSCORE); }
 
  /* operators ordered by precedence */
- "!"      { return symbol(sym.NOT); }
- "*"      { return symbol(sym.TIMES); }
- "*>>"    { return symbol(sym.HIGH_MULT); }
- "/"      { return symbol(sym.DIVIDE); }
- "%"      { return symbol(sym.MODULO); }
- "+"      { return symbol(sym.PLUS); }
- "-"      { return symbol(sym.MINUS); }
- "<"      { return symbol(sym.LT); }
- "<="     { return symbol(sym.LEQ); }
- ">="     { return symbol(sym.GEQ); }
- ">"      { return symbol(sym.GT); }
- "=="     { return symbol(sym.EQUAL); }
- "!="     { return symbol(sym.NOT_EQUAL); }
- "&"      { return symbol(sym.AND); }
- "|"      { return symbol(sym.OR); }
- "="        { return symbol(sym.GETS); }
+ "!"      { return symbol(ParserSym.NOT); }
+ "*"      { return symbol(ParserSym.TIMES); }
+ "*>>"    { return symbol(ParserSym.HIGH_MULT); }
+ "/"      { return symbol(ParserSym.DIVIDE); }
+ "%"      { return symbol(ParserSym.MODULO); }
+ "+"      { return symbol(ParserSym.PLUS); }
+ "-"      { return symbol(ParserSym.MINUS); }
+ "<"      { return symbol(ParserSym.LT); }
+ "<="     { return symbol(ParserSym.LEQ); }
+ ">="     { return symbol(ParserSym.GEQ); }
+ ">"      { return symbol(ParserSym.GT); }
+ "=="     { return symbol(ParserSym.EQUAL); }
+ "!="     { return symbol(ParserSym.NOT_EQUAL); }
+ "&"      { return symbol(ParserSym.AND); }
+ "|"      { return symbol(ParserSym.OR); }
+ "="        { return symbol(ParserSym.GETS); }
 
 
     /* comments */
@@ -199,7 +203,7 @@ HexChar = \\x[2-7][0-9A-E]
 
 <STRING> {
     \"                                  { yybegin(YYINITIAL);
-                                     return new Symbol(sym.STRING_LITERAL, stringStartRow, stringStartCol,
+                                     return new Symbol(ParserSym.STRING_LITERAL, stringStartRow, stringStartCol,
                                      string.toString()); }
     {HexChar}                         { string.append(hexToString(yytext())); }
     [^\n\r\"\\]+                      { string.append( yytext() ); }
@@ -215,5 +219,5 @@ HexChar = \\x[2-7][0-9A-E]
 
 
 /* error fallback */
-[^]                                 { return symbol(sym.error,"Illegal character <"+
+[^]                                 { return symbol(ParserSym.error,"Illegal character <"+
                                                    yytext()+">"); }
