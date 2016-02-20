@@ -24,7 +24,6 @@ public class ParserSym {
   public static final int BREAK = 13;
   public static final int ELSE = 11;
   public static final int IDENTIFIER = 2;
-  public static final int OPTIONAL_SEMICOLON = 44;
   public static final int EOF = 0;
   public static final int IF = 10;
   public static final int COMMA = 39;
@@ -97,8 +96,7 @@ public class ParserSym {
   "SEMICOLON",
   "UNDERSCORE",
   "HIGH_MULT",
-  "UMINUS",
-  "OPTIONAL_SEMICOLON"
+  "UMINUS"
   };
 }
 

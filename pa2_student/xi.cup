@@ -125,12 +125,12 @@ expression ::= IDENTIFIER:i {: RESULT = new Identifier(i); :}
              | unary_operator_expression:uoe {: RESULT = uoe; :}
              ; 
  
-expression_list ::= expression:e COMMA expression_list:lst {: lst.add(e); RESULT = lst; :} 
-          | expression:e {: List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = lst; :}
+expression_list ::= expression:e COMMA expression_list:lst {: lst.add(0, e); RESULT = lst; :} 
+          | expression:e {: List<Expression> lst = new LinkedList<>(); lst.add(0, e); RESULT = lst; :}
           ;
 
-expression_list_trailing_comma ::= expression:e COMMA expression_list_trailing_comma:lst {: lst.add(e); RESULT = lst; :} 
-                                 | expression:e COMMA {: List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = lst; :}
+expression_list_trailing_comma ::= expression:e COMMA expression_list_trailing_comma:lst {: lst.add(0, e); RESULT = lst; :} 
+                                 | expression:e COMMA {: List<Expression> lst = new LinkedList<>(); lst.add(0, e); RESULT = lst; :}
                                  ;
  
 array_literal ::= OPEN_BRACE expression_list:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); :}
@@ -159,32 +159,32 @@ type ::= primitive_type:pt {: RESULT = pt; :}
        ;
        
 types ::= type COMMA types 
-       | type:t  {: List<Type> lst = new LinkedList<>(); lst.add(t); RESULT = lst; :}
+       | type:t  {: List<Type> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; :}
        ; // for functions that return multiple results
 
 typed_declaration ::= IDENTIFIER:id COLON type:t {: RESULT = new TypedDeclaration(new Identifier(id),t); :} //x:int
                     ;
 
-typed_declaration_list ::= typed_declaration:td COMMA typed_declaration_list:lst {: lst.add(td); RESULT = lst; :}
-                        | typed_declaration:td1 COMMA typed_declaration:td2 {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(td1); lst.add(td2); RESULT = lst; :}
+typed_declaration_list ::= typed_declaration:td COMMA typed_declaration_list:lst {: lst.add(0, td); RESULT = lst; :}
+                        | typed_declaration:td1 COMMA typed_declaration:td2 {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(0, td1); lst.add(0, td2); RESULT = lst; :}
                         ; 
                         //enforce more than one to not get confused with typed_declaration
              
 function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), lst); :}//f(x,y,z,...) 
                 | IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), new LinkedList<Expression>()); :} // f()
-                | LENGTH OPEN_PAREN expression:e CLOSE_PAREN {: List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = new FunctionCall(new Identifier("length"), lst); :}
+                | LENGTH OPEN_PAREN expression:e CLOSE_PAREN {: List<Expression> lst = new LinkedList<>(); lst.add(0, e); RESULT = new FunctionCall(new Identifier("length"), lst); :}
                 ;
 
 assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
                  | UNDERSCORE {: RESULT = new Underscore(); :}
                  ;
                  
-assignment_lhs_list ::= assignment_lhs:al COMMA assignment_lhs_list:all {: all.add(al); RESULT = all; :} 
-                      | assignment_lhs:al1 COMMA assignment_lhs:al2 {: List<Assignable> aList = new LinkedList<Assignable>(); aList.add(al1); aList.add(al2); RESULT = aList; :} //enforce multiple things on LHS
+assignment_lhs_list ::= assignment_lhs:al COMMA assignment_lhs_list:all {: all.add(0, al); RESULT = all; :} 
+                      | assignment_lhs:al1 COMMA assignment_lhs:al2 {: List<Assignable> aList = new LinkedList<Assignable>(); aList.add(0, al1); aList.add(0, al2); RESULT = aList; :} //enforce multiple things on LHS
                       | typed_declaration_list:tdl {: RESULT = new LinkedList<Assignable>(tdl); :} //allow x:int, y:int, ... to be on lhs of assignment
                       ;
 
-assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new LinkedList<>(); lst.add(al); RESULT = new Assignment(lst, e); :}// x = expression
+assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); RESULT = new Assignment(lst, e); :}// x = expression
              | assignment_lhs_list:all GETS function_call:fc {: RESULT = new Assignment(all, fc); :}// x,y,z,... = f(x) as well as x:int,y:int,... = f(x)
              | typed_declaration:td GETS expression:e {: RESULT = new Assignment(new ArrayList<Assignable>(Arrays.asList(td)), e); :}//allow x:int = expression 
              ;
@@ -219,7 +219,7 @@ block ::= OPEN_BRACE block_list:bl CLOSE_BRACE  {: RESULT = bl; :}
         | statement:s {: RESULT = s; :}
         ;
 
-block_list ::= block:b block_list:bl {: bl.getBlockList().add(b); RESULT = bl; :}
+block_list ::= block:b block_list:bl {: bl.getBlockList().add(0, b); RESULT = bl; :}
              | empty  {: RESULT = new BlockList(new LinkedList<Block>()); :}
              ;
 
@@ -229,8 +229,8 @@ function_declaration_argument_type ::= array_no_size_type:a {: RESULT = a; :}
 function_declaration_argument_single ::= IDENTIFIER:i COLON function_declaration_argument_type:t {: RESULT = new TypedDeclaration(new Identifier(i), t);  :}
                                        ;
 
-function_declaration_argument_list ::= function_declaration_argument_single:fdas COMMA function_declaration_argument_list:lst {: lst.add(fdas); RESULT = lst; :}
-                                     | function_declaration_argument_single:fdas {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(fdas); RESULT = lst; :}
+function_declaration_argument_list ::= function_declaration_argument_single:fdas COMMA function_declaration_argument_list:lst {: lst.add(0, fdas); RESULT = lst; :}
+                                     | function_declaration_argument_single:fdas {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(0, fdas); RESULT = lst; :}
                                      ;
 
 function_declaration_argument ::= function_declaration_argument_list:lst {: RESULT = lst; :}
@@ -241,7 +241,7 @@ function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:
                        | IDENTIFIER:id OPEN_PAREN function_declaration_argument:args CLOSE_PAREN procedure_block:fb {: RESULT = new FunctionDeclaration(new Identifier(id),args,new LinkedList<Type>(),fb); :}
                        ;
 
-function_declaration_list ::= function_declaration:fd function_declaration_list:lst {: lst.add(fd); RESULT = lst; :}
+function_declaration_list ::= function_declaration:fd function_declaration_list:lst {: lst.add(0, fd); RESULT = lst; :}
                             | empty {: RESULT = new LinkedList<FunctionDeclaration>(); :}
                             ;
                 
@@ -253,7 +253,7 @@ procedure_call ::= IDENTIFIER:id OPEN_PAREN expression_list:elist CLOSE_PAREN {:
                  | IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new ProcedureCall(new Identifier(id), new LinkedList<Expression>()); :}// f()
                  ;
 
-use_block ::= USE IDENTIFIER:id use_block:u {: u.add(new UseStatement(new Identifier(id))); RESULT = u; :} 
+use_block ::= USE IDENTIFIER:id use_block:u {: u.add(0, new UseStatement(new Identifier(id))); RESULT = u; :} 
             | empty   {: RESULT = new LinkedList<UseStatement>(); :}
             ;
       
