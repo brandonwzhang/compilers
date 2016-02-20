@@ -1,32 +1,30 @@
 package com.AST;
 
 public interface NodeVisitor {
-
-
-    public void visit(ArrayBrackets node);
-    public void visit(ArrayIndex node);
-    public void visit(ArrayLiteral node);
-    public void visit(Assignment node);
-    public void visit(Binary node);
-    public void visit(BlockList node);
-    public void visit(BooleanLiteral node);
-    public void visit(CharacterLiteral node);
-    public void visit(FunctionBlock node);
-    public void visit(FunctionCall node);
-    public void visit(FunctionDeclaration node);
-    public void visit(Identifier node);
-    public void visit(IfStatement node);
-    public void visit(IntegerLiteral node);
-    public void visit(ProcedureCall node);
-    public void visit(Program node);
-    public void visit(ReturnStatement node);
-    public void visit(Statement node);
-    public void visit(StringLiteral node);
-    public void visit(Type node);
-    public void visit(TypedDeclaration node);
-    public void visit(Unary node);
-    public void visit(Underscore node);
-    public void visit(UseStatement node);
-    public void visit(WhileStatement node);
+    void visit(ArrayBrackets node);
+    void visit(ArrayIndex node);
+    void visit(ArrayLiteral node);
+    void visit(Assignment node);
+    void visit(Binary node);
+    void visit(BlockList node);
+    void visit(BooleanLiteral node);
+    void visit(CharacterLiteral node);
+    void visit(FunctionBlock node);
+    void visit(FunctionCall node);
+    void visit(FunctionDeclaration node);
+    void visit(Identifier node);
+    void visit(IfStatement node);
+    void visit(IntegerLiteral node);
+    void visit(ProcedureCall node);
+    void visit(Program node);
+    void visit(ReturnStatement node);
+    void visit(Statement node);
+    void visit(StringLiteral node);
+    void visit(Type node);
+    void visit(TypedDeclaration node);
+    void visit(Unary node);
+    void visit(Underscore node);
+    void visit(UseStatement node);
+    void visit(WhileStatement node);
 
 }
