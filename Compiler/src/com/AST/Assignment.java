@@ -4,6 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class Assignment extends Statement {
-    List<Optional<Assignable>> variables;
+    List<Assignable> variables;
     Expression expression;
 }
