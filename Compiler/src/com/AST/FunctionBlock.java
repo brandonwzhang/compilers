@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class FunctionBlock extends Block {
+public class FunctionBlock extends MethodBlock {
     private BlockList blockList;
     private ReturnStatement returnStatement;
 
