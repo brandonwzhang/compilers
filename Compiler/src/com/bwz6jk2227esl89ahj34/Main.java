@@ -2,7 +2,6 @@ package com.bwz6jk2227esl89ahj34;
 import com.AST.*;
 import java.io.*;
 import java_cup.runtime.*;
-import java.util.*;
 
 public class Main {
     private static String sourcePath = "./";
@@ -12,7 +11,7 @@ public class Main {
         CLI cli = new CLI();
         cli.addOption("--lex",
                       "Lex a .xi file to a .lexed file",
-                      files -> XiLexer.lexFile(sourcePath, diagnosticPath,
+                      files -> Lexer.lexFile(sourcePath, diagnosticPath,
                               files),
                       1);
         cli.addOption("--parse",
@@ -70,7 +69,7 @@ public class Main {
         try {
             for (int i = 0; i < files.length; i++) {
                 FileReader reader = new FileReader(files[i]);
-                XiLexer lexer = new XiLexer(reader);
+                Lexer lexer = new Lexer(reader);
                 ComplexSymbolFactory csf = new ComplexSymbolFactory();
                 parser parser = new parser(lexer, csf);
                 Symbol result = parser.parse();

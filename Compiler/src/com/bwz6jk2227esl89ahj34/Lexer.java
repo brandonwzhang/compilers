@@ -5,7 +5,6 @@ import java_cup.runtime.*;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.io.FileReader;
-import java.io.PrintWriter;
 
 
 /**
@@ -13,7 +12,7 @@ import java.io.PrintWriter;
  * <a href="http://www.jflex.de/">JFlex</a> 1.6.1
  * from the specification file <tt>/Users/brandonzhang/IdeaProjects/compilers/lexer/xi.flex</tt>
  */
-class XiLexer implements java_cup.runtime.Scanner {
+class Lexer implements java_cup.runtime.Scanner {
 
   /** This character denotes the end of file */
   public static final int YYEOF = -1;
@@ -366,7 +365,7 @@ class XiLexer implements java_cup.runtime.Scanner {
       for (int i = 0; i < files.length; i++) {
         ArrayList<String> lines = new ArrayList<String>();
         FileReader reader = new FileReader(files[i]);
-        XiLexer lexer = new XiLexer(reader);
+        Lexer lexer = new Lexer(reader);
         Symbol next = lexer.next_token();
         while (next.sym != sym.EOF && next.sym != sym.error) {
           String line = (next.left + 1) + ":" +
@@ -414,7 +413,7 @@ class XiLexer implements java_cup.runtime.Scanner {
    *
    * @param   in  the java.io.Reader to read input from.
    */
-  XiLexer(java.io.Reader in) {
+  Lexer(java.io.Reader in) {
     this.zzReader = in;
   }
 
