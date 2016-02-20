@@ -5,16 +5,12 @@ import java.util.List;
 
 public @Data class Type extends Node {
 
-    public enum BasicType {
+    public enum PrimitiveType {
         INT,
         BOOL
     }
 
-    BasicType basicType;
+    PrimitiveType basicType;
 
-    // the expressions that go inside the front brackets
-    List<Expression> sizedBrackets;
-
-    // the number of emptyBrackets
-    int emptyBrackets;
+    ArrayBrackets arrayBrackets;
 }
