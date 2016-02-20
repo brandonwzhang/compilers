@@ -10,24 +10,24 @@ import java.util.*;
 
 /** CUP v0.11b 20150326 generated parser.
   */
-public class parser
+public class Parser
  extends java_cup.runtime.lr_parser {
 
   @Override
   public final Class<?> getSymbolContainer() {
-    return sym.class;
+    return ParserSym.class;
   }
 
   /** Default constructor. */
   @Deprecated
-  public parser() {super();}
+  public Parser() {super();}
 
   /** Constructor which sets the default scanner. */
   @Deprecated
-  public parser(java_cup.runtime.Scanner s) {super(s);}
+  public Parser(java_cup.runtime.Scanner s) {super(s);}
 
   /** Constructor which sets the default scanner and a SymbolFactory. */
-  public parser(java_cup.runtime.Scanner s, java_cup.runtime.SymbolFactory sf) {super(s,sf);}
+  public Parser(java_cup.runtime.Scanner s, java_cup.runtime.SymbolFactory sf) {super(s,sf);}
 
   /** Production table. */
   protected static final short _production_table[][] = 
@@ -449,13 +449,13 @@ public class parser
   public short[][] reduce_table() {return _reduce_table;}
 
   /** Instance of action encapsulation class. */
-  protected CUP$parser$actions action_obj;
+  protected CUP$Parser$actions action_obj;
 
   /** Action encapsulation object initializer. */
   @Override
   protected void init_actions()
     {
-      action_obj = new CUP$parser$actions(this);
+      action_obj = new CUP$Parser$actions(this);
     }
 
   /** Invoke a user supplied parse action. */
@@ -468,7 +468,7 @@ public class parser
     throws java.lang.Exception
   {
     /* call code in generated class */
-    return action_obj.CUP$parser$do_action(act_num, parser, stack, top);
+    return action_obj.CUP$Parser$do_action(act_num, parser, stack, top);
   }
 
   /** Indicates start state. */
@@ -488,1191 +488,1191 @@ public class parser
 
 
 /** Cup generated class to encapsulate user supplied action code.*/
-class CUP$parser$actions {
-    private final parser parser;
+class CUP$Parser$actions {
+    private final Parser parser;
 
     /** Constructor */
-    CUP$parser$actions(parser parser) {
+    CUP$Parser$actions(Parser parser) {
         this.parser = parser;
     }
 
     /** Method with the actual generated action code for actions 0 to 93. */
-    public final java_cup.runtime.Symbol CUP$parser$do_action_part00000000(
-            int                        CUP$parser$act_num,
-            java_cup.runtime.lr_parser CUP$parser$parser,
-            java.util.Stack<java_cup.runtime.Symbol> CUP$parser$stack,
-            int                        CUP$parser$top)
+    public final java_cup.runtime.Symbol CUP$Parser$do_action_part00000000(
+            int                        CUP$Parser$act_num,
+            java_cup.runtime.lr_parser CUP$Parser$parser,
+            java.util.Stack<java_cup.runtime.Symbol> CUP$Parser$stack,
+            int                        CUP$Parser$top)
             throws java.lang.Exception {
             /* Symbol object for return from actions */
-            java_cup.runtime.Symbol CUP$parser$result;
+            java_cup.runtime.Symbol CUP$Parser$result;
 
         /* select the action based on the action number */
-        switch (CUP$parser$act_num) {
+        switch (CUP$Parser$act_num) {
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 0: // $START ::= program EOF 
             {
                 Object RESULT = null;
-                int start_valleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int start_valright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                Program start_val = CUP$parser$stack.elementAt(CUP$parser$top-1).<Program> value();
+                int start_valleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int start_valright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                Program start_val = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<Program> value();
                 RESULT = start_val;
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("$START",0, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("$START",0, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             /* ACCEPT */
-            CUP$parser$parser.done_parsing();
-            return CUP$parser$result;
+            CUP$Parser$parser.done_parsing();
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 1: // empty ::= 
             {
                 Object RESULT = null;
 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("empty",1, CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("empty",1, CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 2: // boolean_literal ::= TRUE 
             {
                 BooleanLiteral RESULT = null;
                  RESULT = new BooleanLiteral(true); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("boolean_literal",6, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("boolean_literal",6, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 3: // boolean_literal ::= FALSE 
             {
                 BooleanLiteral RESULT = null;
                  RESULT = new BooleanLiteral(false); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("boolean_literal",6, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("boolean_literal",6, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 4: // binary_operator ::= PLUS 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.PLUS; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 5: // binary_operator ::= MINUS 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.MINUS; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 6: // binary_operator ::= TIMES 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.TIMES; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 7: // binary_operator ::= DIVIDE 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.DIVIDE; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 8: // binary_operator ::= MODULO 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.MODULO; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 9: // binary_operator ::= HIGH_MULT 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.HIGH_MULT; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 10: // binary_operator ::= AND 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.AND; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 11: // binary_operator ::= OR 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.OR; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 12: // binary_operator ::= EQUAL 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.EQUAL; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 13: // binary_operator ::= NOT_EQUAL 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.NOT_EQUAL; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 14: // binary_operator ::= LT 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.LT; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 15: // binary_operator ::= LEQ 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.LEQ; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 16: // binary_operator ::= GT 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.GT; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 17: // binary_operator ::= GEQ 
             {
                 BinaryOperator RESULT = null;
                  RESULT = BinaryOperator.GEQ; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 18: // binary_operator_expression ::= expression binary_operator expression 
             {
                 Binary RESULT = null;
-                int e1left = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int e1right = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                Expression e1 = CUP$parser$stack.elementAt(CUP$parser$top-2).<Expression> value();
-                int bopleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int bopright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                BinaryOperator bop = CUP$parser$stack.elementAt(CUP$parser$top-1).<BinaryOperator> value();
-                int e2left = CUP$parser$stack.peek().left;
-                int e2right = CUP$parser$stack.peek().right;
-                Expression e2 = CUP$parser$stack.peek().<Expression> value();
+                int e1left = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int e1right = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                Expression e1 = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<Expression> value();
+                int bopleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int bopright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                BinaryOperator bop = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<BinaryOperator> value();
+                int e2left = CUP$Parser$stack.peek().left;
+                int e2right = CUP$Parser$stack.peek().right;
+                Expression e2 = CUP$Parser$stack.peek().<Expression> value();
                  RESULT = new Binary(bop,e1,e2); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("binary_operator_expression",4, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("binary_operator_expression",4, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 19: // unary_operator_expression ::= NOT expression 
             {
                 Unary RESULT = null;
-                int eleft = CUP$parser$stack.peek().left;
-                int eright = CUP$parser$stack.peek().right;
-                Expression e = CUP$parser$stack.peek().<Expression> value();
+                int eleft = CUP$Parser$stack.peek().left;
+                int eright = CUP$Parser$stack.peek().right;
+                Expression e = CUP$Parser$stack.peek().<Expression> value();
                  RESULT = new Unary(UnaryOperator.NOT, e); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("unary_operator_expression",5, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("unary_operator_expression",5, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 20: // unary_operator_expression ::= MINUS expression 
             {
                 Unary RESULT = null;
-                int eleft = CUP$parser$stack.peek().left;
-                int eright = CUP$parser$stack.peek().right;
-                Expression e = CUP$parser$stack.peek().<Expression> value();
+                int eleft = CUP$Parser$stack.peek().left;
+                int eright = CUP$Parser$stack.peek().right;
+                Expression e = CUP$Parser$stack.peek().<Expression> value();
                  RESULT = new Unary(UnaryOperator.MINUS, e); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("unary_operator_expression",5, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("unary_operator_expression",5, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 21: // array_index ::= expression OPEN_BRACKET expression CLOSE_BRACKET 
             {
                 ArrayIndex RESULT = null;
-                int e1left = CUP$parser$stack.elementAt(CUP$parser$top-3).left;
-                int e1right = CUP$parser$stack.elementAt(CUP$parser$top-3).right;
-                Expression e1 = CUP$parser$stack.elementAt(CUP$parser$top-3).<Expression> value();
-                int e2left = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int e2right = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                Expression e2 = CUP$parser$stack.elementAt(CUP$parser$top-1).<Expression> value();
+                int e1left = CUP$Parser$stack.elementAt(CUP$Parser$top-3).left;
+                int e1right = CUP$Parser$stack.elementAt(CUP$Parser$top-3).right;
+                Expression e1 = CUP$Parser$stack.elementAt(CUP$Parser$top-3).<Expression> value();
+                int e2left = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int e2right = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                Expression e2 = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<Expression> value();
                  RESULT = new ArrayIndex(e1, e2); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("array_index",7, CUP$parser$stack.elementAt(CUP$parser$top-3), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("array_index",7, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 22: // expression ::= IDENTIFIER 
             {
                 Expression RESULT = null;
-                int ileft = CUP$parser$stack.peek().left;
-                int iright = CUP$parser$stack.peek().right;
-                String i = CUP$parser$stack.peek().<String> value();
+                int ileft = CUP$Parser$stack.peek().left;
+                int iright = CUP$Parser$stack.peek().right;
+                String i = CUP$Parser$stack.peek().<String> value();
                  RESULT = new Identifier(i); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 23: // expression ::= STRING_LITERAL 
             {
                 Expression RESULT = null;
-                int sleft = CUP$parser$stack.peek().left;
-                int sright = CUP$parser$stack.peek().right;
-                String s = CUP$parser$stack.peek().<String> value();
+                int sleft = CUP$Parser$stack.peek().left;
+                int sright = CUP$Parser$stack.peek().right;
+                String s = CUP$Parser$stack.peek().<String> value();
                  RESULT = new StringLiteral(s); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 24: // expression ::= CHARACTER_LITERAL 
             {
                 Expression RESULT = null;
-                int cleft = CUP$parser$stack.peek().left;
-                int cright = CUP$parser$stack.peek().right;
-                Character c = CUP$parser$stack.peek().<Character> value();
+                int cleft = CUP$Parser$stack.peek().left;
+                int cright = CUP$Parser$stack.peek().right;
+                Character c = CUP$Parser$stack.peek().<Character> value();
                  RESULT = new CharacterLiteral(c); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 25: // expression ::= array_index 
             {
                 Expression RESULT = null;
-                int aileft = CUP$parser$stack.peek().left;
-                int airight = CUP$parser$stack.peek().right;
-                ArrayIndex ai = CUP$parser$stack.peek().<ArrayIndex> value();
+                int aileft = CUP$Parser$stack.peek().left;
+                int airight = CUP$Parser$stack.peek().right;
+                ArrayIndex ai = CUP$Parser$stack.peek().<ArrayIndex> value();
                  RESULT = ai; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 26: // expression ::= function_call 
             {
                 Expression RESULT = null;
-                int fcleft = CUP$parser$stack.peek().left;
-                int fcright = CUP$parser$stack.peek().right;
-                FunctionCall fc = CUP$parser$stack.peek().<FunctionCall> value();
+                int fcleft = CUP$Parser$stack.peek().left;
+                int fcright = CUP$Parser$stack.peek().right;
+                FunctionCall fc = CUP$Parser$stack.peek().<FunctionCall> value();
                  RESULT = fc; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 27: // expression ::= array_literal 
             {
                 Expression RESULT = null;
-                int alleft = CUP$parser$stack.peek().left;
-                int alright = CUP$parser$stack.peek().right;
-                ArrayLiteral al = CUP$parser$stack.peek().<ArrayLiteral> value();
+                int alleft = CUP$Parser$stack.peek().left;
+                int alright = CUP$Parser$stack.peek().right;
+                ArrayLiteral al = CUP$Parser$stack.peek().<ArrayLiteral> value();
                  RESULT = al; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 28: // expression ::= boolean_literal 
             {
                 Expression RESULT = null;
-                int blleft = CUP$parser$stack.peek().left;
-                int blright = CUP$parser$stack.peek().right;
-                BooleanLiteral bl = CUP$parser$stack.peek().<BooleanLiteral> value();
+                int blleft = CUP$Parser$stack.peek().left;
+                int blright = CUP$Parser$stack.peek().right;
+                BooleanLiteral bl = CUP$Parser$stack.peek().<BooleanLiteral> value();
                  RESULT = bl; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 29: // expression ::= INTEGER_LITERAL 
             {
                 Expression RESULT = null;
-                int ileft = CUP$parser$stack.peek().left;
-                int iright = CUP$parser$stack.peek().right;
-                String i = CUP$parser$stack.peek().<String> value();
+                int ileft = CUP$Parser$stack.peek().left;
+                int iright = CUP$Parser$stack.peek().right;
+                String i = CUP$Parser$stack.peek().<String> value();
                  RESULT = new IntegerLiteral(i); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 30: // expression ::= binary_operator_expression 
             {
                 Expression RESULT = null;
-                int boeleft = CUP$parser$stack.peek().left;
-                int boeright = CUP$parser$stack.peek().right;
-                Binary boe = CUP$parser$stack.peek().<Binary> value();
+                int boeleft = CUP$Parser$stack.peek().left;
+                int boeright = CUP$Parser$stack.peek().right;
+                Binary boe = CUP$Parser$stack.peek().<Binary> value();
                  RESULT = boe; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 31: // expression ::= unary_operator_expression 
             {
                 Expression RESULT = null;
-                int uoeleft = CUP$parser$stack.peek().left;
-                int uoeright = CUP$parser$stack.peek().right;
-                Unary uoe = CUP$parser$stack.peek().<Unary> value();
+                int uoeleft = CUP$Parser$stack.peek().left;
+                int uoeright = CUP$Parser$stack.peek().right;
+                Unary uoe = CUP$Parser$stack.peek().<Unary> value();
                  RESULT = uoe; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression",9, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 32: // expression_list ::= expression COMMA expression_list 
             {
                 List<Expression> RESULT = null;
-                int eleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int eright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                Expression e = CUP$parser$stack.elementAt(CUP$parser$top-2).<Expression> value();
-                int lstleft = CUP$parser$stack.peek().left;
-                int lstright = CUP$parser$stack.peek().right;
-                List<Expression> lst = CUP$parser$stack.peek().<List<Expression>> value();
+                int eleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int eright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                Expression e = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<Expression> value();
+                int lstleft = CUP$Parser$stack.peek().left;
+                int lstright = CUP$Parser$stack.peek().right;
+                List<Expression> lst = CUP$Parser$stack.peek().<List<Expression>> value();
                  lst.add(e); RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression_list",10, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression_list",10, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 33: // expression_list ::= expression 
             {
                 List<Expression> RESULT = null;
-                int eleft = CUP$parser$stack.peek().left;
-                int eright = CUP$parser$stack.peek().right;
-                Expression e = CUP$parser$stack.peek().<Expression> value();
+                int eleft = CUP$Parser$stack.peek().left;
+                int eright = CUP$Parser$stack.peek().right;
+                Expression e = CUP$Parser$stack.peek().<Expression> value();
                  List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression_list",10, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression_list",10, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 34: // expression_list_trailing_comma ::= expression COMMA expression_list_trailing_comma 
             {
                 List<Expression> RESULT = null;
-                int eleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int eright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                Expression e = CUP$parser$stack.elementAt(CUP$parser$top-2).<Expression> value();
-                int lstleft = CUP$parser$stack.peek().left;
-                int lstright = CUP$parser$stack.peek().right;
-                List<Expression> lst = CUP$parser$stack.peek().<List<Expression>> value();
+                int eleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int eright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                Expression e = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<Expression> value();
+                int lstleft = CUP$Parser$stack.peek().left;
+                int lstright = CUP$Parser$stack.peek().right;
+                List<Expression> lst = CUP$Parser$stack.peek().<List<Expression>> value();
                  lst.add(e); RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression_list_trailing_comma",11, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression_list_trailing_comma",11, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 35: // expression_list_trailing_comma ::= expression COMMA 
             {
                 List<Expression> RESULT = null;
-                int eleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int eright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                Expression e = CUP$parser$stack.elementAt(CUP$parser$top-1).<Expression> value();
+                int eleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int eright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                Expression e = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<Expression> value();
                  List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("expression_list_trailing_comma",11, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("expression_list_trailing_comma",11, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 36: // array_literal ::= OPEN_BRACE expression_list CLOSE_BRACE 
             {
                 ArrayLiteral RESULT = null;
-                int lstleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int lstright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                List<Expression> lst = CUP$parser$stack.elementAt(CUP$parser$top-1).<List<Expression>> value();
+                int lstleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int lstright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                List<Expression> lst = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<List<Expression>> value();
                  RESULT = new ArrayLiteral(lst); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("array_literal",8, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("array_literal",8, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 37: // array_literal ::= OPEN_BRACE expression_list_trailing_comma CLOSE_BRACE 
             {
                 ArrayLiteral RESULT = null;
-                int lstleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int lstright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                List<Expression> lst = CUP$parser$stack.elementAt(CUP$parser$top-1).<List<Expression>> value();
+                int lstleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int lstright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                List<Expression> lst = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<List<Expression>> value();
                  RESULT = new ArrayLiteral(lst); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("array_literal",8, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("array_literal",8, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 38: // primitive_type ::= INT 
             {
                 Type.PrimitiveType RESULT = null;
                  RESULT = Type.PrimitiveType.INT; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("primitive_type",12, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("primitive_type",12, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 39: // primitive_type ::= BOOL 
             {
                 Type.PrimitiveType RESULT = null;
                  RESULT = Type.PrimitiveType.BOOL; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("primitive_type",12, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("primitive_type",12, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 40: // array_sized ::= OPEN_BRACKET expression CLOSE_BRACKET array_sized 
             {
                 List<Optional<Expression>> RESULT = null;
-                int eleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int eright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                Expression e = CUP$parser$stack.elementAt(CUP$parser$top-2).<Expression> value();
-                int lstleft = CUP$parser$stack.peek().left;
-                int lstright = CUP$parser$stack.peek().right;
-                List<Optional<Expression>> lst = CUP$parser$stack.peek().<List<Optional<Expression>>> value();
+                int eleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int eright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                Expression e = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<Expression> value();
+                int lstleft = CUP$Parser$stack.peek().left;
+                int lstright = CUP$Parser$stack.peek().right;
+                List<Optional<Expression>> lst = CUP$Parser$stack.peek().<List<Optional<Expression>>> value();
                  lst.add(Optional.of(e)); RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("array_sized",15, CUP$parser$stack.elementAt(CUP$parser$top-3), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("array_sized",15, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 41: // array_sized ::= array_empty 
             {
                 List<Optional<Expression>> RESULT = null;
-                int aeleft = CUP$parser$stack.peek().left;
-                int aeright = CUP$parser$stack.peek().right;
-                List<Optional<Expression>> ae = CUP$parser$stack.peek().<List<Optional<Expression>>> value();
+                int aeleft = CUP$Parser$stack.peek().left;
+                int aeright = CUP$Parser$stack.peek().right;
+                List<Optional<Expression>> ae = CUP$Parser$stack.peek().<List<Optional<Expression>>> value();
                  RESULT = ae; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("array_sized",15, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("array_sized",15, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 42: // array_empty ::= OPEN_BRACKET CLOSE_BRACKET array_empty 
             {
                 List<Optional<Expression>> RESULT = null;
-                int lstleft = CUP$parser$stack.peek().left;
-                int lstright = CUP$parser$stack.peek().right;
-                List<Optional<Expression>> lst = CUP$parser$stack.peek().<List<Optional<Expression>>> value();
+                int lstleft = CUP$Parser$stack.peek().left;
+                int lstright = CUP$Parser$stack.peek().right;
+                List<Optional<Expression>> lst = CUP$Parser$stack.peek().<List<Optional<Expression>>> value();
                  lst.add(Optional.empty()); RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("array_empty",16, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("array_empty",16, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 43: // array_empty ::= empty 
             {
                 List<Optional<Expression>> RESULT = null;
                  RESULT = new LinkedList<Optional<Expression>>(); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("array_empty",16, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("array_empty",16, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 44: // type ::= primitive_type array_sized 
             {
                 Type RESULT = null;
-                int ptleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int ptright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                Type.PrimitiveType pt = CUP$parser$stack.elementAt(CUP$parser$top-1).<Type.PrimitiveType> value();
-                int asleft = CUP$parser$stack.peek().left;
-                int asright = CUP$parser$stack.peek().right;
-                List<Optional<Expression>> as = CUP$parser$stack.peek().<List<Optional<Expression>>> value();
+                int ptleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int ptright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                Type.PrimitiveType pt = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<Type.PrimitiveType> value();
+                int asleft = CUP$Parser$stack.peek().left;
+                int asright = CUP$Parser$stack.peek().right;
+                List<Optional<Expression>> as = CUP$Parser$stack.peek().<List<Optional<Expression>>> value();
                  RESULT = new Type(pt, new ArrayBrackets(as)); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("type",13, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("type",13, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 45: // types ::= type COMMA types 
             {
                 List<Type> RESULT = null;
 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("types",14, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("types",14, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 46: // types ::= type 
             {
                 List<Type> RESULT = null;
-                int tleft = CUP$parser$stack.peek().left;
-                int tright = CUP$parser$stack.peek().right;
-                Type t = CUP$parser$stack.peek().<Type> value();
+                int tleft = CUP$Parser$stack.peek().left;
+                int tright = CUP$Parser$stack.peek().right;
+                Type t = CUP$Parser$stack.peek().<Type> value();
                  List<Type> lst = new LinkedList<>(); lst.add(t); RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("types",14, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("types",14, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 47: // typed_declaration ::= IDENTIFIER COLON type 
             {
                 TypedDeclaration RESULT = null;
-                int idleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int idright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                String id = CUP$parser$stack.elementAt(CUP$parser$top-2).<String> value();
-                int tleft = CUP$parser$stack.peek().left;
-                int tright = CUP$parser$stack.peek().right;
-                Type t = CUP$parser$stack.peek().<Type> value();
+                int idleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int idright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                String id = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<String> value();
+                int tleft = CUP$Parser$stack.peek().left;
+                int tright = CUP$Parser$stack.peek().right;
+                Type t = CUP$Parser$stack.peek().<Type> value();
                  RESULT = new TypedDeclaration(new Identifier(id),t); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("typed_declaration",17, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("typed_declaration",17, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 48: // typed_declaration_list ::= typed_declaration COMMA typed_declaration_list 
             {
                 List<TypedDeclaration> RESULT = null;
-                int tdleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int tdright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                TypedDeclaration td = CUP$parser$stack.elementAt(CUP$parser$top-2).<TypedDeclaration> value();
-                int lstleft = CUP$parser$stack.peek().left;
-                int lstright = CUP$parser$stack.peek().right;
-                List<TypedDeclaration> lst = CUP$parser$stack.peek().<List<TypedDeclaration>> value();
+                int tdleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int tdright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                TypedDeclaration td = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<TypedDeclaration> value();
+                int lstleft = CUP$Parser$stack.peek().left;
+                int lstright = CUP$Parser$stack.peek().right;
+                List<TypedDeclaration> lst = CUP$Parser$stack.peek().<List<TypedDeclaration>> value();
                  lst.add(td); RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("typed_declaration_list",18, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("typed_declaration_list",18, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 49: // typed_declaration_list ::= typed_declaration COMMA typed_declaration 
             {
                 List<TypedDeclaration> RESULT = null;
-                int td1left = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int td1right = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                TypedDeclaration td1 = CUP$parser$stack.elementAt(CUP$parser$top-2).<TypedDeclaration> value();
-                int td2left = CUP$parser$stack.peek().left;
-                int td2right = CUP$parser$stack.peek().right;
-                TypedDeclaration td2 = CUP$parser$stack.peek().<TypedDeclaration> value();
+                int td1left = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int td1right = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                TypedDeclaration td1 = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<TypedDeclaration> value();
+                int td2left = CUP$Parser$stack.peek().left;
+                int td2right = CUP$Parser$stack.peek().right;
+                TypedDeclaration td2 = CUP$Parser$stack.peek().<TypedDeclaration> value();
                  List<TypedDeclaration> lst = new LinkedList<>(); lst.add(td1); lst.add(td2); RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("typed_declaration_list",18, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("typed_declaration_list",18, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 50: // function_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN 
             {
                 FunctionCall RESULT = null;
-                int idleft = CUP$parser$stack.elementAt(CUP$parser$top-3).left;
-                int idright = CUP$parser$stack.elementAt(CUP$parser$top-3).right;
-                String id = CUP$parser$stack.elementAt(CUP$parser$top-3).<String> value();
-                int lstleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int lstright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                List<Expression> lst = CUP$parser$stack.elementAt(CUP$parser$top-1).<List<Expression>> value();
+                int idleft = CUP$Parser$stack.elementAt(CUP$Parser$top-3).left;
+                int idright = CUP$Parser$stack.elementAt(CUP$Parser$top-3).right;
+                String id = CUP$Parser$stack.elementAt(CUP$Parser$top-3).<String> value();
+                int lstleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int lstright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                List<Expression> lst = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<List<Expression>> value();
                  RESULT = new FunctionCall(new Identifier(id), lst); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_call",19, CUP$parser$stack.elementAt(CUP$parser$top-3), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_call",19, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 51: // function_call ::= IDENTIFIER OPEN_PAREN CLOSE_PAREN 
             {
                 FunctionCall RESULT = null;
-                int idleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int idright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                String id = CUP$parser$stack.elementAt(CUP$parser$top-2).<String> value();
+                int idleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int idright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                String id = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<String> value();
                  RESULT = new FunctionCall(new Identifier(id), new LinkedList<Expression>()); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_call",19, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_call",19, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 52: // function_call ::= LENGTH OPEN_PAREN expression CLOSE_PAREN 
             {
                 FunctionCall RESULT = null;
-                int eleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int eright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                Expression e = CUP$parser$stack.elementAt(CUP$parser$top-1).<Expression> value();
+                int eleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int eright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                Expression e = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<Expression> value();
                  List<Expression> lst = new LinkedList<>(); lst.add(e); RESULT = new FunctionCall(new Identifier("length"), lst); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_call",19, CUP$parser$stack.elementAt(CUP$parser$top-3), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_call",19, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 53: // assignment_lhs ::= IDENTIFIER 
             {
                 Assignable RESULT = null;
-                int idleft = CUP$parser$stack.peek().left;
-                int idright = CUP$parser$stack.peek().right;
-                String id = CUP$parser$stack.peek().<String> value();
+                int idleft = CUP$Parser$stack.peek().left;
+                int idright = CUP$Parser$stack.peek().right;
+                String id = CUP$Parser$stack.peek().<String> value();
                  RESULT = new Identifier(id); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs",20, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs",20, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 54: // assignment_lhs ::= UNDERSCORE 
             {
                 Assignable RESULT = null;
                  RESULT = new Underscore(); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs",20, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs",20, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 55: // assignment_lhs_list ::= assignment_lhs COMMA assignment_lhs_list 
             {
                 List<Assignable> RESULT = null;
-                int alleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int alright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                Assignable al = CUP$parser$stack.elementAt(CUP$parser$top-2).<Assignable> value();
-                int allleft = CUP$parser$stack.peek().left;
-                int allright = CUP$parser$stack.peek().right;
-                List<Assignable> all = CUP$parser$stack.peek().<List<Assignable>> value();
+                int alleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int alright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                Assignable al = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<Assignable> value();
+                int allleft = CUP$Parser$stack.peek().left;
+                int allright = CUP$Parser$stack.peek().right;
+                List<Assignable> all = CUP$Parser$stack.peek().<List<Assignable>> value();
                  all.add(al); RESULT = all; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs_list",21, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs_list",21, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 56: // assignment_lhs_list ::= assignment_lhs COMMA assignment_lhs 
             {
                 List<Assignable> RESULT = null;
-                int al1left = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int al1right = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                Assignable al1 = CUP$parser$stack.elementAt(CUP$parser$top-2).<Assignable> value();
-                int al2left = CUP$parser$stack.peek().left;
-                int al2right = CUP$parser$stack.peek().right;
-                Assignable al2 = CUP$parser$stack.peek().<Assignable> value();
+                int al1left = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int al1right = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                Assignable al1 = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<Assignable> value();
+                int al2left = CUP$Parser$stack.peek().left;
+                int al2right = CUP$Parser$stack.peek().right;
+                Assignable al2 = CUP$Parser$stack.peek().<Assignable> value();
                  List<Assignable> aList = new LinkedList<Assignable>(); aList.add(al1); aList.add(al2); RESULT = aList; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs_list",21, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs_list",21, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 57: // assignment_lhs_list ::= typed_declaration_list 
             {
                 List<Assignable> RESULT = null;
-                int tdlleft = CUP$parser$stack.peek().left;
-                int tdlright = CUP$parser$stack.peek().right;
-                List<TypedDeclaration> tdl = CUP$parser$stack.peek().<List<TypedDeclaration>> value();
+                int tdlleft = CUP$Parser$stack.peek().left;
+                int tdlright = CUP$Parser$stack.peek().right;
+                List<TypedDeclaration> tdl = CUP$Parser$stack.peek().<List<TypedDeclaration>> value();
                  RESULT = new LinkedList<Assignable>(tdl); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs_list",21, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs_list",21, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 58: // assignment ::= assignment_lhs GETS expression 
             {
                 Assignment RESULT = null;
-                int alleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int alright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                Assignable al = CUP$parser$stack.elementAt(CUP$parser$top-2).<Assignable> value();
-                int eleft = CUP$parser$stack.peek().left;
-                int eright = CUP$parser$stack.peek().right;
-                Expression e = CUP$parser$stack.peek().<Expression> value();
+                int alleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int alright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                Assignable al = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<Assignable> value();
+                int eleft = CUP$Parser$stack.peek().left;
+                int eright = CUP$Parser$stack.peek().right;
+                Expression e = CUP$Parser$stack.peek().<Expression> value();
                  List<Assignable> lst = new LinkedList<>(); lst.add(al); RESULT = new Assignment(lst, e); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("assignment",22, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment",22, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 59: // assignment ::= assignment_lhs_list GETS function_call 
             {
                 Assignment RESULT = null;
-                int allleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int allright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                List<Assignable> all = CUP$parser$stack.elementAt(CUP$parser$top-2).<List<Assignable>> value();
-                int fcleft = CUP$parser$stack.peek().left;
-                int fcright = CUP$parser$stack.peek().right;
-                FunctionCall fc = CUP$parser$stack.peek().<FunctionCall> value();
+                int allleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int allright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                List<Assignable> all = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<List<Assignable>> value();
+                int fcleft = CUP$Parser$stack.peek().left;
+                int fcright = CUP$Parser$stack.peek().right;
+                FunctionCall fc = CUP$Parser$stack.peek().<FunctionCall> value();
                  RESULT = new Assignment(all, fc); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("assignment",22, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment",22, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 60: // assignment ::= typed_declaration GETS expression 
             {
                 Assignment RESULT = null;
-                int tdleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int tdright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                TypedDeclaration td = CUP$parser$stack.elementAt(CUP$parser$top-2).<TypedDeclaration> value();
-                int eleft = CUP$parser$stack.peek().left;
-                int eright = CUP$parser$stack.peek().right;
-                Expression e = CUP$parser$stack.peek().<Expression> value();
+                int tdleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int tdright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                TypedDeclaration td = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<TypedDeclaration> value();
+                int eleft = CUP$Parser$stack.peek().left;
+                int eright = CUP$Parser$stack.peek().right;
+                Expression e = CUP$Parser$stack.peek().<Expression> value();
                  RESULT = new Assignment(new ArrayList<Assignable>(Arrays.asList(td)), e); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("assignment",22, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment",22, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 61: // if_statement ::= IF OPEN_PAREN expression CLOSE_PAREN block 
             {
                 IfStatement RESULT = null;
-                int eleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int eright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                Expression e = CUP$parser$stack.elementAt(CUP$parser$top-2).<Expression> value();
-                int bleft = CUP$parser$stack.peek().left;
-                int bright = CUP$parser$stack.peek().right;
-                Block b = CUP$parser$stack.peek().<Block> value();
+                int eleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int eright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                Expression e = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<Expression> value();
+                int bleft = CUP$Parser$stack.peek().left;
+                int bright = CUP$Parser$stack.peek().right;
+                Block b = CUP$Parser$stack.peek().<Block> value();
                  RESULT = new IfStatement(e, b, Optional.empty()); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("if_statement",23, CUP$parser$stack.elementAt(CUP$parser$top-4), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("if_statement",23, CUP$Parser$stack.elementAt(CUP$Parser$top-4), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 62: // if_statement ::= IF OPEN_PAREN expression CLOSE_PAREN block ELSE block 
             {
                 IfStatement RESULT = null;
-                int eleft = CUP$parser$stack.elementAt(CUP$parser$top-4).left;
-                int eright = CUP$parser$stack.elementAt(CUP$parser$top-4).right;
-                Expression e = CUP$parser$stack.elementAt(CUP$parser$top-4).<Expression> value();
-                int b1left = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int b1right = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                Block b1 = CUP$parser$stack.elementAt(CUP$parser$top-2).<Block> value();
-                int b2left = CUP$parser$stack.peek().left;
-                int b2right = CUP$parser$stack.peek().right;
-                Block b2 = CUP$parser$stack.peek().<Block> value();
+                int eleft = CUP$Parser$stack.elementAt(CUP$Parser$top-4).left;
+                int eright = CUP$Parser$stack.elementAt(CUP$Parser$top-4).right;
+                Expression e = CUP$Parser$stack.elementAt(CUP$Parser$top-4).<Expression> value();
+                int b1left = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int b1right = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                Block b1 = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<Block> value();
+                int b2left = CUP$Parser$stack.peek().left;
+                int b2right = CUP$Parser$stack.peek().right;
+                Block b2 = CUP$Parser$stack.peek().<Block> value();
                  RESULT = new IfStatement(e, b1, Optional.of(b2)); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("if_statement",23, CUP$parser$stack.elementAt(CUP$parser$top-6), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("if_statement",23, CUP$Parser$stack.elementAt(CUP$Parser$top-6), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 63: // while_statement ::= WHILE OPEN_PAREN expression CLOSE_PAREN block 
             {
                 WhileStatement RESULT = null;
-                int eleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int eright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                Expression e = CUP$parser$stack.elementAt(CUP$parser$top-2).<Expression> value();
-                int bleft = CUP$parser$stack.peek().left;
-                int bright = CUP$parser$stack.peek().right;
-                Block b = CUP$parser$stack.peek().<Block> value();
+                int eleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int eright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                Expression e = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<Expression> value();
+                int bleft = CUP$Parser$stack.peek().left;
+                int bright = CUP$Parser$stack.peek().right;
+                Block b = CUP$Parser$stack.peek().<Block> value();
                  RESULT = new WhileStatement(e,b); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("while_statement",24, CUP$parser$stack.elementAt(CUP$parser$top-4), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("while_statement",24, CUP$Parser$stack.elementAt(CUP$Parser$top-4), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 64: // return_statement ::= RETURN expression_list 
             {
                 ReturnStatement RESULT = null;
-                int lstleft = CUP$parser$stack.peek().left;
-                int lstright = CUP$parser$stack.peek().right;
-                List<Expression> lst = CUP$parser$stack.peek().<List<Expression>> value();
+                int lstleft = CUP$Parser$stack.peek().left;
+                int lstright = CUP$Parser$stack.peek().right;
+                List<Expression> lst = CUP$Parser$stack.peek().<List<Expression>> value();
                  RESULT = new ReturnStatement(lst); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("return_statement",25, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("return_statement",25, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 65: // return_statement ::= RETURN 
             {
                 ReturnStatement RESULT = null;
                  RESULT = new ReturnStatement(new LinkedList<Expression>()); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("return_statement",25, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("return_statement",25, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 66: // statement_no_semicolon ::= if_statement 
             {
                 Statement RESULT = null;
-                int sleft = CUP$parser$stack.peek().left;
-                int sright = CUP$parser$stack.peek().right;
-                IfStatement s = CUP$parser$stack.peek().<IfStatement> value();
+                int sleft = CUP$Parser$stack.peek().left;
+                int sright = CUP$Parser$stack.peek().right;
+                IfStatement s = CUP$Parser$stack.peek().<IfStatement> value();
                  RESULT = s; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",29, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",29, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 67: // statement_no_semicolon ::= while_statement 
             {
                 Statement RESULT = null;
-                int sleft = CUP$parser$stack.peek().left;
-                int sright = CUP$parser$stack.peek().right;
-                WhileStatement s = CUP$parser$stack.peek().<WhileStatement> value();
+                int sleft = CUP$Parser$stack.peek().left;
+                int sright = CUP$Parser$stack.peek().right;
+                WhileStatement s = CUP$Parser$stack.peek().<WhileStatement> value();
                  RESULT = s; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",29, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",29, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 68: // statement_no_semicolon ::= procedure_call 
             {
                 Statement RESULT = null;
-                int pcleft = CUP$parser$stack.peek().left;
-                int pcright = CUP$parser$stack.peek().right;
-                ProcedureCall pc = CUP$parser$stack.peek().<ProcedureCall> value();
+                int pcleft = CUP$Parser$stack.peek().left;
+                int pcright = CUP$Parser$stack.peek().right;
+                ProcedureCall pc = CUP$Parser$stack.peek().<ProcedureCall> value();
                  RESULT = pc; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",29, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",29, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 69: // statement_no_semicolon ::= typed_declaration 
             {
                 Statement RESULT = null;
-                int tdleft = CUP$parser$stack.peek().left;
-                int tdright = CUP$parser$stack.peek().right;
-                TypedDeclaration td = CUP$parser$stack.peek().<TypedDeclaration> value();
+                int tdleft = CUP$Parser$stack.peek().left;
+                int tdright = CUP$Parser$stack.peek().right;
+                TypedDeclaration td = CUP$Parser$stack.peek().<TypedDeclaration> value();
                  RESULT = td; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",29, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",29, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 70: // statement_no_semicolon ::= assignment 
             {
                 Statement RESULT = null;
-                int aleft = CUP$parser$stack.peek().left;
-                int aright = CUP$parser$stack.peek().right;
-                Assignment a = CUP$parser$stack.peek().<Assignment> value();
+                int aleft = CUP$Parser$stack.peek().left;
+                int aright = CUP$Parser$stack.peek().right;
+                Assignment a = CUP$Parser$stack.peek().<Assignment> value();
                  RESULT = a; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",29, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",29, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 71: // statement ::= statement_no_semicolon 
             {
                 Statement RESULT = null;
-                int sleft = CUP$parser$stack.peek().left;
-                int sright = CUP$parser$stack.peek().right;
-                Statement s = CUP$parser$stack.peek().<Statement> value();
+                int sleft = CUP$Parser$stack.peek().left;
+                int sright = CUP$Parser$stack.peek().right;
+                Statement s = CUP$Parser$stack.peek().<Statement> value();
                  RESULT = s; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",28, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement",28, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 72: // statement ::= statement_no_semicolon SEMICOLON 
             {
                 Statement RESULT = null;
-                int sleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int sright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                Statement s = CUP$parser$stack.elementAt(CUP$parser$top-1).<Statement> value();
+                int sleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int sright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                Statement s = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<Statement> value();
                  RESULT = s; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("statement",28, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement",28, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 73: // function_block ::= OPEN_BRACE block_list return_statement CLOSE_BRACE 
             {
                 FunctionBlock RESULT = null;
-                int blleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int blright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                BlockList bl = CUP$parser$stack.elementAt(CUP$parser$top-2).<BlockList> value();
-                int rleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int rright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                ReturnStatement r = CUP$parser$stack.elementAt(CUP$parser$top-1).<ReturnStatement> value();
+                int blleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int blright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                BlockList bl = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<BlockList> value();
+                int rleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int rright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                ReturnStatement r = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<ReturnStatement> value();
                  RESULT = new FunctionBlock(bl, r); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_block",36, CUP$parser$stack.elementAt(CUP$parser$top-3), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_block",36, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 74: // block ::= OPEN_BRACE block_list CLOSE_BRACE 
             {
                 Block RESULT = null;
-                int blleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int blright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                BlockList bl = CUP$parser$stack.elementAt(CUP$parser$top-1).<BlockList> value();
+                int blleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int blright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                BlockList bl = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<BlockList> value();
                  RESULT = bl; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("block",26, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("block",26, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 75: // block ::= function_block 
             {
                 Block RESULT = null;
-                int fbleft = CUP$parser$stack.peek().left;
-                int fbright = CUP$parser$stack.peek().right;
-                FunctionBlock fb = CUP$parser$stack.peek().<FunctionBlock> value();
+                int fbleft = CUP$Parser$stack.peek().left;
+                int fbright = CUP$Parser$stack.peek().right;
+                FunctionBlock fb = CUP$Parser$stack.peek().<FunctionBlock> value();
                  RESULT = fb; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("block",26, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("block",26, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 76: // block ::= statement 
             {
                 Block RESULT = null;
-                int sleft = CUP$parser$stack.peek().left;
-                int sright = CUP$parser$stack.peek().right;
-                Statement s = CUP$parser$stack.peek().<Statement> value();
+                int sleft = CUP$Parser$stack.peek().left;
+                int sright = CUP$Parser$stack.peek().right;
+                Statement s = CUP$Parser$stack.peek().<Statement> value();
                  RESULT = s; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("block",26, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("block",26, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 77: // block_list ::= block block_list 
             {
                 BlockList RESULT = null;
-                int bleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int bright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                Block b = CUP$parser$stack.elementAt(CUP$parser$top-1).<Block> value();
-                int blleft = CUP$parser$stack.peek().left;
-                int blright = CUP$parser$stack.peek().right;
-                BlockList bl = CUP$parser$stack.peek().<BlockList> value();
+                int bleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int bright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                Block b = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<Block> value();
+                int blleft = CUP$Parser$stack.peek().left;
+                int blright = CUP$Parser$stack.peek().right;
+                BlockList bl = CUP$Parser$stack.peek().<BlockList> value();
                  bl.getBlockList().add(b); RESULT = bl; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("block_list",27, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("block_list",27, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 78: // block_list ::= empty 
             {
                 BlockList RESULT = null;
                  RESULT = new BlockList(new LinkedList<Block>()); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("block_list",27, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("block_list",27, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 79: // function_declaration_argument_type ::= primitive_type array_empty 
             {
                 Type RESULT = null;
 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_type",30, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_type",30, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 80: // function_declaration_argument_single ::= IDENTIFIER COLON function_declaration_argument_type 
             {
                 TypedDeclaration RESULT = null;
-                int ileft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int iright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                String i = CUP$parser$stack.elementAt(CUP$parser$top-2).<String> value();
-                int tleft = CUP$parser$stack.peek().left;
-                int tright = CUP$parser$stack.peek().right;
-                Type t = CUP$parser$stack.peek().<Type> value();
+                int ileft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int iright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                String i = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<String> value();
+                int tleft = CUP$Parser$stack.peek().left;
+                int tright = CUP$Parser$stack.peek().right;
+                Type t = CUP$Parser$stack.peek().<Type> value();
                  RESULT = new TypedDeclaration(new Identifier(i), t);  
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_single",31, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_single",31, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 81: // function_declaration_argument_list ::= function_declaration_argument_single COMMA function_declaration_argument_list 
             {
                 List<TypedDeclaration> RESULT = null;
-                int fdasleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int fdasright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                TypedDeclaration fdas = CUP$parser$stack.elementAt(CUP$parser$top-2).<TypedDeclaration> value();
-                int lstleft = CUP$parser$stack.peek().left;
-                int lstright = CUP$parser$stack.peek().right;
-                List<TypedDeclaration> lst = CUP$parser$stack.peek().<List<TypedDeclaration>> value();
+                int fdasleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int fdasright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                TypedDeclaration fdas = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<TypedDeclaration> value();
+                int lstleft = CUP$Parser$stack.peek().left;
+                int lstright = CUP$Parser$stack.peek().right;
+                List<TypedDeclaration> lst = CUP$Parser$stack.peek().<List<TypedDeclaration>> value();
                  lst.add(fdas); RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_list",32, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_list",32, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 82: // function_declaration_argument_list ::= function_declaration_argument_single 
             {
                 List<TypedDeclaration> RESULT = null;
-                int fdasleft = CUP$parser$stack.peek().left;
-                int fdasright = CUP$parser$stack.peek().right;
-                TypedDeclaration fdas = CUP$parser$stack.peek().<TypedDeclaration> value();
+                int fdasleft = CUP$Parser$stack.peek().left;
+                int fdasright = CUP$Parser$stack.peek().right;
+                TypedDeclaration fdas = CUP$Parser$stack.peek().<TypedDeclaration> value();
                  List<TypedDeclaration> lst = new LinkedList<>(); lst.add(fdas); RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_list",32, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_list",32, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 83: // function_declaration_argument ::= function_declaration_argument_list 
             {
                 List<TypedDeclaration> RESULT = null;
-                int lstleft = CUP$parser$stack.peek().left;
-                int lstright = CUP$parser$stack.peek().right;
-                List<TypedDeclaration> lst = CUP$parser$stack.peek().<List<TypedDeclaration>> value();
+                int lstleft = CUP$Parser$stack.peek().left;
+                int lstright = CUP$Parser$stack.peek().right;
+                List<TypedDeclaration> lst = CUP$Parser$stack.peek().<List<TypedDeclaration>> value();
                  RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument",33, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument",33, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 84: // function_declaration_argument ::= empty 
             {
                 List<TypedDeclaration> RESULT = null;
                  RESULT = new LinkedList<TypedDeclaration>(); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument",33, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument",33, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 85: // function_declaration ::= IDENTIFIER OPEN_PAREN function_declaration_argument CLOSE_PAREN COLON types function_block 
             {
                 FunctionDeclaration RESULT = null;
-                int idleft = CUP$parser$stack.elementAt(CUP$parser$top-6).left;
-                int idright = CUP$parser$stack.elementAt(CUP$parser$top-6).right;
-                String id = CUP$parser$stack.elementAt(CUP$parser$top-6).<String> value();
-                int argsleft = CUP$parser$stack.elementAt(CUP$parser$top-4).left;
-                int argsright = CUP$parser$stack.elementAt(CUP$parser$top-4).right;
-                List<TypedDeclaration> args = CUP$parser$stack.elementAt(CUP$parser$top-4).<List<TypedDeclaration>> value();
-                int tleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int tright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                List<Type> t = CUP$parser$stack.elementAt(CUP$parser$top-1).<List<Type>> value();
-                int fbleft = CUP$parser$stack.peek().left;
-                int fbright = CUP$parser$stack.peek().right;
-                FunctionBlock fb = CUP$parser$stack.peek().<FunctionBlock> value();
+                int idleft = CUP$Parser$stack.elementAt(CUP$Parser$top-6).left;
+                int idright = CUP$Parser$stack.elementAt(CUP$Parser$top-6).right;
+                String id = CUP$Parser$stack.elementAt(CUP$Parser$top-6).<String> value();
+                int argsleft = CUP$Parser$stack.elementAt(CUP$Parser$top-4).left;
+                int argsright = CUP$Parser$stack.elementAt(CUP$Parser$top-4).right;
+                List<TypedDeclaration> args = CUP$Parser$stack.elementAt(CUP$Parser$top-4).<List<TypedDeclaration>> value();
+                int tleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int tright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                List<Type> t = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<List<Type>> value();
+                int fbleft = CUP$Parser$stack.peek().left;
+                int fbright = CUP$Parser$stack.peek().right;
+                FunctionBlock fb = CUP$Parser$stack.peek().<FunctionBlock> value();
                  RESULT = new FunctionDeclaration(new Identifier(id), args, t, fb); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration",34, CUP$parser$stack.elementAt(CUP$parser$top-6), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration",34, CUP$Parser$stack.elementAt(CUP$Parser$top-6), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 86: // function_declaration ::= IDENTIFIER OPEN_PAREN function_declaration_argument CLOSE_PAREN function_block 
             {
                 FunctionDeclaration RESULT = null;
-                int idleft = CUP$parser$stack.elementAt(CUP$parser$top-4).left;
-                int idright = CUP$parser$stack.elementAt(CUP$parser$top-4).right;
-                String id = CUP$parser$stack.elementAt(CUP$parser$top-4).<String> value();
-                int argsleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int argsright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                List<TypedDeclaration> args = CUP$parser$stack.elementAt(CUP$parser$top-2).<List<TypedDeclaration>> value();
-                int fbleft = CUP$parser$stack.peek().left;
-                int fbright = CUP$parser$stack.peek().right;
-                FunctionBlock fb = CUP$parser$stack.peek().<FunctionBlock> value();
+                int idleft = CUP$Parser$stack.elementAt(CUP$Parser$top-4).left;
+                int idright = CUP$Parser$stack.elementAt(CUP$Parser$top-4).right;
+                String id = CUP$Parser$stack.elementAt(CUP$Parser$top-4).<String> value();
+                int argsleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int argsright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                List<TypedDeclaration> args = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<List<TypedDeclaration>> value();
+                int fbleft = CUP$Parser$stack.peek().left;
+                int fbright = CUP$Parser$stack.peek().right;
+                FunctionBlock fb = CUP$Parser$stack.peek().<FunctionBlock> value();
                  RESULT = new FunctionDeclaration(new Identifier(id),args,new LinkedList<Type>(),fb); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration",34, CUP$parser$stack.elementAt(CUP$parser$top-4), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration",34, CUP$Parser$stack.elementAt(CUP$Parser$top-4), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 87: // function_declaration_list ::= function_declaration function_declaration_list 
             {
                 List<FunctionDeclaration> RESULT = null;
-                int fdleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int fdright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                FunctionDeclaration fd = CUP$parser$stack.elementAt(CUP$parser$top-1).<FunctionDeclaration> value();
-                int lstleft = CUP$parser$stack.peek().left;
-                int lstright = CUP$parser$stack.peek().right;
-                List<FunctionDeclaration> lst = CUP$parser$stack.peek().<List<FunctionDeclaration>> value();
+                int fdleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int fdright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                FunctionDeclaration fd = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<FunctionDeclaration> value();
+                int lstleft = CUP$Parser$stack.peek().left;
+                int lstright = CUP$Parser$stack.peek().right;
+                List<FunctionDeclaration> lst = CUP$Parser$stack.peek().<List<FunctionDeclaration>> value();
                  lst.add(fd); RESULT = lst; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",35, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",35, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 88: // function_declaration_list ::= empty 
             {
                 List<FunctionDeclaration> RESULT = null;
                  RESULT = new LinkedList<FunctionDeclaration>(); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",35, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",35, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 89: // procedure_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN 
             {
                 ProcedureCall RESULT = null;
-                int idleft = CUP$parser$stack.elementAt(CUP$parser$top-3).left;
-                int idright = CUP$parser$stack.elementAt(CUP$parser$top-3).right;
-                String id = CUP$parser$stack.elementAt(CUP$parser$top-3).<String> value();
-                int elistleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int elistright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                List<Expression> elist = CUP$parser$stack.elementAt(CUP$parser$top-1).<List<Expression>> value();
+                int idleft = CUP$Parser$stack.elementAt(CUP$Parser$top-3).left;
+                int idright = CUP$Parser$stack.elementAt(CUP$Parser$top-3).right;
+                String id = CUP$Parser$stack.elementAt(CUP$Parser$top-3).<String> value();
+                int elistleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int elistright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                List<Expression> elist = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<List<Expression>> value();
                  RESULT = new ProcedureCall(new Identifier(id), elist); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("procedure_call",37, CUP$parser$stack.elementAt(CUP$parser$top-3), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("procedure_call",37, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 90: // procedure_call ::= IDENTIFIER OPEN_PAREN CLOSE_PAREN 
             {
                 ProcedureCall RESULT = null;
-                int idleft = CUP$parser$stack.elementAt(CUP$parser$top-2).left;
-                int idright = CUP$parser$stack.elementAt(CUP$parser$top-2).right;
-                String id = CUP$parser$stack.elementAt(CUP$parser$top-2).<String> value();
+                int idleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
+                int idright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
+                String id = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<String> value();
                  RESULT = new ProcedureCall(new Identifier(id), new LinkedList<Expression>()); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("procedure_call",37, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("procedure_call",37, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 91: // use_block ::= USE IDENTIFIER use_block 
             {
                 List<UseStatement> RESULT = null;
-                int idleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int idright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                String id = CUP$parser$stack.elementAt(CUP$parser$top-1).<String> value();
-                int uleft = CUP$parser$stack.peek().left;
-                int uright = CUP$parser$stack.peek().right;
-                List<UseStatement> u = CUP$parser$stack.peek().<List<UseStatement>> value();
+                int idleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int idright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                String id = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<String> value();
+                int uleft = CUP$Parser$stack.peek().left;
+                int uright = CUP$Parser$stack.peek().right;
+                List<UseStatement> u = CUP$Parser$stack.peek().<List<UseStatement>> value();
                  u.add(new UseStatement(new Identifier(id))); RESULT = u; 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("use_block",2, CUP$parser$stack.elementAt(CUP$parser$top-2), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("use_block",2, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 92: // use_block ::= empty 
             {
                 List<UseStatement> RESULT = null;
                 RESULT = new LinkedList<UseStatement>(); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("use_block",2, CUP$parser$stack.peek(), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("use_block",2, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 93: // program ::= use_block function_declaration_list 
             {
                 Program RESULT = null;
-                int uleft = CUP$parser$stack.elementAt(CUP$parser$top-1).left;
-                int uright = CUP$parser$stack.elementAt(CUP$parser$top-1).right;
-                List<UseStatement> u = CUP$parser$stack.elementAt(CUP$parser$top-1).<List<UseStatement>> value();
-                int lleft = CUP$parser$stack.peek().left;
-                int lright = CUP$parser$stack.peek().right;
-                List<FunctionDeclaration> l = CUP$parser$stack.peek().<List<FunctionDeclaration>> value();
+                int uleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
+                int uright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
+                List<UseStatement> u = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<List<UseStatement>> value();
+                int lleft = CUP$Parser$stack.peek().left;
+                int lright = CUP$Parser$stack.peek().right;
+                List<FunctionDeclaration> l = CUP$Parser$stack.peek().<List<FunctionDeclaration>> value();
                  RESULT = new Program(u,l); 
-                CUP$parser$result = parser.getSymbolFactory().newSymbol("program",0, CUP$parser$stack.elementAt(CUP$parser$top-1), CUP$parser$stack.peek(), RESULT);
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("program",0, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
-            return CUP$parser$result;
+            return CUP$Parser$result;
 
         /* . . . . . .*/
         default:
             throw new Exception(
-                  "Invalid action number " + CUP$parser$act_num + " found in internal parse table");
+                  "Invalid action number " + CUP$Parser$act_num + " found in internal parse table");
 
         }
     } /* end of method */
 
     /** Method splitting the generated action code into several parts. */
-    public final java_cup.runtime.Symbol CUP$parser$do_action(
-            int                        CUP$parser$act_num,
-            java_cup.runtime.lr_parser CUP$parser$parser,
-            java.util.Stack<java_cup.runtime.Symbol> CUP$parser$stack,
-            int                        CUP$parser$top)
+    public final java_cup.runtime.Symbol CUP$Parser$do_action(
+            int                        CUP$Parser$act_num,
+            java_cup.runtime.lr_parser CUP$Parser$parser,
+            java.util.Stack<java_cup.runtime.Symbol> CUP$Parser$stack,
+            int                        CUP$Parser$top)
             throws java.lang.Exception {
-            return CUP$parser$do_action_part00000000(
-                           CUP$parser$act_num,
-                           CUP$parser$parser,
-                           CUP$parser$stack,
-                           CUP$parser$top);
+            return CUP$Parser$do_action_part00000000(
+                           CUP$Parser$act_num,
+                           CUP$Parser$parser,
+                           CUP$Parser$stack,
+                           CUP$Parser$top);
     }
 }
 

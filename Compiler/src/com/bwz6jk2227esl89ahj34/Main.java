@@ -71,8 +71,8 @@ public class Main {
                 FileReader reader = new FileReader(files[i]);
                 Lexer lexer = new Lexer(reader);
                 ComplexSymbolFactory csf = new ComplexSymbolFactory();
-                parser parser = new parser(lexer, csf);
-                Symbol result = parser.parse();
+                Parser Parser = new Parser(lexer, csf);
+                Symbol result = Parser.parse();
 
                 NodeVisitor visitor = new NodeVisitor(); // TODO: pass vars
                 ((Program)(result.value)).accept(visitor);

@@ -5,6 +5,7 @@ import java_cup.runtime.*;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.io.FileReader;
+import java.io.PrintWriter;
 
 
 /**
@@ -304,48 +305,48 @@ class Lexer implements java_cup.runtime.Scanner {
 
   /* user code: */
   public static final HashMap<Integer, String> symbolTranslation = new HashMap<Integer, String>(){{
-    put(sym.IF, "if");
-    put(sym.WHILE, "while");
-    put(sym.ELSE, "else");
-    put(sym.RETURN, "return");
-    put(sym.LENGTH, "length");
-    put(sym.INT, "int");
-    put(sym.BOOL, "bool");
-    put(sym.TRUE, "true");
-    put(sym.FALSE, "false");
-    put(sym.IDENTIFIER, "id");
-    put(sym.INTEGER_LITERAL, "integer");
-    put(sym.NOT, "!");
-    put(sym.TIMES, "*");
-    put(sym.HIGH_MULT, "*>>");
-    put(sym.DIVIDE, "/");
-    put(sym.MODULO, "%");
-    put(sym.PLUS, "+");
-    put(sym.MINUS, "-");
-    put(sym.LT, "<");
-    put(sym.LEQ, "<=");
-    put(sym.GEQ, ">=");
-    put(sym.GT, ">");
-    put(sym.EQUAL, "==");
-    put(sym.NOT_EQUAL, "!=");
-    put(sym.AND, "&");
-    put(sym.OR, "|");
-    put(sym.STRING_LITERAL, "string");
-    put(sym.EOF, "EOF");
-    put(sym.OPEN_PAREN, "(");
-    put(sym.CLOSE_PAREN, ")");
-    put(sym.OPEN_BRACKET, "[");
-    put(sym.CLOSE_BRACKET, "]");
-    put(sym.OPEN_BRACE, "{");
-    put(sym.CLOSE_BRACE, "}");
-    put(sym.COLON, ":");
-    put(sym.COMMA, ",");
-    put(sym.GETS, "="); 
-    put(sym.SEMICOLON, ";");
-    put(sym.CHARACTER_LITERAL, "character");
-    put(sym.USE, "use");
-    put(sym.UNDERSCORE, "_");
-    put(sym.error, "error:");
+    put(ParserSym.IF, "if");
+    put(ParserSym.WHILE, "while");
+    put(ParserSym.ELSE, "else");
+    put(ParserSym.RETURN, "return");
+    put(ParserSym.LENGTH, "length");
+    put(ParserSym.INT, "int");
+    put(ParserSym.BOOL, "bool");
+    put(ParserSym.TRUE, "true");
+    put(ParserSym.FALSE, "false");
+    put(ParserSym.IDENTIFIER, "id");
+    put(ParserSym.INTEGER_LITERAL, "integer");
+    put(ParserSym.NOT, "!");
+    put(ParserSym.TIMES, "*");
+    put(ParserSym.HIGH_MULT, "*>>");
+    put(ParserSym.DIVIDE, "/");
+    put(ParserSym.MODULO, "%");
+    put(ParserSym.PLUS, "+");
+    put(ParserSym.MINUS, "-");
+    put(ParserSym.LT, "<");
+    put(ParserSym.LEQ, "<=");
+    put(ParserSym.GEQ, ">=");
+    put(ParserSym.GT, ">");
+    put(ParserSym.EQUAL, "==");
+    put(ParserSym.NOT_EQUAL, "!=");
+    put(ParserSym.AND, "&");
+    put(ParserSym.OR, "|");
+    put(ParserSym.STRING_LITERAL, "string");
+    put(ParserSym.EOF, "EOF");
+    put(ParserSym.OPEN_PAREN, "(");
+    put(ParserSym.CLOSE_PAREN, ")");
+    put(ParserSym.OPEN_BRACKET, "[");
+    put(ParserSym.CLOSE_BRACKET, "]");
+    put(ParserSym.OPEN_BRACE, "{");
+    put(ParserSym.CLOSE_BRACE, "}");
+    put(ParserSym.COLON, ":");
+    put(ParserSym.COMMA, ",");
+    put(ParserSym.GETS, "="); 
+    put(ParserSym.SEMICOLON, ";");
+    put(ParserSym.CHARACTER_LITERAL, "character");
+    put(ParserSym.USE, "use");
+    put(ParserSym.UNDERSCORE, "_");
+    put(ParserSym.error, "error:");
   }};
 
   public static void lexFile(String sourcePath, String diagnosticPath, String[] args) {
@@ -367,7 +368,7 @@ class Lexer implements java_cup.runtime.Scanner {
         FileReader reader = new FileReader(files[i]);
         Lexer lexer = new Lexer(reader);
         Symbol next = lexer.next_token();
-        while (next.sym != sym.EOF && next.sym != sym.error) {
+        while (next.sym != ParserSym.EOF && next.sym != ParserSym.error) {
           String line = (next.left + 1) + ":" +
                         (next.right + 1) + " " +
                         symbolTranslation.get(next.sym);
@@ -787,12 +788,13 @@ class Lexer implements java_cup.runtime.Scanner {
       if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
         zzAtEOF = true;
             zzDoEOF();
-          { return new java_cup.runtime.Symbol(sym.EOF); }
+          {     return symbol(ParserSym.EOF);
+ }
       }
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
-            { return symbol(sym.error,"Illegal character <"+
+            { return symbol(ParserSym.error,"Illegal character <"+
                                                    yytext()+">");
             }
           case 53: break;
@@ -801,19 +803,19 @@ class Lexer implements java_cup.runtime.Scanner {
             }
           case 54: break;
           case 3: 
-            { return symbol(sym.DIVIDE);
+            { return symbol(ParserSym.DIVIDE);
             }
           case 55: break;
           case 4: 
-            { return symbol(sym.IDENTIFIER, yytext());
+            { return symbol(ParserSym.IDENTIFIER, yytext());
             }
           case 56: break;
           case 5: 
-            { return symbol(sym.UNDERSCORE);
+            { return symbol(ParserSym.UNDERSCORE);
             }
           case 57: break;
           case 6: 
-            { if(yytext().length() > "9223372036854775808".length() || yytext().compareTo("9223372036854775808") > 0) { return symbol(sym.error, "Integer literal is too big to process"); } else {return symbol(sym.INTEGER_LITERAL, yytext()); }
+            { if(yytext().length() > "9223372036854775808".length() || yytext().compareTo("9223372036854775808") > 0) { return symbol(ParserSym.error, "Integer literal is too big to process"); } else {return symbol(ParserSym.INTEGER_LITERAL, yytext()); }
             }
           case 58: break;
           case 7: 
@@ -821,79 +823,79 @@ class Lexer implements java_cup.runtime.Scanner {
             }
           case 59: break;
           case 8: 
-            { return symbol(sym.OPEN_PAREN);
+            { return symbol(ParserSym.OPEN_PAREN);
             }
           case 60: break;
           case 9: 
-            { return symbol(sym.CLOSE_PAREN);
+            { return symbol(ParserSym.CLOSE_PAREN);
             }
           case 61: break;
           case 10: 
-            { return symbol(sym.OPEN_BRACKET);
+            { return symbol(ParserSym.OPEN_BRACKET);
             }
           case 62: break;
           case 11: 
-            { return symbol(sym.CLOSE_BRACKET);
+            { return symbol(ParserSym.CLOSE_BRACKET);
             }
           case 63: break;
           case 12: 
-            { return symbol(sym.OPEN_BRACE);
+            { return symbol(ParserSym.OPEN_BRACE);
             }
           case 64: break;
           case 13: 
-            { return symbol(sym.CLOSE_BRACE);
+            { return symbol(ParserSym.CLOSE_BRACE);
             }
           case 65: break;
           case 14: 
-            { return symbol(sym.COLON);
+            { return symbol(ParserSym.COLON);
             }
           case 66: break;
           case 15: 
-            { return symbol(sym.SEMICOLON);
+            { return symbol(ParserSym.SEMICOLON);
             }
           case 67: break;
           case 16: 
-            { return symbol(sym.COMMA);
+            { return symbol(ParserSym.COMMA);
             }
           case 68: break;
           case 17: 
-            { return symbol(sym.NOT);
+            { return symbol(ParserSym.NOT);
             }
           case 69: break;
           case 18: 
-            { return symbol(sym.TIMES);
+            { return symbol(ParserSym.TIMES);
             }
           case 70: break;
           case 19: 
-            { return symbol(sym.GT);
+            { return symbol(ParserSym.GT);
             }
           case 71: break;
           case 20: 
-            { return symbol(sym.MODULO);
+            { return symbol(ParserSym.MODULO);
             }
           case 72: break;
           case 21: 
-            { return symbol(sym.PLUS);
+            { return symbol(ParserSym.PLUS);
             }
           case 73: break;
           case 22: 
-            { return symbol(sym.MINUS);
+            { return symbol(ParserSym.MINUS);
             }
           case 74: break;
           case 23: 
-            { return symbol(sym.LT);
+            { return symbol(ParserSym.LT);
             }
           case 75: break;
           case 24: 
-            { return symbol(sym.GETS);
+            { return symbol(ParserSym.GETS);
             }
           case 76: break;
           case 25: 
-            { return symbol(sym.AND);
+            { return symbol(ParserSym.AND);
             }
           case 77: break;
           case 26: 
-            { return symbol(sym.OR);
+            { return symbol(ParserSym.OR);
             }
           case 78: break;
           case 27: 
@@ -906,32 +908,32 @@ class Lexer implements java_cup.runtime.Scanner {
           case 80: break;
           case 29: 
             { yybegin(YYINITIAL);
-                                     return new Symbol(sym.STRING_LITERAL, stringStartRow, stringStartCol,
+                                     return new Symbol(ParserSym.STRING_LITERAL, stringStartRow, stringStartCol,
                                      string.toString());
             }
           case 81: break;
           case 30: 
-            { return symbol(sym.IF);
+            { return symbol(ParserSym.IF);
             }
           case 82: break;
           case 31: 
-            { return symbol(sym.error, "Invalid character constant");
+            { return symbol(ParserSym.error, "Invalid character constant");
             }
           case 83: break;
           case 32: 
-            { return symbol(sym.NOT_EQUAL);
+            { return symbol(ParserSym.NOT_EQUAL);
             }
           case 84: break;
           case 33: 
-            { return symbol(sym.GEQ);
+            { return symbol(ParserSym.GEQ);
             }
           case 85: break;
           case 34: 
-            { return symbol(sym.LEQ);
+            { return symbol(ParserSym.LEQ);
             }
           case 86: break;
           case 35: 
-            { return symbol(sym.EQUAL);
+            { return symbol(ParserSym.EQUAL);
             }
           case 87: break;
           case 36: 
@@ -951,31 +953,31 @@ class Lexer implements java_cup.runtime.Scanner {
             }
           case 91: break;
           case 40: 
-            { return symbol(sym.USE);
+            { return symbol(ParserSym.USE);
             }
           case 92: break;
           case 41: 
-            { return symbol(sym.INT);
+            { return symbol(ParserSym.INT);
             }
           case 93: break;
           case 42: 
-            { return symbol(sym.CHARACTER_LITERAL, yytext().charAt(1));
+            { return symbol(ParserSym.CHARACTER_LITERAL, yytext().charAt(1));
             }
           case 94: break;
           case 43: 
-            { return symbol(sym.HIGH_MULT);
+            { return symbol(ParserSym.HIGH_MULT);
             }
           case 95: break;
           case 44: 
-            { return symbol(sym.ELSE);
+            { return symbol(ParserSym.ELSE);
             }
           case 96: break;
           case 45: 
-            { return symbol(sym.TRUE);
+            { return symbol(ParserSym.TRUE);
             }
           case 97: break;
           case 46: 
-            { return symbol(sym.BOOL);
+            { return symbol(ParserSym.BOOL);
             }
           case 98: break;
           case 47: 
@@ -983,23 +985,23 @@ class Lexer implements java_cup.runtime.Scanner {
             }
           case 99: break;
           case 48: 
-            { return symbol(sym.FALSE);
+            { return symbol(ParserSym.FALSE);
             }
           case 100: break;
           case 49: 
-            { return symbol(sym.WHILE);
+            { return symbol(ParserSym.WHILE);
             }
           case 101: break;
           case 50: 
-            { return symbol(sym.LENGTH);
+            { return symbol(ParserSym.LENGTH);
             }
           case 102: break;
           case 51: 
-            { return symbol(sym.RETURN);
+            { return symbol(ParserSym.RETURN);
             }
           case 103: break;
           case 52: 
-            { return symbol(sym.CHARACTER_LITERAL, hexToString(yytext().substring(1, yytext().length()-1)));
+            { return symbol(ParserSym.CHARACTER_LITERAL, hexToString(yytext().substring(1, yytext().length()-1)));
             }
           case 104: break;
           default:

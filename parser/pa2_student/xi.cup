@@ -1,0 +1,224 @@
+
+package com.bwz6jk2227esl89ahj34;
+
+nonterminal empty;
+
+terminal String IDENTIFIER;
+terminal String STRING_LITERAL;
+terminal String CHARACTER_LITERAL;
+terminal Integer INTEGER_LITERAL;
+terminal TRUE, FALSE;
+terminal INT, BOOL;
+
+terminal IF, ELSE, WHILE, BREAK, RETURN, USE, LENGTH, PLUS, MINUS, TIMES,
+  DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
+  OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, UMINUS;
+
+nonterminal Program program;
+
+nonterminal List<UseStatement> use_block;
+
+nonterminal BinaryOperator binary_operator; 
+nonterminal UnaryOperator unary_operator; 
+nonterminal Binary binary_operator_expression;
+nonterminal Unary unary_operator_expression; 
+
+nonterminal BooleanLiteral boolean_literal; 
+nonterminal String array_index; //expression involving array[index] 
+nonterminal String array_literal;
+
+nonterminal FunctionCall function_call;
+nonterminal Expression expression; 
+nonterminal List<Expression> expression_list; 
+nonterminal List<Expression> expression_list_trailing_comma; 
+
+nonterminal Type basic_type;
+nonterminal Type type;
+nonterminal List<Type> type_list;
+nonterminal String array_sized;
+nonterminal String array_empty;
+
+nonterminal TypedDeclaration typed_declaration; 
+nonterminal TypedDeclarationList typed_declaration_list;
+nonterminal ProcedureCall procedure_call;
+nonterminal String assignment_lhs;
+nonterminal String assignment_lhs_list;
+nonterminal Assignment assignment; 
+nonterminal IfStatement if_statement;
+nonterminal WhileStatement while_statement;
+nonterminal ReturnStatement return_statement; 
+nonterminal Statement statement_no_semicolon;
+nonterminal Statement statement;
+nonterminal FunctionBlock function_block; 
+nonterminal BlockList blocks; 
+nonterminal Block block; 
+
+
+nonterminal FunctionDeclaraton function_declaration;
+nonterminal List<FunctionDeclaration> function_declarations;
+
+precedence nonassoc ELSE; 
+
+precedence left OR;
+precedence left AND;
+precedence left EQUAL, NOT_EQUAL; 
+precedence left LT, LEQ, GEQ, GT; 
+precedence left PLUS, MINUS;
+precedence left TIMES, HIGH_MULT, DIVIDE, MODULO;
+precedence left UMINUS, NOT;
+precedence left OPEN_BRACKET; 
+
+start with program;
+
+empty ::= ;
+
+boolean_literal ::= TRUE 
+                  | FALSE
+                  ;  
+
+binary_operator ::= PLUS
+                  | MINUS
+                  | TIMES
+                  | DIVIDE
+                  | MODULO
+                  | HIGH_MULT
+                  | AND
+                  | OR 
+                  | EQUAL
+                  | NOT_EQUAL
+                  | LT
+                  | LEQ 
+                  | GT 
+                  | GEQ 
+                  ;
+
+unary_operator ::= NOT 
+                 | MINUS 
+                 ;
+
+binary_operator_expression ::= expression:e1 binary_operator expression:e2;
+
+unary_operator_expression ::= NOT expression:e
+                            | MINUS expression:e %prec UMINUS 
+                            ;
+
+
+array_index ::= expression OPEN_BRACKET expression CLOSE_BRACKET;  
+
+expression ::= IDENTIFIER 
+             | STRING_LITERAL 
+             | CHARACTER_LITERAL 
+             | array_index 
+             | function_call
+             | array_literal 
+             | boolean_literal 
+             | INTEGER_LITERAL 
+             | binary_operator_expression
+             | unary_operator_expression
+             ; 
+ 
+expression_list ::= expression COMMA expression_list 
+                  | expression
+                  ;
+
+expression_list_trailing_comma ::= expression COMMA expression_list_trailing_comma 
+                                 | expression COMMA
+                                 ;
+ 
+
+array_literal ::= OPEN_BRACE expression_list CLOSE_BRACE 
+           |  OPEN_BRACE expression_list_trailing_comma CLOSE_BRACE
+           ;
+
+basic_type ::= INT 
+            | BOOL 
+            ; 
+
+array_sized ::= OPEN_BRACKET expression CLOSE_BRACKET array_sized 
+             | array_empty  
+             ;
+array_empty ::= OPEN_BRACKET CLOSE_BRACKET array_empty 
+             | empty  
+             ;
+type ::= basic_type array_sized; // does not allow [] after [n]  
+
+type_list ::= type COMMA type_list 
+           | type
+           ; // for functions that return multiple results
+
+typed_declaration ::= IDENTIFIER COLON type; //x:int
+
+typed_declaration_list ::= typed_declaration COMMA typed_declaration_list 
+                        | typed_declaration;
+
+function_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,...) 
+                | IDENTIFIER OPEN_PAREN CLOSE_PAREN // f()
+                | LENGTH OPEN_PAREN expression CLOSE_PAREN
+                ;
+
+assignment_lhs ::= IDENTIFIER 
+                 | typed_declaration 
+                 | UNDERSCORE 
+                 ;
+                 
+assignment_lhs_list ::= assignment_lhs COMMA assignment_lhs_list 
+                      | assignment_lhs
+                      ;
+
+assignment ::= assignment_lhs GETS expression 
+             | assignment_lhs_list GETS function_call 
+             ;
+
+if_statement ::= IF OPEN_PAREN expression:expression CLOSE_PAREN block:block {: RESULT = new IfStatement(expression, block); :}
+               | IF OPEN_PAREN expression:expression CLOSE_PAREN block:trueBlock ELSE block:falseBlock {: RESULT = new IfElseStatement(epxression, trueBlock, falseBlock); :}
+               ;
+
+while_statement ::= WHILE OPEN_PAREN expression:expression CLOSE_PAREN block:block {: RESULT = new WhileStatement(expression, block); :}
+                  ;
+
+return_statement ::= RETURN expression_list:expressionList {: RESULT = expressionList; :}
+                   | RETURN {: RESULT = new ArrayList<Expression>(); :} 
+                   ;
+
+statement_no_semicolon ::= if_statement:ifStatement {: RESULT = ifStatement; :} 
+                         | while_statement:whileStatement {: RESULT = whileStatement; :}
+                         | procedure_call:procedureCall {: RESULT = procedureCall; :}
+                         | typed_declaration_list:typedDeclarationList {: RESULT = typedDeclarationList; :}
+                         | assignment:assignment {: RESULT = assignment; :}
+                         ; 
+
+statement ::= statement_no_semicolon:statement {: RESULT = statement; :}
+            | statement_no_semicolon:statement SEMICOLON {: RESULT = statement; :}
+            ;
+
+function_block ::= OPEN_BRACE blocks:blockList return_statement:returnStatement CLOSE_BRACE {: RESULT = new Block.FunctionBlock(blockList, returnStatement); :}
+                 ;
+
+blocks ::= block:block blocks:blockList {: blockList.getBlockList().add(block); RESULT = blockList; :}
+         | empty {: RESULT = new BlockList(new ArrayList<Block>()); :}
+         ;
+
+block ::= OPEN_BRACE blocks:blockList CLOSE_BRACE {: RESULT = blockList; :}
+        | function_block:functionBlock {: RESULT = functionBlock; :}
+        | statement:statement {: RESULT = statement; :}
+        ;
+
+function_declaration ::= IDENTIFIER:identifier OPEN_PAREN typed_declaration_list:typedDeclarationList CLOSE_PAREN COLON type_list:typeList function_block:functionBlock {: RESULT = new FunctionDeclaration(identifier, typedDeclarationList, typeList, functionBlock); :}
+                       | IDENTIFIER:identifier OPEN_PAREN typed_declaration_list:typedDeclarationList CLOSE_PAREN function_block:functionBlock {: RESULT = new FunctionDeclaration(identifier, typedDeclarationList, new ArrayList<Type>(), functionBlock); :}
+                       ;
+
+function_declarations ::= function_declaration:functionDeclaration function_declarations:functionDeclarations {: RESULT = functionDeclarations.add(functionDeclaration); :}  
+                        | empty {: RESULT = new ArrayList<FunctionDeclaration>(); :}
+                        ; 
+
+procedure_call ::= IDENTIFIER:identifier OPEN_PAREN expression_list:expressionList CLOSE_PAREN //f(x,y,z,...) {: RESULT = new ProcedureCall(identifier, expressionList); :}
+                | IDENTIFIER:identifier OPEN_PAREN CLOSE_PAREN // f() {: RESULT = new ProcedureCall(identifier, new ArrayList<Expression>()); :}
+                ;
+
+use_block ::= USE IDENTIFIER:identifier use_block:useBlock {: useBlock.add(new UseStatement(identifier); RESULT = useBlock :} 
+            | empty {: RESULT = new ArrayList<UseStatement>(); :}
+            ;
+
+program ::= use_block:useBlock function_declarations:functionDeclarations {: RESULT = new Program(useBlock, functionDeclarations); :}
+          ;
