@@ -69,7 +69,6 @@ public class Main {
         }
         try {
             for (int i = 0; i < files.length; i++) {
-                ArrayList<String> lines = new ArrayList<String>();
                 FileReader reader = new FileReader(files[i]);
                 XiLexer lexer = new XiLexer(reader);
                 ComplexSymbolFactory csf = new ComplexSymbolFactory();
