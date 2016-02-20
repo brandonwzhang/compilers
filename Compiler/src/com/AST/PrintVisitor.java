@@ -96,12 +96,16 @@ public class PrintVisitor implements NodeVisitor {
     public void visit(FunctionDeclaration node) {
         printer.startList();
         node.getIdentifier().accept(this);
+        printer.startList();
         for(TypedDeclaration td : node.getTypedDeclarationList()){
             td.accept(this);
         }
+        printer.endList();
+        printer.startList();
         for(Type t : node.getTypeList()){
             t.accept(this);
         }
+        printer.endList();
         node.getFunctionBlock().accept(this);
         printer.endList();
     }

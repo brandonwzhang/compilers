@@ -152,13 +152,13 @@ array_no_size_type ::= array_no_size_type:a OPEN_BRACKET CLOSE_BRACKET {: RESULT
 array_type ::= type:t OPEN_BRACKET CLOSE_BRACKET {: RESULT = new ArrayType(t, Optional.empty()); :} 
              ;
 
-// does not allow [] after [n]  
+
 type ::= primitive_type:pt {: RESULT = pt; :}
        | array_size_type:as {: RESULT = as; :}
        | array_type:ae {: RESULT = ae; :}
        ;
        
-types ::= type COMMA types 
+types ::= type:t COMMA types:lst {: lst.add(0,t); RESULT = lst; :} 
        | type:t  {: List<Type> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; :}
        ; // for functions that return multiple results
 
@@ -171,15 +171,15 @@ function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RE
                 ;
 
 assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
-                 | typed_declaration:td {: RESULT = new TypedDeclaration(td); :}
+                 | typed_declaration:td {: RESULT = td; :}
                  | UNDERSCORE {: RESULT = new Underscore(); :}
                  ;
 
-declaration_assignment_lhs ::= typed_declaration:td {: RESULT = new TypedDeclaration(td); :}
+declaration_assignment_lhs ::= typed_declaration:td {: RESULT = td; :}
                              | UNDERSCORE {: RESULT = new Underscore(); :}
                              ;
 multiple_assignment_lhs ::= declaration_assignment_lhs:dl COMMA multiple_assignment_lhs:dll {: dll.add(0, dl); RESULT = dll; :}
-                          | declaration_assignment_lhs:dl1 COMMA declaration_assignment_lhs:dl2 {: LinkedList<Assignable> lst = new LinkedList<Assignable>(Arrays.asList(dl)); lst.add(0, dl2); RESULT = lst; :}
+                          | declaration_assignment_lhs:dl1 COMMA declaration_assignment_lhs:dl2 {: LinkedList<Assignable> lst = new LinkedList<Assignable>(Arrays.asList(dl2)); lst.add(0, dl1); RESULT = lst; :}
                           ;
 
 assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); RESULT = new Assignment(lst, e); :}// x = expression
@@ -256,5 +256,6 @@ use_block ::= USE IDENTIFIER:id use_block:u {: u.add(0, new UseStatement(new Ide
       
 
 program ::= use_block:u function_declaration_list:l   {: RESULT = new Program(u,l); :}
+          | error
           ; 
           
