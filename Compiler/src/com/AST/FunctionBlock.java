@@ -7,6 +7,6 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class FunctionBlock extends Block {
-    private List<Block> blocks;
+    private BlockList blockList;
     private ReturnStatement returnStatement;
 }

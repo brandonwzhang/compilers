@@ -4,6 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 @AllArgsConstructor
 @Data
-public class Identifier extends Node implements Assignable {
+public class Identifier extends Expression implements Assignable {
     private String name;
 }
