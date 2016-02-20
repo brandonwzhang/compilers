@@ -7,9 +7,6 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class BooleanType extends PrimitiveType {
+public abstract class PrimitiveType extends Type{
 
-    public void accept(NodeVisitor v){
-        v.visit(this);
-    }
 }

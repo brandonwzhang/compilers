@@ -161,6 +161,7 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom("\"" + node.getValue() + "\"");
     }
 
+    /*
     public void visit(Type node) {
         for(int i = 0; i < node.getArrayBrackets().getIndices().size(); i++) {
             printer.startList();
@@ -176,7 +177,9 @@ public class PrintVisitor implements NodeVisitor {
             }
             printer.endList();
         }
-    }
+    }*/
+
+    // TODO: make visit functions for the PrimitiveTypes
 
     public void visit(TypedDeclaration node) {
         printer.startList();
