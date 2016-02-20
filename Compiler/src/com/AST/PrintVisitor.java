@@ -1,6 +1,8 @@
 package com.AST;
 import edu.cornell.cs.cs4120.util.*;
 
+import java.util.Optional;
+
 public class PrintVisitor implements NodeVisitor {
 
     private CodeWriterSExpPrinter printer;
@@ -10,9 +12,7 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(ArrayBrackets node) {
-        printer.startList();
-        // TODO: Ji Hun God
-        printer.endList();
+        /**taken care of in Type so never visited*/
     }
 
     public void visit(ArrayIndex node) {  //TODO: Ji Hun
@@ -155,9 +155,21 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(Type node) {
-        //printer.print
-
-    } //TODO: Ji Hun
+        for(int i = 0; i < node.getArrayBrackets().getIndices().size(); i++) {
+            printer.startList();
+            printer.printAtom("[]");
+        }
+        printer.printAtom(node.getPrimitiveType().toString());
+        for (int j = node.getArrayBrackets().getIndices().size()-1;
+             j >= 0; j--) {
+            Optional<Expression> element =
+                    node.getArrayBrackets().getIndices().get(j);
+            if (element.isPresent()) {
+                element.get().accept(this);
+            }
+            printer.endList();
+        }
+    }
 
     public void visit(TypedDeclaration node) {
         printer.startList();
