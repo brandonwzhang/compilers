@@ -42,10 +42,10 @@ nonterminal ArrayType array_no_size_type;
 nonterminal ArrayType array_type;
 
 nonterminal TypedDeclaration typed_declaration; 
-nonterminal List<TypedDeclaration> typed_declaration_list;
 nonterminal FunctionCall function_call;
 nonterminal Assignable assignment_lhs;
-nonterminal List<Assignable> assignment_lhs_list;
+nonterminal Assignable declaration_assignment_lhs;
+nonterminal List<Assignable> multiple_assignment_lhs;
 nonterminal Assignment assignment; 
 
 nonterminal IfStatement if_statement;  
@@ -126,8 +126,8 @@ expression ::= IDENTIFIER:i {: RESULT = new Identifier(i); :}
              ; 
  
 expression_list ::= expression:e COMMA expression_list:lst {: lst.add(0, e); RESULT = lst; :} 
-          | expression:e {: List<Expression> lst = new LinkedList<>(); lst.add(0, e); RESULT = lst; :}
-          ;
+                  | expression:e {: List<Expression> lst = new LinkedList<>(); lst.add(0, e); RESULT = lst; :}
+                  ;
 
 expression_list_trailing_comma ::= expression:e COMMA expression_list_trailing_comma:lst {: lst.add(0, e); RESULT = lst; :} 
                                  | expression:e COMMA {: List<Expression> lst = new LinkedList<>(); lst.add(0, e); RESULT = lst; :}
@@ -165,28 +165,25 @@ types ::= type COMMA types
 typed_declaration ::= IDENTIFIER:id COLON type:t {: RESULT = new TypedDeclaration(new Identifier(id),t); :} //x:int
                     ;
 
-typed_declaration_list ::= typed_declaration:td COMMA typed_declaration_list:lst {: lst.add(0, td); RESULT = lst; :}
-                        | typed_declaration:td1 COMMA typed_declaration:td2 {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(0, td2); lst.add(0, td1); RESULT = lst; :}
-                        ; 
-                        //enforce more than one to not get confused with typed_declaration
-             
 function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), lst); :}//f(x,y,z,...) 
                 | IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), new LinkedList<Expression>()); :} // f()
                 | LENGTH OPEN_PAREN expression:e CLOSE_PAREN {: List<Expression> lst = new LinkedList<>(); lst.add(0, e); RESULT = new FunctionCall(new Identifier("length"), lst); :}
                 ;
 
 assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
+                 | typed_declaration:td {: RESULT = new TypedDeclaration(td); :
                  | UNDERSCORE {: RESULT = new Underscore(); :}
                  ;
-                 
-assignment_lhs_list ::= assignment_lhs:al COMMA assignment_lhs_list:all {: all.add(0, al); RESULT = all; :} 
-                      | assignment_lhs:al1 COMMA assignment_lhs:al2 {: List<Assignable> aList = new LinkedList<Assignable>(); aList.add(0, al2); aList.add(0, al1); RESULT = aList; :} //enforce multiple things on LHS
-                      | typed_declaration_list:tdl {: RESULT = new LinkedList<Assignable>(tdl); :} //allow x:int, y:int, ... to be on lhs of assignment
-                      ;
+
+declaration_assignment_lhs ::= typed_declaration:td {: RESULT = new TypedDeclaration(td); :}
+                             | UNDERSCORE {: RESULT = new Underscore(); :}
+                             ;
+multiple_assignment_lhs ::= declaration_assignment_lhs:dl COMMA multiple_assignment_lhs:dll {: dll.add(0, dl); RESULT = dll; :}
+                          | declaration_assignment_lhs:dl1 COMMA declaration_assignment_lhs:dl2 {: LinkedList<Assignable> lst = new LinkedList<Assignable>(Arrays.asList(dl)); lst.add(0, dl2); RESULT = lst; :}
+                          ;
 
 assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); RESULT = new Assignment(lst, e); :}// x = expression
-             | assignment_lhs_list:all GETS function_call:fc {: RESULT = new Assignment(all, fc); :}// x,y,z,... = f(x) as well as x:int,y:int,... = f(x)
-             | typed_declaration:td GETS expression:e {: RESULT = new Assignment(new ArrayList<Assignable>(Arrays.asList(td)), e); :}//allow x:int = expression 
+             | multiple_assignment_lhs:all GETS function_call:fc {: RESULT = new Assignment(all, fc); :}// x,y,z,... = f(x) as well as x:int,y:int,... = f(x)
              ;
 
 if_statement ::= IF OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new IfStatement(e, b, Optional.empty()); :}
