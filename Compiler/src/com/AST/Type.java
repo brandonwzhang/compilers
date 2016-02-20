@@ -9,18 +9,6 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class Type extends Node {
+public abstract class Type extends Node {
 
-    public enum PrimitiveType {
-        INT,
-        BOOL
-    }
-
-    private PrimitiveType primitiveType;
-
-    private ArrayBrackets arrayBrackets;
-
-    public void accept(NodeVisitor v){
-        v.visit(this);
-    }
 }
