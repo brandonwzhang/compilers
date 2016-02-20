@@ -2,6 +2,7 @@ package com.bwz6jk2227esl89ahj34;
 import com.AST.*;
 import java.io.*;
 import java_cup.runtime.*;
+import edu.cornell.cs.cs4120.util.*;
 
 public class Main {
     private static String sourcePath = "./";
@@ -74,7 +75,8 @@ public class Main {
                 Parser Parser = new Parser(lexer, csf);
                 Symbol result = Parser.parse();
 
-                NodeVisitor visitor = new NodeVisitor(); // TODO: pass vars
+                CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(System.out);
+                NodeVisitor visitor = new PrintVisitor(printer); // TODO: pass vars
                 ((Program)(result.value)).accept(visitor);
             }
         } catch(Exception e) {
