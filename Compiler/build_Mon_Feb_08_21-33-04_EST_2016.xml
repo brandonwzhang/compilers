@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="compiler" default="all">
   
-  
+  <property environment="env"/>
   <property file="build.properties"/>
   <!-- Uncomment the following property if no tests compilation is needed -->
   <!-- 
@@ -96,6 +96,10 @@
   
   <!-- Project Libraries -->
   
+  <path id="library.java-cup-11b.classpath">
+    <pathelement location="${basedir}/java-cup-11b.jar"/>
+  </path>
+  
   <!-- Modules -->
   
   <import file="${basedir}/module_compiler.xml"/>
@@ -120,9 +124,7 @@
     <mkdir dir="${artifact.temp.output.compiler:jar}"/>
     <jar destfile="${temp.jar.path.Compiler.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
       <zipfileset dir="${compiler.output.dir}"/>
-      <zipfileset file="${basedir}/META-INF/MANIFEST.MF" prefix="META-INF"/>
-      <zipfileset file="${basedir}/java_cup.jar"/>
-      <zipfileset file="${basedir}/lombok.jar"/>
+      <zipfileset src="${basedir}/java-cup-11b.jar"/>
     </jar>
     <copy file="${temp.jar.path.Compiler.jar}" tofile="${artifact.temp.output.compiler:jar}/Compiler.jar"/>
   </target>
