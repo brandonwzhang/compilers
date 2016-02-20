@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class TypedDeclaration extends Statement implements Assignable {
-    private Identifier id;
+    private Identifier identifier;
     private Type type;
 }

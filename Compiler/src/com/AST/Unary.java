@@ -9,5 +9,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=false)
 public class Unary extends Expression {
     private UnaryOperator op;
-    private Expression expr;
+    private Expression expression;
 }

@@ -16,7 +16,7 @@ public class Type extends Node {
         BOOL
     }
 
-    private PrimitiveType basicType;
+    private PrimitiveType primitiveType;
 
     private ArrayBrackets arrayBrackets;
 }
