@@ -104,6 +104,7 @@ public class PrintVisitor implements NodeVisitor {
         node.getGuard().accept(this);
         node.getTrueBlock().accept(this);
         if (node.getFalseBlock().isPresent()) {
+            printer.printAtom("else");
             node.getFalseBlock().get().accept(this);
         }
         printer.endList();
