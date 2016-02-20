@@ -118,6 +118,12 @@ public class PrintVisitor implements NodeVisitor {
         //        "compile-time type Node");
     }
 
+    public void visit(ProcedureBlock node) {
+        printer.startList();
+        node.getBlockList().accept(this);
+        printer.endList();
+    }
+
     public void visit(ProcedureCall node) {
         printer.startList();
         node.getIdentifier().accept(this);
