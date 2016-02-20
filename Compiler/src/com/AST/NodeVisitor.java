@@ -15,6 +15,7 @@ public interface NodeVisitor {
     void visit(Identifier node);
     void visit(IfStatement node);
     void visit(IntegerLiteral node);
+    void visit(Node node);
     void visit(ProcedureCall node);
     void visit(Program node);
     void visit(ReturnStatement node);

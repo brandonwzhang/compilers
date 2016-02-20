@@ -8,5 +8,5 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class BooleanLiteral extends Expression {
-    private boolean value;
+    private Boolean value;
 }

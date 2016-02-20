@@ -1,5 +1,5 @@
 package com.AST;
-
+import edu.cornell.cs.cs4120.util.*;
 
 public class PrintVisitor implements NodeVisitor {
 
@@ -58,40 +58,40 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(BooleanLiteral node) {
-        printer.printAtom(node.getValue());
+        printer.printAtom(node.getValue().toString());
     }
 
     public void visit(CharacterLiteral node) {
-        printer.printAtom(node.getValue());
+        printer.printAtom("" + node.getValue());
     }
 
     public void visit(FunctionBlock node) {
-        printer.startLine();
+        printer.startList();
         node.getBlockList().accept(this);
         node.getReturnStatement().accept(this);
-        printer.endLine();
+        printer.endList();
     }
 
     public void visit(FunctionCall node) {
-        printer.startLine();
+        printer.startList();
         node.getIdentifier().accept(this);
         for(Expression e : node.getArguments()){
             e.accept(this);
         }
-        printer.endLine();
+        printer.endList();
     }
 
     public void visit(FunctionDeclaration node) {
-        printer.startLine();
+        printer.startList();
         node.getIdentifier().accept(this);
-        for(TypeDeclaration td : node.getTypedDeclarationList()){
+        for(TypedDeclaration td : node.getTypedDeclarationList()){
             td.accept(this);
         }
         for(Type t : node.getTypeList()){
             t.accept(this);
         }
         node.getFunctionBlock().accept(this);
-        printer.endLine();
+        printer.endList();
     }
 
     public void visit(Identifier node) {
@@ -113,15 +113,15 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom(node.getValue());
     }
 
-    public void visit(Node node) throws Exception {
-        throw new Exception("visit should not be called on a node with " +
-                "compile-time type Node");
+    public void visit(Node node) {
+        //throw new Exception("visit should not be called on a node with " +
+        //        "compile-time type Node");
     }
 
     public void visit(ProcedureCall node) {
         printer.startList();
         node.getIdentifier().accept(this);
-        for (argument : node.getArguments()) {
+        for (Expression argument : node.getArguments()) {
             argument.accept(this);
         }
         printer.endList();
@@ -144,7 +144,7 @@ public class PrintVisitor implements NodeVisitor {
     public void visit(ReturnStatement node) {
         printer.startList();
         printer.printAtom("return");
-        for (value : node.getValues()) {
+        for (Expression value : node.getValues()) {
             value.accept(this);
         }
         printer.endList();
@@ -155,17 +155,15 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(Type node) {
-
-
-        int[0][1] -> ([] ([] int 1) 0)
+        //printer.print
 
     } //TODO: Ji Hun
 
     public void visit(TypedDeclaration node) {
-        printer.startLine();
+        printer.startList();
         node.getIdentifier().accept(this);
         node.getType().accept(this);
-        printer.endLine();
+        printer.endList();
     }
 
     public void visit(Unary node) {
