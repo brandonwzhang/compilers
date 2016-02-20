@@ -3,6 +3,7 @@ package com.AST;
 public interface NodeVisitor {
     void visit(ArrayIndex node);
     void visit(ArrayLiteral node);
+    void visit(ArrayType node);
     void visit(Assignment node);
     void visit(Binary node);
     void visit(BlockList node);
@@ -16,7 +17,6 @@ public interface NodeVisitor {
     void visit(IfStatement node);
     void visit(IntegerLiteral node);
     void visit(IntegerType node);
-    void visit(Node node);
     void visit(ProcedureBlock node);
     void visit(ProcedureCall node);
     void visit(Program node);

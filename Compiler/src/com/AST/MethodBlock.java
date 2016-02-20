@@ -1,4 +1,5 @@
 package com.AST;
 
-public class MethodBlock extends Block {
+public abstract class MethodBlock extends Block {
+
 }

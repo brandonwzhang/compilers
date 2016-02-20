@@ -9,6 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public abstract class Type extends Node {
+public abstract class Type {
 
+    public abstract void accept(NodeVisitor v);
 }

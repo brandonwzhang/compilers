@@ -1,5 +1,6 @@
 package com.AST;
 
-public class Block extends Node {
+public abstract class Block {
 
+    public abstract void accept(NodeVisitor v);
 }

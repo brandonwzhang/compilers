@@ -1,8 +1,9 @@
 use Hello
 use Util
 
-main(args:[][]){
-	println("Hello World!");
+main(args:int[][]) {
+	y:int[1][2]
+	println("Hello World!")
 	x:int = "wumpus"
-	return;
+	return
 }

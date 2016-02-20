@@ -27,6 +27,16 @@ public class PrintVisitor implements NodeVisitor {
         printer.endList();
     }
 
+    public void visit(ArrayType node) {
+        printer.startList();
+        printer.printAtom("[]");
+        node.getBaseType().accept(this);
+        if (node.getSize().isPresent()) {
+            node.getSize().get().accept(this);
+        }
+        printer.endList();
+    }
+
     public void visit(Assignment node) {
         printer.startList();
         printer.printAtom("=");
@@ -57,7 +67,9 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom(node.getValue().toString());
     }
 
-    public void visit(BooleanType node) { }
+    public void visit(BooleanType node) {
+        printer.printAtom("bool");
+    }
 
     public void visit(CharacterLiteral node) {
         printer.printAtom("'" + node.getValue() + "'");
@@ -112,10 +124,8 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom(node.getValue());
     }
 
-    public void visit(IntegerType node) { }
-
-    public void visit(Node node) {
-        System.out.println("something is wrong");
+    public void visit(IntegerType node) {
+        printer.printAtom("int");
     }
 
     public void visit(ProcedureBlock node) {
@@ -178,6 +188,16 @@ public class PrintVisitor implements NodeVisitor {
             printer.endList();
         }
     }*/
+
+    public void visit(Type node) {
+        if (node instanceof ArrayType) {
+            ((ArrayType) node).accept(this);
+        } else if (node instanceof IntegerType) {
+            ((IntegerType) node).accept(this);
+        } else { // BooleanType
+            ((BooleanType) node).accept(this);
+        }
+    }
 
     // TODO: make visit functions for the PrimitiveTypes
 

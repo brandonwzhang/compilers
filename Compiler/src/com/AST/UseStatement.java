@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class UseStatement extends Node {
+public class UseStatement {
     private Identifier identifier;
 
     public void accept(NodeVisitor v){

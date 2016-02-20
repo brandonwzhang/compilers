@@ -12,4 +12,8 @@ import java.util.Optional;
 public class ArrayType extends Type {
     private Type baseType;
     private Optional<Expression> size;
+
+    public void accept(NodeVisitor v) {
+        v.visit(this);
+    }
 }

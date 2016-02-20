@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class FunctionDeclaration extends Node {
+public class FunctionDeclaration {
     private Identifier identifier;
     private List<TypedDeclaration> typedDeclarationList;
     private List<Type> typeList;

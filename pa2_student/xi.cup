@@ -153,7 +153,7 @@ array_type ::= type:t OPEN_BRACKET CLOSE_BRACKET {: RESULT = new ArrayType(t, Op
              ;
 
 // does not allow [] after [n]  
-type ::= primitive_type:pt {: RESULT = new Type(pt, new ArrayBrackets(as)); :}
+type ::= primitive_type:pt {: RESULT = pt; :}
        | array_size_type:as {: RESULT = as; :}
        | array_type:ae {: RESULT = ae; :}
        ;
