@@ -13,7 +13,7 @@ terminal IF, ELSE, WHILE, BREAK, RETURN, USE, LENGTH, PLUS, MINUS, TIMES,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
   COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, UMINUS, OPTIONAL_SEMICOLON;
 
-nonterminal program;
+nonterminal Program program;
 
 nonterminal empty;
 nonterminal use_block;
@@ -52,6 +52,10 @@ nonterminal String blocks;
 nonterminal String statement;
 nonterminal String statement_no_semicolon;
 
+nonterminal String function_declaration_argument_type;
+nonterminal String function_declaration_argument_single; 
+nonterminal String function_declaration_argument_list;
+nonterminal String function_declaration_argument;
 
 nonterminal String function_declaration;
 nonterminal String function_declaration_list;
@@ -105,7 +109,7 @@ unary_operator_expression ::= NOT expression:e
 							;
 
 
-array_index ::= expression OPEN_BRACKET expression CLOSE_BRACKET;  //TODO lol
+array_index ::= expression OPEN_BRACKET expression CLOSE_BRACKET;  
 
 expression ::= IDENTIFIER 
   			 | STRING_LITERAL 
@@ -139,17 +143,19 @@ basic_type ::= INT
 array_sized ::= OPEN_BRACKET expression CLOSE_BRACKET array_sized 
              | array_empty  
              ;
+             
 array_empty ::= OPEN_BRACKET CLOSE_BRACKET array_empty 
 			 | empty  
              ;
 
-type ::= basic_type array_sized; // does not allow [] after [n]  
-
+type ::= basic_type array_sized // does not allow [] after [n]  
+       ;
 types ::= type COMMA types 
 		   | type
 		   ; // for functions that return multiple results
 
-typed_declaration ::= IDENTIFIER COLON type; //x:int
+typed_declaration ::= IDENTIFIER COLON type //x:int
+										;
 
 typed_declaration_list ::= typed_declaration COMMA typed_declaration_list 
 						| typed_declaration COMMA typed_declaration
@@ -179,7 +185,8 @@ if_statement ::= IF OPEN_PAREN expression CLOSE_PAREN block
                | IF OPEN_PAREN expression CLOSE_PAREN block ELSE block
                ;
 
-while_statement ::= WHILE OPEN_PAREN expression CLOSE_PAREN block;
+while_statement ::= WHILE OPEN_PAREN expression CLOSE_PAREN block
+                  ;
 
 return_statement ::= RETURN expression_list 
                    | RETURN 
@@ -198,7 +205,8 @@ statement ::= statement_no_semicolon %prec OPTIONAL_SEMICOLON
 			| statement_no_semicolon SEMICOLON 
 			;
 
-function_block ::= OPEN_BRACE blocks return_statement CLOSE_BRACE;
+function_block ::= OPEN_BRACE blocks return_statement CLOSE_BRACE
+								 ;
 
 block ::= OPEN_BRACE blocks CLOSE_BRACE 
 		| function_block
@@ -209,8 +217,23 @@ blocks ::= block blocks
 		 | empty
          ;
 
-function_declaration ::= IDENTIFIER OPEN_PAREN typed_declaration_list CLOSE_PAREN COLON types function_block
-                       | IDENTIFIER OPEN_PAREN typed_declaration_list CLOSE_PAREN function_block
+function_declaration_argument_type ::= basic_type array_empty 
+									 ;
+
+function_declaration_argument_single ::= IDENTIFIER COLON function_declaration_argument_type
+									   ;
+
+function_declaration_argument_list ::= function_declaration_argument_single COMMA function_declaration_argument_list
+									 | function_declaration_argument_single COMMA function_declaration_argument_single
+									 ;
+
+function_declaration_argument ::= function_declaration_argument_single
+								| function_declaration_argument_list
+								| empty 
+								;
+
+function_declaration ::= IDENTIFIER OPEN_PAREN function_declaration_argument CLOSE_PAREN COLON types function_block
+                       | IDENTIFIER OPEN_PAREN function_declaration_argument CLOSE_PAREN function_block
                        ;
 
 function_declaration_list ::= function_declaration function_declaration_list
@@ -221,6 +244,9 @@ procedure_call ::= IDENTIFIER OPEN_PAREN expression_list CLOSE_PAREN //f(x,y,z,.
 				;
 
 use_block ::= USE IDENTIFIER use_block 
-			| empty;
+			| empty
+      ;
+      
 
-program ::= use_block function_declaration_list;
+program ::= use_block function_declaration_list
+					;	
