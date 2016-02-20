@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class ArrayIndex extends Expression {
+public class ArrayIndex extends Expression implements Assignable {
     private Expression arrayRef;
     private Expression index;
 

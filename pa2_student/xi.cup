@@ -30,9 +30,9 @@ nonterminal Expression E;
 nonterminal Expression F;
 nonterminal Expression G;
 nonterminal Expression H;
+nonterminal Expression I;
 
 nonterminal BooleanLiteral boolean_literal; 
-nonterminal ArrayIndex array_index; //expression involving array[index] 
 nonterminal ArrayLiteral array_literal;
 
 nonterminal Expression expression; 
@@ -55,7 +55,7 @@ nonterminal Assignment assignment;
 
 nonterminal IfStatement if_statement;  
 nonterminal WhileStatement while_statement;
-nonterminal ReturnStatement return_statement;   //TODO
+nonterminal ReturnStatement return_statement;   
 nonterminal Block block; 
 nonterminal BlockList block_list; 
 nonterminal Statement statement;
@@ -75,7 +75,6 @@ nonterminal ProcedureCall procedure_call;
 
 precedence nonassoc ELSE; 
 precedence nonassoc SEMICOLON;
-precedence left OPEN_BRACKET; 
 
 start with program;
 
@@ -122,22 +121,22 @@ G ::= H:h {: RESULT = h; :}
     | MINUS H:h {: RESULT = new Unary(UnaryOperator.MINUS, h); :}
     ;
 
-H ::= boolean_literal:b {: RESULT = b; :}
+H ::= I:i {: RESULT = i; :}
+    | function_call:fc {: RESULT = fc; :}
+    | H:h OPEN_BRACKET I:i CLOSE_BRACKET {: RESULT = new ArrayIndex(h,i); :}
+    ;
+
+I ::= boolean_literal:b {: RESULT = b; :}
     | INTEGER_LITERAL:i {: RESULT = new IntegerLiteral(i); :}
     | OPEN_PAREN A:a CLOSE_PAREN {: RESULT = a; :}
+    | IDENTIFIER: i {: RESULT = new Identifier(i); :}
+    | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
+    | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); :}
+    | array_literal:al {: RESULT = al; :}
     ;
 
 
-array_index ::= expression:e1 OPEN_BRACKET expression:e2 CLOSE_BRACKET {: RESULT = new ArrayIndex(e1, e2); :}
-              ;  
-
-expression ::= IDENTIFIER:i {: RESULT = new Identifier(i); :}
-             | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
-             | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); :}
-             | array_index:ai {: RESULT = ai; :}
-             | function_call:fc {: RESULT = fc; :}
-             | array_literal:al {: RESULT = al; :}
-             | A:a {: RESULT = a; :}
+expression ::= A:a {: RESULT = a; :}
              ; 
  
 expression_list ::= expression:e COMMA expression_list:lst {: lst.add(0, e); RESULT = lst; :} 
@@ -156,21 +155,7 @@ primitive_type ::= INT {: RESULT = new IntegerType(); :}
                  | BOOL {: RESULT = new BooleanType(); :}
                  ; 
 
-array_size_type ::= array_size_type:as OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayType(as, Optional.of(e)); :}
-              | primitive_type:pt OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayType(pt, Optional.of(e)); :}
-              ;
-
-array_no_size_type ::= array_no_size_type:a OPEN_BRACKET CLOSE_BRACKET {: RESULT = new ArrayType(a, Optional.empty()); :}
-                     | primitive_type:p OPEN_BRACKET CLOSE_BRACKET {: RESULT = new ArrayType(p, Optional.empty()); :}
-                     ;
-             
-array_type ::= type:t OPEN_BRACKET CLOSE_BRACKET {: RESULT = new ArrayType(t, Optional.empty()); :} 
-             ;
-
-
 type ::= primitive_type:pt {: RESULT = pt; :}
-       | array_size_type:as {: RESULT = as; :}
-       | array_type:ae {: RESULT = ae; :}
        ;
        
 types ::= type:t COMMA types:lst {: lst.add(0,t); RESULT = lst; :} 
@@ -186,6 +171,7 @@ function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RE
                 ;
 
 assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
+                 | IDENTIFIER:id OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayIndex(new Identifier(id),e); :}
                  | typed_declaration:td {: RESULT = td; :}
                  | UNDERSCORE {: RESULT = new Underscore(); :}
                  ;
@@ -235,8 +221,7 @@ block_list ::= block:b block_list:bl {: bl.getBlockList().add(0, b); RESULT = bl
              | empty  {: RESULT = new BlockList(new LinkedList<Block>()); :}
              ;
 
-function_declaration_argument_type ::= array_no_size_type:a {: RESULT = a; :}
-                                     | primitive_type:p {: RESULT = p; :}
+function_declaration_argument_type ::= primitive_type:p {: RESULT = p; :}
                                      ;
 function_declaration_argument_single ::= IDENTIFIER:i COLON function_declaration_argument_type:t {: RESULT = new TypedDeclaration(new Identifier(i), t);  :}
                                        ;
