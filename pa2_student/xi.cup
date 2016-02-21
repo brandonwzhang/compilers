@@ -45,6 +45,8 @@ nonterminal List<Optional<Expression>> array_size_type;
 nonterminal List<Optional<Expression>> array_no_size_type;
 
 nonterminal TypedDeclaration typed_declaration; 
+nonterminal FunctionCall function_call_no_args;
+nonterminal FunctionCall function_call_regular;
 nonterminal FunctionCall function_call;
 nonterminal Expression assignment_lhs_array;
 nonterminal Assignable assignment_lhs;
@@ -170,22 +172,31 @@ type ::= primitive_type:pt array_size_type: ast {: RESULT = new Type(pt, new Arr
 typed_declaration ::= IDENTIFIER:id COLON type:t {: RESULT = new TypedDeclaration(new Identifier(id),t); :} //x:int
                     ;
 
-function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), lst); :}//f(x,y,z,...) 
-                | IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), new LinkedList<Expression>()); :} // f()
+function_call_no_args ::= IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), new LinkedList<Expression>()); :} // f()
+                        ; 
+
+function_call_regular ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), lst); :}//f(x,y,z,...) 
                 | LENGTH OPEN_PAREN expression:e CLOSE_PAREN {: List<Expression> lst = new LinkedList<>(); lst.add(0, e); RESULT = new FunctionCall(new Identifier("length"), lst); :}
+                ;
+
+function_call ::= function_call_no_args:f {: RESULT = f; :}
+                | function_call_regular:f {: RESULT = f; :}
                 ;
 
 
 assignment_lhs_array ::= function_call:fc {: RESULT = fc; :}
                        | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
                        | IDENTIFIER:i {: RESULT = new Identifier(i); :}
+                       | INTEGER_LITERAL:i {: RESULT = new IntegerLiteral(i); :}
+                       | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); :}
+                       | boolean_literal:b {: RESULT = b; :}
                        ;
 
 
 assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
                  | assignment_lhs_array:a OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayIndex(a,e); :}
                  | typed_declaration:td {: RESULT = td; :}
-                 | function_call:fc {: RESULT = fc; :}
+                 | function_call_regular:fc {: RESULT = fc; :}
                  | UNDERSCORE {: RESULT = new Underscore(); :}
                  ;
 
