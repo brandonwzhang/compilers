@@ -41,12 +41,12 @@ nonterminal List<Expression> expression_list_trailing_comma;
 
 nonterminal Type.PrimitiveType primitive_type;
 nonterminal Type type;
-nonterminal List<Type> types;
 nonterminal List<Optional<Expression>> array_size_type;
 nonterminal List<Optional<Expression>> array_no_size_type;
 
 nonterminal TypedDeclaration typed_declaration; 
 nonterminal FunctionCall function_call;
+nonterminal Expression assignment_lhs_array;
 nonterminal Assignable assignment_lhs;
 nonterminal Assignable declaration_assignment_lhs;
 nonterminal List<Assignable> multiple_assignment_lhs;
@@ -175,9 +175,17 @@ function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RE
                 | LENGTH OPEN_PAREN expression:e CLOSE_PAREN {: List<Expression> lst = new LinkedList<>(); lst.add(0, e); RESULT = new FunctionCall(new Identifier("length"), lst); :}
                 ;
 
+
+assignment_lhs_array ::= function_call:fc {: RESULT = fc; :}
+                       | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
+                       | IDENTIFIER:i {: RESULT = new Identifier(i); :}
+                       ;
+
+
 assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
-                 | IDENTIFIER:id OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayIndex(new Identifier(id),e); :}
+                 | assignment_lhs_array:a OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayIndex(a,e); :}
                  | typed_declaration:td {: RESULT = td; :}
+                 | function_call:fc {: RESULT = fc; :}
                  | UNDERSCORE {: RESULT = new Underscore(); :}
                  ;
 
