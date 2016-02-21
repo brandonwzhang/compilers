@@ -34,12 +34,15 @@ import java.io.PrintWriter;
         FileReader reader = new FileReader(sourcePath + file);
         Lexer lexer = new Lexer(reader);
         Symbol next = lexer.next_token();
-        while (next.sym != ParserSym.EOF && next.sym != ParserSym.error) {
+        while (next.sym != ParserSym.EOF) {
           String line = next.left + ":" +
                         next.right + " " +
                         Util.symbolTranslation.get(next.sym);
           if (next.value != null) {
             line += " " + next.value;
+          }
+          if (next.sym == ParserSym.error) {
+            break;
           }
           lines.add(line);
           next = lexer.next_token();
