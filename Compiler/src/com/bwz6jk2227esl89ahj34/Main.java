@@ -10,15 +10,8 @@ public class Main {
 
     public static void main(String[] args) {
         CLI cli = new CLI();
-        cli.addOption("--lex",
-                      "Lex a .xi file to a .lexed file",
-                      files -> Lexer.lexFile(sourcePath, diagnosticPath,
-                              files),
-                      1);
-        cli.addOption("--parse",
-                      "Parse a .xi file to a .parsed file",
-                      files -> Main.parse(sourcePath, diagnosticPath, files),
-                      1);
+        // the order in which options are added is the order in which they
+        // are executed (but options can be provided in any order when running this file)
         cli.addOption("-sourcepath",
                       "Set the path for source files",
                       Main::setSourcePath,
@@ -27,6 +20,15 @@ public class Main {
                       "Set the path for diagnostic files",
                       Main::setDiagnosticPath,
                       1);
+        cli.addOption("--lex",
+                "Lex a .xi file to a .lexed file",
+                files -> Lexer.lexFile(sourcePath, diagnosticPath,
+                        files)
+        );
+        cli.addOption("--parse",
+                "Parse a .xi file to a .parsed file",
+                files -> Main.parse(sourcePath, diagnosticPath, files)
+        );
         cli.execute(args);
     }
 
@@ -54,22 +56,13 @@ public class Main {
         diagnosticPath = args[0];
     }
 
-    public static void parse(String sourcePath, String diagnosticPath, String[] args) {
-        if (args.length == 0) {
-            System.out.println("Please specify input files");
-            return;
-        }
-        if (args[0] == null) {
-            System.out.println("Please specify input files");
-            return;
-        }
-        String[] files = args[0].split(":");
-        for (int i = 0; i < files.length; i++) {
-            files[i] = sourcePath + files[i];
-        }
+    public static void parse(String sourcePath, String diagnosticPath, String[] files) {
+
+        System.out.println("Parsing " + files.length + " file(s).");
         try {
             for (String file : files) {
-                FileReader reader = new FileReader(file);
+                System.out.println("Parsing " + sourcePath + file);
+                FileReader reader = new FileReader(sourcePath + file);
                 Lexer lexer = new Lexer(reader);
                 Parser parser = new Parser(lexer);
                 Symbol result = parser.parse();
@@ -80,10 +73,11 @@ public class Main {
                 }
                 String output = file.replace(".xi", ".parsed");
 
-                FileOutputStream fos = new FileOutputStream(new File(sourcePath + output));
+                FileOutputStream fos = new FileOutputStream(new File(diagnosticPath + output));
                 CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(fos);
                 NodeVisitor visitor = new PrintVisitor(printer);
                 ((Program)(result.value)).accept(visitor);
+                System.out.println("Writing " + diagnosticPath + output);
                 printer.flush();
             }
         } catch(Exception e) {
