@@ -27,24 +27,12 @@ public class PrintVisitor implements NodeVisitor {
         printer.endList();
     }
 
-    public void visit(ArrayType node) {
-        printer.startList();
-        printer.printAtom("[]");
-        node.getBaseType().accept(this);
-        if (node.getSize().isPresent()) {
-            node.getSize().get().accept(this);
-        }
-        printer.endList();
-    }
-
     public void visit(Assignment node) {
         printer.startList();
         printer.printAtom("=");
-        printer.startList();
         for(Assignable a : node.getVariables()){
             a.accept(this);
         }
-        printer.endList();
         node.getExpression().accept(this);
         printer.endList();
     }
@@ -67,10 +55,6 @@ public class PrintVisitor implements NodeVisitor {
 
     public void visit(BooleanLiteral node) {
         printer.printAtom(node.getValue().toString());
-    }
-
-    public void visit(BooleanType node) {
-        printer.printAtom("bool");
     }
 
     public void visit(CharacterLiteral node) {
@@ -130,10 +114,6 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom(node.getValue());
     }
 
-    public void visit(IntegerType node) {
-        printer.printAtom("int");
-    }
-
     public void visit(ProcedureBlock node) {
         printer.startList();
         node.getBlockList().accept(this);
@@ -177,7 +157,7 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom("\"" + node.getValue() + "\"");
     }
 
-    /*
+
     public void visit(Type node) {
         for(int i = 0; i < node.getArrayBrackets().getIndices().size(); i++) {
             printer.startList();
@@ -193,19 +173,7 @@ public class PrintVisitor implements NodeVisitor {
             }
             printer.endList();
         }
-    }*/
-
-    public void visit(Type node) {
-        if (node instanceof ArrayType) {
-            ((ArrayType) node).accept(this);
-        } else if (node instanceof IntegerType) {
-            ((IntegerType) node).accept(this);
-        } else { // BooleanType
-            ((BooleanType) node).accept(this);
-        }
     }
-
-    // TODO: make visit functions for the PrimitiveTypes
 
     public void visit(TypedDeclaration node) {
         printer.startList();

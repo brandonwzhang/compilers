@@ -9,7 +9,20 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public abstract class Type {
+public class Type {
 
-    public abstract void accept(NodeVisitor v);
+    public enum PrimitiveType {
+        INT,
+        BOOL
+    }
+
+    private PrimitiveType primitiveType;
+    private ArrayBrackets arrayBrackets;
+
+    public void accept(NodeVisitor v){
+        v.visit(this);
+    }
+
 }
+
+
