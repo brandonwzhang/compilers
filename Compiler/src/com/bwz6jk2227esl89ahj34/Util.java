@@ -46,6 +46,6 @@ public class Util {
         System.out.println(sExp1);
         System.out.println(sExp2);
 
-        return sExp1.equals(sExp2);
+        return sExp1.trim().equals(sExp2.trim());
     }
 }
