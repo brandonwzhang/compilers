@@ -67,8 +67,6 @@ public class Main {
     public static void parse(String sourcePath,
                              String diagnosticPath,
                              String[] files) {
-        System.out.println();
-        System.out.println("Parsing " + files.length + " file(s).");
         try {
             for (String file : files) {
                 if (!file.contains(".xi")) {
@@ -89,7 +87,8 @@ public class Main {
                 if (parser.hasSyntaxError) {
                     // handle syntax error, output to file
                     parser.hasSyntaxError = false;
-                    Util.writeAndClose(output, new ArrayList<String>(Arrays.asList(parser.syntaxErrMessage)));
+                    Util.writeAndClose(diagnosticPath + output, new
+                            ArrayList<String>(Arrays.asList(parser.syntaxErrMessage)));
 
                     parser.syntaxErrMessage = "";
                     continue;
@@ -103,7 +102,6 @@ public class Main {
                 NodeVisitor visitor = new PrintVisitor(printer);
 
                 ((Program)(result.value)).accept(visitor);
-                System.out.println("Writing " + diagnosticPath + output);
                 printer.flush();
             }
         } catch(Exception e) {
