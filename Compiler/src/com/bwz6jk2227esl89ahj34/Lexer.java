@@ -772,7 +772,7 @@ class Lexer implements java_cup.runtime.Scanner {
             }
           case 58: break;
           case 7: 
-            { string.setLength(0); stringStartRow = yyline; stringStartCol = yycolumn; yybegin(STRING);
+            { string.setLength(0); stringStartRow = yyline + 1; stringStartCol = yycolumn + 1; yybegin(STRING);
             }
           case 59: break;
           case 8: 
