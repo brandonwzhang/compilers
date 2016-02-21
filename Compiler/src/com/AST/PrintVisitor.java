@@ -104,13 +104,21 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom(node.getName());
     }
 
+    public static boolean isStatement(Block b) {
+        return (b instanceof Statement);
+    }
+
     public void visit(IfStatement node) {
         printer.startList();
         printer.printAtom("if");
         node.getGuard().accept(this);
-        printer.startList();
+        if(!isStatement(node.getTrueBlock())) {
+            printer.startList();
+        }
         node.getTrueBlock().accept(this);
-        printer.endList();
+        if(!isStatement(node.getTrueBlock())) {
+            printer.endList();
+        }
         if (node.getFalseBlock().isPresent()) {
             node.getFalseBlock().get().accept(this);
         }
@@ -211,7 +219,13 @@ public class PrintVisitor implements NodeVisitor {
         printer.startList();
         printer.printAtom("while");
         node.getGuard().accept(this);
+        if(!isStatement(node.getBlock())) {
+            printer.startList();
+        }
         node.getBlock().accept(this);
+        if(!isStatement(node.getBlock())) {
+            printer.endList();
+        }
         printer.endList();
     }
 }

@@ -123,7 +123,7 @@ G ::= H:h {: RESULT = h; :}
 
 H ::= I:i {: RESULT = i; :}
     | function_call:fc {: RESULT = fc; :}
-    | H:h OPEN_BRACKET I:i CLOSE_BRACKET {: RESULT = new ArrayIndex(h,i); :}
+    | H:h OPEN_BRACKET A:a CLOSE_BRACKET {: RESULT = new ArrayIndex(h,a); :}
     ;
 
 I ::= boolean_literal:b {: RESULT = b; :}
