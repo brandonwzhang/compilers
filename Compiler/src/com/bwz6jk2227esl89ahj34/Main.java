@@ -1,6 +1,9 @@
 package com.bwz6jk2227esl89ahj34;
 import com.AST.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import java_cup.runtime.*;
 import edu.cornell.cs.cs4120.util.*;
 
@@ -31,7 +34,7 @@ public class Main {
         );
         cli.execute(args);
         try {
-            testHarness();
+            //testHarness();
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -78,9 +81,21 @@ public class Main {
                 FileReader reader = new FileReader(sourcePath + file);
                 Lexer lexer = new Lexer(reader);
                 Parser parser = new Parser(lexer);
-                Symbol result = parser.parse();
 
                 String output = file.replace(".xi", ".parsed");
+
+                Symbol result = parser.parse();
+
+                if (parser.hasSyntaxError) {
+                    // handle syntax error, output to file
+                    parser.hasSyntaxError = false;
+                    Util.writeAndClose(output, new ArrayList<String>(Arrays.asList(parser.syntaxErrMessage)));
+
+                    parser.syntaxErrMessage = "";
+                    continue;
+                }
+
+
                 FileOutputStream fos = new FileOutputStream(
                         new File(diagnosticPath + output));
                 CodeWriterSExpPrinter printer =
