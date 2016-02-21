@@ -41,10 +41,10 @@ import java.io.PrintWriter;
           if (next.value != null) {
             line += " " + next.value;
           }
+          lines.add(line);
           if (next.sym == ParserSym.error) {
             break;
           }
-          lines.add(line);
           next = lexer.next_token();
         }
         String output = file.replace(".xi", ".lexed");
