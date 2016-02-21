@@ -46,11 +46,11 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(BlockList node) {
-        printer.startList();
+       // printer.startList();
         for(Block b : node.getBlockList()){
             b.accept(this);
         }
-        printer.endList();
+       // printer.endList();
     }
 
     public void visit(BooleanLiteral node) {

@@ -64,12 +64,9 @@ public class Main {
             return;
         }
         String[] files = args[0].split(":");
-        for (int i = 0; i < files.length; i++) {
-            files[i] = sourcePath + files[i];
-        }
         try {
             for (String file : files) {
-                FileReader reader = new FileReader(file);
+                FileReader reader = new FileReader(sourcePath + file);
                 Lexer lexer = new Lexer(reader);
                 Parser parser = new Parser(lexer);
                 Symbol result = parser.parse();
@@ -80,11 +77,14 @@ public class Main {
                 }
                 String output = file.replace(".xi", ".parsed");
 
-                FileOutputStream fos = new FileOutputStream(new File(sourcePath + output));
+                FileOutputStream fos = new FileOutputStream(new File(diagnosticPath + output));
                 CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(fos);
                 NodeVisitor visitor = new PrintVisitor(printer);
                 ((Program)(result.value)).accept(visitor);
                 printer.flush();
+
+                //boolean b = Util.compareSExpFiles(sourcePath+"giventest2_expected.parsed", diagnosticPath+output);
+                //System.out.println(b);
             }
         } catch(Exception e) {
             e.printStackTrace();
