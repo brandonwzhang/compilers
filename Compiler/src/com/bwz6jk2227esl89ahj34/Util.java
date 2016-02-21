@@ -59,7 +59,6 @@ public class Util {
             PrintWriter writer = new PrintWriter(file);
             for (int i = 0; i < lines.size() - 1; i++) {
                 writer.println(lines.get(i));
-                i++;
             }
             writer.print(lines.get(lines.size() - 1));
             writer.close();
