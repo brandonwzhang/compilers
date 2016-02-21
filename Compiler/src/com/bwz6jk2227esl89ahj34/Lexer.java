@@ -322,8 +322,8 @@ class Lexer implements java_cup.runtime.Scanner {
         Lexer lexer = new Lexer(reader);
         Symbol next = lexer.next_token();
         while (next.sym != ParserSym.EOF && next.sym != ParserSym.error) {
-          String line = (next.left + 1) + ":" +
-                        (next.right + 1) + " " +
+          String line = next.left + ":" +
+                        next.right + " " +
                         Util.symbolTranslation.get(next.sym);
           if (next.value != null) {
             line += " " + next.value;
@@ -347,10 +347,10 @@ class Lexer implements java_cup.runtime.Scanner {
   StringBuffer hexBuffer = new StringBuffer();
 
   private Symbol symbol(int type) {
-    return new Symbol(type, yyline, yycolumn);
+    return new Symbol(type, yyline + 1, yycolumn + 1);
   }
   private Symbol symbol(int type, Object value) {
-    return new Symbol(type, yyline, yycolumn, value);
+    return new Symbol(type, yyline + 1, yycolumn + 1, value);
   }
 
   /* Converts a char containing hex (eg. '\x64') to a string (eg. "d") */
