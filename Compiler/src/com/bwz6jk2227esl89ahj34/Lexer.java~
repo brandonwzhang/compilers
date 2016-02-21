@@ -324,7 +324,7 @@ class Lexer implements java_cup.runtime.Scanner {
         while (next.sym != ParserSym.EOF && next.sym != ParserSym.error) {
           String line = (next.left + 1) + ":" +
                         (next.right + 1) + " " +
-                        Util.symbolTranslation.get(next.sym);
+                        symbolTranslation.get(next.sym);
           if (next.value != null) {
             line += " " + next.value;
           }

@@ -6,8 +6,54 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Util {
+    public static final HashMap<Integer, String> symbolTranslation = new HashMap<Integer, String>(){{
+        put(ParserSym.IF, "if");
+        put(ParserSym.WHILE, "while");
+        put(ParserSym.ELSE, "else");
+        put(ParserSym.RETURN, "return");
+        put(ParserSym.LENGTH, "length");
+        put(ParserSym.INT, "int");
+        put(ParserSym.BOOL, "bool");
+        put(ParserSym.TRUE, "true");
+        put(ParserSym.FALSE, "false");
+        put(ParserSym.IDENTIFIER, "id");
+        put(ParserSym.INTEGER_LITERAL, "integer");
+        put(ParserSym.NOT, "!");
+        put(ParserSym.TIMES, "*");
+        put(ParserSym.HIGH_MULT, "*>>");
+        put(ParserSym.DIVIDE, "/");
+        put(ParserSym.MODULO, "%");
+        put(ParserSym.PLUS, "+");
+        put(ParserSym.MINUS, "-");
+        put(ParserSym.LT, "<");
+        put(ParserSym.LEQ, "<=");
+        put(ParserSym.GEQ, ">=");
+        put(ParserSym.GT, ">");
+        put(ParserSym.EQUAL, "==");
+        put(ParserSym.NOT_EQUAL, "!=");
+        put(ParserSym.AND, "&");
+        put(ParserSym.OR, "|");
+        put(ParserSym.STRING_LITERAL, "string");
+        put(ParserSym.EOF, "EOF");
+        put(ParserSym.OPEN_PAREN, "(");
+        put(ParserSym.CLOSE_PAREN, ")");
+        put(ParserSym.OPEN_BRACKET, "[");
+        put(ParserSym.CLOSE_BRACKET, "]");
+        put(ParserSym.OPEN_BRACE, "{");
+        put(ParserSym.CLOSE_BRACE, "}");
+        put(ParserSym.COLON, ":");
+        put(ParserSym.COMMA, ",");
+        put(ParserSym.GETS, "=");
+        put(ParserSym.SEMICOLON, ";");
+        put(ParserSym.CHARACTER_LITERAL, "character");
+        put(ParserSym.USE, "use");
+        put(ParserSym.UNDERSCORE, "_");
+        put(ParserSym.error, "error:");
+    }};
+
     public static void writeAndClose(String file, ArrayList<String> lines) {
         try {
             PrintWriter writer = new PrintWriter(file);
