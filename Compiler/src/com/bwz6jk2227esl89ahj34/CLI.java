@@ -26,7 +26,7 @@ public class CLI {
         for (int i = 0; i < args.length; i++) {
             // Return early if an invalid option is detected
             if (!options.keySet().contains(args[i])) {
-                System.out.println(args[0] + " is not an option.");
+                System.out.println(args[i] + " is not an option.");
                 return;
             }
             Option option = options.get(args[i]);

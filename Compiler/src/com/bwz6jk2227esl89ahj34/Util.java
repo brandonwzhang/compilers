@@ -23,13 +23,18 @@ public class Util {
         }
     }
 
-    public static boolean compareSExp(String fileName1, String fileName2) throws IOException {
+    public static boolean compareSExpFiles(String fileName1, String fileName2) throws IOException {
 
         String sExp1 = new String(Files.readAllBytes(Paths.get(fileName1)),
                 Charset.forName("UTF-8"));
         String sExp2 = new String(Files.readAllBytes(Paths.get(fileName2)),
                 Charset.forName("UTF-8"));
 
+        return compareSExp(sExp1, sExp2);
+    }
+
+    public static boolean compareSExp(String sExp1, String sExp2) {
+        
         sExp1 = sExp1.replaceAll("\\s+", " ")
                 .replaceAll("\\(\\s?", "(")
                 .replaceAll("\\s?\\)", ")");

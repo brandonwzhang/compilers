@@ -38,7 +38,6 @@ public class ParserSym {
   public static final int TRUE = 6;
   public static final int COLON = 38;
   public static final int GT = 25;
-  public static final int UMINUS = 43;
   public static final int NOT = 22;
   public static final int GEQ = 26;
   public static final int OPEN_PAREN = 34;
@@ -95,8 +94,7 @@ public class ParserSym {
   "COMMA",
   "SEMICOLON",
   "UNDERSCORE",
-  "HIGH_MULT",
-  "UMINUS"
+  "HIGH_MULT"
   };
 }
 
