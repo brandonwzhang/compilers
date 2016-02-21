@@ -12,8 +12,11 @@ import java.util.List;
 public class Type {
 
     public enum PrimitiveType {
-        INT,
-        BOOL
+        INT, BOOL;
+
+        @Override public String toString() {
+            return super.toString().toLowerCase();
+        }
     }
 
     private PrimitiveType primitiveType;
