@@ -6,6 +6,11 @@
 package com.bwz6jk2227esl89ahj34;
 
 import com.AST.*;
+import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
+import java_cup.runtime.Symbol;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.util.*;
 
 /** CUP v0.11b 20150326 generated parser.
@@ -621,16 +626,57 @@ public class Parser
 
 
 
+    public static void parseFile(String sourcePath,
+                             String diagnosticPath,
+                             String[] files) {
+        try {
+            for (String file : files) {
+                if (!file.contains(".xi")) {
+                    System.out.println(file + "is not a .xi file. " +
+                            "This file will not be parsed.");
+                    continue;
+                }
+
+                FileReader reader = new FileReader(sourcePath + file);
+                Lexer lexer = new Lexer(reader);
+                Parser parser = new Parser(lexer);
+
+                String output = file.replace(".xi", ".parsed");
+
+                Symbol result = parser.parse();
+
+                if (parser.hasSyntaxError) {
+                    // handle syntax error, output to file
+                    parser.hasSyntaxError = false;
+                    Util.writeAndClose(diagnosticPath + output, new
+                            ArrayList<String>(Arrays.asList(parser.syntaxErrMessage)));
+
+                    parser.syntaxErrMessage = "";
+                    continue;
+                }
+
+
+                FileOutputStream fos = new FileOutputStream(
+                        new File(diagnosticPath + output));
+                CodeWriterSExpPrinter printer =
+                        new CodeWriterSExpPrinter(fos);
+                NodeVisitor visitor = new PrintVisitor(printer);
+
+                ((Program)(result.value)).accept(visitor);
+                printer.flush();
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean hasSyntaxError = false;
     public String syntaxErrMessage = "";
     
-    public void syntax_error(java_cup.runtime.Symbol cur_token){
+    public void syntax_error(Symbol cur_token){
         hasSyntaxError = true;
-        syntaxErrMessage = cur_token.left + ":" + cur_token.right + 
-          " error: Unexpected token " + Util.symbolTranslation.get(cur_token.sym);
-        if (cur_token.value != null) {
-            syntaxErrMessage += " " + cur_token.value;
-        }
+        syntaxErrMessage = cur_token.left + ":" + cur_token.right + " Syntax error";
+        
         done_parsing();
     }
 

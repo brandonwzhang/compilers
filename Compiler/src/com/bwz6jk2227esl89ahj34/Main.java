@@ -30,7 +30,7 @@ public class Main {
         );
         cli.addOption("--parse",
                 "Parse a .xi file to a .parsed file",
-                files -> Main.parse(sourcePath, diagnosticPath, files)
+                files -> Parser.parseFile(sourcePath, diagnosticPath, files)
         );
         cli.execute(args);
         try {
@@ -64,51 +64,6 @@ public class Main {
         diagnosticPath = args[0];
     }
 
-    public static void parse(String sourcePath,
-                             String diagnosticPath,
-                             String[] files) {
-        try {
-            for (String file : files) {
-                if (!file.contains(".xi")) {
-                    System.out.println(file + "is not a .xi file. " +
-                            "This file will not be parsed.");
-                    continue;
-                }
-                System.out.println("Parsing " + sourcePath + file);
-
-                FileReader reader = new FileReader(sourcePath + file);
-                Lexer lexer = new Lexer(reader);
-                Parser parser = new Parser(lexer);
-
-                String output = file.replace(".xi", ".parsed");
-
-                Symbol result = parser.parse();
-
-                if (parser.hasSyntaxError) {
-                    // handle syntax error, output to file
-                    parser.hasSyntaxError = false;
-                    Util.writeAndClose(diagnosticPath + output, new
-                            ArrayList<String>(Arrays.asList(parser.syntaxErrMessage)));
-
-                    parser.syntaxErrMessage = "";
-                    continue;
-                }
-
-
-                FileOutputStream fos = new FileOutputStream(
-                        new File(diagnosticPath + output));
-                CodeWriterSExpPrinter printer =
-                        new CodeWriterSExpPrinter(fos);
-                NodeVisitor visitor = new PrintVisitor(printer);
-
-                ((Program)(result.value)).accept(visitor);
-                printer.flush();
-            }
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void testHarness() throws IOException {
         String[] testFileNames = new String[] {"arrayinit", "arrayinit2",
                 "ex1", "ex2", "gcd", "insertionsort", "mdarrays", "ratadd",
@@ -118,7 +73,7 @@ public class Main {
             testFileNames[i] = testFileNames[i] + ".xi";
         }
 
-        parse("../parser/tests/", "../parser/tests/", testFileNames);
+        Parser.parseFile("../parser/tests/", "../parser/tests/", testFileNames);
 
         for (String file : testFileNames) {
             String sExpFile1 =
