@@ -30,8 +30,14 @@ public class PrintVisitor implements NodeVisitor {
     public void visit(Assignment node) {
         printer.startList();
         printer.printAtom("=");
+        if(node.getVariables().size() > 1) {
+            printer.startList();
+        }
         for(Assignable a : node.getVariables()){
             a.accept(this);
+        }
+        if(node.getVariables().size() > 1) {
+            printer.endList();
         }
         node.getExpression().accept(this);
         printer.endList();
@@ -46,11 +52,11 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(BlockList node) {
-        printer.startList();
+       // printer.startList();
         for(Block b : node.getBlockList()){
             b.accept(this);
         }
-        printer.endList();
+       // printer.endList();
     }
 
     public void visit(BooleanLiteral node) {
@@ -102,9 +108,10 @@ public class PrintVisitor implements NodeVisitor {
         printer.startList();
         printer.printAtom("if");
         node.getGuard().accept(this);
+        printer.startList();
         node.getTrueBlock().accept(this);
+        printer.endList();
         if (node.getFalseBlock().isPresent()) {
-            printer.printAtom("else");
             node.getFalseBlock().get().accept(this);
         }
         printer.endList();

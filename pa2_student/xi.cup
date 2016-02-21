@@ -218,11 +218,12 @@ statement_no_semicolon ::= if_statement:s {: RESULT = s; :}
                          ; 
 
 //this should be okay since semicolon doesn't actually matter
-statement ::= statement_no_semicolon:s {: RESULT = s; :}
-            | statement_no_semicolon:s SEMICOLON {: RESULT = s; :}
+statement ::= statement_no_semicolon:s {: RESULT = s; :} 
+            | statement_no_semicolon:s SEMICOLON {: RESULT = s; :} 
             ;
 
 function_block ::= OPEN_BRACE block_list:bl return_statement:r CLOSE_BRACE {: RESULT = new FunctionBlock(bl, r); :}
+                 | OPEN_BRACE block_list:bl return_statement:r SEMICOLON CLOSE_BRACE {: RESULT = new FunctionBlock(bl,r); :}
                  ;
 
 block ::= OPEN_BRACE block_list:bl CLOSE_BRACE  {: RESULT = bl; :}
@@ -262,6 +263,7 @@ function_declaration_list ::= function_declaration:fd function_declaration_list:
                 
 procedure_block ::=  OPEN_BRACE block_list:b CLOSE_BRACE {: RESULT = new ProcedureBlock(b); :}
                   | OPEN_BRACE block_list:b RETURN CLOSE_BRACE {: RESULT = new ProcedureBlock(b); :}
+                  | OPEN_BRACE block_list:b RETURN SEMICOLON CLOSE_BRACE {: RESULT = new ProcedureBlock(b); :}
                   ;
                  
 procedure_call ::= IDENTIFIER:id OPEN_PAREN expression_list:elist CLOSE_PAREN {: RESULT = new ProcedureCall(new Identifier(id), elist); :} //f(x,y,z,...) 

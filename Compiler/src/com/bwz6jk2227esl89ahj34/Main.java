@@ -55,7 +55,7 @@ public class Main {
         }
         diagnosticPath = args[0];
     }
-
+    
     public static void parse(String sourcePath, String diagnosticPath, String[] files) {
 
         System.out.println("Parsing " + files.length + " file(s).");
@@ -79,6 +79,9 @@ public class Main {
                 ((Program)(result.value)).accept(visitor);
                 System.out.println("Writing " + diagnosticPath + output);
                 printer.flush();
+
+                //boolean b = Util.compareSExpFiles(sourcePath+"giventest2_expected.parsed", diagnosticPath+output);
+                //System.out.println(b);
             }
         } catch(Exception e) {
             e.printStackTrace();
