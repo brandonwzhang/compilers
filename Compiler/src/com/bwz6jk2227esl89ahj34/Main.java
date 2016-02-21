@@ -30,6 +30,11 @@ public class Main {
                 files -> Main.parse(sourcePath, diagnosticPath, files)
         );
         cli.execute(args);
+        try {
+            testHarness();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -55,43 +60,60 @@ public class Main {
         }
         diagnosticPath = args[0];
     }
-    
-    public static void parse(String sourcePath, String diagnosticPath, String[] files) {
 
+    public static void parse(String sourcePath,
+                             String diagnosticPath,
+                             String[] files) {
+        System.out.println();
         System.out.println("Parsing " + files.length + " file(s).");
         try {
             for (String file : files) {
+                if (!file.contains(".xi")) {
+                    System.out.println(file + "is not a .xi file. " +
+                            "This file will not be parsed.");
+                    continue;
+                }
                 System.out.println("Parsing " + sourcePath + file);
+
                 FileReader reader = new FileReader(sourcePath + file);
                 Lexer lexer = new Lexer(reader);
                 Parser parser = new Parser(lexer);
                 Symbol result = parser.parse();
 
-                if (!file.contains(".xi")) {
-                    System.out.println(file + "is not a .xi file. This file will not be parsed.");
-                    continue;
-                }
                 String output = file.replace(".xi", ".parsed");
-
-                FileOutputStream fos = new FileOutputStream(new File(diagnosticPath + output));
-                CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(fos);
+                FileOutputStream fos = new FileOutputStream(
+                        new File(diagnosticPath + output));
+                CodeWriterSExpPrinter printer =
+                        new CodeWriterSExpPrinter(fos);
                 NodeVisitor visitor = new PrintVisitor(printer);
+
                 ((Program)(result.value)).accept(visitor);
                 System.out.println("Writing " + diagnosticPath + output);
                 printer.flush();
-
-                //boolean b = Util.compareSExpFiles(sourcePath+"giventest2_expected.parsed", diagnosticPath+output);
-                //System.out.println(b);
             }
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
 
-//        try {
-//            System.out.println();
-//            System.out.println(Util.compareSExp("../parser/tests/test2.parsed", "../parser/tests/test2.parsed"));
-//        } catch(Exception e) {
-//
-//        }
+    public static void testHarness() throws IOException {
+        String[] testFileNames = new String[] {"arrayinit", "arrayinit2",
+                "ex1", "ex2", "gcd", "insertionsort", "mdarrays", "ratadd",
+                "ratadduse", "spec1", "spec2", "spec3" };
+
+        for (int i = 0; i < testFileNames.length; i++) {
+            testFileNames[i] = testFileNames[i] + ".xi";
+        }
+
+        parse("../parser/tests/", "../parser/tests/", testFileNames);
+
+        for (String file : testFileNames) {
+            String sExpFile1 =
+                    "../parser/tests/" + file.replace(".xi",".parsedsol");
+            String sExpFile2 =
+                    "../parser/tests/" + file.replace(".xi", ".parsed");
+            System.out.println();
+            System.out.println(Util.compareSExpFiles(sExpFile1, sExpFile2));
+        }
     }
 }

@@ -349,23 +349,21 @@ class Lexer implements java_cup.runtime.Scanner {
     put(ParserSym.error, "error:");
   }};
 
-  public static void lexFile(String sourcePath, String diagnosticPath, String[] args) {
-    if (args.length == 0) {
-      System.out.println("Please specify input files");
-      return;
-    }
-    if (args[0] == null) {
-      System.out.println("Please specify input files");
-      return;
-    }
-    String[] files = args[0].split(":");
-    for (int i = 0; i < files.length; i++) {
-      files[i] = sourcePath + files[i];
-    }
+  public static void lexFile(String sourcePath,
+                             String diagnosticPath,
+                             String[] files) {
+    System.out.println();
+    System.out.println("Lexing " + files.length + " file(s).");
     try {
-      for (int i = 0; i < files.length; i++) {
-        ArrayList<String> lines = new ArrayList<String>();
-        FileReader reader = new FileReader(files[i]);
+      for (String file : files) {
+        if (!file.contains(".xi")) {
+          System.out.println(file +
+                  "is not a .xi file. This file will not be lexed.");
+          continue;
+        }
+        System.out.println("Lexing " + sourcePath + file);
+        ArrayList<String> lines = new ArrayList<>();
+        FileReader reader = new FileReader(sourcePath + file);
         Lexer lexer = new Lexer(reader);
         Symbol next = lexer.next_token();
         while (next.sym != ParserSym.EOF && next.sym != ParserSym.error) {
@@ -378,9 +376,9 @@ class Lexer implements java_cup.runtime.Scanner {
           lines.add(line);
           next = lexer.next_token();
         }
-        String writeFile = diagnosticPath + 
-                           files[i].substring(0, files[i].indexOf(".")) +
-                           ".lexed";
+        String output = file.replace(".xi", ".lexed");
+        String writeFile = diagnosticPath + output;
+        System.out.println("Writing " + diagnosticPath + output);
         Util.writeAndClose(writeFile, lines);
       }
     } catch(Exception e) {
