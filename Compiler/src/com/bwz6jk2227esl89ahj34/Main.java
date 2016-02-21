@@ -68,20 +68,33 @@ public class Main {
             files[i] = sourcePath + files[i];
         }
         try {
-            for (int i = 0; i < files.length; i++) {
-                FileReader reader = new FileReader(files[i]);
+            for (String file : files) {
+                FileReader reader = new FileReader(file);
                 Lexer lexer = new Lexer(reader);
-                //ComplexSymbolFactory csf = new ComplexSymbolFactory();
-                Parser Parser = new Parser(lexer);
-                Symbol result = Parser.parse();
+                Parser parser = new Parser(lexer);
+                Symbol result = parser.parse();
 
-                CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(System.out);
-                NodeVisitor visitor = new PrintVisitor(printer); // TODO: pass vars
+                if (!file.contains(".xi")) {
+                    System.out.println(file + "is not a .xi file. This file will not be parsed.");
+                    continue;
+                }
+                String output = file.replace(".xi", ".parsed");
+
+                FileOutputStream fos = new FileOutputStream(new File(sourcePath + output));
+                CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(fos);
+                NodeVisitor visitor = new PrintVisitor(printer);
                 ((Program)(result.value)).accept(visitor);
                 printer.flush();
             }
         } catch(Exception e) {
             e.printStackTrace();
         }
+
+//        try {
+//            System.out.println();
+//            System.out.println(Util.compareSExp("../parser/tests/test2.parsed", "../parser/tests/test2.parsed"));
+//        } catch(Exception e) {
+//
+//        }
     }
 }
