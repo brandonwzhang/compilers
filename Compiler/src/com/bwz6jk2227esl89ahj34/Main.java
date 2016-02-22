@@ -13,9 +13,11 @@ public class Main {
 
     public static void main(String[] args) {
         CLI cli = new CLI();
-        // the order in which options are added is the order in which they
-        // are executed (but options can be provided in any order when running
-        //               this file)
+        /*
+            The order in which these options are added is the same as which
+            they will be executed (but options can be provided in any order
+            when calling xic
+         */
         cli.addOption("-sourcepath",
                       "Set the path for source files",
                       Main::setSourcePath,
@@ -33,11 +35,6 @@ public class Main {
                 files -> Parser.parseFile(sourcePath, diagnosticPath, files),
                 0);
         cli.execute(args);
-        try {
-            //testHarness();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -64,6 +61,10 @@ public class Main {
         diagnosticPath = args[0];
     }
 
+    /**
+     * Executes parseFile on a list of filenames. For debugging purposes only.
+     * @throws IOException
+     */
     public static void testHarness() throws IOException {
         String[] testFileNames = new String[] {"arrayinit", "arrayinit2",
                 "ex1", "ex2", "gcd", "insertionsort", "mdarrays", "ratadd",

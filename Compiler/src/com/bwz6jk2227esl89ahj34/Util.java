@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Util {
+    /**
+     * Translates symbol numbers into print-friendly strings. Used for lexer
+     * and parser outputting.
+     */
     public static final HashMap<Integer, String> symbolTranslation = new HashMap<Integer, String>(){{
         put(ParserSym.IF, "if");
         put(ParserSym.WHILE, "while");
@@ -54,12 +58,18 @@ public class Util {
         put(ParserSym.error, "error:");
     }};
 
+    /**
+     * Prints a list of lines into a file.
+     * @param file the name of the file
+     * @param lines a list of Strings to be printed line by line
+     */
     public static void writeAndClose(String file, ArrayList<String> lines) {
         try {
             PrintWriter writer = new PrintWriter(file);
             for (int i = 0; i < lines.size() - 1; i++) {
                 writer.println(lines.get(i));
             }
+            // Prints last line without a newline at the end
             writer.print(lines.get(lines.size() - 1));
             writer.close();
         } catch(Exception e) {
