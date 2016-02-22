@@ -108,6 +108,7 @@ nonterminal List<Optional<Expression>> array_no_size_type;
 
 nonterminal TypedDeclaration typed_declaration; 
 nonterminal FunctionCall function_call;
+nonterminal ArrayIndex assignment_lhs_array_brackets;
 nonterminal Expression assignment_lhs_array;
 nonterminal Assignable assignment_lhs;
 nonterminal Assignable declaration_assignment_lhs;
@@ -238,14 +239,18 @@ function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RE
                 ;
 
 
+assignment_lhs_array_brackets ::= assignment_lhs_array:a OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayIndex(a,e); :}
+                                ;
+
 assignment_lhs_array ::= function_call:fc {: RESULT = fc; :}
                        | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
                        | IDENTIFIER:i {: RESULT = new Identifier(i); :}
+                       | assignment_lhs_array_brackets:a {: RESULT = a; :}
                        ;
 
 
 assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
-                 | assignment_lhs_array:a OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayIndex(a,e); :}
+                 | assignment_lhs_array_brackets:a {: RESULT = a; :}
                  | typed_declaration:td {: RESULT = td; :}
                  | function_call:fc {: RESULT = fc; :}
                  | UNDERSCORE {: RESULT = new Underscore(); :}
