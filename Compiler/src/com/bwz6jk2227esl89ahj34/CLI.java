@@ -34,7 +34,7 @@ public class CLI {
         files = new ArrayList<>();
         Option.Action helpAction = args -> printOptions();
         Option helpOption = new Option("List commands", helpAction, 0);
-        options.put("--help", helpOption);
+        options.put("--help", helpOption); // help is a default option
     }
 
     /**
