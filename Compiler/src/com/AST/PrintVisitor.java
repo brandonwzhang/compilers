@@ -11,7 +11,7 @@ public class PrintVisitor implements NodeVisitor {
         this.printer = printer;
     }
 
-    public void visit(ArrayIndex node) {  //TODO: Ji Hun
+    public void visit(ArrayIndex node) {  
         printer.startList();
         printer.printAtom("[]");
         node.getArrayRef().accept(this);
