@@ -14,7 +14,8 @@ public class Main {
     public static void main(String[] args) {
         CLI cli = new CLI();
         // the order in which options are added is the order in which they
-        // are executed (but options can be provided in any order when running this file)
+        // are executed (but options can be provided in any order when running
+        //               this file)
         cli.addOption("-sourcepath",
                       "Set the path for source files",
                       Main::setSourcePath,
@@ -25,13 +26,12 @@ public class Main {
                       1);
         cli.addOption("--lex",
                 "Lex a .xi file to a .lexed file",
-                files -> Lexer.lexFile(sourcePath, diagnosticPath,
-                        files)
-        );
+                files -> Lexer.lexFile(sourcePath, diagnosticPath, files),
+                0);
         cli.addOption("--parse",
                 "Parse a .xi file to a .parsed file",
-                files -> Parser.parseFile(sourcePath, diagnosticPath, files)
-        );
+                files -> Parser.parseFile(sourcePath, diagnosticPath, files),
+                0);
         cli.execute(args);
         try {
             //testHarness();
