@@ -8,6 +8,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * A class containing static utility methods and variables.
+ */
 public class Util {
     /**
      * Translates symbol numbers into print-friendly strings. Used for lexer
@@ -77,6 +80,11 @@ public class Util {
         }
     }
 
+    /**
+     * fileName1 and fileName2 are the locations of files that contain
+     * S expressions. This method compares those two S expressions for
+     * equality. Returns true if they are equal; false otherwise.
+     */
     public static boolean compareSExpFiles(String fileName1, String fileName2) throws IOException {
 
         String sExp1 = new String(Files.readAllBytes(Paths.get(fileName1)),
@@ -87,19 +95,25 @@ public class Util {
         return compareSExp(sExp1, sExp2);
     }
 
+    /**
+     * A method that compares two S expressions for equality. Insignificant
+     * whitespace is ignored. Returns true if they are equal; false otherwise.
+     */
     public static boolean compareSExp(String sExp1, String sExp2) {
         
         sExp1 = sExp1.replaceAll("\\s+", " ")
                 .replaceAll("\\(\\s?", "(")
-                .replaceAll("\\s?\\)", ")");
+                .replaceAll("\\s?\\)", ")")
+                .trim();
 
         sExp2 = sExp2.replaceAll("\\s+", " ")
                 .replaceAll("\\(\\s?", "(")
-                .replaceAll("\\s?\\)", ")");
+                .replaceAll("\\s?\\)", ")")
+                .trim();
 
         System.out.println(sExp1);
         System.out.println(sExp2);
 
-        return sExp1.trim().equals(sExp2.trim());
+        return sExp1.equals(sExp2);
     }
 }

@@ -27,7 +27,11 @@ parser code {:
                 Lexer lexer = new Lexer(reader);
                 Parser parser = new Parser(lexer);
 
-                String output = file.replace(".xi", ".parsed");
+                String output = file;
+                if (output.contains("/")) {
+                    output = output.substring(output.lastIndexOf('/') + 1);
+                }
+                output = output.replace(".xi", ".lexed");
 
                 Symbol result = parser.parse();
 
@@ -40,7 +44,6 @@ parser code {:
                     parser.syntaxErrMessage = "";
                     continue;
                 }
-
 
                 FileOutputStream fos = new FileOutputStream(
                         new File(diagnosticPath + output));
