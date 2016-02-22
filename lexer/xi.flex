@@ -47,12 +47,8 @@ import java.io.PrintWriter;
           }
           next = lexer.next_token();
         }
-        
-        String output = file;
-        if (output.contains("/")) {
-          output = output.substring(output.lastIndexOf('/') + 1);
-        }
-        output = output.replace(".xi", ".lexed");
+
+        String output = file.replace(".xi", ".lexed");
         String writeFile = diagnosticPath + output;
         System.out.println("Writing " + diagnosticPath + output);
         Util.writeAndClose(writeFile, lines);
