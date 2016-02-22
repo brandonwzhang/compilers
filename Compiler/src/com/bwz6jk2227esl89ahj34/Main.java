@@ -40,7 +40,7 @@ public class Main {
             System.out.println("Please provide source path");
             return;
         }
-        sourcePath = args[0];
+        sourcePath = args[0] + "/";
     }
 
     /**
@@ -52,7 +52,7 @@ public class Main {
             System.out.println("Please provide diagnostic path");
             return;
         }
-        diagnosticPath = args[0];
+        diagnosticPath = args[0] + "/";
     }
 
     /**

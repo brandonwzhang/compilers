@@ -644,7 +644,7 @@ public class Parser
                 Lexer lexer = new Lexer(reader);
                 Parser parser = new Parser(lexer);
 
-                String output = file.replace(".xi", ".lexed");
+                String output = sourcePath + file.replace(".xi", ".lexed");
 
                 Symbol result = parser.parse();
 

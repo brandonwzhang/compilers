@@ -48,7 +48,7 @@ import java.io.PrintWriter;
           next = lexer.next_token();
         }
 
-        String output = file.replace(".xi", ".lexed");
+        String output = sourcePath + file.replace(".xi", ".lexed");
         String writeFile = diagnosticPath + output;
         System.out.println("Writing " + diagnosticPath + output);
         Util.writeAndClose(writeFile, lines);
