@@ -675,11 +675,14 @@ public class Parser
 
     public boolean hasSyntaxError = false;
     public String syntaxErrMessage = "";
-    
-    public void syntax_error(Symbol cur_token){
+
+    public void syntax_error(java_cup.runtime.Symbol cur_token){
         hasSyntaxError = true;
-        syntaxErrMessage = cur_token.left + ":" + cur_token.right + " Syntax error";
-        
+        syntaxErrMessage = cur_token.left + ":" + cur_token.right +
+              " error: Unexpected token " + Util.symbolTranslation.get(cur_token.sym);
+        if (cur_token.value != null) {
+            syntaxErrMessage += " " + cur_token.value;
+        }
         done_parsing();
     }
 
