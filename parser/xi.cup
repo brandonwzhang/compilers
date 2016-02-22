@@ -59,10 +59,13 @@ parser code {:
     public boolean hasSyntaxError = false;
     public String syntaxErrMessage = "";
     
-    public void syntax_error(Symbol cur_token){
+    public void syntax_error(java_cup.runtime.Symbol cur_token){
         hasSyntaxError = true;
-        syntaxErrMessage = cur_token.left + ":" + cur_token.right + " Syntax error";
-        
+        syntaxErrMessage = cur_token.left + ":" + cur_token.right + 
+          " error: Unexpected token " + Util.symbolTranslation.get(cur_token.sym);
+        if (cur_token.value != null) {
+            syntaxErrMessage += " " + cur_token.value;
+        }
         done_parsing();
     }
 :}
@@ -108,6 +111,7 @@ nonterminal List<Optional<Expression>> array_no_size_type;
 
 nonterminal TypedDeclaration typed_declaration; 
 nonterminal FunctionCall function_call;
+nonterminal ArrayIndex assignment_lhs_array_brackets;
 nonterminal Expression assignment_lhs_array;
 nonterminal Assignable assignment_lhs;
 nonterminal Assignable declaration_assignment_lhs;
@@ -238,14 +242,18 @@ function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RE
                 ;
 
 
+assignment_lhs_array_brackets ::= assignment_lhs_array:a OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayIndex(a,e); :}
+                                ;
+
 assignment_lhs_array ::= function_call:fc {: RESULT = fc; :}
                        | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
                        | IDENTIFIER:i {: RESULT = new Identifier(i); :}
+                       | assignment_lhs_array_brackets:a {: RESULT = a; :}
                        ;
 
 
 assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
-                 | assignment_lhs_array:a OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayIndex(a,e); :}
+                 | assignment_lhs_array_brackets:a {: RESULT = a; :}
                  | typed_declaration:td {: RESULT = td; :}
                  | function_call:fc {: RESULT = fc; :}
                  | UNDERSCORE {: RESULT = new Underscore(); :}
