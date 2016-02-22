@@ -17,19 +17,19 @@ public class Main {
         // are executed (but options can be provided in any order when running
         //               this file)
         cli.addOption("-sourcepath",
-                      "Set the path for source files",
+                      "Set the path for source files. Takes one argument.",
                       Main::setSourcePath,
                       1);
         cli.addOption("-D",
-                      "Set the path for diagnostic files",
+                      "Set the path for diagnostic files. Takes one argument.",
                       Main::setDiagnosticPath,
                       1);
         cli.addOption("--lex",
-                "Lex a .xi file to a .lexed file",
+                "Lex the .xi source files to .lexed files.",
                 files -> Lexer.lexFile(sourcePath, diagnosticPath, files),
                 0);
         cli.addOption("--parse",
-                "Parse a .xi file to a .parsed file",
+                "Parse the .xi source files to .parsed files.",
                 files -> Parser.parseFile(sourcePath, diagnosticPath, files),
                 0);
         cli.execute(args);
@@ -45,7 +45,7 @@ public class Main {
      * @param args single element String array containing the path
      */
     public static void setSourcePath(String[] args) {
-        if (args[0] == null) {
+        if (args.length == 0 || args[0] == null) {
             System.out.println("Please provide source path");
             return;
         }
@@ -57,13 +57,16 @@ public class Main {
      * @param args single element String array containing the path
      */
     public static void setDiagnosticPath(String[] args) {
-        if (args[0] == null) {
+        if (args.length == 0 || args[0] == null) {
             System.out.println("Please provide diagnostic path");
             return;
         }
         diagnosticPath = args[0];
     }
 
+    /**
+     * The tests from the test harness that contain proper Xi code.
+     */
     public static void testHarness() throws IOException {
         String[] testFileNames = new String[] {"arrayinit", "arrayinit2",
                 "ex1", "ex2", "gcd", "insertionsort", "mdarrays", "ratadd",
@@ -73,13 +76,13 @@ public class Main {
             testFileNames[i] = testFileNames[i] + ".xi";
         }
 
-        Parser.parseFile("../parser/tests/", "../parser/tests/", testFileNames);
+        Parser.parseFile("parser/tests/", "parser/tests/", testFileNames);
 
         for (String file : testFileNames) {
             String sExpFile1 =
-                    "../parser/tests/" + file.replace(".xi",".parsedsol");
+                    "parser/tests/" + file.replace(".xi",".parsedsol");
             String sExpFile2 =
-                    "../parser/tests/" + file.replace(".xi", ".parsed");
+                    "parser/tests/" + file.replace(".xi", ".parsed");
             System.out.println();
             System.out.println(Util.compareSExpFiles(sExpFile1, sExpFile2));
         }
