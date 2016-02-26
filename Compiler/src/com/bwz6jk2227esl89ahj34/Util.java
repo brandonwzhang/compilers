@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
@@ -78,6 +79,16 @@ public class Util {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Creates the directories that make up the given path.
+     * Nothing happens if the path already exists.
+     * @param path
+     */
+    public static void makePath(String path) {
+        File file = new File(path);
+        file.mkdirs();
     }
 
     /**

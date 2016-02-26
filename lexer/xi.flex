@@ -48,9 +48,10 @@ import java.io.PrintWriter;
           next = lexer.next_token();
         }
 
-        String output = sourcePath + file.replace(".xi", ".lexed");
+        String output = file.replace(".xi", ".lexed");
         String writeFile = diagnosticPath + output;
-        System.out.println("Writing " + diagnosticPath + output);
+        Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1);
+        System.out.println("Writing " + writeFile);
         Util.writeAndClose(writeFile, lines);
       }
     } catch(Exception e) {
