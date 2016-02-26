@@ -105,8 +105,8 @@ nonterminal List<Expression> expression_list_trailing_comma;
 
 nonterminal Type.PrimitiveType primitive_type;
 nonterminal Type type;
-nonterminal List<Optional<Expression>> array_size_type;
-nonterminal List<Optional<Expression>> array_no_size_type;
+nonterminal SimpleEntry<List<Expression>, Integer> array_size_type;
+nonterminal Integer array_no_size_type;
 
 nonterminal TypedDeclaration typed_declaration; 
 nonterminal FunctionCall function_call;
@@ -127,9 +127,9 @@ nonterminal Statement statement_no_semicolon;
 
 nonterminal Type function_declaration_argument_type;
 nonterminal List<Type> function_declaration_return_types; 
-nonterminal TypedDeclaration function_declaration_argument_single; 
-nonterminal List<TypedDeclaration> function_declaration_argument_list;
-nonterminal List<TypedDeclaration> function_declaration_argument;
+nonterminal SimpleEntry<Identifier, Type> function_declaration_argument_single; 
+nonterminal List<SimpleEntry<Identifier, Type>> function_declaration_argument_list;
+nonterminal List<SimpleEntry<Identifier, Type>> function_declaration_argument;
 
 nonterminal FunctionDeclaration function_declaration;
 nonterminal List<FunctionDeclaration> function_declaration_list;
@@ -220,19 +220,19 @@ primitive_type ::= INT {: RESULT = Type.PrimitiveType.INT; :}
                  | BOOL {: RESULT = Type.PrimitiveType.BOOL; :}
                  ; 
 
-array_size_type ::= OPEN_BRACKET expression:e CLOSE_BRACKET array_size_type:lst {: lst.add(0, Optional.of(e)); RESULT = lst; :}
-                  | array_no_size_type:ae {: RESULT = ae; :}
+array_size_type ::= OPEN_BRACKET expression:e CLOSE_BRACKET array_size_type:ast {: ast.getKey().add(0, e); RESULT = ast; :}
+                  | array_no_size_type:anst {: RESULT = new SimpleEntry<List<Expression>, Integer>(new LinkedList<>(), anst); :}
                   ;
 
-array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type:lst {: lst.add(0, Optional.empty()); RESULT = lst; :}
-                     | empty {: RESULT = new LinkedList<Optional<Expression>>(); :} 
+array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type:anst {: RESULT = anst + 1; :}
+                     | empty {: RESULT = 0; :} 
                      ;
 
-type ::= primitive_type:pt array_size_type: ast {: RESULT = new Type(pt, new ArrayBrackets(ast)); :}
+type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new Type(pt, anst)); :}
        ;
        
 
-typed_declaration ::= IDENTIFIER:id COLON type:t {: RESULT = new TypedDeclaration(new Identifier(id),t); :} //x:int
+typed_declaration ::= IDENTIFIER:id COLON primitive_type:t array_size_type:ast {: RESULT = new TypedDeclaration(new Identifier(id),t, ast.getKey(), ast.getKey().length() + ast.getValue()); :} //x:int
                     ;
 
 function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), lst); :}//f(x,y,z,...) 
@@ -304,22 +304,19 @@ block_list ::= block:b block_list:bl {: bl.getBlockList().add(0, b); RESULT = bl
              | empty  {: RESULT = new BlockList(new LinkedList<Block>()); :}
              ;
 
-function_declaration_argument_type ::= primitive_type:p array_no_size_type:a {: RESULT = new Type(p,new ArrayBrackets(a)); :}
-                                     ;
-
-function_declaration_return_types ::= function_declaration_argument_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :} 
+function_declaration_return_types ::= type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :} 
        | function_declaration_argument_type:t  {: List<Type> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; :}
        ; 
 
-function_declaration_argument_single ::= IDENTIFIER:i COLON function_declaration_argument_type:t {: RESULT = new TypedDeclaration(new Identifier(i), t);  :}
+function_declaration_argument_single ::= IDENTIFIER:i COLON type:t {: RESULT = new SimpleEntry<Identifier, Type>(new Identifier(i), t); :}
                                        ;
 
 function_declaration_argument_list ::= function_declaration_argument_single:fdas COMMA function_declaration_argument_list:lst {: lst.add(0, fdas); RESULT = lst; :}
-                                     | function_declaration_argument_single:fdas {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(0, fdas); RESULT = lst; :}
+                                     | function_declaration_argument_single:fdas {: List<SimpleEntry<Identifier, Type>> lst = new LinkedList<>(); lst.add(0, fdas); RESULT = lst; :}
                                      ;
 
 function_declaration_argument ::= function_declaration_argument_list:lst {: RESULT = lst; :}
-                                | empty {: RESULT = new LinkedList<TypedDeclaration>(); :}
+                                | empty {: RESULT = new LinkedList<>(); :}
                                 ;
                 
 function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:args CLOSE_PAREN COLON function_declaration_return_types:t function_block:fb {: RESULT = new FunctionDeclaration(new Identifier(id), args, t, fb); :}
