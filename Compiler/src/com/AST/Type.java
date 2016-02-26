@@ -20,7 +20,8 @@ public class Type {
     }
 
     private PrimitiveType primitiveType;
-    private ArrayBrackets arrayBrackets;
+    private Integer numBrackets;
+    //private ArrayBrackets arrayBrackets;
 
     public void accept(NodeVisitor v){
         v.visit(this);
