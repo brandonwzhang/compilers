@@ -10,7 +10,11 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class TypedDeclaration extends Statement implements Assignable {
     private Identifier identifier;
-    private Type type;
+    private Type.PrimitiveType primitiveType;
+    private List<Expression> arraySized;
+    private Integer arrayEmpty;
+
+    //private Type type;
 
     public void accept(NodeVisitor v){
         v.visit(this);

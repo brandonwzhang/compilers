@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.AbstractMap;
 import java.util.List;
 
 @AllArgsConstructor
@@ -11,7 +12,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class FunctionDeclaration {
     private Identifier identifier;
-    private List<TypedDeclaration> typedDeclarationList;
+    private List<AbstractMap.SimpleEntry<Identifier, Type>> argList;
     private List<Type> typeList;
     private MethodBlock functionBlock;
 

@@ -1,6 +1,7 @@
 package com.AST;
 import edu.cornell.cs.cs4120.util.*;
 
+import java.util.AbstractMap;
 import java.util.Optional;
 
 public class PrintVisitor implements NodeVisitor {
@@ -87,13 +88,18 @@ public class PrintVisitor implements NodeVisitor {
         printer.startList();
         node.getIdentifier().accept(this);
         printer.startList();
-        for(TypedDeclaration td : node.getTypedDeclarationList()){
-            td.accept(this);
+        for(AbstractMap.SimpleEntry<Identifier, Type> arg : node.getArgList()){
+            printer.startList();
+            arg.getKey().accept(this);
+            //arg.getValue().accept(this);
+            printType(arg.getValue());
+            printer.endList();
         }
         printer.endList();
         printer.startList();
         for(Type t : node.getTypeList()){
-            t.accept(this);
+            printType(t);
+            //t.accept(this);
         }
         printer.endList();
         node.getFunctionBlock().accept(this);
@@ -173,19 +179,13 @@ public class PrintVisitor implements NodeVisitor {
     }
 
 
-    public void visit(Type node) {
-        for(int i = 0; i < node.getArrayBrackets().getIndices().size(); i++) {
+    public void printType(Type node) {
+        for(int i = 0; i < node.getNumBrackets(); i++) {
             printer.startList();
             printer.printAtom("[]");
         }
         printer.printAtom(node.getPrimitiveType().toString());
-        for (int j = node.getArrayBrackets().getIndices().size()-1;
-             j >= 0; j--) {
-            Optional<Expression> element =
-                    node.getArrayBrackets().getIndices().get(j);
-            if (element.isPresent()) {
-                element.get().accept(this);
-            }
+        for(int j = 0; j < node.getNumBrackets(); j++) {
             printer.endList();
         }
     }
@@ -193,7 +193,23 @@ public class PrintVisitor implements NodeVisitor {
     public void visit(TypedDeclaration node) {
         printer.startList();
         node.getIdentifier().accept(this);
-        node.getType().accept(this);
+        int numBrackets = node.getArraySized().size() + node.getArrayEmpty();
+        for(int i = 0; i < numBrackets; i++) {
+            printer.startList();
+            printer.printAtom("[]");
+        }
+
+        printer.printAtom(node.getPrimitiveType().toString());
+
+        for(int j = 0; j < node.getArrayEmpty(); j++) {
+            printer.endList();
+        }
+
+        for(int k = node.getArraySized().size()-1; k >= 0; k--) {
+            node.getArraySized().get(k).accept(this);
+            printer.endList();
+        }
+
         printer.endList();
     }
 
