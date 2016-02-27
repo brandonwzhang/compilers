@@ -26,7 +26,7 @@ public class Type {
         this.numBrackets = numBrackets;
 
         if(primitiveType == PrimitiveType.UNIT || primitiveType == PrimitiveType.VOID) {
-            assert this.numBrackets == 0;
+            assert this.numBrackets == 0 || this.numBrackets == null;
         }
     }
 
