@@ -27,7 +27,7 @@ parser code {:
                 Lexer lexer = new Lexer(reader);
                 Parser parser = new Parser(lexer);
 
-                String output = file.replace(".xi", ".parsed");
+                String output = sourcePath + file.replace(".xi", ".lexed");
 
                 Symbol result = parser.parse();
 
@@ -40,7 +40,6 @@ parser code {:
                     parser.syntaxErrMessage = "";
                     continue;
                 }
-
 
                 FileOutputStream fos = new FileOutputStream(
                         new File(diagnosticPath + output));
@@ -59,10 +58,13 @@ parser code {:
     public boolean hasSyntaxError = false;
     public String syntaxErrMessage = "";
     
-    public void syntax_error(Symbol cur_token){
+    public void syntax_error(java_cup.runtime.Symbol cur_token){
         hasSyntaxError = true;
-        syntaxErrMessage = cur_token.left + ":" + cur_token.right + " Syntax error";
-        
+        syntaxErrMessage = cur_token.left + ":" + cur_token.right + 
+          " error: Unexpected token " + Util.symbolTranslation.get(cur_token.sym);
+        if (cur_token.value != null) {
+            syntaxErrMessage += " " + cur_token.value;
+        }
         done_parsing();
     }
 :}
@@ -264,7 +266,7 @@ multiple_assignment_lhs ::= declaration_assignment_lhs:dl COMMA multiple_assignm
                           ;
 
 assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); RESULT = new Assignment(lst, e); :}// x = expression
-             | multiple_assignment_lhs:all GETS function_call:fc {: RESULT = new Assignment(all, fc); :}// x,y,z,... = f(x) as well as x:int,y:int,... = f(x)
+             | multiple_assignment_lhs:all GETS function_call:fc {: RESULT = new Assignment(all, fc); :}
              ;
 
 if_statement ::= IF OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new IfStatement(e, b, Optional.empty()); :}

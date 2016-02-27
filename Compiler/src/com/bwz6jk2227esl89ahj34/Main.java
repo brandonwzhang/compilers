@@ -1,11 +1,5 @@
 package com.bwz6jk2227esl89ahj34;
-import com.AST.*;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import java_cup.runtime.*;
-import edu.cornell.cs.cs4120.util.*;
 
 public class Main {
     private static String sourcePath = "./";
@@ -13,31 +7,28 @@ public class Main {
 
     public static void main(String[] args) {
         CLI cli = new CLI();
-        // the order in which options are added is the order in which they
-        // are executed (but options can be provided in any order when running this file)
+        /*
+            The order in which these options are added is the same as which
+            they will be executed (but options can be provided in any order
+            when calling xic
+         */
         cli.addOption("-sourcepath",
-                      "Set the path for source files",
+                      "Set the path for source files. Takes one argument.",
                       Main::setSourcePath,
                       1);
         cli.addOption("-D",
-                      "Set the path for diagnostic files",
+                      "Set the path for diagnostic files. Takes one argument.",
                       Main::setDiagnosticPath,
                       1);
         cli.addOption("--lex",
-                "Lex a .xi file to a .lexed file",
-                files -> Lexer.lexFile(sourcePath, diagnosticPath,
-                        files)
-        );
+                "Lex the .xi source files to .lexed files.",
+                files -> Lexer.lexFile(sourcePath, diagnosticPath, files),
+                0);
         cli.addOption("--parse",
-                "Parse a .xi file to a .parsed file",
-                files -> Parser.parseFile(sourcePath, diagnosticPath, files)
-        );
+                "Parse the .xi source files to .parsed files.",
+                files -> Parser.parseFile(sourcePath, diagnosticPath, files),
+                0);
         cli.execute(args);
-        try {
-            //testHarness();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -45,11 +36,11 @@ public class Main {
      * @param args single element String array containing the path
      */
     public static void setSourcePath(String[] args) {
-        if (args[0] == null) {
+        if (args.length == 0 || args[0] == null) {
             System.out.println("Please provide source path");
             return;
         }
-        sourcePath = args[0];
+        sourcePath = args[0] + "/";
     }
 
     /**
@@ -57,13 +48,17 @@ public class Main {
      * @param args single element String array containing the path
      */
     public static void setDiagnosticPath(String[] args) {
-        if (args[0] == null) {
+        if (args.length == 0 || args[0] == null) {
             System.out.println("Please provide diagnostic path");
             return;
         }
-        diagnosticPath = args[0];
+        diagnosticPath = args[0] + "/";
     }
 
+    /**
+     * Executes parseFile on a list of filenames. For debugging purposes only.
+     * @throws IOException
+     */
     public static void testHarness() throws IOException {
         String[] testFileNames = new String[] {"arrayinit", "arrayinit2",
                 "ex1", "ex2", "gcd", "insertionsort", "mdarrays", "ratadd",
@@ -73,13 +68,13 @@ public class Main {
             testFileNames[i] = testFileNames[i] + ".xi";
         }
 
-        Parser.parseFile("../parser/tests/", "../parser/tests/", testFileNames);
+        Parser.parseFile("parser/tests/", "parser/tests/", testFileNames);
 
         for (String file : testFileNames) {
             String sExpFile1 =
-                    "../parser/tests/" + file.replace(".xi",".parsedsol");
+                    "parser/tests/" + file.replace(".xi",".parsedsol");
             String sExpFile2 =
-                    "../parser/tests/" + file.replace(".xi", ".parsed");
+                    "parser/tests/" + file.replace(".xi", ".parsed");
             System.out.println();
             System.out.println(Util.compareSExpFiles(sExpFile1, sExpFile2));
         }
