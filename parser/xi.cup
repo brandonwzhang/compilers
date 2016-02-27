@@ -233,7 +233,7 @@ type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new Type(pt, ans
        ;
        
 
-typed_declaration ::= IDENTIFIER:id COLON primitive_type:t array_size_type:ast {: RESULT = new TypedDeclaration(new Identifier(id),t, ast.getKey(), ast.getKey().size() + ast.getValue()); :} //x:int
+typed_declaration ::= IDENTIFIER:id COLON primitive_type:t array_size_type:ast {: RESULT = new TypedDeclaration(new Identifier(id),t, ast.getKey(), ast.getValue()); :} //x:int
                     ;
 
 function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), lst); :}//f(x,y,z,...) 
