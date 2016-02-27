@@ -642,14 +642,16 @@ public class Parser
                 Lexer lexer = new Lexer(reader);
                 Parser parser = new Parser(lexer);
 
-                String output = sourcePath + file.replace(".xi", ".lexed");
+                String output = file.replace(".xi", ".parsed");
+                String writeFile = diagnosticPath + output;
+                Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
 
                 Symbol result = parser.parse();
 
                 if (parser.hasSyntaxError) {
                     // handle syntax error, output to file
                     parser.hasSyntaxError = false;
-                    Util.writeAndClose(diagnosticPath + output, new
+                    Util.writeAndClose(writeFile, new
                             ArrayList<String>(Arrays.asList(parser.syntaxErrMessage)));
 
                     parser.syntaxErrMessage = "";
@@ -657,7 +659,7 @@ public class Parser
                 }
 
                 FileOutputStream fos = new FileOutputStream(
-                        new File(diagnosticPath + output));
+                        new File(writeFile));
                 CodeWriterSExpPrinter printer =
                         new CodeWriterSExpPrinter(fos);
                 NodeVisitor visitor = new PrintVisitor(printer);
