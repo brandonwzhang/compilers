@@ -644,7 +644,7 @@ public class Parser
                 Lexer lexer = new Lexer(reader);
                 Parser parser = new Parser(lexer);
 
-                String output = file.replace(".xi", ".lexed");
+                String output = file.replace(".xi", ".parsed");
                 String writeFile = diagnosticPath + output;
                 Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
 
