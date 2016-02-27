@@ -646,7 +646,7 @@ public class Parser
 
                 String output = file.replace(".xi", ".lexed");
                 String writeFile = diagnosticPath + output;
-                Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1);
+                Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
 
                 Symbol result = parser.parse();
 

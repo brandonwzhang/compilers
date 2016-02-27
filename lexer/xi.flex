@@ -50,7 +50,7 @@ import java.io.PrintWriter;
 
         String output = file.replace(".xi", ".lexed");
         String writeFile = diagnosticPath + output;
-        Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1);
+        Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
         System.out.println("Writing " + writeFile);
         Util.writeAndClose(writeFile, lines);
       }
