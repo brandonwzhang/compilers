@@ -6,13 +6,12 @@ import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-@AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class Type {
 
     public enum PrimitiveType {
-        INT, BOOL;
+        INT, BOOL, UNIT, VOID;
 
         @Override public String toString() {
             return super.toString().toLowerCase();
@@ -21,6 +20,15 @@ public class Type {
 
     private PrimitiveType primitiveType;
     private Integer numBrackets;
+
+    public Type(PrimitiveType t, Integer numBrackets) {
+        this.primitiveType = t;
+        this.numBrackets = numBrackets;
+
+        if(primitiveType == PrimitiveType.UNIT || primitiveType == PrimitiveType.VOID) {
+            assert this.numBrackets == 0;
+        }
+    }
 
 }
 
