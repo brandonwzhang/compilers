@@ -19,7 +19,6 @@ public interface NodeVisitor {
     void visit(Program node);
     void visit(ReturnStatement node);
     void visit(StringLiteral node);
-    void visit(Type node);
     void visit(TypedDeclaration node);
     void visit(Unary node);
     void visit(Underscore node);

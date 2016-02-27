@@ -67,16 +67,18 @@ public class Util {
      * @param lines a list of Strings to be printed line by line
      */
     public static void writeAndClose(String file, ArrayList<String> lines) {
-        try {
-            PrintWriter writer = new PrintWriter(file);
-            for (int i = 0; i < lines.size() - 1; i++) {
-                writer.println(lines.get(i));
+        if(!lines.isEmpty()) {
+            try {
+                PrintWriter writer = new PrintWriter(file);
+                for (int i = 0; i < lines.size() - 1; i++) {
+                    writer.println(lines.get(i));
+                }
+                // Prints last line without a newline at the end
+                writer.print(lines.get(lines.size() - 1));
+                writer.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            // Prints last line without a newline at the end
-            writer.print(lines.get(lines.size() - 1));
-            writer.close();
-        } catch(Exception e) {
-            e.printStackTrace();
         }
     }
 

@@ -177,29 +177,34 @@ public class PrintVisitor implements NodeVisitor {
     }
 
 
-//    public void printType(Type node) {
-//        for(int i = 0; i < node.getArrayBrackets().getIndices().size(); i++) {
-//            printer.startList();
-//            printer.printAtom("[]");
-//        }
-//        printer.printAtom(node.getPrimitiveType().toString());
-//        for (int j = node.getArrayBrackets().getIndices().size()-1;
-//             j >= 0; j--) {
-//            Optional<Expression> element =
-//                    node.getArrayBrackets().getIndices().get(j);
-//            if (element.isPresent()) {
-//                element.get().accept(this);
-//            }
-//            printer.endList();
-//        }
-//    }
-//
-//    public void visit(TypedDeclaration node) {
-//        printer.startList();
-//        node.getIdentifier().accept(this);
-//        node.getType().accept(this);
-//        printer.endList();
-//    }
+    public void printType(Type node) {
+        for(int i = 0; i < node.getNumBrackets(); i++) {
+            printer.startList();
+            printer.printAtom("[]");
+        }
+        printer.printAtom(node.getPrimitiveType().toString());
+        for(int j = 0; j < node.getNumBrackets(); j++) {
+            printer.endList();
+        }
+    }
+
+    public void visit(TypedDeclaration node) {
+        printer.startList();
+        node.getIdentifier().accept(this);
+        int numBrackets = node.getArraySized().size() + node.getArrayEmpty();
+        for(int i = 0; i < numBrackets; i++) {
+            printer.startList();
+            printer.printAtom("[]");
+        }
+        printer.printAtom(node.getPrimitiveType().toString());
+        for(int j = 0; j < node.getArrayEmpty(); j++) {
+            printer.endList();
+        }
+        for(int k = node.getArraySized().size()-1; k >= 0; k--) {
+            node.getArraySized().get(k).accept(this);
+        }
+        printer.endList();
+    }
 
     public void visit(Unary node) {
         printer.startList();
