@@ -1,6 +1,7 @@
 package com.AST;
 import edu.cornell.cs.cs4120.util.*;
 
+import java.util.AbstractMap;
 import java.util.Optional;
 
 public class PrintVisitor implements NodeVisitor {
@@ -87,8 +88,11 @@ public class PrintVisitor implements NodeVisitor {
         printer.startList();
         node.getIdentifier().accept(this);
         printer.startList();
-        for(TypedDeclaration td : node.getTypedDeclarationList()){
-            td.accept(this);
+        for(AbstractMap.SimpleEntry<Identifier, Type> arg : node.getArgList()){
+            printer.startList();
+            arg.getKey().accept(this);
+            arg.getValue().accept(this);
+            printer.endList();
         }
         printer.endList();
         printer.startList();
@@ -173,29 +177,29 @@ public class PrintVisitor implements NodeVisitor {
     }
 
 
-    public void visit(Type node) {
-        for(int i = 0; i < node.getArrayBrackets().getIndices().size(); i++) {
-            printer.startList();
-            printer.printAtom("[]");
-        }
-        printer.printAtom(node.getPrimitiveType().toString());
-        for (int j = node.getArrayBrackets().getIndices().size()-1;
-             j >= 0; j--) {
-            Optional<Expression> element =
-                    node.getArrayBrackets().getIndices().get(j);
-            if (element.isPresent()) {
-                element.get().accept(this);
-            }
-            printer.endList();
-        }
-    }
-
-    public void visit(TypedDeclaration node) {
-        printer.startList();
-        node.getIdentifier().accept(this);
-        node.getType().accept(this);
-        printer.endList();
-    }
+//    public void printType(Type node) {
+//        for(int i = 0; i < node.getArrayBrackets().getIndices().size(); i++) {
+//            printer.startList();
+//            printer.printAtom("[]");
+//        }
+//        printer.printAtom(node.getPrimitiveType().toString());
+//        for (int j = node.getArrayBrackets().getIndices().size()-1;
+//             j >= 0; j--) {
+//            Optional<Expression> element =
+//                    node.getArrayBrackets().getIndices().get(j);
+//            if (element.isPresent()) {
+//                element.get().accept(this);
+//            }
+//            printer.endList();
+//        }
+//    }
+//
+//    public void visit(TypedDeclaration node) {
+//        printer.startList();
+//        node.getIdentifier().accept(this);
+//        node.getType().accept(this);
+//        printer.endList();
+//    }
 
     public void visit(Unary node) {
         printer.startList();

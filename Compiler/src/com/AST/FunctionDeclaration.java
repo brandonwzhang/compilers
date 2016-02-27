@@ -13,8 +13,7 @@ import java.util.List;
 public class FunctionDeclaration {
     private Identifier identifier;
     private List<AbstractMap.SimpleEntry<Identifier, Type>> argList;
-    //private List<TypedDeclaration> typedDeclarationList;
-    //private List<Type> typeList;
+    private List<Type> typeList;
     private MethodBlock functionBlock;
 
     public void accept(NodeVisitor v){

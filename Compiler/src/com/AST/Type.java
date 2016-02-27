@@ -21,7 +21,6 @@ public class Type {
 
     private PrimitiveType primitiveType;
     private Integer numBrackets;
-    //private ArrayBrackets arrayBrackets;
 
     public void accept(NodeVisitor v){
         v.visit(this);
