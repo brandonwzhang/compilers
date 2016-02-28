@@ -13,7 +13,7 @@ import java.util.List;
 public class FunctionDeclaration {
     private Identifier identifier;
     private List<AbstractMap.SimpleEntry<Identifier, VariableType>> argList;
-    private List<VariableType> typeList;
+    private List<VariableType> returnTypeList;
     private MethodBlock functionBlock;
 
     public void accept(NodeVisitor v){
