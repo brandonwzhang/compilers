@@ -173,8 +173,16 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(BlockList node) {
-        for (Block block : node.getBlockList()) {
+        List<Block> blockList = node.getBlockList();
+        for (Block block : blockList) {
             block.accept(this);
+        }
+        int size = blockList.size();
+        if (size == 0) {
+            node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        } else {
+            Type lastType = blockList.get(size - 1).getType();
+            node.setType(lastType);
         }
     }
 
