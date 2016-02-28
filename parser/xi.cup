@@ -106,8 +106,8 @@ nonterminal Expression expression;
 nonterminal List<Expression> expression_list; 
 nonterminal List<Expression> expression_list_trailing_comma; 
 
-nonterminal Type.PrimitiveType primitive_type;
-nonterminal Type type;
+nonterminal PrimitiveType primitive_type;
+nonterminal VariableType var_type;
 nonterminal SimpleEntry<List<Expression>, Integer> array_size_type;
 nonterminal Integer array_no_size_type;
 
@@ -128,11 +128,11 @@ nonterminal BlockList block_list;
 nonterminal Statement statement;
 nonterminal Statement statement_no_semicolon;
 
-nonterminal Type function_declaration_argument_type;
+nonterminal VariableType function_declaration_argument_type;
 nonterminal List<Type> function_declaration_return_types; 
-nonterminal SimpleEntry<Identifier, Type> function_declaration_argument_single; 
-nonterminal List<SimpleEntry<Identifier, Type>> function_declaration_argument_list;
-nonterminal List<SimpleEntry<Identifier, Type>> function_declaration_argument;
+nonterminal SimpleEntry<Identifier, VariableType> function_declaration_argument_single; 
+nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_argument_list;
+nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_argument;
 
 nonterminal FunctionDeclaration function_declaration;
 nonterminal List<FunctionDeclaration> function_declaration_list;
@@ -219,8 +219,8 @@ array_literal ::= OPEN_BRACE expression_list:lst CLOSE_BRACE {: RESULT = new Arr
                 |  OPEN_BRACE expression_list_trailing_comma:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); :}
                 ;
 
-primitive_type ::= INT {: RESULT = Type.PrimitiveType.INT; :}
-                 | BOOL {: RESULT = Type.PrimitiveType.BOOL; :}
+primitive_type ::= INT {: RESULT = PrimitiveType.INT; :}
+                 | BOOL {: RESULT = PrimitiveType.BOOL; :}
                  ; 
 
 array_size_type ::= OPEN_BRACKET expression:e CLOSE_BRACKET array_size_type:ast {: ast.getKey().add(0, e); RESULT = ast; :}
@@ -231,7 +231,7 @@ array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type:anst {: RES
                      | empty {: RESULT = 0; :} 
                      ;
 
-type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new Type(pt, anst); :}
+var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new VariableType(pt, anst); :}
        ;
        
 
@@ -307,15 +307,15 @@ block_list ::= block:b block_list:bl {: bl.getBlockList().add(0, b); RESULT = bl
              | empty  {: RESULT = new BlockList(new LinkedList<Block>()); :}
              ;
 
-function_declaration_return_types ::= type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :} 
+function_declaration_return_types ::= var_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :} 
        | function_declaration_argument_type:t  {: List<Type> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; :}
        ; 
 
-function_declaration_argument_single ::= IDENTIFIER:i COLON type:t {: RESULT = new SimpleEntry<Identifier, Type>(new Identifier(i), t); :}
+function_declaration_argument_single ::= IDENTIFIER:i COLON var_type:t {: RESULT = new SimpleEntry<Identifier, VariableType>(new Identifier(i), t); :}
                                        ;
 
 function_declaration_argument_list ::= function_declaration_argument_single:fdas COMMA function_declaration_argument_list:lst {: lst.add(0, fdas); RESULT = lst; :}
-                                     | function_declaration_argument_single:fdas {: List<SimpleEntry<Identifier, Type>> lst = new LinkedList<>(); lst.add(0, fdas); RESULT = lst; :}
+                                     | function_declaration_argument_single:fdas {: List<SimpleEntry<Identifier, VariableType>> lst = new LinkedList<>(); lst.add(0, fdas); RESULT = lst; :}
                                      ;
 
 function_declaration_argument ::= function_declaration_argument_list:lst {: RESULT = lst; :}
