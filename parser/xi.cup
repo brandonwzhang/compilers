@@ -321,8 +321,8 @@ function_declaration_argument ::= function_declaration_argument_list:lst {: RESU
                                 | empty {: RESULT = new LinkedList<>(); :}
                                 ;
                 
-function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:args CLOSE_PAREN COLON function_declaration_return_types:t function_block:fb {: RESULT = new FunctionDeclaration(new Identifier(id), args, t, fb); :}
-                       | IDENTIFIER:id OPEN_PAREN function_declaration_argument:args CLOSE_PAREN procedure_block:fb {: RESULT = new FunctionDeclaration(new Identifier(id),args,new LinkedList<VariableType>(),fb); :}
+function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t function_block:fb {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, t), args, fb); :}
+                       | IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN procedure_block:fb {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new LinkedList<>()), args, fb); :}
                        ;
 
 function_declaration_list ::= function_declaration:fd function_declaration_list:lst {: lst.add(0, fd); RESULT = lst; :}

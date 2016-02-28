@@ -12,9 +12,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class FunctionDeclaration {
     private Identifier identifier;
-    private List<AbstractMap.SimpleEntry<Identifier, VariableType>> argList;
-    private List<VariableType> returnTypeList;
-    private MethodBlock functionBlock;
+    private FunctionType type;
+    private List<Identifier> argList;
+    private MethodBlock methodBlock;
 
     public void accept(NodeVisitor v){
         v.visit(this);

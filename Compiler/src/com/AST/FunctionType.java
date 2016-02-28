@@ -10,7 +10,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class FunctionType extends Type {
-    List<VariableType> argumentTypes;
-    List<VariableType> returnValueTypes;
-
+    List<VariableType> argTypeList;
+    List<VariableType> returnValueTypeList;
 }

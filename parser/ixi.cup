@@ -1,0 +1,114 @@
+package com.bwz6jk2227esl89ahj34;
+import com.AST.*;
+import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
+import java_cup.runtime.Symbol;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.util.*;
+import java.util.AbstractMap.*;
+
+class InterfaceParser;
+
+parser code {:
+
+    public static void parseInterface(String sourcePath, String interfaceName, Map<Identifier, Type> context) {
+        try {
+            FileReader reader = new FileReader(sourcePath + file);
+            Lexer lexer = new Lexer(reader);
+            Parser parser = new Parser(lexer);
+
+            Symbol result = parser.parse();
+
+            if (parser.hasSyntaxError) {
+                // handle syntax error, output to file
+                parser.hasSyntaxError = false;
+                // TODO: Handle error here
+                parser.syntaxErrMessage = "";
+                return;
+            }
+
+            List<FunctionDeclaration> declarations = (List<FunctionDeclaration>) result.value;
+
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean hasSyntaxError = false;
+    public String syntaxErrMessage = "";
+    
+    public void syntax_error(java_cup.runtime.Symbol cur_token){
+        hasSyntaxError = true;
+        syntaxErrMessage = cur_token.left + ":" + cur_token.right + 
+          " error: Unexpected token " + Util.symbolTranslation.get(cur_token.sym);
+        if (cur_token.value != null) {
+            syntaxErrMessage += " " + cur_token.value;
+        }
+        done_parsing();
+    }
+:}
+
+terminal String IDENTIFIER;
+terminal INT, BOOL;
+
+terminal OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, COLON, COMMA, SEMICOLON;
+
+nonterminal empty;
+
+nonterminal PrimitiveType primitive_type;
+nonterminal VariableType var_type;
+nonterminal Integer array_no_size_type;
+
+nonterminal VariableType function_declaration_argument_type;
+nonterminal List<VariableType> function_declaration_return_types; 
+nonterminal SimpleEntry<Identifier, VariableType> function_declaration_argument_single; 
+nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_argument_list;
+nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_argument;
+
+nonterminal FunctionDeclaration function_declaration;
+nonterminal FunctionDeclaration function_declaration_line;
+nonterminal List<FunctionDeclaration> function_declaration_list;
+
+start with function_declaration_list;
+
+empty ::= ;
+
+primitive_type ::= INT {: RESULT = PrimitiveType.INT; :}
+                 | BOOL {: RESULT = PrimitiveType.BOOL; :}
+                 ; 
+
+array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type:anst {: RESULT = anst + 1; :}
+                     | empty {: RESULT = 0; :} 
+                     ;
+
+var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new VariableType(pt, anst); :}
+       ;
+       
+function_declaration_return_types ::= var_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :} 
+       | function_declaration_argument_type:t  {: List<VariableType> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; :}
+       ; 
+
+function_declaration_argument_single ::= IDENTIFIER:i COLON var_type:t {: RESULT = new SimpleEntry<Identifier, VariableType>(new Identifier(i), t); :}
+                                       ;
+
+function_declaration_argument_list ::= function_declaration_argument_single:fdas COMMA function_declaration_argument_list:lst {: lst.add(0, fdas); RESULT = lst; :}
+                                     | function_declaration_argument_single:fdas {: List<SimpleEntry<Identifier, VariableType>> lst = new LinkedList<>(); lst.add(0, fdas); RESULT = lst; :}
+                                     ;
+
+function_declaration_argument ::= function_declaration_argument_list:lst {: RESULT = lst; :}
+                                | empty {: RESULT = new LinkedList<>(); :}
+                                ;
+                
+function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, t), args, null); :}
+                       | IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new LinkedList<>()), args, null); :}
+                       ;
+
+function_declaration_line ::= function_declaration:fd {: RESULT = fd :}
+                            | function_declaration:fd SEMICOLON {: RESULT = fd :}
+                            ;
+function_declaration_list ::= function_declaration_line:fd function_declaration_list:lst {: lst.add(0, fd); RESULT = lst; :}
+                            | empty {: RESULT = new LinkedList<FunctionDeclaration>(); :}
+                            ;

@@ -1,7 +1,7 @@
 package com.AST;
 import edu.cornell.cs.cs4120.util.*;
 
-import java.util.AbstractMap;
+import java.util.List;
 
 public class PrintVisitor implements NodeVisitor {
 
@@ -85,19 +85,23 @@ public class PrintVisitor implements NodeVisitor {
         printer.startList();
         node.getIdentifier().accept(this);
         printer.startList();
-        for(AbstractMap.SimpleEntry<Identifier, VariableType> arg : node.getArgList()){
+        List<Identifier> argList = node.getArgList();
+        List<VariableType> argTypeList = node.getType().getArgTypeList();
+        List<VariableType> returnTypeList = node.getType()
+                .getReturnValueTypeList();
+        for(int i = 0; i < node.getArgList().size(); i++){
             printer.startList();
-            arg.getKey().accept(this);
-            printType(arg.getValue());
+            argList.get(i).accept(this);
+            printType(argTypeList.get(i));
             printer.endList();
         }
         printer.endList();
         printer.startList();
-        for(VariableType t : node.getReturnTypeList()) {
+        for(VariableType t : returnTypeList) {
             printType(t);
         }
         printer.endList();
-        node.getFunctionBlock().accept(this);
+        node.getMethodBlock().accept(this);
         printer.endList();
     }
 
@@ -196,13 +200,13 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom(node.getType().getPrimitiveType().toString());
 
         int numArrayEmpty = node.getType().getNumBrackets() -
-                node.getArraySizes().size();
+                node.getArraySizeList().size();
         for(int j = 0; j < numArrayEmpty; j++) {
             printer.endList();
         }
 
-        for(int k = node.getArraySizes().size()-1; k >= 0; k--) {
-            node.getArraySizes().get(k).accept(this);
+        for(int k = node.getArraySizeList().size()-1; k >= 0; k--) {
+            node.getArraySizeList().get(k).accept(this);
             printer.endList();
         }
 
