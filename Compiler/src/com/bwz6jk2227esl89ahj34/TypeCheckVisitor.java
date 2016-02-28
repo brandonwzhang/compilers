@@ -15,7 +15,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     // AST field (that we build up as we visit) TODO
 
     // Local variable that stores current function in scope with a stack, used for return statements
-    private Stack<Identifier> currentFunction = new Stack<>();
+    private FunctionType currentFunctionType;
 
     // Final types, for ease of checking equality
     private final VariableType UNIT_TYPE = new VariableType(PrimitiveType.UNIT, 0);
@@ -234,7 +234,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(FunctionDeclaration node) {
         // TODO: do we care about the other fields?
 
-        this.currentFunction.push(new Identifier(node.getIdentifier().getName()));
+        currentFunctionType = (FunctionType) node.getType();
         node.getMethodBlock().accept(this);
 
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
@@ -332,9 +332,9 @@ public class TypeCheckVisitor implements NodeVisitor {
 
     public void visit(ReturnStatement node) {
         // Checks if the return types match those outlined in the function declaration
-        FunctionType returnType = (FunctionType)contexts.peek().get(currentFunction);
-
-        List<VariableType> functionReturnTypes = returnType.getReturnTypeList().getVariableTypeList();
+        List<VariableType> functionReturnTypes = currentFunctionType
+                                                 .getReturnTypeList()
+                                                 .getVariableTypeList();
         List<Expression> returnTypes = node.getValues();
 
         // check if they are both the same size
