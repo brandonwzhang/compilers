@@ -1373,7 +1373,7 @@ class CUP$Parser$actions {
                 int astleft = CUP$Parser$stack.peek().left;
                 int astright = CUP$Parser$stack.peek().right;
                 SimpleEntry<List<Expression>,Integer> ast = CUP$Parser$stack.peek().<SimpleEntry<List<Expression>,Integer>> value();
-                 RESULT = new TypedDeclaration(new Identifier(id),t, ast.getKey(), ast.getValue()); 
+                 RESULT = new TypedDeclaration(new Identifier(id), new VariableType(t, ast.getKey().size() + ast.getValue()), ast.getKey()); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("typed_declaration",21, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;

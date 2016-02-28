@@ -1,5 +1,6 @@
 package com.AST;
 
-public abstract class Type {
 
+public abstract class Type {
+    
 }

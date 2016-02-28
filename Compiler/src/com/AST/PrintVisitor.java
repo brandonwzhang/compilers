@@ -193,15 +193,16 @@ public class PrintVisitor implements NodeVisitor {
     public void visit(TypedDeclaration node) {
         printer.startList();
         node.getIdentifier().accept(this);
-        int numBrackets = node.getArraySized().size() + node.getArrayEmpty();
-        for(int i = 0; i < numBrackets; i++) {
+        for(int i = 0; i < node.getType().getNumBrackets(); i++) {
             printer.startList();
             printer.printAtom("[]");
         }
 
-        printer.printAtom(node.getPrimitiveType().toString());
+        printer.printAtom(node.getType().getPrimitiveType().toString());
 
-        for(int j = 0; j < node.getArrayEmpty(); j++) {
+        int numArrayEmpty = node.getType().getNumBrackets() -
+                node.getArraySized().size();
+        for(int j = 0; j < numArrayEmpty; j++) {
             printer.endList();
         }
 
