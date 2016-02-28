@@ -143,9 +143,9 @@ public class InterfaceParser
 
 
 
-    public static void parseInterface(String sourcePath, String interfaceName, Map<Identifier, Type> context) {
+    public static void parseInterface(String libPath, String interfaceName, Map<Identifier, Type> context) {
         try {
-            FileReader reader = new FileReader(sourcePath + file);
+            FileReader reader = new FileReader(libPath + file);
             Lexer lexer = new Lexer(reader);
             Parser parser = new Parser(lexer);
 
@@ -160,8 +160,37 @@ public class InterfaceParser
             }
 
             List<FunctionDeclaration> declarations = (List<FunctionDeclaration>) result.value;
+            for (FunctionDeclaration declaration : declarations) {
+                context.put(declaration.getIdentifier(), declaration.getType());
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    public static boolean checkInterface(String libPath, String interfaceName, Map<Identifier, Type> context) {
+        try {
+            FileReader reader = new FileReader(libPath + file);
+            Lexer lexer = new Lexer(reader);
+            Parser parser = new Parser(lexer);
 
+            Symbol result = parser.parse();
+
+            if (parser.hasSyntaxError) {
+                // handle syntax error, output to file
+                parser.hasSyntaxError = false;
+                // TODO: Handle error here
+                parser.syntaxErrMessage = "";
+                return;
+            }
+
+            List<FunctionDeclaration> declarations = (List<FunctionDeclaration>) result.value;
+            for (FunctionDeclaration declaration : declarations) {
+                if (!context.get(declaration.getIdentifier()).equals(declaration.getType())) {
+                    return false;
+                }
+            }
+            return true;
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -382,7 +411,7 @@ class CUP$InterfaceParser$actions {
                 int tleft = CUP$InterfaceParser$stack.peek().left;
                 int tright = CUP$InterfaceParser$stack.peek().right;
                 List<VariableType> t = CUP$InterfaceParser$stack.peek().<List<VariableType>> value();
-                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, t), args, null); 
+                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, null); 
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",9, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-5), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
@@ -397,7 +426,7 @@ class CUP$InterfaceParser$actions {
                 int argPairsleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
                 int argPairsright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).right;
                 List<SimpleEntry<Identifier,VariableType>> argPairs = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).<List<SimpleEntry<Identifier,VariableType>>> value();
-                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new LinkedList<>()), args, null); 
+                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, null); 
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",9, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;

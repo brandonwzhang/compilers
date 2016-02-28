@@ -1957,8 +1957,8 @@ class CUP$Parser$actions {
                 int fbleft = CUP$Parser$stack.peek().left;
                 int fbright = CUP$Parser$stack.peek().right;
                 FunctionBlock fb = CUP$Parser$stack.peek().<FunctionBlock> value();
-                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, t), args, fb); 
-                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration",41, CUP$Parser$stack.elementAt(CUP$Parser$top-6), CUP$Parser$stack.peek(), RESULT);
+                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, fb); 
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration",40, CUP$Parser$stack.elementAt(CUP$Parser$top-6), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
 
@@ -1975,8 +1975,8 @@ class CUP$Parser$actions {
                 int fbleft = CUP$Parser$stack.peek().left;
                 int fbright = CUP$Parser$stack.peek().right;
                 ProcedureBlock fb = CUP$Parser$stack.peek().<ProcedureBlock> value();
-                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new LinkedList<>()), args, fb); 
-                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration",41, CUP$Parser$stack.elementAt(CUP$Parser$top-4), CUP$Parser$stack.peek(), RESULT);
+                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, fb); 
+                CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration",40, CUP$Parser$stack.elementAt(CUP$Parser$top-4), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
 

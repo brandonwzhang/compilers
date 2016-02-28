@@ -131,8 +131,8 @@ function_declaration_argument ::= function_declaration_argument_list:lst {: RESU
                                 | empty {: RESULT = new LinkedList<>(); :}
                                 ;
                 
-function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, t), args, null); :}
-                       | IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new LinkedList<>()), args, null); :}
+function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, null); :}
+                       | IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, null); :}
                        ;
 
 function_declaration_line ::= function_declaration:fd {: RESULT = fd :}
