@@ -11,7 +11,7 @@ import java.util.List;
 public class TypedDeclaration extends Statement implements Assignable {
     private Identifier identifier;
     private VariableType type;
-    private List<Expression> arraySized;
+    private List<Expression> arraySizes;
 
     public void accept(NodeVisitor v){
         v.visit(this);
