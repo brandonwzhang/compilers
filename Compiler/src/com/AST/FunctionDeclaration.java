@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class FunctionDeclaration {
+public class FunctionDeclaration extends Node {
     private Identifier identifier;
     private FunctionType functionType;
     private List<Identifier> argList;

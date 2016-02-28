@@ -8,7 +8,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class Program {
+public class Program extends Node {
     private List<UseStatement> useBlock;
     private List<FunctionDeclaration> funcDecs;
 
