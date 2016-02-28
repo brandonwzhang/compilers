@@ -1855,13 +1855,13 @@ class CUP$Parser$actions {
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 89: // function_declaration_return_types ::= var_type COMMA function_declaration_return_types 
             {
-                List<Type> RESULT = null;
+                List<VariableType> RESULT = null;
                 int tleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
                 int tright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
                 VariableType t = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<VariableType> value();
                 int lstleft = CUP$Parser$stack.peek().left;
                 int lstright = CUP$Parser$stack.peek().right;
-                List<Type> lst = CUP$Parser$stack.peek().<List<Type>> value();
+                List<VariableType> lst = CUP$Parser$stack.peek().<List<VariableType>> value();
                  lst.add(0,t); RESULT = lst; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration_return_types",37, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
@@ -1870,11 +1870,11 @@ class CUP$Parser$actions {
         /*. . . . . . . . . . . . . . . . . . . .*/
         case 90: // function_declaration_return_types ::= function_declaration_argument_type 
             {
-                List<Type> RESULT = null;
+                List<VariableType> RESULT = null;
                 int tleft = CUP$Parser$stack.peek().left;
                 int tright = CUP$Parser$stack.peek().right;
                 VariableType t = CUP$Parser$stack.peek().<VariableType> value();
-                 List<Type> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; 
+                 List<VariableType> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration_return_types",37, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1954,7 +1954,7 @@ class CUP$Parser$actions {
                 List<SimpleEntry<Identifier,VariableType>> args = CUP$Parser$stack.elementAt(CUP$Parser$top-4).<List<SimpleEntry<Identifier,VariableType>>> value();
                 int tleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
                 int tright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
-                List<Type> t = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<List<Type>> value();
+                List<VariableType> t = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<List<VariableType>> value();
                 int fbleft = CUP$Parser$stack.peek().left;
                 int fbright = CUP$Parser$stack.peek().right;
                 FunctionBlock fb = CUP$Parser$stack.peek().<FunctionBlock> value();
@@ -1976,7 +1976,7 @@ class CUP$Parser$actions {
                 int fbleft = CUP$Parser$stack.peek().left;
                 int fbright = CUP$Parser$stack.peek().right;
                 ProcedureBlock fb = CUP$Parser$stack.peek().<ProcedureBlock> value();
-                 RESULT = new FunctionDeclaration(new Identifier(id),args,new LinkedList<Type>(),fb); 
+                 RESULT = new FunctionDeclaration(new Identifier(id),args,new LinkedList<VariableType>(),fb); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration",41, CUP$Parser$stack.elementAt(CUP$Parser$top-4), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
