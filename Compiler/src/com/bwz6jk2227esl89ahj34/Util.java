@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34;
 
+import com.AST.PrimitiveType;
 import com.AST.Program;
 import com.AST.TypeException;
 import java_cup.runtime.Symbol;
@@ -133,6 +134,17 @@ public class Util {
         return sExp1.equals(sExp2);
     }
 
+    public static PrimitiveType lub(PrimitiveType one, PrimitiveType two) {
+        assert one == PrimitiveType.UNIT || one == PrimitiveType.VOID;
+        assert two == PrimitiveType.UNIT || two == PrimitiveType.VOID;
+
+        if (one == PrimitiveType.UNIT || two == PrimitiveType.UNIT) {
+            return PrimitiveType.UNIT;
+        } else {
+            return PrimitiveType.VOID;
+        }
+    }
+
     public static void typecheck(String sourcePath, String diagnosticPath, String[] files) {
         try {
             for (String file : files) {
@@ -165,10 +177,12 @@ public class Util {
                 NodeVisitor visitor = new TypeCheckVisitor();
 
                 try {
+                    System.out.println(output);
                     ((Program)(result.value)).accept(visitor);
+                    System.out.println("typed");
                 } catch (//TypeException
                             Exception e) {
-
+                    e.printStackTrace();
                 }
             }
         } catch (Exception e) {
