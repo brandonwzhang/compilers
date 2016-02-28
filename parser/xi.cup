@@ -148,63 +148,63 @@ start with program;
 
 empty ::= ;
 
-boolean_literal ::= TRUE  {: RESULT = new BooleanLiteral(true); :}
-          | FALSE       {: RESULT = new BooleanLiteral(false); :}
+boolean_literal ::= TRUE  {: RESULT = new BooleanLiteral(true); RESULT.setLocation(parser.cur_token); :}
+          | FALSE       {: RESULT = new BooleanLiteral(false); RESULT.setLocation(parser.cur_token); :}
           ;  
 
-A ::= B:b {: RESULT = b; :}
-    | A:a OR B:b {: RESULT = new Binary(BinaryOperator.OR, a,b); :}
+A ::= B:b {: RESULT = b; RESULT.setLocation(parser.cur_token); :}
+    | A:a OR B:b {: RESULT = new Binary(BinaryOperator.OR, a,b); RESULT.setLocation(parser.cur_token); :}
     ;
 
-B ::= C:c {: RESULT = c; :}
-    | B:b AND C:c {: RESULT = new Binary(BinaryOperator.AND, b,c); :}
+B ::= C:c {: RESULT = c; RESULT.setLocation(parser.cur_token); :}
+    | B:b AND C:c {: RESULT = new Binary(BinaryOperator.AND, b,c); RESULT.setLocation(parser.cur_token); :}
     ;
 
-C ::= D:d {: RESULT = d; :}
-    | C:c EQUAL D:d {: RESULT = new Binary(BinaryOperator.EQUAL, c,d); :}
-    | C:c NOT_EQUAL D:d  {: RESULT = new Binary(BinaryOperator.NOT_EQUAL,c,d); :}
+C ::= D:d {: RESULT = d; RESULT.setLocation(parser.cur_token); :}
+    | C:c EQUAL D:d {: RESULT = new Binary(BinaryOperator.EQUAL, c,d); RESULT.setLocation(parser.cur_token); :}
+    | C:c NOT_EQUAL D:d  {: RESULT = new Binary(BinaryOperator.NOT_EQUAL,c,d); RESULT.setLocation(parser.cur_token); :}
     ;
 
-D ::= E:e {: RESULT = e; :}
-    | D:d LT E:e {: RESULT = new Binary(BinaryOperator.LT, d,e); :}
-    | D:d LEQ E:e {: RESULT = new Binary(BinaryOperator.LEQ, d,e); :}
-    | D:d GT E:e {: RESULT = new Binary(BinaryOperator.GT, d,e); :}
-    | D:d GEQ E:e  {: RESULT = new Binary(BinaryOperator.GEQ, d,e); :}
+D ::= E:e {: RESULT = e; RESULT.setLocation(parser.cur_token); :}
+    | D:d LT E:e {: RESULT = new Binary(BinaryOperator.LT, d,e); RESULT.setLocation(parser.cur_token); :}
+    | D:d LEQ E:e {: RESULT = new Binary(BinaryOperator.LEQ, d,e); RESULT.setLocation(parser.cur_token); :}
+    | D:d GT E:e {: RESULT = new Binary(BinaryOperator.GT, d,e); RESULT.setLocation(parser.cur_token); :}
+    | D:d GEQ E:e  {: RESULT = new Binary(BinaryOperator.GEQ, d,e); RESULT.setLocation(parser.cur_token); :}
     ;
 
-E ::= F:f {: RESULT = f;:}
-    | E:e PLUS F:f {: RESULT = new Binary(BinaryOperator.PLUS, e,f); :}
-    | E:e MINUS F:f {: RESULT = new Binary(BinaryOperator.MINUS,e,f); :}
+E ::= F:f {: RESULT = f; RESULT.setLocation(parser.cur_token); :}
+    | E:e PLUS F:f {: RESULT = new Binary(BinaryOperator.PLUS, e,f); RESULT.setLocation(parser.cur_token); :}
+    | E:e MINUS F:f {: RESULT = new Binary(BinaryOperator.MINUS,e,f); RESULT.setLocation(parser.cur_token); :}
     ; 
 
-F ::= G:g {: RESULT = g; :}
-    | F:f TIMES G:g {: RESULT = new Binary(BinaryOperator.TIMES, f,g); :}
-    | F:f HIGH_MULT G:g  {: RESULT = new Binary(BinaryOperator.HIGH_MULT, f,g); :}
-    | F:f DIVIDE G:g  {: RESULT = new Binary(BinaryOperator.DIVIDE, f,g); :}
-    | F:f MODULO G:g  {: RESULT = new Binary(BinaryOperator.MODULO, f,g); :}
+F ::= G:g {: RESULT = g; RESULT.setLocation(parser.cur_token); :}
+    | F:f TIMES G:g {: RESULT = new Binary(BinaryOperator.TIMES, f,g); RESULT.setLocation(parser.cur_token); :}
+    | F:f HIGH_MULT G:g  {: RESULT = new Binary(BinaryOperator.HIGH_MULT, f,g); RESULT.setLocation(parser.cur_token); :}
+    | F:f DIVIDE G:g  {: RESULT = new Binary(BinaryOperator.DIVIDE, f,g); RESULT.setLocation(parser.cur_token); :}
+    | F:f MODULO G:g  {: RESULT = new Binary(BinaryOperator.MODULO, f,g); RESULT.setLocation(parser.cur_token); :}
     ;  
 
-G ::= H:h {: RESULT = h; :}
-    | NOT H:h {: RESULT = new Unary(UnaryOperator.NOT, h); :}
-    | MINUS H:h {: RESULT = new Unary(UnaryOperator.MINUS, h); :}
+G ::= H:h {: RESULT = h; RESULT.setLocation(parser.cur_token); :}
+    | NOT H:h {: RESULT = new Unary(UnaryOperator.NOT, h); RESULT.setLocation(parser.cur_token); :}
+    | MINUS H:h {: RESULT = new Unary(UnaryOperator.MINUS, h); RESULT.setLocation(parser.cur_token); :}
     ;
 
-H ::= I:i {: RESULT = i; :}
-    | function_call:fc {: RESULT = fc; :}
-    | H:h OPEN_BRACKET A:a CLOSE_BRACKET {: RESULT = new ArrayIndex(h,a); :}
+H ::= I:i {: RESULT = i; RESULT.setLocation(parser.cur_token); :}
+    | function_call:fc {: RESULT = fc; RESULT.setLocation(parser.cur_token); :}
+    | H:h OPEN_BRACKET A:a CLOSE_BRACKET {: RESULT = new ArrayIndex(h,a); RESULT.setLocation(parser.cur_token); :}
     ;
 
-I ::= boolean_literal:b {: RESULT = b; :}
-    | INTEGER_LITERAL:i {: RESULT = new IntegerLiteral(i); :}
-    | OPEN_PAREN A:a CLOSE_PAREN {: RESULT = a; :}
-    | IDENTIFIER: i {: RESULT = new Identifier(i); :}
-    | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
-    | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); :}
-    | array_literal:al {: RESULT = al; :}
+I ::= boolean_literal:b {: RESULT = b; RESULT.setLocation(parser.cur_token); :}
+    | INTEGER_LITERAL:i {: RESULT = new IntegerLiteral(i); RESULT.setLocation(parser.cur_token); :}
+    | OPEN_PAREN A:a CLOSE_PAREN {: RESULT = a; RESULT.setLocation(parser.cur_token); :}
+    | IDENTIFIER: i {: RESULT = new Identifier(i); RESULT.setLocation(parser.cur_token); :}
+    | STRING_LITERAL:s {: RESULT = new StringLiteral(s); RESULT.setLocation(parser.cur_token); :} 
+    | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); RESULT.setLocation(parser.cur_token); :}
+    | array_literal:al {: RESULT = al; RESULT.setLocation(parser.cur_token); :}
     ;
 
 
-expression ::= A:a {: RESULT = a; :}
+expression ::= A:a {: RESULT = a; RESULT.setLocation(parser.cur_token); :}
              ; 
  
 expression_list ::= expression:e COMMA expression_list:lst {: lst.add(0, e); RESULT = lst; :} 
@@ -215,8 +215,8 @@ expression_list_trailing_comma ::= expression:e COMMA expression_list_trailing_c
                                  | expression:e COMMA {: List<Expression> lst = new LinkedList<>(); lst.add(0, e); RESULT = lst; :}
                                  ;
  
-array_literal ::= OPEN_BRACE expression_list:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); :}
-                |  OPEN_BRACE expression_list_trailing_comma:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); :}
+array_literal ::= OPEN_BRACE expression_list:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); RESULT.setLocation(parser.cur_token); :}
+                |  OPEN_BRACE expression_list_trailing_comma:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); RESULT.setLocation(parser.cur_token); :}
                 ;
 
 primitive_type ::= INT {: RESULT = Type.PrimitiveType.INT; :}
@@ -235,22 +235,22 @@ type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new Type(pt, ans
        ;
        
 
-typed_declaration ::= IDENTIFIER:id COLON primitive_type:t array_size_type:ast {: RESULT = new TypedDeclaration(new Identifier(id),t, ast.getKey(), ast.getValue()); :} //x:int
+typed_declaration ::= IDENTIFIER:id COLON primitive_type:t array_size_type:ast {: RESULT = new TypedDeclaration(new Identifier(id),t, ast.getKey(), ast.getValue()); RESULT.setLocation(parser.cur_token); :} //x:int
                     ;
 
-function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), lst); :}//f(x,y,z,...) 
-                | IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), new LinkedList<Expression>()); :} // f()
-                | LENGTH OPEN_PAREN expression:e CLOSE_PAREN {: List<Expression> lst = new LinkedList<>(); lst.add(0, e); RESULT = new FunctionCall(new Identifier("length"), lst); :}
+function_call ::= IDENTIFIER:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), lst); RESULT.setLocation(parser.cur_token); :}//f(x,y,z,...) 
+                | IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier(id), new LinkedList<Expression>()); RESULT.setLocation(parser.cur_token); :} // f()
+                | LENGTH OPEN_PAREN expression:e CLOSE_PAREN {: List<Expression> lst = new LinkedList<>(); lst.add(0, e); RESULT = new FunctionCall(new Identifier("length"), lst); RESULT.setLocation(parser.cur_token); :}
                 ;
 
 
-assignment_lhs_array_brackets ::= assignment_lhs_array:a OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayIndex(a,e); :}
+assignment_lhs_array_brackets ::= assignment_lhs_array:a OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayIndex(a,e); RESULT.setLocation(parser.cur_token); :}
                                 ;
 
-assignment_lhs_array ::= function_call:fc {: RESULT = fc; :}
-                       | STRING_LITERAL:s {: RESULT = new StringLiteral(s); :} 
-                       | IDENTIFIER:i {: RESULT = new Identifier(i); :}
-                       | assignment_lhs_array_brackets:a {: RESULT = a; :}
+assignment_lhs_array ::= function_call:fc {: RESULT = fc; RESULT.setLocation(parser.cur_token); :}
+                       | STRING_LITERAL:s {: RESULT = new StringLiteral(s); RESULT.setLocation(parser.cur_token); :} 
+                       | IDENTIFIER:i {: RESULT = new Identifier(i); RESULT.setLocation(parser.cur_token); :}
+                       | assignment_lhs_array_brackets:a {: RESULT = a; RESULT.setLocation(parser.cur_token); :}
                        ;
 
 
