@@ -12,7 +12,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class FunctionDeclaration {
     private Identifier identifier;
-    private FunctionType type;
+    private FunctionType functionType;
     private List<Identifier> argList;
     private MethodBlock methodBlock;
 
