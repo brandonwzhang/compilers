@@ -109,22 +109,24 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (node.getVariables().size() > 1 && !(node.getExpression().getType() instanceof VariableTypeList)) {
             throw new TypeException("TODO");
         }
-        if (node.getVariables().size() == 1) {
+        else if (node.getVariables().size() == 1) {
             if (!node.getVariables().get(0).getType().equals(node.getExpression().getType())) {
                 throw new TypeException("TODO");
             }
         }
 
-        // TODO: multiple assign on left
-        VariableTypeList RHS = (VariableTypeList)node.getExpression().getType();
-        if (node.getVariables().size() != RHS.getVariableTypeList().size()) {
-            throw new TypeException("TODO");
-        }
-        for(int i = 0; i < node.getVariables().size(); i++) {
-            Type leftType = node.getVariables().get(i).getType();
-            Type rightType = RHS.getVariableTypeList().get(i);
-            if (!leftType.equals(rightType)) {
+        else {
+            // TODO: multiple assign on left
+            VariableTypeList RHS = (VariableTypeList) node.getExpression().getType();
+            if (node.getVariables().size() != RHS.getVariableTypeList().size()) {
                 throw new TypeException("TODO");
+            }
+            for (int i = 0; i < node.getVariables().size(); i++) {
+                Type leftType = node.getVariables().get(i).getType();
+                Type rightType = RHS.getVariableTypeList().get(i);
+                if (!leftType.equals(rightType)) {
+                    throw new TypeException("TODO");
+                }
             }
         }
 
@@ -134,7 +136,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(Binary node) {
         node.getLeft().accept(this);
         node.getRight().accept(this);
-        if (!node.getLeft().getType().equals(node.getRight())) {
+        if (!node.getLeft().getType().equals(node.getRight().getType())) {
             throw new TypeException("TODO invalid binary operator");
         } else {
             BinaryOperator binop = node.getOp();
@@ -242,7 +244,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (node.getFalseBlock().isPresent()) {
             node.getFalseBlock().get().accept(this);
             PrimitiveType r1 = ((VariableType) node.getTrueBlock().getType()).getPrimitiveType();
-            PrimitiveType r2 = ((VariableType) node.getTrueBlock().getType()).getPrimitiveType();
+            PrimitiveType r2 = ((VariableType) node.getFalseBlock().get().getType()).getPrimitiveType();
             node.setType(new VariableType(Util.lub(r1,r2), 0));
         } else {
             node.setType(new VariableType(PrimitiveType.UNIT, 0));
@@ -350,14 +352,15 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException("TODO: cannot shadow variables");
         }
         context.put(identifier, node.getDeclarationType());
+        node.setType(node.getDeclarationType());
     }
 
     public void visit(Unary node) {
         node.getExpression().accept(this);
         UnaryOperator unop = node.getOp();
-        if (node.getExpression().getType() == INT_TYPE && unop == UnaryOperator.MINUS) {
+        if (node.getExpression().getType().equals(INT_TYPE) && unop == UnaryOperator.MINUS) {
             node.setType(new VariableType(PrimitiveType.INT, 0));
-        } else if (node.getExpression().getType() == BOOL_TYPE && unop == UnaryOperator.NOT) {
+        } else if (node.getExpression().getType().equals(BOOL_TYPE) && unop == UnaryOperator.NOT) {
             node.setType(new VariableType(PrimitiveType.BOOL, 0));
         } else {
             throw new TypeException("TODO invalid unary operator");
