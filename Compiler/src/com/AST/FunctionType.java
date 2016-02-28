@@ -1,15 +1,16 @@
 package com.AST;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
-import java.util.Optional;
-
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class ArrayBrackets {
-    private List<Optional<Expression>> indices;
+public class FunctionType extends Type {
+    List<VariableType> argumentTypes;
+    List<VariableType> returnValueTypes;
+
 }
