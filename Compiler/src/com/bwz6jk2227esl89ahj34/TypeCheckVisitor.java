@@ -4,6 +4,12 @@ import com.AST.*;
 import java.util.*;
 
 public class TypeCheckVisitor implements NodeVisitor {
+    // Name of the source file. Used for interface checking.
+    private String sourceFileName;
+
+    // Path to interface files
+    private String libPath;
+
     // Context field
     private Stack<Context> contexts;
     // AST field (that we build up as we visit) TODO
@@ -40,7 +46,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     private final Set<BinaryOperator> BOOL_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(bool_binary_operator_bool));
     private final Set<BinaryOperator> ARRAY_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(array_binary_operator_bool));
 
-    public TypeCheckVisitor() {
+    public TypeCheckVisitor(String sourceFileName, String libPath) {
         contexts = new Stack<>();
         // initialize first context with length function
         Context initContext = new Context();
@@ -50,6 +56,8 @@ public class TypeCheckVisitor implements NodeVisitor {
         initContext.put(new Identifier("length"), new FunctionType(lengthArgType, lengthReturnType));
 
         contexts.push(initContext);
+        this.sourceFileName = sourceFileName;
+        this.libPath = libPath;
     }
 
     public void visit(ArrayIndex node) {
@@ -369,10 +377,57 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
 
+    /**
+     * Add function declarations in a given interface to a context.
+     * @param libPath       a String of the path to the interface files
+     * @param interfaceName a String of the name of the interface
+     * @param context       a Context to add the function declarations to
+     * @return              a String of the error or null if no error
+     */
+    public String addInterface(String libPath, String interfaceName, Context context) {
+        List<FunctionDeclaration> declarations = new LinkedList<>();
+        String error = InterfaceParser.parseInterface(libPath, interfaceName, declarations);
+        for (FunctionDeclaration declaration : declarations) {
+            context.put(declaration.getIdentifier(), declaration.getType());
+        }
+        return error;
+    }
+
+    /**
+     * Checks that all declarations in an interface file are implemented in its associated in its xi file
+     * @param libPath       a String of the path to the interface files
+     * @param interfaceName a String of the name of the interface
+     * @param context       a Context to add the function declarations to
+     * @return              a String of the error or null if no error
+     */
+    public String checkInterface(String libPath, String interfaceName, Context context) {
+        List<FunctionDeclaration> declarations = new LinkedList<>();
+        String error = InterfaceParser.parseInterface(libPath, interfaceName, declarations);
+        for (FunctionDeclaration declaration : declarations) {
+            if (!context.get(declaration.getIdentifier()).equals(declaration.getType())) {
+                return declaration.getIdentifier().getName() + " is not implemented";
+            }
+        }
+        return error;
+    }
+
     public void visit(UseStatement node) {
-        // find interface files
-        // parse the function names and types
-        // add them to the symbol table at top of stack
+        String interfaceName = node.getIdentifier().getName();
+        // If the interface name is the same as our source file, we need to
+        // check that all its functions are implemented.
+        if (interfaceName.equals(sourceFileName)) {
+            String error = checkInterface(libPath, interfaceName, contexts.peek());
+            if (error != null) {
+                throw new TypeException(error);
+            }
+            node.setType(UNIT_TYPE);
+            return;
+        }
+        String error = addInterface(libPath, interfaceName, contexts.peek());
+        if (error != null) {
+            throw new TypeException(error);
+        }
+        node.setType(UNIT_TYPE);
     }
 
     public void visit(WhileStatement node) {

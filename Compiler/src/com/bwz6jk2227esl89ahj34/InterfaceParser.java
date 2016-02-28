@@ -21,7 +21,7 @@ public class InterfaceParser
 
   @Override
   public final Class<?> getSymbolContainer() {
-    return InterfaceParserSym.class;
+    return ParserSym.class;
   }
 
   /** Default constructor. */
@@ -166,40 +166,6 @@ public class InterfaceParser
             return "Interface " + interfaceName + " not found";
         }
         return null;
-    }
-
-    /**
-     * Add function declarations in a given interface to a context.
-     * @param libPath       a String of the path to the interface files
-     * @param interfaceName a String of the name of the interface
-     * @param context       a Context to add the function declarations to
-     * @return              a String of the error or null if no error
-     */
-    public String addInterface(String libPath, String interfaceName, Context context) {
-        List<FunctionDeclaration> declarations = new LinkedList<>(); 
-        String error = InterfaceParser.parseInterface(libPath, interfaceName, declarations);
-        for (FunctionDeclaration declaration : declarations) {
-            context.put(declaration.getIdentifier(), declaration.getType());
-        }
-        return error;
-    }
-    
-    /**
-     * Checks that all declarations in an interface file are implemented in its associated in its xi file
-     * @param libPath       a String of the path to the interface files
-     * @param interfaceName a String of the name of the interface
-     * @param context       a Context to add the function declarations to
-     * @return              a String of the error or null if no error
-     */
-    public String checkInterface(String libPath, String interfaceName, Context context) {
-        List<FunctionDeclaration> declarations = new LinkedList<>(); 
-        String error = InterfaceParser.parseInterface(libPath, interfaceName, declarations);
-        for (FunctionDeclaration declaration : declarations) {
-            if (!context.get(declaration.getIdentifier()).equals(declaration.getType())) {
-                return declaration.getIdentifier().getName() + " is not implemented";
-            }
-        }
-        return error;
     }
 
     public boolean hasSyntaxError = false;

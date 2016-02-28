@@ -4,6 +4,7 @@ import java.io.*;
 public class Main {
     private static String sourcePath = "./";
     private static String diagnosticPath = "./";
+    private static String libPath = "./";
 
     public static void main(String[] args) {
         CLI cli = new CLI();
@@ -30,7 +31,10 @@ public class Main {
                 0);
         cli.addOption("--typecheck",
                 "Typecheck the .xi source files",
-                files -> Util.typecheck(sourcePath, diagnosticPath, files),
+                files -> Util.typeCheck(sourcePath,
+                                        diagnosticPath,
+                                        libPath,
+                                        files),
                 0);
         cli.execute(args);
     }
