@@ -2,7 +2,6 @@ package com.AST;
 import edu.cornell.cs.cs4120.util.*;
 
 import java.util.AbstractMap;
-import java.util.Optional;
 
 public class PrintVisitor implements NodeVisitor {
 
@@ -201,13 +200,13 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom(node.getType().getPrimitiveType().toString());
 
         int numArrayEmpty = node.getType().getNumBrackets() -
-                node.getArraySized().size();
+                node.getArraySizes().size();
         for(int j = 0; j < numArrayEmpty; j++) {
             printer.endList();
         }
 
-        for(int k = node.getArraySized().size()-1; k >= 0; k--) {
-            node.getArraySized().get(k).accept(this);
+        for(int k = node.getArraySizes().size()-1; k >= 0; k--) {
+            node.getArraySizes().get(k).accept(this);
             printer.endList();
         }
 
