@@ -52,11 +52,9 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(BlockList node) {
-       // printer.startList();
         for(Block b : node.getBlockList()){
             b.accept(this);
         }
-       // printer.endList();
     }
 
     public void visit(BooleanLiteral node) {
@@ -90,7 +88,6 @@ public class PrintVisitor implements NodeVisitor {
         for(AbstractMap.SimpleEntry<Identifier, VariableType> arg : node.getArgList()){
             printer.startList();
             arg.getKey().accept(this);
-            //arg.getValue().accept(this);
             printType(arg.getValue());
             printer.endList();
         }
@@ -98,7 +95,6 @@ public class PrintVisitor implements NodeVisitor {
         printer.startList();
         for(VariableType t : node.getReturnTypeList()) {
             printType(t);
-            //t.accept(this);
         }
         printer.endList();
         node.getFunctionBlock().accept(this);
