@@ -13,9 +13,9 @@ class InterfaceParser;
 
 parser code {:
 
-    public static void parseInterface(String sourcePath, String interfaceName, Map<Identifier, Type> context) {
+    public static void parseInterface(String libPath, String interfaceName, Map<Identifier, Type> context) {
         try {
-            FileReader reader = new FileReader(sourcePath + file);
+            FileReader reader = new FileReader(libPath + file);
             Lexer lexer = new Lexer(reader);
             Parser parser = new Parser(lexer);
 
@@ -30,8 +30,37 @@ parser code {:
             }
 
             List<FunctionDeclaration> declarations = (List<FunctionDeclaration>) result.value;
+            for (FunctionDeclaration declaration : declarations) {
+                context.put(declaration.getIdentifier(), declaration.getType());
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    public static boolean checkInterface(String libPath, String interfaceName, Map<Identifier, Type> context) {
+        try {
+            FileReader reader = new FileReader(libPath + file);
+            Lexer lexer = new Lexer(reader);
+            Parser parser = new Parser(lexer);
 
+            Symbol result = parser.parse();
+
+            if (parser.hasSyntaxError) {
+                // handle syntax error, output to file
+                parser.hasSyntaxError = false;
+                // TODO: Handle error here
+                parser.syntaxErrMessage = "";
+                return;
+            }
+
+            List<FunctionDeclaration> declarations = (List<FunctionDeclaration>) result.value;
+            for (FunctionDeclaration declaration : declarations) {
+                if (!context.get(declaration.getIdentifier()).equals(declaration.getType())) {
+                    return false;
+                }
+            }
+            return true;
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -110,5 +139,5 @@ function_declaration_line ::= function_declaration:fd {: RESULT = fd :}
                             | function_declaration:fd SEMICOLON {: RESULT = fd :}
                             ;
 function_declaration_list ::= function_declaration_line:fd function_declaration_list:lst {: lst.add(0, fd); RESULT = lst; :}
-                            | empty {: RESULT = new LinkedList<FunctionDeclaration>(); :}
+                            | function_declaration_line:fd {: RESULT = new LinkedList<FunctionDeclaration>(); RESULT.add(fd); :}
                             ;

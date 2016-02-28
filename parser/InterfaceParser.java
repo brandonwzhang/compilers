@@ -53,27 +53,27 @@ public class InterfaceParser
   /** Parse-action table. */
   protected static final short[][] _action_table = 
     unpackFromStrings(new String[] {
-    "\000\042\000\006\002\000\004\006\001\002\000\004\002" +
-    "\044\001\002\000\006\002\000\004\006\001\002\000\004" +
-    "\011\012\001\002\000\010\002\ufff1\004\ufff1\015\011\001" +
-    "\002\000\004\002\uffee\001\002\000\006\002\ufff0\004\ufff0" +
-    "\001\002\000\006\004\015\012\000\001\002\000\004\012" +
-    "\034\001\002\000\004\012\ufff5\001\002\000\004\013\022" +
-    "\001\002\000\006\012\ufff6\014\020\001\002\000\004\012" +
-    "\ufff4\001\002\000\004\004\015\001\002\000\004\012\ufff7" +
-    "\001\002\000\006\005\026\006\024\001\002\000\006\012" +
-    "\ufff8\014\ufff8\001\002\000\010\007\ufffe\012\ufffe\014\ufffe" +
-    "\001\002\000\010\007\030\012\000\014\000\001\002\000" +
-    "\010\007\uffff\012\uffff\014\uffff\001\002\000\006\012\ufffb" +
-    "\014\ufffb\001\002\000\004\010\032\001\002\000\006\012" +
-    "\ufffc\014\ufffc\001\002\000\010\007\030\012\000\014\000" +
-    "\001\002\000\006\012\ufffd\014\ufffd\001\002\000\012\002" +
-    "\ufff2\004\ufff2\013\035\015\ufff2\001\002\000\006\005\026" +
-    "\006\024\001\002\000\004\014\041\001\002\000\010\002" +
-    "\ufff3\004\ufff3\015\ufff3\001\002\000\010\002\ufff9\004\ufff9" +
-    "\015\ufff9\001\002\000\006\005\026\006\024\001\002\000" +
-    "\010\002\ufffa\004\ufffa\015\ufffa\001\002\000\004\002\uffef" +
-    "\001\002\000\004\002\001\001\002" });
+    "\000\041\000\004\004\006\001\002\000\004\002\043\001" +
+    "\002\000\006\002\uffee\004\006\001\002\000\004\011\011" +
+    "\001\002\000\010\002\ufff1\004\ufff1\015\010\001\002\000" +
+    "\006\002\ufff0\004\ufff0\001\002\000\006\004\014\012\000" +
+    "\001\002\000\004\012\033\001\002\000\004\012\ufff5\001" +
+    "\002\000\004\013\021\001\002\000\006\012\ufff6\014\017" +
+    "\001\002\000\004\012\ufff4\001\002\000\004\004\014\001" +
+    "\002\000\004\012\ufff7\001\002\000\006\005\025\006\023" +
+    "\001\002\000\006\012\ufff8\014\ufff8\001\002\000\010\007" +
+    "\ufffe\012\ufffe\014\ufffe\001\002\000\010\007\027\012\000" +
+    "\014\000\001\002\000\010\007\uffff\012\uffff\014\uffff\001" +
+    "\002\000\006\012\ufffb\014\ufffb\001\002\000\004\010\031" +
+    "\001\002\000\006\012\ufffc\014\ufffc\001\002\000\010\007" +
+    "\027\012\000\014\000\001\002\000\006\012\ufffd\014\ufffd" +
+    "\001\002\000\012\002\ufff2\004\ufff2\013\034\015\ufff2\001" +
+    "\002\000\006\005\025\006\023\001\002\000\004\014\040" +
+    "\001\002\000\010\002\ufff3\004\ufff3\015\ufff3\001\002\000" +
+    "\010\002\ufff9\004\ufff9\015\ufff9\001\002\000\006\005\025" +
+    "\006\023\001\002\000\010\002\ufffa\004\ufffa\015\ufffa\001" +
+    "\002\000\004\002\uffef\001\002\000\004\002\001\001\002" +
+    "" });
 
   /** Access to parse-action table. */
   @Override
@@ -82,21 +82,21 @@ public class InterfaceParser
   /** {@code reduce_goto} table. */
   protected static final short[][] _reduce_table = 
     unpackFromStrings(new String[] {
-    "\000\042\000\012\002\007\013\006\014\004\015\003\001" +
-    "\001\000\002\001\001\000\012\002\007\013\006\014\004" +
-    "\015\042\001\001\000\002\001\001\000\002\001\001\000" +
-    "\002\001\001\000\002\001\001\000\012\002\016\010\015" +
-    "\011\013\012\012\001\001\000\002\001\001\000\002\001" +
-    "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
-    "\000\006\010\015\011\020\001\001\000\002\001\001\000" +
-    "\006\003\024\004\022\001\001\000\002\001\001\000\002" +
-    "\001\001\000\006\002\030\005\026\001\001\000\002\001" +
-    "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
-    "\000\006\002\030\005\032\001\001\000\002\001\001\000" +
-    "\002\001\001\000\012\003\024\004\035\006\037\007\036" +
+    "\000\041\000\010\013\006\014\004\015\003\001\001\000" +
+    "\002\001\001\000\010\013\006\014\004\015\041\001\001" +
+    "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
+    "\012\002\015\010\014\011\012\012\011\001\001\000\002" +
     "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
-    "\001\000\012\003\024\004\035\006\037\007\041\001\001" +
-    "\000\002\001\001\000\002\001\001\000\002\001\001" });
+    "\001\000\002\001\001\000\006\010\014\011\017\001\001" +
+    "\000\002\001\001\000\006\003\023\004\021\001\001\000" +
+    "\002\001\001\000\002\001\001\000\006\002\027\005\025" +
+    "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
+    "\001\000\002\001\001\000\006\002\027\005\031\001\001" +
+    "\000\002\001\001\000\002\001\001\000\012\003\023\004" +
+    "\034\006\036\007\035\001\001\000\002\001\001\000\002" +
+    "\001\001\000\002\001\001\000\012\003\023\004\034\006" +
+    "\036\007\040\001\001\000\002\001\001\000\002\001\001" +
+    "\000\002\001\001" });
 
   /** Access to {@code reduce_goto} table. */
   @Override
@@ -143,46 +143,25 @@ public class InterfaceParser
 
 
 
-    public static void parseFile(String sourcePath,
-                             String diagnosticPath,
-                             String[] files) {
+    public static void parseInterface(String sourcePath, String interfaceName, Map<Identifier, Type> context) {
         try {
-            for (String file : files) {
-                if (!file.contains(".xi")) {
-                    System.out.println(file + "is not a .xi file. " +
-                            "This file will not be parsed.");
-                    continue;
-                }
+            FileReader reader = new FileReader(sourcePath + file);
+            Lexer lexer = new Lexer(reader);
+            Parser parser = new Parser(lexer);
 
-                FileReader reader = new FileReader(sourcePath + file);
-                Lexer lexer = new Lexer(reader);
-                Parser parser = new Parser(lexer);
+            Symbol result = parser.parse();
 
-                String output = file.replace(".xi", ".parsed");
-                String writeFile = diagnosticPath + output;
-                Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
-
-                Symbol result = parser.parse();
-
-                if (parser.hasSyntaxError) {
-                    // handle syntax error, output to file
-                    parser.hasSyntaxError = false;
-                    Util.writeAndClose(writeFile, new
-                            ArrayList<String>(Arrays.asList(parser.syntaxErrMessage)));
-
-                    parser.syntaxErrMessage = "";
-                    continue;
-                }
-
-                FileOutputStream fos = new FileOutputStream(
-                        new File(writeFile));
-                CodeWriterSExpPrinter printer =
-                        new CodeWriterSExpPrinter(fos);
-                NodeVisitor visitor = new PrintVisitor(printer);
-
-                ((Program)(result.value)).accept(visitor);
-                printer.flush();
+            if (parser.hasSyntaxError) {
+                // handle syntax error, output to file
+                parser.hasSyntaxError = false;
+                // TODO: Handle error here
+                parser.syntaxErrMessage = "";
+                return;
             }
+
+            List<FunctionDeclaration> declarations = (List<FunctionDeclaration>) result.value;
+
+
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -403,7 +382,7 @@ class CUP$InterfaceParser$actions {
                 int tleft = CUP$InterfaceParser$stack.peek().left;
                 int tright = CUP$InterfaceParser$stack.peek().right;
                 List<VariableType> t = CUP$InterfaceParser$stack.peek().<List<VariableType>> value();
-                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, t), args, fb); 
+                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, t), args, null); 
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",9, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-5), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
@@ -418,7 +397,7 @@ class CUP$InterfaceParser$actions {
                 int argPairsleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
                 int argPairsright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).right;
                 List<SimpleEntry<Identifier,VariableType>> argPairs = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).<List<SimpleEntry<Identifier,VariableType>>> value();
-                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new LinkedList<>()), args, fb); 
+                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new LinkedList<>()), args, null); 
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",9, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
@@ -463,10 +442,13 @@ class CUP$InterfaceParser$actions {
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 19: // function_declaration_list ::= empty 
+        case 19: // function_declaration_list ::= function_declaration_line 
             {
                 List<FunctionDeclaration> RESULT = null;
-                 RESULT = new LinkedList<FunctionDeclaration>(); 
+                int fdleft = CUP$InterfaceParser$stack.peek().left;
+                int fdright = CUP$InterfaceParser$stack.peek().right;
+                FunctionDeclaration fd = CUP$InterfaceParser$stack.peek().<FunctionDeclaration> value();
+                 RESULT = new LinkedList<FunctionDeclaration>(); RESULT.add(fd); 
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",11, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
