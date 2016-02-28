@@ -21,7 +21,7 @@ public class InterfaceParser
 
   @Override
   public final Class<?> getSymbolContainer() {
-    return InterfaceParserSym.class;
+    return ParserSym.class;
   }
 
   /** Default constructor. */
@@ -143,57 +143,29 @@ public class InterfaceParser
 
 
 
-    public static void parseInterface(String libPath, String interfaceName, Map<Identifier, Type> context) {
+    /**
+     * Parses an interface file and adds the declarations to a given list
+     * @param libPath       a String of the path to the interface files
+     * @param interfaceName a String of the name of the interface
+     * @param declarations  a List<FunctionDeclaration> to store the parsed function declarations that must be empty
+     * @return              a String of the error or null if no error
+     */
+    public static String parseInterface(String libPath, String interfaceName, List<FunctionDeclaration> declarations) {
+        assert(declarations.size() == 0);
         try {
-            FileReader reader = new FileReader(libPath + file);
+            FileReader reader = new FileReader(libPath + interfaceName + ".ixi");
             Lexer lexer = new Lexer(reader);
             Parser parser = new Parser(lexer);
-
             Symbol result = parser.parse();
-
             if (parser.hasSyntaxError) {
-                // handle syntax error, output to file
-                parser.hasSyntaxError = false;
-                // TODO: Handle error here
-                parser.syntaxErrMessage = "";
-                return;
+                // Encountered parsing error, return error message
+                return parser.syntaxErrMessage;
             }
-
-            List<FunctionDeclaration> declarations = (List<FunctionDeclaration>) result.value;
-            for (FunctionDeclaration declaration : declarations) {
-                context.put(declaration.getIdentifier(), declaration.getType());
-            }
+            declarations.addAll((List<FunctionDeclaration>) result.value);
         } catch(Exception e) {
-            e.printStackTrace();
+            return "Interface " + interfaceName + " not found";
         }
-    }
-
-    public static boolean checkInterface(String libPath, String interfaceName, Map<Identifier, Type> context) {
-        try {
-            FileReader reader = new FileReader(libPath + file);
-            Lexer lexer = new Lexer(reader);
-            Parser parser = new Parser(lexer);
-
-            Symbol result = parser.parse();
-
-            if (parser.hasSyntaxError) {
-                // handle syntax error, output to file
-                parser.hasSyntaxError = false;
-                // TODO: Handle error here
-                parser.syntaxErrMessage = "";
-                return;
-            }
-
-            List<FunctionDeclaration> declarations = (List<FunctionDeclaration>) result.value;
-            for (FunctionDeclaration declaration : declarations) {
-                if (!context.get(declaration.getIdentifier()).equals(declaration.getType())) {
-                    return false;
-                }
-            }
-            return true;
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        return null;
     }
 
     public boolean hasSyntaxError = false;
@@ -438,7 +410,7 @@ class CUP$InterfaceParser$actions {
                 int fdleft = CUP$InterfaceParser$stack.peek().left;
                 int fdright = CUP$InterfaceParser$stack.peek().right;
                 FunctionDeclaration fd = CUP$InterfaceParser$stack.peek().<FunctionDeclaration> value();
-                 RESULT = fd 
+                 RESULT = fd; 
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_line",10, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
@@ -450,7 +422,7 @@ class CUP$InterfaceParser$actions {
                 int fdleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
                 int fdright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).right;
                 FunctionDeclaration fd = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).<FunctionDeclaration> value();
-                 RESULT = fd 
+                 RESULT = fd; 
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_line",10, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;

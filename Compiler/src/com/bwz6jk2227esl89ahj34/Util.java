@@ -145,7 +145,10 @@ public class Util {
         }
     }
 
-    public static void typecheck(String sourcePath, String diagnosticPath, String[] files) {
+    public static void typeCheck(String sourcePath,
+                                 String diagnosticPath,
+                                 String libPath,
+                                 String[] files) {
         try {
             for (String file : files) {
                 if (!file.contains(".xi")) {
@@ -174,7 +177,9 @@ public class Util {
                     continue;
                 }
 
-                NodeVisitor visitor = new TypeCheckVisitor();
+                NodeVisitor visitor =
+                        new TypeCheckVisitor(file.replace(".xi", ""),
+                                             libPath);
 
                 try {
                     System.out.println(output);
