@@ -88,7 +88,7 @@ public class PrintVisitor implements NodeVisitor {
         printer.startList();
         node.getIdentifier().accept(this);
         printer.startList();
-        for(AbstractMap.SimpleEntry<Identifier, Type> arg : node.getArgList()){
+        for(AbstractMap.SimpleEntry<Identifier, VariableType> arg : node.getArgList()){
             printer.startList();
             arg.getKey().accept(this);
             //arg.getValue().accept(this);
@@ -97,7 +97,7 @@ public class PrintVisitor implements NodeVisitor {
         }
         printer.endList();
         printer.startList();
-        for(Type t : node.getTypeList()){
+        for(VariableType t : node.getTypeList()){
             printType(t);
             //t.accept(this);
         }
@@ -179,7 +179,7 @@ public class PrintVisitor implements NodeVisitor {
     }
 
 
-    public void printType(Type node) {
+    public void printType(VariableType node) {
         for(int i = 0; i < node.getNumBrackets(); i++) {
             printer.startList();
             printer.printAtom("[]");
