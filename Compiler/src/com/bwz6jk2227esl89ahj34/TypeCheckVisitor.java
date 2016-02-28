@@ -132,6 +132,10 @@ public class TypeCheckVisitor implements NodeVisitor {
             for (int i = 0; i < node.getVariables().size(); i++) {
                 Type leftType = node.getVariables().get(i).getType();
                 Type rightType = RHS.getVariableTypeList().get(i);
+
+                if (((VariableType) leftType).getPrimitiveType() == PrimitiveType.UNIT) {
+                    continue;
+                }
                 if (!leftType.equals(rightType)) {
                     throw new TypeException("TODO");
                 }
@@ -234,7 +238,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(FunctionDeclaration node) {
         // TODO: do we care about the other fields?
 
-        currentFunctionType = (FunctionType) node.getType();
+        currentFunctionType = node.getFunctionType();
         node.getMethodBlock().accept(this);
 
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
@@ -322,7 +326,7 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         // Shouldn't be needed if all children typecheck correctly
         for (FunctionDeclaration funcDec : node.getFuncDecs()) {
-            if (!funcDec.getType().equals(PrimitiveType.UNIT)) {
+            if (!funcDec.getType().equals(UNIT_TYPE)) {
                 throw new TypeException("TODO");
             }
         }
@@ -335,7 +339,12 @@ public class TypeCheckVisitor implements NodeVisitor {
         List<VariableType> functionReturnTypes = currentFunctionType
                                                  .getReturnTypeList()
                                                  .getVariableTypeList();
-        List<Expression> returnTypes = node.getValues();
+        List<Expression> returnExpressions = node.getValues();
+        List<VariableType> returnTypes = new ArrayList<>();
+        for (Expression expression : returnExpressions) {
+            expression.accept(this);
+            returnTypes.add((VariableType) expression.getType());
+        }
 
         // check if they are both the same size
         if (functionReturnTypes == null || functionReturnTypes.size() == 0) {
