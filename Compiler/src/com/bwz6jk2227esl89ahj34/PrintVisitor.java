@@ -1,4 +1,5 @@
-package com.AST;
+package com.bwz6jk2227esl89ahj34;
+import com.AST.*;
 import edu.cornell.cs.cs4120.util.*;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public class PrintVisitor implements NodeVisitor {
         this.printer = printer;
     }
 
-    public void visit(ArrayIndex node) {  
+    public void visit(ArrayIndex node) {
         printer.startList();
         printer.printAtom("[]");
         node.getArrayRef().accept(this);

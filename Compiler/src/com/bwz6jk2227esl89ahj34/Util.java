@@ -1,12 +1,15 @@
 package com.bwz6jk2227esl89ahj34;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import com.AST.Program;
+import com.AST.TypeException;
+import java_cup.runtime.Symbol;
+
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -128,5 +131,48 @@ public class Util {
         System.out.println(sExp2);
 
         return sExp1.equals(sExp2);
+    }
+
+    public static void typecheck(String sourcePath, String diagnosticPath, String[] files) {
+        try {
+            for (String file : files) {
+                if (!file.contains(".xi")) {
+                    System.out.println(file + "is not a .xi file. " +
+                            "This file will not be processed.");
+                    continue;
+                }
+
+                FileReader reader = new FileReader(sourcePath + file);
+                Lexer lexer = new Lexer(reader);
+                Parser parser = new Parser(lexer);
+
+                String output = file.replace(".xi", ".typed");
+                String writeFile = diagnosticPath + output;
+                Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
+
+                Symbol result = parser.parse();
+
+                if (parser.hasSyntaxError) {
+                    // handle syntax error, output to file
+                    parser.hasSyntaxError = false;
+                    Util.writeAndClose(writeFile, new
+                            ArrayList<String>(Arrays.asList(parser.syntaxErrMessage)));
+
+                    parser.syntaxErrMessage = "";
+                    continue;
+                }
+
+                NodeVisitor visitor = new TypeCheckVisitor();
+
+                try {
+                    ((Program)(result.value)).accept(visitor);
+                } catch (//TypeException
+                            Exception e) {
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

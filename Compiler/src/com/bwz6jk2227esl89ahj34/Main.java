@@ -28,6 +28,10 @@ public class Main {
                 "Parse the .xi source files to .parsed files.",
                 files -> Parser.parseFile(sourcePath, diagnosticPath, files),
                 0);
+        cli.addOption("--typecheck",
+                "Typecheck the .xi source files",
+                files -> Util.typecheck(sourcePath, diagnosticPath, files),
+                0);
         cli.execute(args);
     }
 

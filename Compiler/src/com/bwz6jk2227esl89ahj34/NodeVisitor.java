@@ -1,4 +1,6 @@
-package com.AST;
+package com.bwz6jk2227esl89ahj34;
+
+import com.AST.*;
 
 public interface NodeVisitor {
     void visit(ArrayIndex node);
