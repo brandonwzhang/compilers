@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34;
 
 import com.AST.*;
+
 import java.util.*;
 
 public class TypeCheckVisitor implements NodeVisitor {
@@ -63,18 +64,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(ArrayIndex node) {
         node.getArrayRef().accept(this);
         Type arrayType = node.getType();
-        if (arrayType instanceof VariableTypeList) {
-            List<VariableType> returnTypes = ((VariableTypeList)(arrayType)).getVariableTypeList();
-            if (returnTypes.size() != 1) {
-                throw new TypeException("TODO this isn't an array so we can't index");
-            } else {
-                VariableType array = returnTypes.get(0);
-                if(array.getNumBrackets() < 1) {
-                    throw new TypeException("TODO this isn't an array so we can't index");
-                }
-                node.setType(new VariableType(array.getPrimitiveType(), array.getNumBrackets()-1));
-            }
-        } else if (arrayType instanceof VariableType) {
+        if (arrayType instanceof VariableType) {
             VariableType array = (VariableType)(arrayType);
             if(array.getNumBrackets() < 1) {
                 throw new TypeException("TODO this isn't an array so we can't index");

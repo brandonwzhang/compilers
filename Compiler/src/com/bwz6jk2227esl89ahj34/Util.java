@@ -2,10 +2,12 @@ package com.bwz6jk2227esl89ahj34;
 
 import com.AST.PrimitiveType;
 import com.AST.Program;
-import com.AST.TypeException;
 import java_cup.runtime.Symbol;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;

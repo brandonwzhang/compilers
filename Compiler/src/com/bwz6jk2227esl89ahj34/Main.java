@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34;
-import java.io.*;
+
+import java.io.IOException;
 
 public class Main {
     private static String sourcePath = "./";
