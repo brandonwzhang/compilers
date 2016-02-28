@@ -18,4 +18,6 @@ public abstract class Node {
         this.row = symbol.left;
         this.col = symbol.right;
     }
+
+    public abstract void accept(NodeVisitor v);
 }
