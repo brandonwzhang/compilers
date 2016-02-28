@@ -12,8 +12,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class FunctionDeclaration {
     private Identifier identifier;
-    private List<AbstractMap.SimpleEntry<Identifier, Type>> argList;
-    private List<Type> typeList;
+    private List<AbstractMap.SimpleEntry<Identifier, VariableType>> argList;
+    private List<VariableType> typeList;
     private MethodBlock functionBlock;
 
     public void accept(NodeVisitor v){
