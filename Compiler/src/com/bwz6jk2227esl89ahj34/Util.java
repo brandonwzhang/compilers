@@ -161,7 +161,7 @@ public class Util {
                 if (parser.hasSyntaxError) {
                     // handle syntax error, output to file
                     parser.hasSyntaxError = false;
-                    Util.writeAndClose(writeFile, new
+                    Util.writeAndClose(writeFile.replace(".typed", "parsed"), new
                             ArrayList<String>(Arrays.asList(parser.syntaxErrMessage)));
 
                     parser.syntaxErrMessage = "";
@@ -173,12 +173,13 @@ public class Util {
                                              libPath);
                 // attempt typechecking
                 try {
+                    System.out.println();
                     System.out.println(output);
                     ((Program) result.value).accept(visitor);
                     System.out.println("typed");
                 } catch (TypeException e) {
                     System.out.println(e.getMessage());
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
         } catch (Exception e) {

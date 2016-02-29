@@ -38,6 +38,17 @@ public class Main {
                                         files),
                 0);
         cli.execute(args);
+
+        String[] passFileNames = {"mdarrays.xi"};
+        Util.typeCheck("typecheck/passtests/", "typecheck/passtests/",
+                libPath, passFileNames);
+
+        String[] failFileNames = {"invalid_assign.xi", "invalid_function.xi",
+                "invalid_multireturn.xi", "invalid_multireturn2.xi",
+                "invalid_operand.xi", "invalid_proccall.xi",
+                "invalid_type.xi", "invalid_underscore.xi"};
+        Util.typeCheck("typecheck/failtests/", "typecheck/failtests/",
+                libPath, failFileNames);
     }
 
     /**
@@ -68,7 +79,7 @@ public class Main {
      * Executes parseFile on a list of filenames. For debugging purposes only.
      * @throws IOException
      */
-    public static void testHarness() throws IOException {
+    public static void parseTestHarness() throws IOException {
         String[] testFileNames = new String[] {"arrayinit", "arrayinit2",
                 "ex1", "ex2", "gcd", "insertionsort", "mdarrays", "ratadd",
                 "ratadduse", "spec1", "spec2", "spec3" };
