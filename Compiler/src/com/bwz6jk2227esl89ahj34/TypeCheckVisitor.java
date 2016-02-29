@@ -64,9 +64,11 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(ArrayIndex node) {
         node.getArrayRef().accept(this);
         node.getIndex().accept(this);
+
         if (!node.getIndex().getType().equals(INT_TYPE)) {
             throw new TypeException("TODO index is not an integer");
         }
+
         Type type = node.getArrayRef().getType();
         if (type instanceof VariableType) {
             VariableType arrayType = (VariableType) type;
@@ -74,7 +76,8 @@ public class TypeCheckVisitor implements NodeVisitor {
                 throw new TypeException("TODO this isn't an array so we can't index");
             }
             node.setType(new VariableType(arrayType.getPrimitiveType(), arrayType.getNumBrackets() - 1));
-        } else { //arrayType instanceof FuncType
+
+        } else { //arrayType instanceof FuncType of VarTypeList
             throw new TypeException("TODO I don't think it should ever get here unless it's an error");
         }
     }
@@ -86,54 +89,64 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         // check all types equal to the first type
-        // TODO: enforce everything is a variable type?
-        Type type = null;
+        Type firstType = null;
         for (Expression e : node.getValues()) {
             e.accept(this);
-            if (type == null) {
-                type = e.getType();
-            } else if (!type.equals(e.getType())) {
-                throw new TypeException("TODO: types in arrayliteral don't match");
+            Type type = e.getType();
+            if (type instanceof VariableType) {
+                if (firstType == null) {
+                    firstType = type;
+                } else if (!firstType.equals(type)) {
+                    throw new TypeException("TODO: types in arrayliteral don't match");
+                }
+
+            } else {
+                throw new TypeException("TODO must be VariableType");
             }
         }
-        assert type != null;
+        assert firstType != null;
 
-        node.setType(new VariableType(((VariableType) type).getPrimitiveType(), 1));
+        VariableType type = (VariableType) firstType;
+        node.setType(new VariableType(type.getPrimitiveType(), 1));
     }
 
     public void visit(Assignment node) {
-        for (Assignable a : node.getVariables()) {
+        List<Assignable> variables = node.getVariables();
+        for (Assignable a : variables) {
             a.accept(this);
         }
-        List<Assignable> variables = node.getVariables();
         Expression expression = node.getExpression();
         expression.accept(this);
 
         // if LHS has more than one element, RHS must be VariableTypeList
-        if (variables.size() > 1 && !(expression.getType() instanceof VariableTypeList)) {
+        if (expression.getType() instanceof VariableTypeList) {
+            VariableTypeList rhs = (VariableTypeList) expression.getType();
+            if (variables.size() != rhs.getVariableTypeList().size()) {
+                throw new TypeException("TODO sizes don't match");
+            }
+
+            for (int i = 0; i < variables.size(); i++) {
+                Type leftType = variables.get(i).getType();
+                Type rightType = rhs.getVariableTypeList().get(i);
+
+                if (!(leftType instanceof VariableType)) {
+                    throw new TypeException("lhs variables must be VariableType");
+                }
+
+                if (!leftType.equals(UNIT_TYPE) && !leftType.equals(rightType)) {
+                    throw new TypeException("TODO type mismatch");
+                }
+            }
+
+        } else if (expression.getType() instanceof FunctionType) {
+            throw new TypeException("TODO cannot be FunctionType");
+
+        } else if (variables.size() > 1) {
             throw new TypeException("TODO sizes don't match");
 
         } else if (variables.size() == 1) {
             if (!variables.get(0).getType().equals(expression.getType())) {
                 throw new TypeException("TODO type mismatch");
-            }
-
-        } else {
-            // TODO: multiple assign on left
-            VariableTypeList rhs = (VariableTypeList) expression.getType();
-            if (node.getVariables().size() != rhs.getVariableTypeList().size()) {
-                throw new TypeException("TODO sizes don't match");
-            }
-            for (int i = 0; i < variables.size(); i++) {
-                Type leftType = variables.get(i).getType();
-                Type rightType = rhs.getVariableTypeList().get(i);
-
-                if (((VariableType) leftType).getPrimitiveType() == PrimitiveType.UNIT) {
-                    continue;
-                }
-                if (!leftType.equals(rightType)) {
-                    throw new TypeException("TODO type mismatch");
-                }
             }
         }
 
@@ -141,14 +154,18 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(Binary node) {
-        node.getLeft().accept(this);
-        node.getRight().accept(this);
-        if (!node.getLeft().getType().equals(node.getRight().getType())) {
-            throw new TypeException("TODO invalid binary operator");
+        Expression left = node.getLeft();
+        Expression right = node.getRight();
+        left.accept(this);
+        right.accept(this);
+
+        if (!left.getType().equals(right.getType())) {
+            throw new TypeException("TODO left and right types don't match");
+
         } else {
             BinaryOperator binop = node.getOp();
-            boolean isInteger = node.getLeft().getType().equals(INT_TYPE);
-            boolean isBool = node.getLeft().getType().equals(BOOL_TYPE);
+            boolean isInteger = left.getType().equals(INT_TYPE);
+            boolean isBool = left.getType().equals(BOOL_TYPE);
 
             boolean valid_int_binary_operator_int = INT_BINARY_OPERATOR_INT.contains(binop) && isInteger;
             boolean valid_int_binary_operator_bool = INT_BINARY_OPERATOR_BOOL.contains(binop) && isInteger;
@@ -163,8 +180,15 @@ public class TypeCheckVisitor implements NodeVisitor {
             } else if (ARRAY_BINARY_OPERATOR_BOOL.contains(binop) && !isBool && !isInteger) {
                 node.setType(new VariableType(PrimitiveType.BOOL, 0));
             } else if (binop.equals(BinaryOperator.PLUS) && !isBool && !isInteger) {
-                VariableType leftType = (VariableType) node.getLeft().getType();
-                node.setType(new VariableType(leftType.getPrimitiveType(), leftType.getNumBrackets()));
+
+                if (left.getType() instanceof VariableType) {
+                    VariableType leftType = (VariableType) left.getType();
+                    node.setType(new VariableType(leftType.getPrimitiveType(), leftType.getNumBrackets()));
+
+                } else {
+                    throw new TypeException("must be VariableType");
+                }
+
             } else {
                 throw new TypeException("TODO invalid binary operator");
             }
@@ -222,16 +246,20 @@ public class TypeCheckVisitor implements NodeVisitor {
         List<VariableType> argumentTypes = new ArrayList<>();
         for (Expression argument : node.getArguments()) {
             argument.accept(this);
-            if (!(argument.getType() instanceof VariableType)) {
+
+            if (argument.getType() instanceof VariableType) {
+                VariableType argType = (VariableType) argument.getType();
+                argumentTypes.add(argType);
+            } else {
                 throw new TypeException("TODO: argument is not VariableType");
             }
-            argumentTypes.add((VariableType) argument.getType());
         }
 
         Type type = context.get(node.getIdentifier());
         if (!(type instanceof FunctionType)) {
             throw new TypeException("TODO: this identifier doesn't point to a function");
         }
+
         FunctionType thisFuncType = (FunctionType) type;
         FunctionType funcType = new FunctionType(argumentTypes, thisFuncType.getReturnTypeList());
         if (!thisFuncType.equals(funcType)) {
@@ -275,13 +303,17 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (!guard.getType().equals(BOOL_TYPE)) {
             throw new TypeException("TODO: guard not a bool");
         }
-        node.getTrueBlock().accept(this);
 
-        if (node.getFalseBlock().isPresent()) {
-            node.getFalseBlock().get().accept(this);
-            PrimitiveType r1 = ((VariableType) node.getTrueBlock().getType()).getPrimitiveType();
-            PrimitiveType r2 = ((VariableType) node.getFalseBlock().get().getType()).getPrimitiveType();
+        Block trueBlock = node.getTrueBlock();
+        trueBlock.accept(this);
+
+        Optional<Block> falseBlock = node.getFalseBlock();
+        if (falseBlock.isPresent()) {
+            falseBlock.get().accept(this);
+            PrimitiveType r1 = ((VariableType) trueBlock.getType()).getPrimitiveType();
+            PrimitiveType r2 = ((VariableType) falseBlock.get().getType()).getPrimitiveType();
             node.setType(new VariableType(Util.lub(r1,r2), 0));
+
         } else {
             node.setType(new VariableType(PrimitiveType.UNIT, 0));
         }
@@ -301,19 +333,25 @@ public class TypeCheckVisitor implements NodeVisitor {
 
     public void visit(ProcedureCall node) {
         Context context = contexts.peek();
-        if (!context.containsKey(node.getIdentifier())) {
+        Identifier id = node.getIdentifier();
+        if (!context.containsKey(id)) {
             throw new TypeException("TODO: procedure not defined");
         }
 
-        // variabletype casting again
         List<VariableType> argumentTypes = new ArrayList<>();
         for (Expression argument : node.getArguments()) {
             argument.accept(this);
-            argumentTypes.add((VariableType) argument.getType());
+
+            if (argument.getType() instanceof VariableType) {
+                VariableType argType = (VariableType) argument.getType();
+                argumentTypes.add(argType);
+            } else {
+                throw new TypeException("TODO: argument is not VariableType");
+            }
         }
 
         FunctionType funcType = new FunctionType(argumentTypes, new VariableTypeList(new ArrayList<>()));
-        if (!funcType.equals(context.get(node.getIdentifier()))) {
+        if (!funcType.equals(context.get(id))) {
             throw new TypeException("TODO: argument types do not match with procedure definition");
         }
 
@@ -351,10 +389,13 @@ public class TypeCheckVisitor implements NodeVisitor {
         List<VariableType> returnTypes = new ArrayList<>();
         for (Expression expression : returnExpressions) {
             expression.accept(this);
-            if (!(expression.getType() instanceof VariableType)) {
+
+            if (expression.getType() instanceof VariableType) {
+                VariableType type = (VariableType) expression.getType();
+                returnTypes.add(type);
+            } else {
                 throw new TypeException("TODO must be VariableType");
             }
-            returnTypes.add((VariableType) expression.getType());
         }
 
         if (functionReturnTypes.size() == 0 && returnTypes.size() != 0) {
@@ -385,17 +426,22 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (context.containsKey(identifier)) {
             throw new TypeException("TODO: cannot shadow variables");
         }
+
         context.put(identifier, node.getDeclarationType());
         node.setType(node.getDeclarationType());
     }
 
     public void visit(Unary node) {
-        node.getExpression().accept(this);
+        Expression expression = node.getExpression();
+        expression.accept(this);
+
         UnaryOperator unop = node.getOp();
-        if (node.getExpression().getType().equals(INT_TYPE) && unop == UnaryOperator.MINUS) {
+        if (expression.getType().equals(INT_TYPE) && unop == UnaryOperator.MINUS) {
             node.setType(new VariableType(PrimitiveType.INT, 0));
-        } else if (node.getExpression().getType().equals(BOOL_TYPE) && unop == UnaryOperator.NOT) {
+
+        } else if (expression.getType().equals(BOOL_TYPE) && unop == UnaryOperator.NOT) {
             node.setType(new VariableType(PrimitiveType.BOOL, 0));
+
         } else {
             throw new TypeException("TODO invalid unary operator");
         }
@@ -425,13 +471,16 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(WhileStatement node) {
-        node.getGuard().accept(this);
-        if (!node.getGuard().getType().equals(BOOL_TYPE)) {
+        Expression guard = node.getGuard();
+        guard.accept(this);
+        if (!guard.getType().equals(BOOL_TYPE)) {
             throw new TypeException("TODO");
         }
-        node.getBlock().accept(this);
 
-        if (!node.getBlock().getType().equals(UNIT_TYPE) || !node.getBlock().getType().equals(VOID_TYPE)) {
+        Block block = node.getBlock();
+        block.accept(this);
+
+        if (!block.getType().equals(UNIT_TYPE) || !block.getType().equals(VOID_TYPE)) {
             throw new TypeException("TODO"); //debug
         }
 
