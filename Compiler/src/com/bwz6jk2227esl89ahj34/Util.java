@@ -136,17 +136,6 @@ public class Util {
         return sExp1.equals(sExp2);
     }
 
-    public static PrimitiveType lub(PrimitiveType one, PrimitiveType two) {
-        assert one == PrimitiveType.UNIT || one == PrimitiveType.VOID;
-        assert two == PrimitiveType.UNIT || two == PrimitiveType.VOID;
-
-        if (one == PrimitiveType.UNIT || two == PrimitiveType.UNIT) {
-            return PrimitiveType.UNIT;
-        } else {
-            return PrimitiveType.VOID;
-        }
-    }
-
     public static void typeCheck(String sourcePath,
                                  String diagnosticPath,
                                  String libPath,

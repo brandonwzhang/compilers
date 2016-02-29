@@ -13,6 +13,7 @@ public class TypeCheckVisitor implements NodeVisitor {
 
     // Context field
     private Stack<Context> contexts;
+
     // AST field (that we build up as we visit) TODO
 
     // Local variable that stores current function in scope with a stack, used for return statements
@@ -312,7 +313,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             falseBlock.get().accept(this);
             PrimitiveType r1 = ((VariableType) trueBlock.getType()).getPrimitiveType();
             PrimitiveType r2 = ((VariableType) falseBlock.get().getType()).getPrimitiveType();
-            node.setType(new VariableType(Util.lub(r1,r2), 0));
+            node.setType(new VariableType(lub(r1,r2), 0));
 
         } else {
             node.setType(new VariableType(PrimitiveType.UNIT, 0));
@@ -519,5 +520,16 @@ public class TypeCheckVisitor implements NodeVisitor {
             }
         }
         return error;
+    }
+
+    public PrimitiveType lub(PrimitiveType one, PrimitiveType two) {
+        assert one == PrimitiveType.UNIT || one == PrimitiveType.VOID;
+        assert two == PrimitiveType.UNIT || two == PrimitiveType.VOID;
+
+        if (one == PrimitiveType.UNIT || two == PrimitiveType.UNIT) {
+            return PrimitiveType.UNIT;
+        } else {
+            return PrimitiveType.VOID;
+        }
     }
 }
