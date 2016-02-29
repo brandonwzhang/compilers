@@ -307,8 +307,6 @@ class Lexer implements java_cup.runtime.Scanner {
   public static void lexFile(String sourcePath,
                              String diagnosticPath,
                              String[] files) {
-    System.out.println();
-    System.out.println("Lexing " + files.length + " file(s).");
     try {
       for (String file : files) {
         if (!file.contains(".xi")) {
@@ -316,7 +314,6 @@ class Lexer implements java_cup.runtime.Scanner {
                   "is not a .xi file. This file will not be lexed.");
           continue;
         }
-        System.out.println("Lexing " + sourcePath + file);
         ArrayList<String> lines = new ArrayList<>();
         FileReader reader = new FileReader(sourcePath + file);
         Lexer lexer = new Lexer(reader);
@@ -338,7 +335,6 @@ class Lexer implements java_cup.runtime.Scanner {
         String output = file.replace(".xi", ".lexed");
         String writeFile = diagnosticPath + output;
         Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
-        System.out.println("Writing " + writeFile);
         Util.writeAndClose(writeFile, lines);
       }
     } catch(Exception e) {

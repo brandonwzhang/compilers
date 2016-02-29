@@ -74,7 +74,6 @@ public class CLI {
                 optionArgsMap.put(optionName, optionArgs);
             } else {
                 files.add(args[i]);
-                System.out.println(args[i]);
             }
         }
 
@@ -119,7 +118,7 @@ public class CLI {
                           Option.Action action,
                           int nArgs) {
         if (optionName.charAt(0) != '-') {
-            System.out.println("The option name must begin with '0'." +
+            System.out.println("The option name must begin with '-'." +
                     "This option will not be added.");
             return;
         }

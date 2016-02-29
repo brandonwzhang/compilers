@@ -174,10 +174,9 @@ public class Util {
 
                 try {
                     System.out.println(output);
-                    ((Program)(result.value)).accept(visitor);
+                    ((Program) result.value).accept(visitor);
                     System.out.println("typed");
-                } catch (//TypeException
-                            Exception e) {
+                } catch (TypeException e) {
                     e.printStackTrace();
                 }
             }

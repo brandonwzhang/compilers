@@ -20,8 +20,6 @@ import java.io.PrintWriter;
   public static void lexFile(String sourcePath,
                              String diagnosticPath,
                              String[] files) {
-    System.out.println();
-    System.out.println("Lexing " + files.length + " file(s).");
     try {
       for (String file : files) {
         if (!file.contains(".xi")) {
@@ -29,7 +27,6 @@ import java.io.PrintWriter;
                   "is not a .xi file. This file will not be lexed.");
           continue;
         }
-        System.out.println("Lexing " + sourcePath + file);
         ArrayList<String> lines = new ArrayList<>();
         FileReader reader = new FileReader(sourcePath + file);
         Lexer lexer = new Lexer(reader);
@@ -51,7 +48,6 @@ import java.io.PrintWriter;
         String output = file.replace(".xi", ".lexed");
         String writeFile = diagnosticPath + output;
         Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
-        System.out.println("Writing " + writeFile);
         Util.writeAndClose(writeFile, lines);
       }
     } catch(Exception e) {
