@@ -253,57 +253,57 @@ assignment_lhs_array ::= function_call:fc {: RESULT = fc; RESULT.setLocation(par
                        ;
 
 
-assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); :}
-                 | assignment_lhs_array_brackets:a {: RESULT = a; :}
-                 | typed_declaration:td {: RESULT = td; :}
-                 | function_call:fc {: RESULT = fc; :}
-                 | UNDERSCORE {: RESULT = new Underscore(); :}
+assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); RESULT.setLocation(parser.cur_token); :}
+                 | assignment_lhs_array_brackets:a {: RESULT = a; RESULT.setLocation(parser.cur_token); :}
+                 | typed_declaration:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
+                 | function_call:fc {: RESULT = fc; RESULT.setLocation(parser.cur_token); :}
+                 | UNDERSCORE {: RESULT = new Underscore(); RESULT.setLocation(parser.cur_token); :}
                  ;
 
-declaration_assignment_lhs ::= typed_declaration:td {: RESULT = td; :}
-                             | UNDERSCORE {: RESULT = new Underscore(); :}
+declaration_assignment_lhs ::= typed_declaration:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
+                             | UNDERSCORE {: RESULT = new Underscore(); RESULT.setLocation(parser.cur_token); :}
                              ;
 multiple_assignment_lhs ::= declaration_assignment_lhs:dl COMMA multiple_assignment_lhs:dll {: dll.add(0, dl); RESULT = dll; :}
                           | declaration_assignment_lhs:dl1 COMMA declaration_assignment_lhs:dl2 {: LinkedList<Assignable> lst = new LinkedList<Assignable>(Arrays.asList(dl2)); lst.add(0, dl1); RESULT = lst; :}
                           ;
 
-assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); RESULT = new Assignment(lst, e); :}// x = expression
-             | multiple_assignment_lhs:all GETS function_call:fc {: RESULT = new Assignment(all, fc); :}
+assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); RESULT = new Assignment(lst, e); RESULT.setLocation(parser.cur_token); :}// x = expression
+             | multiple_assignment_lhs:all GETS function_call:fc {: RESULT = new Assignment(all, fc); RESULT.setLocation(parser.cur_token); :}
              ;
 
-if_statement ::= IF OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new IfStatement(e, b, Optional.empty()); :}
-               | IF OPEN_PAREN expression:e CLOSE_PAREN block:b1 ELSE block:b2 {: RESULT = new IfStatement(e, b1, Optional.of(b2)); :}
+if_statement ::= IF OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new IfStatement(e, b, Optional.empty()); RESULT.setLocation(parser.cur_token); :}
+               | IF OPEN_PAREN expression:e CLOSE_PAREN block:b1 ELSE block:b2 {: RESULT = new IfStatement(e, b1, Optional.of(b2)); RESULT.setLocation(parser.cur_token); :}
                ;
 
-while_statement ::= WHILE OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new WhileStatement(e,b); :}
+while_statement ::= WHILE OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new WhileStatement(e,b); RESULT.setLocation(parser.cur_token); :}
                   ;
 
-return_statement ::= RETURN expression_list:lst {: RESULT = new ReturnStatement(lst); :}
+return_statement ::= RETURN expression_list:lst {: RESULT = new ReturnStatement(lst); RESULT.setLocation(parser.cur_token); :}
                    ;
 
-statement_no_semicolon ::= if_statement:s {: RESULT = s; :} 
-                         | while_statement:s {: RESULT = s; :}
-                         | procedure_call:pc {: RESULT = pc; :}
-                         | typed_declaration:td {: RESULT = td; :}
-                         | assignment:a {: RESULT = a; :}
+statement_no_semicolon ::= if_statement:s {: RESULT = s; RESULT.setLocation(parser.cur_token); :} 
+                         | while_statement:s {: RESULT = s; RESULT.setLocation(parser.cur_token); :}
+                         | procedure_call:pc {: RESULT = pc; RESULT.setLocation(parser.cur_token); :}
+                         | typed_declaration:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
+                         | assignment:a {: RESULT = a; RESULT.setLocation(parser.cur_token); :}
                          ; 
 
 //this should be okay since semicolon doesn't actually matter
-statement ::= statement_no_semicolon:s {: RESULT = s; :} 
-            | statement_no_semicolon:s SEMICOLON {: RESULT = s; :} 
+statement ::= statement_no_semicolon:s {: RESULT = s; RESULT.setLocation(parser.cur_token); :} 
+            | statement_no_semicolon:s SEMICOLON {: RESULT = s; RESULT.setLocation(parser.cur_token); :} 
             ;
 
-function_block ::= OPEN_BRACE block_list:bl return_statement:r CLOSE_BRACE {: RESULT = new FunctionBlock(bl, r); :}
-                 | OPEN_BRACE block_list:bl return_statement:r SEMICOLON CLOSE_BRACE {: RESULT = new FunctionBlock(bl,r); :}
+function_block ::= OPEN_BRACE block_list:bl return_statement:r CLOSE_BRACE {: RESULT = new FunctionBlock(bl, r); RESULT.setLocation(parser.cur_token); :}
+                 | OPEN_BRACE block_list:bl return_statement:r SEMICOLON CLOSE_BRACE {: RESULT = new FunctionBlock(bl,r); RESULT.setLocation(parser.cur_token); :}
                  ;
 
-block ::= OPEN_BRACE block_list:bl CLOSE_BRACE  {: RESULT = bl; :}
-        | function_block:fb {: RESULT = fb; :}
-        | statement:s {: RESULT = s; :}
+block ::= OPEN_BRACE block_list:bl CLOSE_BRACE  {: RESULT = bl; RESULT.setLocation(parser.cur_token); :}
+        | function_block:fb {: RESULT = fb; RESULT.setLocation(parser.cur_token); :}
+        | statement:s {: RESULT = s; RESULT.setLocation(parser.cur_token); :}
         ;
 
-block_list ::= block:b block_list:bl {: bl.getBlockList().add(0, b); RESULT = bl; :}
-             | empty  {: RESULT = new BlockList(new LinkedList<Block>()); :}
+block_list ::= block:b block_list:bl {: bl.getBlockList().add(0, b); RESULT = bl; RESULT.setLocation(parser.cur_token); :}
+             | empty  {: RESULT = new BlockList(new LinkedList<Block>()); RESULT.setLocation(parser.cur_token); :}
              ;
 
 function_declaration_return_types ::= var_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :} 
@@ -321,28 +321,28 @@ function_declaration_argument ::= function_declaration_argument_list:lst {: RESU
                                 | empty {: RESULT = new LinkedList<>(); :}
                                 ;
                 
-function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t function_block:fb {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, fb); :}
-                       | IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN procedure_block:fb {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, fb); :}
+function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t function_block:fb {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, fb); RESULT.setLocation(parser.cur_token); :}
+                       | IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN procedure_block:fb {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, fb); RESULT.setLocation(parser.cur_token); :}
                        ;
 
 function_declaration_list ::= function_declaration:fd function_declaration_list:lst {: lst.add(0, fd); RESULT = lst; :}
                             | empty {: RESULT = new LinkedList<FunctionDeclaration>(); :}
                             ;
                 
-procedure_block ::=  OPEN_BRACE block_list:b CLOSE_BRACE {: RESULT = new ProcedureBlock(b); :}
-                  | OPEN_BRACE block_list:b RETURN CLOSE_BRACE {: RESULT = new ProcedureBlock(b); :}
-                  | OPEN_BRACE block_list:b RETURN SEMICOLON CLOSE_BRACE {: RESULT = new ProcedureBlock(b); :}
+procedure_block ::=  OPEN_BRACE block_list:b CLOSE_BRACE {: RESULT = new ProcedureBlock(b); RESULT.setLocation(parser.cur_token); :}
+                  | OPEN_BRACE block_list:b RETURN CLOSE_BRACE {: RESULT = new ProcedureBlock(b); RESULT.setLocation(parser.cur_token); :}
+                  | OPEN_BRACE block_list:b RETURN SEMICOLON CLOSE_BRACE {: RESULT = new ProcedureBlock(b); RESULT.setLocation(parser.cur_token); :}
                   ;
                  
-procedure_call ::= IDENTIFIER:id OPEN_PAREN expression_list:elist CLOSE_PAREN {: RESULT = new ProcedureCall(new Identifier(id), elist); :} //f(x,y,z,...) 
-                 | IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new ProcedureCall(new Identifier(id), new LinkedList<Expression>()); :}// f()
+procedure_call ::= IDENTIFIER:id OPEN_PAREN expression_list:elist CLOSE_PAREN {: RESULT = new ProcedureCall(new Identifier(id), elist); RESULT.setLocation(parser.cur_token); :} //f(x,y,z,...) 
+                 | IDENTIFIER:id OPEN_PAREN CLOSE_PAREN {: RESULT = new ProcedureCall(new Identifier(id), new LinkedList<Expression>()); RESULT.setLocation(parser.cur_token); :}// f()
                  ;
 
-use_block ::= USE IDENTIFIER:id use_block:u {: u.add(0, new UseStatement(new Identifier(id))); RESULT = u; :} 
+use_block ::= USE IDENTIFIER:id use_block:u {: u.add(0, new UseStatement(new Identifier(id))); RESULT = u; RESULT.get(0).setLocation(parser.cur_token); :} 
             | empty   {: RESULT = new LinkedList<UseStatement>(); :}
             ;
       
 
-program ::= use_block:u function_declaration_list:l   {: RESULT = new Program(u,l); :}
+program ::= use_block:u function_declaration_list:l   {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
           | error
           ; 
