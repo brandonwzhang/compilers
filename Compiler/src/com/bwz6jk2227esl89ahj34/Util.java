@@ -171,12 +171,13 @@ public class Util {
                 NodeVisitor visitor =
                         new TypeCheckVisitor(file.replace(".xi", ""),
                                              libPath);
-
+                // attempt typechecking
                 try {
                     System.out.println(output);
                     ((Program) result.value).accept(visitor);
                     System.out.println("typed");
                 } catch (TypeException e) {
+                    System.out.println(e.getMessage());
                     e.printStackTrace();
                 }
             }

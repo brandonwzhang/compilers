@@ -8,12 +8,11 @@ package com.bwz6jk2227esl89ahj34;
 import com.AST.*;
 import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
+import java.util.AbstractMap.*;
 
 /** CUP v0.11b 20150326 generated parser.
   */
@@ -1487,7 +1486,7 @@ class CUP$Parser$actions {
                 int idleft = CUP$Parser$stack.peek().left;
                 int idright = CUP$Parser$stack.peek().right;
                 String id = CUP$Parser$stack.peek().<String> value();
-                 RESULT = new Identifier(id); 
+                 RESULT = new Identifier(id); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs",25, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1499,7 +1498,7 @@ class CUP$Parser$actions {
                 int aleft = CUP$Parser$stack.peek().left;
                 int aright = CUP$Parser$stack.peek().right;
                 ArrayIndex a = CUP$Parser$stack.peek().<ArrayIndex> value();
-                 RESULT = a; 
+                 RESULT = a; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs",25, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1511,7 +1510,7 @@ class CUP$Parser$actions {
                 int tdleft = CUP$Parser$stack.peek().left;
                 int tdright = CUP$Parser$stack.peek().right;
                 TypedDeclaration td = CUP$Parser$stack.peek().<TypedDeclaration> value();
-                 RESULT = td; 
+                 RESULT = td; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs",25, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1523,7 +1522,7 @@ class CUP$Parser$actions {
                 int fcleft = CUP$Parser$stack.peek().left;
                 int fcright = CUP$Parser$stack.peek().right;
                 FunctionCall fc = CUP$Parser$stack.peek().<FunctionCall> value();
-                 RESULT = fc; 
+                 RESULT = fc; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs",25, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1532,7 +1531,7 @@ class CUP$Parser$actions {
         case 64: // assignment_lhs ::= UNDERSCORE 
             {
                 Assignable RESULT = null;
-                 RESULT = new Underscore(); 
+                 RESULT = new Underscore(); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs",25, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1544,7 +1543,7 @@ class CUP$Parser$actions {
                 int tdleft = CUP$Parser$stack.peek().left;
                 int tdright = CUP$Parser$stack.peek().right;
                 TypedDeclaration td = CUP$Parser$stack.peek().<TypedDeclaration> value();
-                 RESULT = td; 
+                 RESULT = td; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("declaration_assignment_lhs",26, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1553,7 +1552,7 @@ class CUP$Parser$actions {
         case 66: // declaration_assignment_lhs ::= UNDERSCORE 
             {
                 Assignable RESULT = null;
-                 RESULT = new Underscore(); 
+                 RESULT = new Underscore(); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("declaration_assignment_lhs",26, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1598,7 +1597,7 @@ class CUP$Parser$actions {
                 int eleft = CUP$Parser$stack.peek().left;
                 int eright = CUP$Parser$stack.peek().right;
                 Expression e = CUP$Parser$stack.peek().<Expression> value();
-                 List<Assignable> lst = new LinkedList<>(); lst.add(0, al); RESULT = new Assignment(lst, e); 
+                 List<Assignable> lst = new LinkedList<>(); lst.add(0, al); RESULT = new Assignment(lst, e); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment",28, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1613,7 +1612,7 @@ class CUP$Parser$actions {
                 int fcleft = CUP$Parser$stack.peek().left;
                 int fcright = CUP$Parser$stack.peek().right;
                 FunctionCall fc = CUP$Parser$stack.peek().<FunctionCall> value();
-                 RESULT = new Assignment(all, fc); 
+                 RESULT = new Assignment(all, fc); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment",28, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1628,7 +1627,7 @@ class CUP$Parser$actions {
                 int bleft = CUP$Parser$stack.peek().left;
                 int bright = CUP$Parser$stack.peek().right;
                 Block b = CUP$Parser$stack.peek().<Block> value();
-                 RESULT = new IfStatement(e, b, Optional.empty()); 
+                 RESULT = new IfStatement(e, b, Optional.empty()); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("if_statement",29, CUP$Parser$stack.elementAt(CUP$Parser$top-4), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1646,7 +1645,7 @@ class CUP$Parser$actions {
                 int b2left = CUP$Parser$stack.peek().left;
                 int b2right = CUP$Parser$stack.peek().right;
                 Block b2 = CUP$Parser$stack.peek().<Block> value();
-                 RESULT = new IfStatement(e, b1, Optional.of(b2)); 
+                 RESULT = new IfStatement(e, b1, Optional.of(b2)); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("if_statement",29, CUP$Parser$stack.elementAt(CUP$Parser$top-6), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1661,7 +1660,7 @@ class CUP$Parser$actions {
                 int bleft = CUP$Parser$stack.peek().left;
                 int bright = CUP$Parser$stack.peek().right;
                 Block b = CUP$Parser$stack.peek().<Block> value();
-                 RESULT = new WhileStatement(e,b); 
+                 RESULT = new WhileStatement(e,b); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("while_statement",30, CUP$Parser$stack.elementAt(CUP$Parser$top-4), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1673,7 +1672,7 @@ class CUP$Parser$actions {
                 int lstleft = CUP$Parser$stack.peek().left;
                 int lstright = CUP$Parser$stack.peek().right;
                 List<Expression> lst = CUP$Parser$stack.peek().<List<Expression>> value();
-                 RESULT = new ReturnStatement(lst); 
+                 RESULT = new ReturnStatement(lst); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("return_statement",31, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1685,7 +1684,7 @@ class CUP$Parser$actions {
                 int sleft = CUP$Parser$stack.peek().left;
                 int sright = CUP$Parser$stack.peek().right;
                 IfStatement s = CUP$Parser$stack.peek().<IfStatement> value();
-                 RESULT = s; 
+                 RESULT = s; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",35, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1697,7 +1696,7 @@ class CUP$Parser$actions {
                 int sleft = CUP$Parser$stack.peek().left;
                 int sright = CUP$Parser$stack.peek().right;
                 WhileStatement s = CUP$Parser$stack.peek().<WhileStatement> value();
-                 RESULT = s; 
+                 RESULT = s; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",35, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1709,7 +1708,7 @@ class CUP$Parser$actions {
                 int pcleft = CUP$Parser$stack.peek().left;
                 int pcright = CUP$Parser$stack.peek().right;
                 ProcedureCall pc = CUP$Parser$stack.peek().<ProcedureCall> value();
-                 RESULT = pc; 
+                 RESULT = pc; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",35, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1721,7 +1720,7 @@ class CUP$Parser$actions {
                 int tdleft = CUP$Parser$stack.peek().left;
                 int tdright = CUP$Parser$stack.peek().right;
                 TypedDeclaration td = CUP$Parser$stack.peek().<TypedDeclaration> value();
-                 RESULT = td; 
+                 RESULT = td; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",35, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1733,7 +1732,7 @@ class CUP$Parser$actions {
                 int aleft = CUP$Parser$stack.peek().left;
                 int aright = CUP$Parser$stack.peek().right;
                 Assignment a = CUP$Parser$stack.peek().<Assignment> value();
-                 RESULT = a; 
+                 RESULT = a; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",35, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1745,7 +1744,7 @@ class CUP$Parser$actions {
                 int sleft = CUP$Parser$stack.peek().left;
                 int sright = CUP$Parser$stack.peek().right;
                 Statement s = CUP$Parser$stack.peek().<Statement> value();
-                 RESULT = s; 
+                 RESULT = s; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement",34, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1757,7 +1756,7 @@ class CUP$Parser$actions {
                 int sleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
                 int sright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
                 Statement s = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<Statement> value();
-                 RESULT = s; 
+                 RESULT = s; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement",34, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1772,7 +1771,7 @@ class CUP$Parser$actions {
                 int rleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
                 int rright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
                 ReturnStatement r = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<ReturnStatement> value();
-                 RESULT = new FunctionBlock(bl, r); 
+                 RESULT = new FunctionBlock(bl, r); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_block",42, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1787,7 +1786,7 @@ class CUP$Parser$actions {
                 int rleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
                 int rright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
                 ReturnStatement r = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<ReturnStatement> value();
-                 RESULT = new FunctionBlock(bl,r); 
+                 RESULT = new FunctionBlock(bl,r); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_block",42, CUP$Parser$stack.elementAt(CUP$Parser$top-4), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1799,7 +1798,7 @@ class CUP$Parser$actions {
                 int blleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
                 int blright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
                 BlockList bl = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<BlockList> value();
-                 RESULT = bl; 
+                 RESULT = bl; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("block",32, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1811,7 +1810,7 @@ class CUP$Parser$actions {
                 int fbleft = CUP$Parser$stack.peek().left;
                 int fbright = CUP$Parser$stack.peek().right;
                 FunctionBlock fb = CUP$Parser$stack.peek().<FunctionBlock> value();
-                 RESULT = fb; 
+                 RESULT = fb; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("block",32, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1823,7 +1822,7 @@ class CUP$Parser$actions {
                 int sleft = CUP$Parser$stack.peek().left;
                 int sright = CUP$Parser$stack.peek().right;
                 Statement s = CUP$Parser$stack.peek().<Statement> value();
-                 RESULT = s; 
+                 RESULT = s; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("block",32, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1838,7 +1837,7 @@ class CUP$Parser$actions {
                 int blleft = CUP$Parser$stack.peek().left;
                 int blright = CUP$Parser$stack.peek().right;
                 BlockList bl = CUP$Parser$stack.peek().<BlockList> value();
-                 bl.getBlockList().add(0, b); RESULT = bl; 
+                 bl.getBlockList().add(0, b); RESULT = bl; RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("block_list",33, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1847,7 +1846,7 @@ class CUP$Parser$actions {
         case 88: // block_list ::= empty 
             {
                 BlockList RESULT = null;
-                 RESULT = new BlockList(new LinkedList<Block>()); 
+                 RESULT = new BlockList(new LinkedList<Block>()); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("block_list",33, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1958,7 +1957,7 @@ class CUP$Parser$actions {
                 int fbleft = CUP$Parser$stack.peek().left;
                 int fbright = CUP$Parser$stack.peek().right;
                 FunctionBlock fb = CUP$Parser$stack.peek().<FunctionBlock> value();
-                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, fb); 
+                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, fb); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration",40, CUP$Parser$stack.elementAt(CUP$Parser$top-6), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1976,7 +1975,7 @@ class CUP$Parser$actions {
                 int fbleft = CUP$Parser$stack.peek().left;
                 int fbright = CUP$Parser$stack.peek().right;
                 ProcedureBlock fb = CUP$Parser$stack.peek().<ProcedureBlock> value();
-                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, fb); 
+                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, fb); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration",40, CUP$Parser$stack.elementAt(CUP$Parser$top-4), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2012,7 +2011,7 @@ class CUP$Parser$actions {
                 int bleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
                 int bright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
                 BlockList b = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<BlockList> value();
-                 RESULT = new ProcedureBlock(b); 
+                 RESULT = new ProcedureBlock(b); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("procedure_block",43, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2024,7 +2023,7 @@ class CUP$Parser$actions {
                 int bleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
                 int bright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
                 BlockList b = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<BlockList> value();
-                 RESULT = new ProcedureBlock(b); 
+                 RESULT = new ProcedureBlock(b); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("procedure_block",43, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2036,7 +2035,7 @@ class CUP$Parser$actions {
                 int bleft = CUP$Parser$stack.elementAt(CUP$Parser$top-3).left;
                 int bright = CUP$Parser$stack.elementAt(CUP$Parser$top-3).right;
                 BlockList b = CUP$Parser$stack.elementAt(CUP$Parser$top-3).<BlockList> value();
-                 RESULT = new ProcedureBlock(b); 
+                 RESULT = new ProcedureBlock(b); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("procedure_block",43, CUP$Parser$stack.elementAt(CUP$Parser$top-4), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2051,7 +2050,7 @@ class CUP$Parser$actions {
                 int elistleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
                 int elistright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
                 List<Expression> elist = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<List<Expression>> value();
-                 RESULT = new ProcedureCall(new Identifier(id), elist); 
+                 RESULT = new ProcedureCall(new Identifier(id), elist); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("procedure_call",44, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2063,7 +2062,7 @@ class CUP$Parser$actions {
                 int idleft = CUP$Parser$stack.elementAt(CUP$Parser$top-2).left;
                 int idright = CUP$Parser$stack.elementAt(CUP$Parser$top-2).right;
                 String id = CUP$Parser$stack.elementAt(CUP$Parser$top-2).<String> value();
-                 RESULT = new ProcedureCall(new Identifier(id), new LinkedList<Expression>()); 
+                 RESULT = new ProcedureCall(new Identifier(id), new LinkedList<Expression>()); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("procedure_call",44, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2078,7 +2077,7 @@ class CUP$Parser$actions {
                 int uleft = CUP$Parser$stack.peek().left;
                 int uright = CUP$Parser$stack.peek().right;
                 List<UseStatement> u = CUP$Parser$stack.peek().<List<UseStatement>> value();
-                 u.add(0, new UseStatement(new Identifier(id))); RESULT = u; 
+                 u.add(0, new UseStatement(new Identifier(id))); RESULT = u; RESULT.get(0).setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("use_block",2, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2102,7 +2101,7 @@ class CUP$Parser$actions {
                 int lleft = CUP$Parser$stack.peek().left;
                 int lright = CUP$Parser$stack.peek().right;
                 List<FunctionDeclaration> l = CUP$Parser$stack.peek().<List<FunctionDeclaration>> value();
-                 RESULT = new Program(u,l); 
+                 RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("program",0, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;

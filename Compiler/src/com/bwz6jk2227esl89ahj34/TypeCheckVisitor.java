@@ -161,7 +161,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         right.accept(this);
 
         if (!left.getType().equals(right.getType())) {
-            throw new TypeException("TODO left and right types don't match");
+            throw new TypeException("Semantic error: TODO LOCATION: left and right types don't match");
 
         } else {
             BinaryOperator binop = node.getOp();
@@ -187,11 +187,11 @@ public class TypeCheckVisitor implements NodeVisitor {
                     node.setType(new VariableType(leftType.getPrimitiveType(), leftType.getNumBrackets()));
 
                 } else {
-                    throw new TypeException("must be VariableType");
+                    throw new TypeException("Semantic error: TODO Location: must be VariableType");
                 }
 
             } else {
-                throw new TypeException("TODO invalid binary operator");
+                throw new TypeException("Semantic error: TODO LOCATION: invalid binary operator");
             }
         }
     }
@@ -230,10 +230,9 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         // sanity check
         if (!blockList.getType().equals(UNIT_TYPE) || !returnStatement.getType().equals(VOID_TYPE)) {
-            throw new TypeException("TODO");
+            throw new TypeException("Semantic error: TODO LOCATION: BlockList and Return Statement for FunctionBlock must be UNIT");
         }
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
-        // TODO: check types, and set this type
 
         contexts.pop();
     }
@@ -241,7 +240,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(FunctionCall node) {
         Context context = contexts.peek();
         if (!context.containsKey(node.getIdentifier())) {
-            throw new TypeException("TODO: function not defined");
+            throw new TypeException("Semantic error: TODO LOCATION: function not defined");
         }
 
         List<VariableType> argumentTypes = new ArrayList<>();
@@ -252,7 +251,7 @@ public class TypeCheckVisitor implements NodeVisitor {
                 VariableType argType = (VariableType) argument.getType();
                 argumentTypes.add(argType);
             } else {
-                throw new TypeException("TODO: argument is not VariableType");
+                throw new TypeException("Semantic error: TODO: argument is not VariableType");
             }
         }
 
