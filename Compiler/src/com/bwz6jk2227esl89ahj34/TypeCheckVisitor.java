@@ -52,7 +52,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         contexts = new Stack<>();
         // initialize first context with length function
         Context initContext = new Context();
-        List<VariableType> lengthArgType = Collections.singletonList(new VariableType(PrimitiveType.UNIT, 0));
+        List<VariableType> lengthArgType = Collections.singletonList(new VariableType(PrimitiveType.INT, 1));
         VariableTypeList lengthReturnType =
                 new VariableTypeList(Collections.singletonList(new VariableType(PrimitiveType.INT, 0)));
         initContext.put(new Identifier("length"), new FunctionType(lengthArgType, lengthReturnType));
@@ -108,7 +108,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         assert firstType != null;
 
         VariableType type = (VariableType) firstType;
-        node.setType(new VariableType(type.getPrimitiveType(), 1));
+        node.setType(new VariableType(type.getPrimitiveType(), type.getNumBrackets() + 1));
     }
 
     public void visit(Assignment node) {
@@ -481,7 +481,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         Block block = node.getBlock();
         block.accept(this);
 
-        if (!block.getType().equals(UNIT_TYPE) || !block.getType().equals(VOID_TYPE)) {
+        if (!block.getType().equals(UNIT_TYPE) && !block.getType().equals(VOID_TYPE)) {
             throw new TypeException("TODO"); //debug
         }
 
