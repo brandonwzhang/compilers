@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34;
 
-import com.AST.*;
+import com.bwz6jk2227esl89ahj34.AST.*;
 import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
 
 import java.util.List;
