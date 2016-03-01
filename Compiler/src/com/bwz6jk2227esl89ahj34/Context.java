@@ -1,7 +1,7 @@
 package com.bwz6jk2227esl89ahj34;
 
-import com.AST.Identifier;
-import com.AST.Type;
+import com.bwz6jk2227esl89ahj34.AST.Identifier;
+import com.bwz6jk2227esl89ahj34.AST.Type;
 
 import java.util.HashMap;
 
