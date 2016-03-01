@@ -216,7 +216,7 @@ expression_list_trailing_comma ::= expression:e COMMA expression_list_trailing_c
  
 array_literal ::= OPEN_BRACE expression_list:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); RESULT.setLocation(parser.cur_token); :}
                 |  OPEN_BRACE expression_list_trailing_comma:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); RESULT.setLocation(parser.cur_token); :}
-                | OPEN_BRACE CLOSE_BRACE {: RESULT = new ArrayLiteral(new LinkedList<>()); :}
+                | OPEN_BRACE CLOSE_BRACE {: RESULT = new ArrayLiteral(new LinkedList<>()); RESULT.setLocation(parser.cur_token); :}
                 ;
 
 primitive_type ::= INT {: RESULT = PrimitiveType.INT; :}

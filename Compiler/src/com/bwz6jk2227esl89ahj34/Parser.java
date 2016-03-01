@@ -5,7 +5,7 @@
 
 package com.bwz6jk2227esl89ahj34;
 
-import com.bwz6jk2227esl89ahj34.AST.*;
+import com.AST.*;
 import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
 import java.io.File;
@@ -1289,7 +1289,7 @@ class CUP$Parser$actions {
         case 44: // array_literal ::= OPEN_BRACE CLOSE_BRACE 
             {
                 ArrayLiteral RESULT = null;
-                 RESULT = new ArrayLiteral(new LinkedList<>()); 
+                 RESULT = new ArrayLiteral(new LinkedList<>()); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("array_literal",13, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
