@@ -262,7 +262,11 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         FunctionType thisFuncType = (FunctionType) type;
         FunctionType funcType = new FunctionType(argumentTypes, thisFuncType.getReturnTypeList());
-        if (!thisFuncType.equals(funcType)) {
+        //function call don't match arguments AND
+        //not a valid length call...
+        if (!thisFuncType.equals(funcType) && 
+                !(node.getIdentifier().getName().equals("length")
+                && argumentTypes.size() == 1 && argumentTypes.get(0).getNumBrackets() > 0)) {
             throw new TypeException("TODO: argument types do not match with function definition");
         }
 
