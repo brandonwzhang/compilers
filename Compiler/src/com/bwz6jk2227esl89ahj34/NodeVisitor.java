@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34;
 
-import com.AST.*;
+import com.bwz6jk2227esl89ahj34.AST.*;
 
 public interface NodeVisitor {
     void visit(ArrayIndex node);

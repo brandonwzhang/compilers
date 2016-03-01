@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34;
 
-import com.AST.*;
+import com.bwz6jk2227esl89ahj34.AST.*;
 
 import java.util.*;
 
@@ -363,17 +363,33 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(Program node) {
-        // Imports all functions from interface file into the context
-        for (UseStatement useStatement : node.getUseBlock()) {
-            useStatement.accept(this);
-        }
-
         // first pass collects all function types, adds to context
         for (FunctionDeclaration funcDec : node.getFuncDecs()) {
             // TODO: is shadowing of functions disallowed?
             Identifier funcName = funcDec.getIdentifier();
             FunctionType funcType = funcDec.getFunctionType();
             contexts.peek().put(funcName, funcType);
+        }
+
+        // If the interface matches our source file name, we check to make sure
+        // its declarations match.
+        // If not, add the declarations to the context.
+        for (UseStatement useStatement : node.getUseBlock()) {
+            String interfaceName = useStatement.getIdentifier().getName();
+            // If the interface name is the same as our source file, we need to
+            // check that all its functions are implemented.
+            if (interfaceName.equals(sourceFileName)) {
+                String error = checkInterface(libPath, interfaceName, contexts.peek());
+                if (error != null) {
+                    throw new TypeException(error);
+                }
+            } else {
+                String error = addInterface(libPath, interfaceName, contexts.peek());
+                if (error != null) {
+                    throw new TypeException(error);
+                }
+            }
+            node.setType(UNIT_TYPE);
         }
 
         // second pass typechecks all the function bodies
@@ -456,22 +472,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(UseStatement node) {
-        String interfaceName = node.getIdentifier().getName();
-        // If the interface name is the same as our source file, we need to
-        // check that all its functions are implemented.
-        if (interfaceName.equals(sourceFileName)) {
-            String error = checkInterface(libPath, interfaceName, contexts.peek());
-            if (error != null) {
-                throw new TypeException(error);
-            }
-            node.setType(UNIT_TYPE);
-            return;
-        }
-        String error = addInterface(libPath, interfaceName, contexts.peek());
-        if (error != null) {
-            throw new TypeException(error);
-        }
-        node.setType(UNIT_TYPE);
+        // Use statements are handled in visit(Program node)
     }
 
     public void visit(WhileStatement node) {
@@ -502,6 +503,13 @@ public class TypeCheckVisitor implements NodeVisitor {
         List<FunctionDeclaration> declarations = new LinkedList<>();
         String error = InterfaceParser.parseInterface(libPath, interfaceName, declarations);
         for (FunctionDeclaration declaration : declarations) {
+            // Error if function already exists in context with different type
+            if (context.get(declaration.getIdentifier()) != null &&
+                    !context.get(declaration.getIdentifier()).equals
+                            (declaration.getFunctionType())) {
+                return declaration.getIdentifier().getName() +
+                        " already declared with different type";
+            }
             context.put(declaration.getIdentifier(), declaration.getFunctionType());
         }
         return error;
@@ -518,7 +526,10 @@ public class TypeCheckVisitor implements NodeVisitor {
         List<FunctionDeclaration> declarations = new LinkedList<>();
         String error = InterfaceParser.parseInterface(libPath, interfaceName, declarations);
         for (FunctionDeclaration declaration : declarations) {
-            if (!context.get(declaration.getIdentifier()).equals(declaration.getType())) {
+            // Error if function isn't implemented or has different type
+            if (context.get(declaration.getIdentifier()) == null ||
+                    !context.get(declaration.getIdentifier()).equals
+                            (declaration.getFunctionType())) {
                 return declaration.getIdentifier().getName() + " is not implemented";
             }
         }

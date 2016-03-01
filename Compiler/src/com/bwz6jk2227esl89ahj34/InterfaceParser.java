@@ -5,11 +5,9 @@
 
 package com.bwz6jk2227esl89ahj34;
 
-import com.AST.*;
-import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
+import com.bwz6jk2227esl89ahj34.AST.*;
 import java_cup.runtime.Symbol;
-import java.io.File;
-import java.io.FileOutputStream;
+
 import java.io.FileReader;
 import java.util.*;
 import java.util.AbstractMap.*;
@@ -21,7 +19,7 @@ public class InterfaceParser
 
   @Override
   public final Class<?> getSymbolContainer() {
-    return InterfaceParserSym.class;
+    return ParserSym.class;
   }
 
   /** Default constructor. */
