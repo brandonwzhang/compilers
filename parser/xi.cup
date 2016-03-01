@@ -306,6 +306,8 @@ statement ::= statement_no_semicolon:s {: RESULT = s; RESULT.setLocation(parser.
 
 function_block ::= OPEN_BRACE block_list:bl return_statement:r CLOSE_BRACE {: RESULT = new FunctionBlock(bl, r); RESULT.setLocation(parser.cur_token); :}
                  | OPEN_BRACE block_list:bl return_statement:r SEMICOLON CLOSE_BRACE {: RESULT = new FunctionBlock(bl,r); RESULT.setLocation(parser.cur_token); :}
+                 | OPEN_BRACE function_block:fb CLOSE_BRACE {: RESULT = fb; RESULT.setLocation(parser.cur_token); :} 
+                 | OPEN_BRACE function_block:fb CLOSE_BRACE SEMICOLON {: RESULT = fb; RESULT.setLocation(parser.cur_token); :}
                  ;
 
 block ::= OPEN_BRACE block_list:bl CLOSE_BRACE  {: RESULT = bl; RESULT.setLocation(parser.cur_token); :}
