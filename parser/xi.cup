@@ -339,6 +339,7 @@ procedure_call ::= IDENTIFIER:id OPEN_PAREN expression_list:elist CLOSE_PAREN {:
                  ;
 
 use_block ::= USE IDENTIFIER:id use_block:u {: u.add(0, new UseStatement(new Identifier(id))); RESULT = u; RESULT.get(0).setLocation(parser.cur_token); :} 
+            | USE IDENTIFIER:id SEMICOLON use_block:u {: u.add(0, new UseStatement(new Identifier(id))); RESULT = u; RESULT.get(0).setLocation(parser.cur_token); :}
             | empty   {: RESULT = new LinkedList<UseStatement>(); :}
             ;
       
