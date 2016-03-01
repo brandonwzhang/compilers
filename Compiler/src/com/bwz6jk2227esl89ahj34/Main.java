@@ -7,7 +7,7 @@ public class Main {
     private static String sourcePath = "./";
     private static String diagnosticPath = "./";
     private static String libPath = "./";
-    private static boolean debug = false;
+    private static boolean debug;
 
     public static void main(String[] args) {
         CLI cli = new CLI();
@@ -93,6 +93,10 @@ public class Main {
      */
     public static void turnDebugOn(String[] args) {
         debug = true;
+    }
+
+    public static boolean debugOn() {
+        return debug;
     }
 
     /**

@@ -18,7 +18,8 @@ public class Util {
      * Translates symbol numbers into print-friendly strings. Used for lexer
      * and parser outputting.
      */
-    public static final HashMap<Integer, String> symbolTranslation = new HashMap<Integer, String>(){{
+    public static final HashMap<Integer, String> symbolTranslation =
+            new HashMap<Integer, String>() {{
         put(ParserSym.IF, "if");
         put(ParserSym.WHILE, "while");
         put(ParserSym.ELSE, "else");
@@ -69,6 +70,11 @@ public class Util {
      * @param lines a list of Strings to be printed line by line
      */
     public static void writeAndClose(String file, List<String> lines) {
+
+        if (Main.debugOn()) {
+            System.out.println("DEBUG: Writing " + file);
+        }
+
         if(!lines.isEmpty()) {
             try {
                 PrintWriter writer = new PrintWriter(file);
@@ -91,7 +97,11 @@ public class Util {
      */
     public static void makePath(String path) {
         File file = new File(path);
-        file.mkdirs();
+        boolean created = file.mkdirs();
+
+        if (created && Main.debugOn()) {
+            System.out.println("Created path: " + path);
+        }
     }
 
     /**
@@ -103,7 +113,10 @@ public class Util {
      * @param diagnosticPath The destination path.
      * @param lines The contents to be written.
      */
-    public static void writeHelper(String file, String extension, String diagnosticPath, List<String> lines) {
+    public static void writeHelper(String file,
+                                   String extension,
+                                   String diagnosticPath,
+                                   List<String> lines) {
         String output = file.replace(".xi", "." + extension);
         String writeFile = diagnosticPath + output;
         makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
@@ -115,7 +128,8 @@ public class Util {
      * S expressions. This method compares those two S expressions for
      * equality. Returns true if they are equal; false otherwise.
      */
-    public static boolean compareSExpFiles(String fileName1, String fileName2) throws IOException {
+    public static boolean compareSExpFiles(String fileName1, String fileName2)
+            throws IOException {
 
         String sExp1 = new String(Files.readAllBytes(Paths.get(fileName1)),
                 Charset.forName("UTF-8"));
@@ -151,7 +165,13 @@ public class Util {
      * Returns Optional of FileReader. If the file doesn't exist,
      * an empty Optional is returned.
      */
-    public static Optional<FileReader> getFileReader(String sourcePath, String file) {
+    public static Optional<FileReader> getFileReader(String sourcePath,
+                                                     String file) {
+
+        if (Main.debugOn()) {
+            System.out.println();
+            System.out.println("DEBUG: Reading " + sourcePath + file);
+        }
 
         FileReader reader;
         try {
@@ -198,13 +218,14 @@ public class Util {
             ((Program) result.get().value).accept(visitor);
             System.out.println("typed");
         } catch (TypeException e) {
-            System.out.println(e.getMessage());
+            System.out.println(e.toString());
             //e.printStackTrace();
             //TODO: write diagnostic
         }
     }
 
-    public static Optional<Symbol> parseHelper(Parser parser, List<String> lines) {
+    public static Optional<Symbol> parseHelper(Parser parser,
+                                               List<String> lines) {
         Symbol result;
         try {
             result = parser.parse();
@@ -215,6 +236,10 @@ public class Util {
 
         if (parser.hasSyntaxError) {
             // handle syntax error, output to file
+            if (Main.debugOn()) {
+                System.out.println("DEBUG: Syntax error.");
+            }
+
             parser.hasSyntaxError = false;
             lines.clear();
             lines.add(parser.syntaxErrMessage);
@@ -264,6 +289,9 @@ public class Util {
                 }
                 lines.add(line);
                 if (next.sym == ParserSym.error) {
+                    if (Main.debugOn()) {
+                        System.out.println("DEBUG: Lexical error.");
+                    }
                     break;
                 }
                 next = lexer.next_token();
