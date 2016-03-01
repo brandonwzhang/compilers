@@ -5,7 +5,7 @@
 
 package com.bwz6jk2227esl89ahj34;
 
-import com.AST.*;
+import com.bwz6jk2227esl89ahj34.AST.*;
 import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
 import java.io.File;
@@ -751,7 +751,7 @@ class CUP$Parser$actions {
                 int mleft = CUP$Parser$stack.peek().left;
                 int mright = CUP$Parser$stack.peek().right;
                 Integer m = CUP$Parser$stack.peek().<Integer> value();
-                 RESULT = m+1; RESULT.setLocation(parser.cur_token); 
+                 RESULT = m+1; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("minus_list",3, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -760,7 +760,7 @@ class CUP$Parser$actions {
         case 3: // minus_list ::= MINUS 
             {
                 Integer RESULT = null;
-                 RESULT = 1; RESULT.setLocation(parser.cur_token); 
+                 RESULT = 1; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("minus_list",3, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
