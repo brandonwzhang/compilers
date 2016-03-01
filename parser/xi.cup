@@ -216,6 +216,7 @@ expression_list_trailing_comma ::= expression:e COMMA expression_list_trailing_c
  
 array_literal ::= OPEN_BRACE expression_list:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); RESULT.setLocation(parser.cur_token); :}
                 |  OPEN_BRACE expression_list_trailing_comma:lst CLOSE_BRACE {: RESULT = new ArrayLiteral(lst); RESULT.setLocation(parser.cur_token); :}
+                | OPEN_BRACE CLOSE_BRACE {: RESULT = new ArrayLiteral(new LinkedList<>()); :}
                 ;
 
 primitive_type ::= INT {: RESULT = PrimitiveType.INT; :}
@@ -326,7 +327,7 @@ function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:
                        ;
 
 function_declaration_list ::= function_declaration:fd function_declaration_list:lst {: lst.add(0, fd); RESULT = lst; :}
-                            | empty {: RESULT = new LinkedList<FunctionDeclaration>(); :}
+                            | function_declaration:fd {: List<FunctionDeclaration> lst = new LinkedList<FunctionDeclaration>(); lst.add(0,fd); RESULT = lst; :}
                             ;
                 
 procedure_block ::=  OPEN_BRACE block_list:b CLOSE_BRACE {: RESULT = new ProcedureBlock(b); RESULT.setLocation(parser.cur_token); :}
