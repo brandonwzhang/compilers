@@ -218,7 +218,7 @@ public class Util {
             ((Program) result.get().value).accept(visitor);
             System.out.println("typed");
         } catch (TypeException e) {
-            System.out.println(e.getMessage());
+            System.out.println(e.toString());
             //e.printStackTrace();
             //TODO: write diagnostic
         }

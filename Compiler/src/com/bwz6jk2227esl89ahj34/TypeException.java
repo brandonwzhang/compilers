@@ -15,11 +15,9 @@ public class TypeException extends RuntimeException {
         this.col = col;
     }
 
-//    @Override
-//    public void printStackTrace() {
-//        System.out.print("Semantic error: beginning at ");
-//        System.out.print(row + ":");
-//        System.out.print(col + ": ");
-//        System.out.println(this.errMessage);
-//    }
+    @Override
+    public String toString() {
+        return "Semantic error: beginning at "
+                + row + ":" + col + ": " + this.errMessage;
+    }
 }
