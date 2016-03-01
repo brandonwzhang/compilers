@@ -1,7 +1,7 @@
 package com.bwz6jk2227esl89ahj34;
 
-import com.AST.PrimitiveType;
 import com.AST.Program;
+import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
 
 import java.io.*;
@@ -68,7 +68,7 @@ public class Util {
      * @param file the name of the file
      * @param lines a list of Strings to be printed line by line
      */
-    public static void writeAndClose(String file, ArrayList<String> lines) {
+    public static void writeAndClose(String file, List<String> lines) {
         if(!lines.isEmpty()) {
             try {
                 PrintWriter writer = new PrintWriter(file);
@@ -92,6 +92,22 @@ public class Util {
     public static void makePath(String path) {
         File file = new File(path);
         file.mkdirs();
+    }
+
+    /**
+     * A helper function for writing a diagnostic file.
+     * Side effect: the necessary directories will be created.
+     *
+     * @param file The source file's name. Must end in .xi
+     * @param extension The extension of the file to be written.
+     * @param diagnosticPath The destination path.
+     * @param lines The contents to be written.
+     */
+    public static void writeHelper(String file, String extension, String diagnosticPath, List<String> lines) {
+        String output = file.replace(".xi", "." + extension);
+        String writeFile = diagnosticPath + output;
+        makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
+        writeAndClose(writeFile, lines);
     }
 
     /**
@@ -132,32 +148,6 @@ public class Util {
     }
 
     /**
-     * Takes a String array that contains names of Xi files.
-     * Returns an array of file names with all of the xi extensions replaced
-     * with the given extension (don't include the .)
-     *
-     * If a given file name is not a .xi file, then it is not included in
-     * the returned array. Prints to System.out when this occurs.
-     */
-    public static String[] formatFiles(String[] files, String extension) {
-        List<String> returnList = new ArrayList<>();
-
-        for (String file : files) {
-            if (!file.contains(".xi")) {
-                System.out.println(file + "is not a .xi file. " +
-                        "This file will not be processed.");
-                continue;
-            }
-
-            String output = file.replace(".xi", "." + extension);
-            returnList.add(output);
-        }
-
-        String[] returnArray = new String[returnList.size()];
-        return returnList.toArray(returnArray);
-    }
-
-    /**
      * Returns Optional of FileReader. If the file doesn't exist,
      * an empty Optional is returned.
      */
@@ -189,40 +179,113 @@ public class Util {
 
         String output = file.replace(".xi", ".typed");
         String writeFile = diagnosticPath + output;
-        Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
+        makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
 
-        Symbol result;
-        try {
-            result = parser.parse();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-
-        if (parser.hasSyntaxError) {
-            // handle syntax error, output to file
-            parser.hasSyntaxError = false;
-            Util.writeAndClose(writeFile.replace(".typed", "parsed"), new
-                    ArrayList<String>(Arrays.asList(parser.syntaxErrMessage)));
-
-            parser.syntaxErrMessage = "";
+        List<String> parseLines = new ArrayList<>();
+        Optional<Symbol> result = parseHelper(parser, parseLines);
+        if (!result.isPresent()) {
+            // TODO: syntactic error. what do we do?
             return;
         }
 
         NodeVisitor visitor =
-                new TypeCheckVisitor(file.replace(".xi", ""),
-                        libPath);
+                new TypeCheckVisitor(file.replace(".xi", ""), libPath);
 
         // attempt typechecking
         try {
             System.out.println();
             System.out.println(output);
-            ((Program) result.value).accept(visitor);
+            ((Program) result.get().value).accept(visitor);
             System.out.println("typed");
         } catch (TypeException e) {
             System.out.println(e.getMessage());
             //e.printStackTrace();
-            //write diagnostic
+            //TODO: write diagnostic
         }
+    }
+
+    public static Optional<Symbol> parseHelper(Parser parser, List<String> lines) {
+        Symbol result;
+        try {
+            result = parser.parse();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+
+        if (parser.hasSyntaxError) {
+            // handle syntax error, output to file
+            parser.hasSyntaxError = false;
+            lines.clear();
+            lines.add(parser.syntaxErrMessage);
+            parser.syntaxErrMessage = "";
+            return Optional.empty();
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        CodeWriterSExpPrinter printer =
+                new CodeWriterSExpPrinter(baos);
+        NodeVisitor visitor = new PrintVisitor(printer);
+
+        ((Program)(result.value)).accept(visitor);
+
+        printer.flush();
+        lines.add(baos.toString());
+
+        return Optional.of(result);
+    }
+
+    public static void parseFile(String sourcePath,
+                                 String diagnosticPath,
+                                 String file) {
+
+        Optional<FileReader> reader = getFileReader(sourcePath, file);
+        if (!reader.isPresent()) {
+            return;
+        }
+
+        Lexer lexer = new Lexer(reader.get());
+        Parser parser = new Parser(lexer);
+
+        List<String> lines = new ArrayList<>();
+        parseHelper(parser, lines);
+        writeHelper(file, "parsed", diagnosticPath, lines);
+    }
+
+    public static void lexHelper(Lexer lexer, List<String> lines) {
+        try {
+            Symbol next = lexer.next_token();
+            while (next.sym != ParserSym.EOF) {
+                String line = next.left + ":" +
+                        next.right + " " +
+                        Util.symbolTranslation.get(next.sym);
+                if (next.value != null) {
+                    line += " " + next.value;
+                }
+                lines.add(line);
+                if (next.sym == ParserSym.error) {
+                    break;
+                }
+                next = lexer.next_token();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void lexFile(String sourcePath,
+                               String diagnosticPath,
+                               String file) {
+
+        Optional<FileReader> reader = getFileReader(sourcePath, file);
+        if (!reader.isPresent()) {
+            return;
+        }
+
+        Lexer lexer = new Lexer(reader.get());
+
+        List<String> lines = new ArrayList<>();
+        lexHelper(lexer, lines);
+        writeHelper(file, "lexed", diagnosticPath, lines);
     }
 }
