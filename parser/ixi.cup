@@ -53,9 +53,16 @@ parser code {:
 :}
 
 terminal String IDENTIFIER;
+terminal String STRING_LITERAL;
+terminal Character CHARACTER_LITERAL;
+terminal String INTEGER_LITERAL;
+terminal TRUE, FALSE;
 terminal INT, BOOL;
 
-terminal OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, COLON, COMMA, SEMICOLON;
+terminal IF, ELSE, WHILE, BREAK, RETURN, USE, LENGTH, PLUS, MINUS, TIMES,
+  DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
+  OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT;
 
 nonterminal empty;
 
@@ -72,10 +79,7 @@ nonterminal FunctionDeclaration function_declaration;
 nonterminal FunctionDeclaration function_declaration_line;
 nonterminal List<FunctionDeclaration> function_declaration_list;
 
-//start with function_declaration_list;
-nonterminal List<FunctionDeclaration> interface;
-start with interface;
-interface ::= function_declaration_list;
+start with function_declaration_list;
 empty ::= ;
 
 primitive_type ::= INT {: RESULT = PrimitiveType.INT; :}
