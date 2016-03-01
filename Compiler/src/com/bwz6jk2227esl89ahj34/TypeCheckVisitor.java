@@ -502,7 +502,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         List<FunctionDeclaration> declarations = new LinkedList<>();
         String error = InterfaceParser.parseInterface(libPath, interfaceName, declarations);
         for (FunctionDeclaration declaration : declarations) {
-            context.put(declaration.getIdentifier(), declaration.getType());
+            context.put(declaration.getIdentifier(), declaration.getFunctionType());
         }
         return error;
     }
