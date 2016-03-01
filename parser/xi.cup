@@ -89,6 +89,8 @@ nonterminal Program program;
 nonterminal empty;
 nonterminal List<UseStatement> use_block;
 
+nonterminal Integer minus_list; 
+
 nonterminal Expression A;
 nonterminal Expression B;
 nonterminal Expression C;
@@ -147,6 +149,10 @@ start with program;
 
 empty ::= ;
 
+minus_list ::= MINUS minus_list:m {: RESULT = m+1; RESULT.setLocation(parser.cur_token); :}
+             | MINUS {: RESULT = 1; RESULT.setLocation(parser.cur_token); :} 
+             ;
+
 boolean_literal ::= TRUE  {: RESULT = new BooleanLiteral(true); RESULT.setLocation(parser.cur_token); :}
           | FALSE       {: RESULT = new BooleanLiteral(false); RESULT.setLocation(parser.cur_token); :}
           ;  
@@ -185,7 +191,7 @@ F ::= G:g {: RESULT = g; RESULT.setLocation(parser.cur_token); :}
 
 G ::= H:h {: RESULT = h; RESULT.setLocation(parser.cur_token); :}
     | NOT H:h {: RESULT = new Unary(UnaryOperator.NOT, h); RESULT.setLocation(parser.cur_token); :}
-    | MINUS H:h {: RESULT = new Unary(UnaryOperator.MINUS, h); RESULT.setLocation(parser.cur_token); :}
+    | minus_list:m H:h {: if (m%2 == 1) { RESULT = new Unary(UnaryOperator.MINUS, h); } else { RESULT = h; } RESULT.setLocation(parser.cur_token); :}
     ;
 
 H ::= I:i {: RESULT = i; RESULT.setLocation(parser.cur_token); :}
