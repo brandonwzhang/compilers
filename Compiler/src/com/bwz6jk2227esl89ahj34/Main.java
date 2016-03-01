@@ -7,6 +7,7 @@ public class Main {
     private static String sourcePath = "./";
     private static String diagnosticPath = "./";
     private static String libPath = "./";
+    private static boolean debug = false;
 
     public static void main(String[] args) {
         CLI cli = new CLI();
@@ -15,14 +16,22 @@ public class Main {
             they will be executed (but options can be provided in any order
             when calling xic
          */
+        cli.addOption("--debug",
+                      "Turns on debug mode.",
+                      Main::turnDebugOn,
+                      0);
         cli.addOption("-sourcepath",
-                      "Set the path for source files. Takes one argument.",
-                      Main::setSourcePath,
-                      1);
+                "Set the path for source files. Takes one argument.",
+                Main::setSourcePath,
+                1);
         cli.addOption("-D",
-                      "Set the path for diagnostic files. Takes one argument.",
-                      Main::setDiagnosticPath,
-                      1);
+                "Set the path for diagnostic files. Takes one argument.",
+                Main::setDiagnosticPath,
+                1);
+        cli.addOption("-libpath",
+                "Set the path for interface files. Takes one argument.",
+                Main::setLibPath,
+                1);
         cli.addOption("--lex",
                 "Lex the .xi source files to .lexed files.",
                 files -> Lexer.lexFile(sourcePath, diagnosticPath, files),
@@ -38,22 +47,12 @@ public class Main {
                                         sourcePath, file)),
                 0);
         cli.execute(args);
-/*
-        String[] passFileNames = {"mdarrays.xi"};
-        for (String filename : passFileNames) {
-            Util.typeCheck("typecheck/passtests/", "typecheck/passtests/",
-                    libPath, filename);
-        }
 
-        String[] failFileNames = {"invalid_assign.xi", "invalid_function.xi",
-                "invalid_multireturn.xi", "invalid_multireturn2.xi",
-                "invalid_operand.xi", "invalid_proccall.xi",
-                "invalid_type.xi", "invalid_underscore.xi"};
-        for (String filename : failFileNames) {
-            Util.typeCheck("typecheck/failtests/", "typecheck/failtests/",
-                    libPath, filename);
+        if(debug) {
+            // put debug mode behaviors here
+            //parseTestHarness();
+            typeCheckTests();
         }
-        */
     }
 
     /**
@@ -78,6 +77,43 @@ public class Main {
             return;
         }
         diagnosticPath = args[0] + "/";
+    }
+
+    public static void setLibPath(String[] args) {
+        if (args.length == 0 || args[0] == null) {
+            System.out.println("Please provide lib path");
+            return;
+        }
+        libPath = args[0] + "/";
+    }
+
+    /**
+     * Turns on debug mode, which runs some automated tests and provides
+     * more print statements.
+     */
+    public static void turnDebugOn(String[] args) {
+        debug = true;
+    }
+
+    /**
+     * Automated tests for typecheck.
+     */
+    public static void typeCheckTests() {
+
+        String[] passFileNames = {"mdarrays.xi"};
+        for (String filename : passFileNames) {
+            Util.typeCheck("typecheck/passtests/", "typecheck/passtests/",
+                    libPath, filename);
+        }
+
+        String[] failFileNames = {"invalid_assign.xi", "invalid_function.xi",
+                "invalid_multireturn.xi", "invalid_multireturn2.xi",
+                "invalid_operand.xi", "invalid_proccall.xi",
+                "invalid_type.xi", "invalid_underscore.xi"};
+        for (String filename : failFileNames) {
+            Util.typeCheck("typecheck/failtests/", "typecheck/failtests/",
+                    libPath, filename);
+        }
     }
 
     /**
