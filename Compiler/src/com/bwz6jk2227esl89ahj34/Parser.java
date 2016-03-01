@@ -1428,7 +1428,7 @@ class CUP$Parser$actions {
                 int astleft = CUP$Parser$stack.peek().left;
                 int astright = CUP$Parser$stack.peek().right;
                 Integer ast = CUP$Parser$stack.peek().<Integer> value();
-                 RESULT = new TypedDeclaration(new Identifier(id), new VariableType(t, ast.getKey().size() + ast.getValue()), ast.getKey()); RESULT.setLocation(parser.cur_token); 
+                 RESULT = new TypedDeclaration(new Identifier(id), new VariableType(t, ast), new LinkedList<Expression>()); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("typed_declaration_no_size",23, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;

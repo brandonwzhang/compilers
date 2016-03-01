@@ -242,7 +242,7 @@ var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new Variable
        ;
        
 
-typed_declaration_no_size ::= IDENTIFIER:id COLON primitive_type:t array_no_size_type:ast {: RESULT = new TypedDeclaration(new Identifier(id), new VariableType(t, ast.getKey().size() + ast.getValue()), ast.getKey()); RESULT.setLocation(parser.cur_token); :} //x:int
+typed_declaration_no_size ::= IDENTIFIER:id COLON primitive_type:t array_no_size_type:ast {: RESULT = new TypedDeclaration(new Identifier(id), new VariableType(t, ast), new LinkedList<Expression>()); RESULT.setLocation(parser.cur_token); :} //x:int
                     ;
 
 typed_declaration ::= IDENTIFIER:id COLON primitive_type:t array_size_type:ast {: RESULT = new TypedDeclaration(new Identifier(id), new VariableType(t, ast.getKey().size() + ast.getValue()), ast.getKey()); RESULT.setLocation(parser.cur_token); :} //x:int
