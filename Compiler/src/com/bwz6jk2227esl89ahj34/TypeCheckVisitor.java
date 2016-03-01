@@ -67,19 +67,19 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.getIndex().accept(this);
 
         if (!node.getIndex().getType().equals(INT_TYPE)) {
-            throw new TypeException("TODO index is not an integer", node.getRow(), node.getCol());
+            throw new TypeException("Index is not an integer", node.getRow(), node.getCol());
         }
 
         Type type = node.getArrayRef().getType();
         if (type instanceof VariableType) {
             VariableType arrayType = (VariableType) type;
             if(arrayType.getNumBrackets() < 1) {
-                throw new TypeException("TODO this isn't an array so we can't index");
+                throw new TypeException("Indexed element must be an array of at least dimension 1", node.getRow(), node.getCol());
             }
             node.setType(new VariableType(arrayType.getPrimitiveType(), arrayType.getNumBrackets() - 1));
 
         } else { //arrayType instanceof FuncType of VarTypeList
-            throw new TypeException("TODO I don't think it should ever get here unless it's an error", node.getRow(), node.getCol());
+            throw new TypeException("Should not reach", node.getRow(), node.getCol());
         }
     }
 
@@ -98,11 +98,11 @@ public class TypeCheckVisitor implements NodeVisitor {
                 if (firstType == null) {
                     firstType = type;
                 } else if (!firstType.equals(type)) {
-                    throw new TypeException("TODO: types in arrayliteral don't match", node.getRow(), node.getCol());
+                    throw new TypeException("Types in the array literal must all match", node.getRow(), node.getCol());
                 }
 
             } else {
-                throw new TypeException("TODO must be VariableType", node.getRow(), node.getCol());
+                throw new TypeException("Element of array literal must be a variable type", node.getRow(), node.getCol());
             }
         }
         assert firstType != null;
@@ -123,7 +123,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (expression.getType() instanceof VariableTypeList) {
             VariableTypeList rhs = (VariableTypeList) expression.getType();
             if (variables.size() != rhs.getVariableTypeList().size()) {
-                throw new TypeException("TODO sizes don't match", node.getRow(), node.getCol());
+                throw new TypeException("Assignment must have same number of elements on both sides", node.getRow(), node.getCol());
             }
 
             for (int i = 0; i < variables.size(); i++) {
@@ -131,17 +131,17 @@ public class TypeCheckVisitor implements NodeVisitor {
                 Type rightType = rhs.getVariableTypeList().get(i);
 
                 if (!(leftType instanceof VariableType)) {
-                    throw new TypeException("lhs variables must be VariableType");
+                    throw new TypeException("LHS variables must be variable types", node.getRow(), node.getCol());
                 }
 
                 if (!leftType.equals(UNIT_TYPE) && !leftType.equals(rightType)) {
-                    throw new TypeException("TODO type mismatch");
+                    throw new TypeException("Type on left hand must match type on right hand", node.getRow(), node.getCol());
                 }
             }
 
         } else if (expression.getType() instanceof FunctionType) {
-            throw new TypeException("TODO cannot be FunctionType", node.getRow(), node.getCol());
-
+            throw new TypeException("Right hand side cannot be Function Type", node.getRow(), node.getCol());
+            
         } else if (variables.size() > 1) {
             throw new TypeException("TODO sizes don't match", node.getRow(), node.getCol());
 
