@@ -4,16 +4,11 @@ import com.AST.PrimitiveType;
 import com.AST.Program;
 import java_cup.runtime.Symbol;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * A class containing static utility methods and variables.
@@ -136,54 +131,98 @@ public class Util {
         return sExp1.equals(sExp2);
     }
 
+    /**
+     * Takes a String array that contains names of Xi files.
+     * Returns an array of file names with all of the xi extensions replaced
+     * with the given extension (don't include the .)
+     *
+     * If a given file name is not a .xi file, then it is not included in
+     * the returned array. Prints to System.out when this occurs.
+     */
+    public static String[] formatFiles(String[] files, String extension) {
+        List<String> returnList = new ArrayList<>();
+
+        for (String file : files) {
+            if (!file.contains(".xi")) {
+                System.out.println(file + "is not a .xi file. " +
+                        "This file will not be processed.");
+                continue;
+            }
+
+            String output = file.replace(".xi", "." + extension);
+            returnList.add(output);
+        }
+
+        String[] returnArray = new String[returnList.size()];
+        return returnList.toArray(returnArray);
+    }
+
+    /**
+     * Returns Optional of FileReader. If the file doesn't exist,
+     * an empty Optional is returned.
+     */
+    public static Optional<FileReader> getFileReader(String sourcePath, String file) {
+
+        FileReader reader;
+        try {
+            reader = new FileReader(sourcePath + file);
+            return Optional.of(reader);
+
+        } catch (FileNotFoundException e) {
+            System.out.println(sourcePath + file + " was not found.");
+            return Optional.empty();
+        }
+    }
+
     public static void typeCheck(String sourcePath,
                                  String diagnosticPath,
                                  String libPath,
-                                 String[] files) {
+                                 String file) {
+
+        Optional<FileReader> reader = getFileReader(sourcePath, file);
+        if (!reader.isPresent()) {
+            return;
+        }
+
+        Lexer lexer = new Lexer(reader.get());
+        Parser parser = new Parser(lexer);
+
+        String output = file.replace(".xi", ".typed");
+        String writeFile = diagnosticPath + output;
+        Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
+
+        Symbol result;
         try {
-            for (String file : files) {
-                if (!file.contains(".xi")) {
-                    System.out.println(file + "is not a .xi file. " +
-                            "This file will not be processed.");
-                    continue;
-                }
-
-                FileReader reader = new FileReader(sourcePath + file);
-                Lexer lexer = new Lexer(reader);
-                Parser parser = new Parser(lexer);
-
-                String output = file.replace(".xi", ".typed");
-                String writeFile = diagnosticPath + output;
-                Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
-
-                Symbol result = parser.parse();
-
-                if (parser.hasSyntaxError) {
-                    // handle syntax error, output to file
-                    parser.hasSyntaxError = false;
-                    Util.writeAndClose(writeFile.replace(".typed", "parsed"), new
-                            ArrayList<String>(Arrays.asList(parser.syntaxErrMessage)));
-
-                    parser.syntaxErrMessage = "";
-                    continue;
-                }
-
-                NodeVisitor visitor =
-                        new TypeCheckVisitor(file.replace(".xi", ""),
-                                             libPath);
-                // attempt typechecking
-                try {
-                    System.out.println();
-                    System.out.println(output);
-                    ((Program) result.value).accept(visitor);
-                    System.out.println("typed");
-                } catch (TypeException e) {
-                    System.out.println(e.getMessage());
-                    //e.printStackTrace();
-                }
-            }
+            result = parser.parse();
         } catch (Exception e) {
             e.printStackTrace();
+            return;
+        }
+
+        if (parser.hasSyntaxError) {
+            // handle syntax error, output to file
+            parser.hasSyntaxError = false;
+            Util.writeAndClose(writeFile.replace(".typed", "parsed"), new
+                    ArrayList<String>(Arrays.asList(parser.syntaxErrMessage)));
+
+            parser.syntaxErrMessage = "";
+            return;
+        }
+
+        NodeVisitor visitor =
+                new TypeCheckVisitor(file.replace(".xi", ""),
+                        libPath);
+
+        // attempt typechecking
+        try {
+            System.out.println();
+            System.out.println(output);
+            ((Program) result.value).accept(visitor);
+            System.out.println("typed");
+        } catch (TypeException e) {
+            System.out.println(e.getMessage());
+            //e.printStackTrace();
+            //write diagnostic
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Main {
     private static String sourcePath = "./";
@@ -32,23 +33,25 @@ public class Main {
                 0);
         cli.addOption("--typecheck",
                 "Typecheck the .xi source files",
-                files -> Util.typeCheck(sourcePath,
-                                        diagnosticPath,
-                                        libPath,
-                                        files),
+                files -> Arrays.stream(files).forEach(file ->
+                                Util.typeCheck(sourcePath, diagnosticPath, libPath, file)),
                 0);
         cli.execute(args);
 
         String[] passFileNames = {"mdarrays.xi"};
-        Util.typeCheck("typecheck/passtests/", "typecheck/passtests/",
-                libPath, passFileNames);
+        for (String filename : passFileNames) {
+            Util.typeCheck("typecheck/passtests/", "typecheck/passtests/",
+                    libPath, filename);
+        }
 
         String[] failFileNames = {"invalid_assign.xi", "invalid_function.xi",
                 "invalid_multireturn.xi", "invalid_multireturn2.xi",
                 "invalid_operand.xi", "invalid_proccall.xi",
                 "invalid_type.xi", "invalid_underscore.xi"};
-        Util.typeCheck("typecheck/failtests/", "typecheck/failtests/",
-                libPath, failFileNames);
+        for (String filename : failFileNames) {
+            Util.typeCheck("typecheck/failtests/", "typecheck/failtests/",
+                    libPath, filename);
+        }
     }
 
     /**
