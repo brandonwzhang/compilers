@@ -111,8 +111,8 @@ HexChar = \\x[2-7][0-9A-E]
 
  /* char literals */
  \'[^\n\r]\'                        { return symbol(ParserSym.CHARACTER_LITERAL, yytext().charAt(1)); }
- "'\n'"                             { return symbol(ParserSym.CHARACTER_LITERAL, yytext().charAt(1)); }
- "'\r'"                             { return symbol(ParserSym.CHARACTER_LITERAL, yytext().charAt(1)); }
+ "'\\n'"                            { return symbol(ParserSym.CHARACTER_LITERAL, '\n'); }
+ "'\\r'"                            { return symbol(ParserSym.CHARACTER_LITERAL, '\r'); }
  \'{HexChar}\'                      { return symbol(ParserSym.CHARACTER_LITERAL, hexToString(yytext().substring(1, yytext().length()-1))); }
 
  \'[^\']*\'                           { return symbol(ParserSym.error, "Invalid character constant"); }

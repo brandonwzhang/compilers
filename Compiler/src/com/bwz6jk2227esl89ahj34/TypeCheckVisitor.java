@@ -274,26 +274,28 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(FunctionDeclaration node) {
-        // first pass takes care of identifier and functionType
         currentFunctionType = node.getFunctionType();
         List<Identifier> argList = node.getArgList();
         List<VariableType> argTypeList = currentFunctionType.getArgTypeList();
-        // these are guaranteed to be the same size
+        assert argList.size() == argTypeList.size();
 
         Context newContext = new Context(contexts.peek());
         for (int i = 0; i < argList.size(); i++) {
             newContext.put(argList.get(i), argTypeList.get(i));
         }
 
+        MethodBlock methodBlock = node.getMethodBlock();
+
         contexts.push(newContext);
-        node.getMethodBlock().accept(this);
+        methodBlock.accept(this);
         contexts.pop();
 
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        assert(methodBlock.getType() == UNIT_TYPE || methodBlock.getType() == VOID_TYPE);
+        node.setType(UNIT_TYPE);
     }
 
     public void visit(Identifier node) {
-        // check if identifier is in context
+        // Check if identifier is in context
         Type type = contexts.peek().get(node);
         if (type == null) {
             throw new TypeException("Identifier does not exist in context", node.getRow(), node.getCol());
@@ -305,7 +307,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         Expression guard = node.getGuard();
         guard.accept(this);
         if (!guard.getType().equals(BOOL_TYPE)) {
-            throw new TypeException("TODO: guard not a bool", node.getRow(), node.getCol());
+            throw new TypeException("If statement guard must be of type bool", node.getRow(), node.getCol());
         }
 
         Block trueBlock = node.getTrueBlock();
@@ -316,8 +318,8 @@ public class TypeCheckVisitor implements NodeVisitor {
             falseBlock.get().accept(this);
             PrimitiveType r1 = ((VariableType) trueBlock.getType()).getPrimitiveType();
             PrimitiveType r2 = ((VariableType) falseBlock.get().getType()).getPrimitiveType();
+            // If has type void iff both blocks have type void
             node.setType(new VariableType(lub(r1,r2), 0));
-
         } else {
             node.setType(new VariableType(PrimitiveType.UNIT, 0));
         }
@@ -339,19 +341,15 @@ public class TypeCheckVisitor implements NodeVisitor {
         Context context = contexts.peek();
         Identifier id = node.getIdentifier();
         if (!context.containsKey(id)) {
-            throw new TypeException("TODO: procedure not defined", node.getRow(), node.getCol());
+            throw new TypeException("Procedure " + id.getName() + " not defined", node.getRow(), node.getCol());
         }
 
         List<VariableType> argumentTypes = new ArrayList<>();
         for (Expression argument : node.getArguments()) {
             argument.accept(this);
-
-            if (argument.getType() instanceof VariableType) {
-                VariableType argType = (VariableType) argument.getType();
-                argumentTypes.add(argType);
-            } else {
-                throw new TypeException("TODO: argument is not VariableType", node.getRow(), node.getCol());
-            }
+            assert argument.getType() instanceof VariableType;
+            VariableType argType = (VariableType) argument.getType();
+            argumentTypes.add(argType);
         }
 
         FunctionType funcType = new FunctionType(argumentTypes, new VariableTypeList(new ArrayList<>()));
@@ -363,36 +361,42 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(Program node) {
-        // first pass collects all function types, adds to context
+        // First pass collects all function types, adds to context
         for (FunctionDeclaration funcDec : node.getFuncDecs()) {
-            // TODO: is shadowing of functions disallowed?
             Identifier funcName = funcDec.getIdentifier();
+            // Disallow overloading and shadowing
+            if (contexts.peek().get(funcName) != null) {
+                throw new TypeException(funcName.getName() + "declared multiple times", node.getRow(), node.getCol());
+            }
             FunctionType funcType = funcDec.getFunctionType();
             contexts.peek().put(funcName, funcType);
         }
 
         // If the interface matches our source file name, we check to make sure
         // its declarations match.
-        // If not, add the declarations to the context.
         for (UseStatement useStatement : node.getUseBlock()) {
             String interfaceName = useStatement.getIdentifier().getName();
-            // If the interface name is the same as our source file, we need to
-            // check that all its functions are implemented.
             if (interfaceName.equals(sourceFileName)) {
                 String error = checkInterface(libPath, interfaceName, contexts.peek());
                 if (error != null) {
                     throw new TypeException(error, node.getRow(), node.getCol());
                 }
-            } else {
+            }
+            useStatement.setType(new VariableType(PrimitiveType.UNIT, 0));
+        }
+        // If not, add the declarations to the context.
+        for (UseStatement useStatement : node.getUseBlock()) {
+            String interfaceName = useStatement.getIdentifier().getName();
+            if (!interfaceName.equals(sourceFileName)) {
                 String error = addInterface(libPath, interfaceName, contexts.peek());
                 if (error != null) {
                     throw new TypeException(error, node.getRow(), node.getCol());
                 }
             }
-            node.setType(UNIT_TYPE);
+            useStatement.setType(new VariableType(PrimitiveType.UNIT, 0));
         }
 
-        // second pass typechecks all the function bodies
+        // Second pass typechecks all the function bodies
         for (FunctionDeclaration funcDec : node.getFuncDecs()) {
             funcDec.accept(this);
         }
@@ -405,31 +409,24 @@ public class TypeCheckVisitor implements NodeVisitor {
         List<VariableType> functionReturnTypes = currentFunctionType
                                                  .getReturnTypeList()
                                                  .getVariableTypeList();
-        List<Expression> returnExpressions = node.getValues();
         List<VariableType> returnTypes = new ArrayList<>();
-        for (Expression expression : returnExpressions) {
+
+        for (Expression expression : node.getValues()) {
             expression.accept(this);
-
-            if (expression.getType() instanceof VariableType) {
-                VariableType type = (VariableType) expression.getType();
-                returnTypes.add(type);
-            } else {
-                throw new TypeException("TODO must be VariableType", node.getRow(), node.getCol());
-            }
+            // Expression must have a VariableType
+            assert expression.getType() instanceof VariableType;
+            VariableType type = (VariableType) expression.getType();
+            returnTypes.add(type);
         }
 
-        if (functionReturnTypes.size() == 0 && returnTypes.size() != 0) {
-            throw new TypeException("TODO procedure is returning something", node.getRow(), node.getCol());
-        }
-
-        // precondition: they are the same length
+        // Precondition: they are the same length
         if(functionReturnTypes.size() != returnTypes.size()) {
-            throw new TypeException("TODO return values do not match the number of types in function declaration", node.getRow(), node.getCol());
+            throw new TypeException("Number of return values does not match function declaration", node.getRow(), node.getCol());
         }
 
         for (int i = 0; i < returnTypes.size(); i++) {
             if (!functionReturnTypes.get(i).equals(returnTypes.get(i))) {
-                throw new TypeException("TODO return values do not match types in function declaration", node.getRow(), node.getCol());
+                throw new TypeException("Return values do not match types in function declaration", node.getRow(), node.getCol());
             }
         }
 
@@ -444,9 +441,9 @@ public class TypeCheckVisitor implements NodeVisitor {
         Identifier identifier = node.getIdentifier();
         Context context = contexts.peek();
         if (context.containsKey(identifier)) {
-            throw new TypeException("TODO: cannot shadow variables", node.getRow(), node.getCol());
+            throw new TypeException("Variable " + identifier.getName() + " already declared in scope",
+                    node.getRow(), node.getCol());
         }
-
         context.put(identifier, node.getDeclarationType());
         node.setType(node.getDeclarationType());
     }
@@ -458,12 +455,10 @@ public class TypeCheckVisitor implements NodeVisitor {
         UnaryOperator unop = node.getOp();
         if (expression.getType().equals(INT_TYPE) && unop == UnaryOperator.MINUS) {
             node.setType(new VariableType(PrimitiveType.INT, 0));
-
         } else if (expression.getType().equals(BOOL_TYPE) && unop == UnaryOperator.NOT) {
             node.setType(new VariableType(PrimitiveType.BOOL, 0));
-
         } else {
-            throw new TypeException("TODO invalid unary operator");
+            throw new TypeException("Invalid unary operator", node.getRow(), node.getCol());
         }
     }
 
@@ -479,16 +474,14 @@ public class TypeCheckVisitor implements NodeVisitor {
         Expression guard = node.getGuard();
         guard.accept(this);
         if (!guard.getType().equals(BOOL_TYPE)) {
-            throw new TypeException("TODO", node.getRow(), node.getCol());
+            throw new TypeException("While statement guard must be of type bool", node.getRow(), node.getCol());
         }
 
         Block block = node.getBlock();
         block.accept(this);
 
-        if (!block.getType().equals(UNIT_TYPE) && !block.getType().equals(VOID_TYPE)) {
-            throw new TypeException("TODO", node.getRow(), node.getCol()); //debug
-        }
-
+        // Blocks should only have either unit or void type
+        assert block.getType().equals(UNIT_TYPE) || block.getType().equals(VOID_TYPE);
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
 
