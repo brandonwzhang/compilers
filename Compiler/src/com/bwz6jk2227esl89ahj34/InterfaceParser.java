@@ -6,12 +6,13 @@
 package com.bwz6jk2227esl89ahj34;
 
 import com.AST.*;
+import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
-
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.AbstractMap.*;
 
 /** CUP v0.11b 20150326 generated parser.
   */
@@ -20,7 +21,7 @@ public class InterfaceParser
 
   @Override
   public final Class<?> getSymbolContainer() {
-    return ParserSym.class;
+    return InterfaceParserSym.class;
   }
 
   /** Default constructor. */
@@ -39,11 +40,11 @@ public class InterfaceParser
     unpackFromStrings(new String[] {
     "\000\024\000\002\002\004\000\002\002\002\000\002\003" +
     "\003\000\002\003\003\000\002\005\005\000\002\005\003" +
-    "\000\002\004\004\000\002\007\005\000\002\007\003\000" +
-    "\002\010\005\000\002\011\005\000\002\011\003\000\002" +
-    "\012\003\000\002\012\003\000\002\013\010\000\002\013" +
-    "\006\000\002\014\003\000\002\014\004\000\002\015\004" +
-    "\000\002\015\003" });
+    "\000\002\004\004\000\002\006\005\000\002\006\003\000" +
+    "\002\007\005\000\002\010\005\000\002\010\003\000\002" +
+    "\011\003\000\002\011\003\000\002\012\010\000\002\012" +
+    "\006\000\002\013\003\000\002\013\004\000\002\014\004" +
+    "\000\002\014\003" });
 
   /** Access to production table. */
   @Override
@@ -52,27 +53,29 @@ public class InterfaceParser
   /** Parse-action table. */
   protected static final short[][] _action_table = 
     unpackFromStrings(new String[] {
-    "\000\041\000\004\004\006\001\002\000\004\002\043\001" +
-    "\002\000\006\002\uffee\004\006\001\002\000\004\011\011" +
-    "\001\002\000\010\002\ufff1\004\ufff1\015\010\001\002\000" +
-    "\006\002\ufff0\004\ufff0\001\002\000\006\004\014\012\000" +
-    "\001\002\000\004\012\033\001\002\000\004\012\ufff5\001" +
-    "\002\000\004\013\021\001\002\000\006\012\ufff6\014\017" +
-    "\001\002\000\004\012\ufff4\001\002\000\004\004\014\001" +
-    "\002\000\004\012\ufff7\001\002\000\006\005\025\006\023" +
-    "\001\002\000\006\012\ufff8\014\ufff8\001\002\000\010\007" +
-    "\ufffe\012\ufffe\014\ufffe\001\002\000\010\007\027\012\000" +
-    "\014\000\001\002\000\010\007\uffff\012\uffff\014\uffff\001" +
-    "\002\000\006\012\ufffb\014\ufffb\001\002\000\004\010\031" +
-    "\001\002\000\006\012\ufffc\014\ufffc\001\002\000\010\007" +
-    "\027\012\000\014\000\001\002\000\006\012\ufffd\014\ufffd" +
-    "\001\002\000\012\002\ufff2\004\ufff2\013\034\015\ufff2\001" +
-    "\002\000\006\005\025\006\023\001\002\000\004\014\040" +
-    "\001\002\000\010\002\ufff3\004\ufff3\015\ufff3\001\002\000" +
-    "\010\002\ufff9\004\ufff9\015\ufff9\001\002\000\006\005\025" +
-    "\006\023\001\002\000\010\002\ufffa\004\ufffa\015\ufffa\001" +
-    "\002\000\004\002\uffef\001\002\000\004\002\001\001\002" +
-    "" });
+    "\000\040\000\004\004\006\001\002\000\004\002\042\001" +
+    "\002\000\006\002\uffee\004\006\001\002\000\004\044\011" +
+    "\001\002\000\010\002\ufff1\004\ufff1\052\010\001\002\000" +
+    "\006\002\ufff0\004\ufff0\001\002\000\006\004\014\045\000" +
+    "\001\002\000\004\045\033\001\002\000\004\045\ufff5\001" +
+    "\002\000\004\050\021\001\002\000\006\045\ufff6\051\017" +
+    "\001\002\000\004\045\ufff4\001\002\000\004\004\014\001" +
+    "\002\000\004\045\ufff7\001\002\000\006\012\025\013\023" +
+    "\001\002\000\006\045\ufff8\051\ufff8\001\002\000\016\002" +
+    "\ufffe\004\ufffe\042\ufffe\045\ufffe\051\ufffe\052\ufffe\001\002" +
+    "\000\016\002\000\004\000\042\027\045\000\051\000\052" +
+    "\000\001\002\000\016\002\uffff\004\uffff\042\uffff\045\uffff" +
+    "\051\uffff\052\uffff\001\002\000\014\002\ufffb\004\ufffb\045" +
+    "\ufffb\051\ufffb\052\ufffb\001\002\000\004\043\031\001\002" +
+    "\000\014\002\ufffc\004\ufffc\045\ufffc\051\ufffc\052\ufffc\001" +
+    "\002\000\016\002\000\004\000\042\027\045\000\051\000" +
+    "\052\000\001\002\000\014\002\ufffd\004\ufffd\045\ufffd\051" +
+    "\ufffd\052\ufffd\001\002\000\012\002\ufff2\004\ufff2\050\034" +
+    "\052\ufff2\001\002\000\006\012\025\013\023\001\002\000" +
+    "\012\002\ufff9\004\ufff9\051\037\052\ufff9\001\002\000\010" +
+    "\002\ufff3\004\ufff3\052\ufff3\001\002\000\006\012\025\013" +
+    "\023\001\002\000\010\002\ufffa\004\ufffa\052\ufffa\001\002" +
+    "\000\004\002\uffef\001\002\000\004\002\001\001\002" });
 
   /** Access to parse-action table. */
   @Override
@@ -81,21 +84,20 @@ public class InterfaceParser
   /** {@code reduce_goto} table. */
   protected static final short[][] _reduce_table = 
     unpackFromStrings(new String[] {
-    "\000\041\000\010\013\006\014\004\015\003\001\001\000" +
-    "\002\001\001\000\010\013\006\014\004\015\041\001\001" +
+    "\000\040\000\010\012\006\013\004\014\003\001\001\000" +
+    "\002\001\001\000\010\012\006\013\004\014\040\001\001" +
     "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
-    "\012\002\015\010\014\011\012\012\011\001\001\000\002" +
+    "\012\002\015\007\014\010\012\011\011\001\001\000\002" +
     "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
-    "\001\000\002\001\001\000\006\010\014\011\017\001\001" +
+    "\001\000\002\001\001\000\006\007\014\010\017\001\001" +
     "\000\002\001\001\000\006\003\023\004\021\001\001\000" +
     "\002\001\001\000\002\001\001\000\006\002\027\005\025" +
     "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
     "\001\000\002\001\001\000\006\002\027\005\031\001\001" +
-    "\000\002\001\001\000\002\001\001\000\012\003\023\004" +
-    "\034\006\036\007\035\001\001\000\002\001\001\000\002" +
-    "\001\001\000\002\001\001\000\012\003\023\004\034\006" +
-    "\036\007\040\001\001\000\002\001\001\000\002\001\001" +
-    "\000\002\001\001" });
+    "\000\002\001\001\000\002\001\001\000\010\003\023\004" +
+    "\034\006\035\001\001\000\002\001\001\000\002\001\001" +
+    "\000\010\003\023\004\034\006\037\001\001\000\002\001" +
+    "\001\000\002\001\001\000\002\001\001" });
 
   /** Access to {@code reduce_goto} table. */
   @Override
@@ -154,7 +156,7 @@ public class InterfaceParser
         try {
             FileReader reader = new FileReader(libPath + interfaceName + ".ixi");
             Lexer lexer = new Lexer(reader);
-            Parser parser = new Parser(lexer);
+            InterfaceParser parser = new InterfaceParser(lexer);
             Symbol result = parser.parse();
             if (parser.hasSyntaxError) {
                 // Encountered parsing error, return error message
@@ -290,19 +292,19 @@ class CUP$InterfaceParser$actions {
                 int lstright = CUP$InterfaceParser$stack.peek().right;
                 List<VariableType> lst = CUP$InterfaceParser$stack.peek().<List<VariableType>> value();
                  lst.add(0,t); RESULT = lst; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_return_types",5, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_return_types",4, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 8: // function_declaration_return_types ::= function_declaration_argument_type 
+        case 8: // function_declaration_return_types ::= var_type 
             {
                 List<VariableType> RESULT = null;
                 int tleft = CUP$InterfaceParser$stack.peek().left;
                 int tright = CUP$InterfaceParser$stack.peek().right;
                 VariableType t = CUP$InterfaceParser$stack.peek().<VariableType> value();
                  List<VariableType> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_return_types",5, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_return_types",4, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
@@ -317,7 +319,7 @@ class CUP$InterfaceParser$actions {
                 int tright = CUP$InterfaceParser$stack.peek().right;
                 VariableType t = CUP$InterfaceParser$stack.peek().<VariableType> value();
                  RESULT = new SimpleEntry<Identifier, VariableType>(new Identifier(i), t); 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_single",6, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_single",5, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
@@ -332,7 +334,7 @@ class CUP$InterfaceParser$actions {
                 int lstright = CUP$InterfaceParser$stack.peek().right;
                 List<SimpleEntry<Identifier,VariableType>> lst = CUP$InterfaceParser$stack.peek().<List<SimpleEntry<Identifier,VariableType>>> value();
                  lst.add(0, fdas); RESULT = lst; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_list",7, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_list",6, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
@@ -344,7 +346,7 @@ class CUP$InterfaceParser$actions {
                 int fdasright = CUP$InterfaceParser$stack.peek().right;
                 SimpleEntry<Identifier,VariableType> fdas = CUP$InterfaceParser$stack.peek().<SimpleEntry<Identifier,VariableType>> value();
                  List<SimpleEntry<Identifier, VariableType>> lst = new LinkedList<>(); lst.add(0, fdas); RESULT = lst; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_list",7, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_list",6, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
@@ -356,7 +358,7 @@ class CUP$InterfaceParser$actions {
                 int lstright = CUP$InterfaceParser$stack.peek().right;
                 List<SimpleEntry<Identifier,VariableType>> lst = CUP$InterfaceParser$stack.peek().<List<SimpleEntry<Identifier,VariableType>>> value();
                  RESULT = lst; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument",8, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument",7, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
@@ -365,7 +367,7 @@ class CUP$InterfaceParser$actions {
             {
                 List<SimpleEntry<Identifier,VariableType>> RESULT = null;
                  RESULT = new LinkedList<>(); 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument",8, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument",7, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
@@ -383,7 +385,7 @@ class CUP$InterfaceParser$actions {
                 int tright = CUP$InterfaceParser$stack.peek().right;
                 List<VariableType> t = CUP$InterfaceParser$stack.peek().<List<VariableType>> value();
                  List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, null); 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",9, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-5), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",8, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-5), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
@@ -398,7 +400,7 @@ class CUP$InterfaceParser$actions {
                 int argPairsright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).right;
                 List<SimpleEntry<Identifier,VariableType>> argPairs = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).<List<SimpleEntry<Identifier,VariableType>>> value();
                  List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, null); 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",9, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",8, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
@@ -410,7 +412,7 @@ class CUP$InterfaceParser$actions {
                 int fdright = CUP$InterfaceParser$stack.peek().right;
                 FunctionDeclaration fd = CUP$InterfaceParser$stack.peek().<FunctionDeclaration> value();
                  RESULT = fd; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_line",10, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_line",9, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
@@ -422,7 +424,7 @@ class CUP$InterfaceParser$actions {
                 int fdright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).right;
                 FunctionDeclaration fd = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).<FunctionDeclaration> value();
                  RESULT = fd; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_line",10, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_line",9, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
@@ -437,7 +439,7 @@ class CUP$InterfaceParser$actions {
                 int lstright = CUP$InterfaceParser$stack.peek().right;
                 List<FunctionDeclaration> lst = CUP$InterfaceParser$stack.peek().<List<FunctionDeclaration>> value();
                  lst.add(0, fd); RESULT = lst; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",11, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",10, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
@@ -449,7 +451,7 @@ class CUP$InterfaceParser$actions {
                 int fdright = CUP$InterfaceParser$stack.peek().right;
                 FunctionDeclaration fd = CUP$InterfaceParser$stack.peek().<FunctionDeclaration> value();
                  RESULT = new LinkedList<FunctionDeclaration>(); RESULT.add(fd); 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",11, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",10, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
