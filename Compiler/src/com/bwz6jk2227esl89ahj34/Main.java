@@ -21,13 +21,17 @@ public class Main {
                       Main::turnDebugOn,
                       0);
         cli.addOption("-sourcepath",
-                      "Set the path for source files. Takes one argument.",
-                      Main::setSourcePath,
-                      1);
+                "Set the path for source files. Takes one argument.",
+                Main::setSourcePath,
+                1);
         cli.addOption("-D",
-                      "Set the path for diagnostic files. Takes one argument.",
-                      Main::setDiagnosticPath,
-                      1);
+                "Set the path for diagnostic files. Takes one argument.",
+                Main::setDiagnosticPath,
+                1);
+        cli.addOption("-libpath",
+                "Set the path for interface files. Takes one argument.",
+                Main::setLibPath,
+                1);
         cli.addOption("--lex",
                 "Lex the .xi source files to .lexed files.",
                 files -> Lexer.lexFile(sourcePath, diagnosticPath, files),
@@ -73,6 +77,14 @@ public class Main {
             return;
         }
         diagnosticPath = args[0] + "/";
+    }
+
+    public static void setLibPath(String[] args) {
+        if (args.length == 0 || args[0] == null) {
+            System.out.println("Please provide lib path");
+            return;
+        }
+        libPath = args[0] + "/";
     }
 
     /**
