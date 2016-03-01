@@ -463,7 +463,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             node.setType(new VariableType(PrimitiveType.BOOL, 0));
 
         } else {
-            throw new TypeException("TODO invalid unary operator");
+            throw new TypeException("TODO invalid unary operator", node.getRow(), node.getCol());
         }
     }
 
