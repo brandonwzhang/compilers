@@ -25,7 +25,7 @@ parser code {:
         try {
             FileReader reader = new FileReader(libPath + interfaceName + ".ixi");
             Lexer lexer = new Lexer(reader);
-            Parser parser = new Parser(lexer);
+            InterfaceParser parser = new InterfaceParser(lexer);
             Symbol result = parser.parse();
             if (parser.hasSyntaxError) {
                 // Encountered parsing error, return error message
@@ -36,40 +36,6 @@ parser code {:
             return "Interface " + interfaceName + " not found";
         }
         return null;
-    }
-
-    /**
-     * Add function declarations in a given interface to a context.
-     * @param libPath       a String of the path to the interface files
-     * @param interfaceName a String of the name of the interface
-     * @param context       a Context to add the function declarations to
-     * @return              a String of the error or null if no error
-     */
-    public String addInterface(String libPath, String interfaceName, Context context) {
-        List<FunctionDeclaration> declarations = new LinkedList<>(); 
-        String error = InterfaceParser.parseInterface(libPath, interfaceName, declarations);
-        for (FunctionDeclaration declaration : declarations) {
-            context.put(declaration.getIdentifier(), declaration.getType());
-        }
-        return error;
-    }
-    
-    /**
-     * Checks that all declarations in an interface file are implemented in its associated in its xi file
-     * @param libPath       a String of the path to the interface files
-     * @param interfaceName a String of the name of the interface
-     * @param context       a Context to add the function declarations to
-     * @return              a String of the error or null if no error
-     */
-    public String checkInterface(String libPath, String interfaceName, Context context) {
-        List<FunctionDeclaration> declarations = new LinkedList<>(); 
-        String error = InterfaceParser.parseInterface(libPath, interfaceName, declarations);
-        for (FunctionDeclaration declaration : declarations) {
-            if (!context.get(declaration.getIdentifier()).equals(declaration.getType())) {
-                return declaration.getIdentifier().getName() + " is not implemented";
-            }
-        }
-        return error;
     }
 
     public boolean hasSyntaxError = false;
@@ -97,7 +63,6 @@ nonterminal PrimitiveType primitive_type;
 nonterminal VariableType var_type;
 nonterminal Integer array_no_size_type;
 
-nonterminal VariableType function_declaration_argument_type;
 nonterminal List<VariableType> function_declaration_return_types; 
 nonterminal SimpleEntry<Identifier, VariableType> function_declaration_argument_single; 
 nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_argument_list;
@@ -107,8 +72,10 @@ nonterminal FunctionDeclaration function_declaration;
 nonterminal FunctionDeclaration function_declaration_line;
 nonterminal List<FunctionDeclaration> function_declaration_list;
 
-start with function_declaration_list;
-
+//start with function_declaration_list;
+nonterminal List<FunctionDeclaration> interface;
+start with interface;
+interface ::= function_declaration_list;
 empty ::= ;
 
 primitive_type ::= INT {: RESULT = PrimitiveType.INT; :}
@@ -123,7 +90,7 @@ var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new Variable
        ;
        
 function_declaration_return_types ::= var_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :} 
-       | function_declaration_argument_type:t  {: List<VariableType> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; :}
+       | var_type:t  {: List<VariableType> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; :}
        ; 
 
 function_declaration_argument_single ::= IDENTIFIER:i COLON var_type:t {: RESULT = new SimpleEntry<Identifier, VariableType>(new Identifier(i), t); :}

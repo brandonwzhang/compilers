@@ -34,10 +34,11 @@ public class Main {
         cli.addOption("--typecheck",
                 "Typecheck the .xi source files",
                 files -> Arrays.stream(files).forEach(file ->
-                                Util.typeCheck(sourcePath, diagnosticPath, libPath, file)),
+                                Util.typeCheck(sourcePath, diagnosticPath,
+                                        sourcePath, file)),
                 0);
         cli.execute(args);
-
+/*
         String[] passFileNames = {"mdarrays.xi"};
         for (String filename : passFileNames) {
             Util.typeCheck("typecheck/passtests/", "typecheck/passtests/",
@@ -52,6 +53,7 @@ public class Main {
             Util.typeCheck("typecheck/failtests/", "typecheck/failtests/",
                     libPath, filename);
         }
+        */
     }
 
     /**
