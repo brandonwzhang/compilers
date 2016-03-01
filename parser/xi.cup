@@ -114,6 +114,7 @@ nonterminal SimpleEntry<List<Expression>, Integer> array_size_type;
 nonterminal Integer array_no_size_type;
 
 nonterminal TypedDeclaration typed_declaration; 
+nonterminal TypedDeclaration typed_declaration_no_size;
 nonterminal FunctionCall function_call;
 nonterminal ArrayIndex assignment_lhs_array_brackets;
 nonterminal Expression assignment_lhs_array;
@@ -241,6 +242,9 @@ var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new Variable
        ;
        
 
+typed_declaration_no_size ::= IDENTIFIER:id COLON primitive_type:t array_no_size_type:ast {: RESULT = new TypedDeclaration(new Identifier(id), new VariableType(t, ast.getKey().size() + ast.getValue()), ast.getKey()); RESULT.setLocation(parser.cur_token); :} //x:int
+                    ;
+
 typed_declaration ::= IDENTIFIER:id COLON primitive_type:t array_size_type:ast {: RESULT = new TypedDeclaration(new Identifier(id), new VariableType(t, ast.getKey().size() + ast.getValue()), ast.getKey()); RESULT.setLocation(parser.cur_token); :} //x:int
                     ;
 
@@ -262,12 +266,12 @@ assignment_lhs_array ::= function_call:fc {: RESULT = fc; RESULT.setLocation(par
 
 assignment_lhs ::= IDENTIFIER:id {: RESULT = new Identifier(id); RESULT.setLocation(parser.cur_token); :}
                  | assignment_lhs_array_brackets:a {: RESULT = a; RESULT.setLocation(parser.cur_token); :}
-                 | typed_declaration:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
+                 | typed_declaration_no_size:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
                  | function_call:fc {: RESULT = fc; RESULT.setLocation(parser.cur_token); :}
                  | UNDERSCORE {: RESULT = new Underscore(); RESULT.setLocation(parser.cur_token); :}
                  ;
 
-declaration_assignment_lhs ::= typed_declaration:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
+declaration_assignment_lhs ::= typed_declaration_no_size:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
                              | UNDERSCORE {: RESULT = new Underscore(); RESULT.setLocation(parser.cur_token); :}
                              ;
 multiple_assignment_lhs ::= declaration_assignment_lhs:dl COMMA multiple_assignment_lhs:dll {: dll.add(0, dl); RESULT = dll; :}
