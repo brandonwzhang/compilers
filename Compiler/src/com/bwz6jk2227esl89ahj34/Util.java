@@ -214,7 +214,6 @@ public class Util {
 
         // attempt typechecking
         try {
-            System.out.println();
             System.out.println(output);
             ((Program) result.get().value).accept(visitor);
             System.out.println("typed");
@@ -261,6 +260,11 @@ public class Util {
         return Optional.of(result);
     }
 
+    /**
+     * Parses the Xi file located at sourcePath + file.
+     * Writes the output to diagnosticPath + file.
+     * The output is an S-expression representing the AST of the given program.
+     */
     public static void parseFile(String sourcePath,
                                  String diagnosticPath,
                                  String file) {
@@ -277,7 +281,7 @@ public class Util {
         parseHelper(parser, lines);
         writeHelper(file, "parsed", diagnosticPath, lines);
     }
-
+    
     public static void lexHelper(Lexer lexer, List<String> lines) {
         try {
             Symbol next = lexer.next_token();
@@ -300,6 +304,10 @@ public class Util {
         }
     }
 
+    /**
+     * Lexes the Xi file located at sourcePath + file.
+     * Writes the lexed output to diagnosticPath + file.
+     */
     public static void lexFile(String sourcePath,
                                String diagnosticPath,
                                String file) {
