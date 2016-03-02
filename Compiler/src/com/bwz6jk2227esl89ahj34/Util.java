@@ -162,8 +162,9 @@ public class Util {
     }
 
     /**
-     * Returns Optional of FileReader. If the file doesn't exist,
-     * an empty Optional is returned.
+     * Creates a FileReader for sourcePath + file and returns it inside
+     * an Optional. If the file is not found, then an empty Optional
+     * is returned.
      */
     public static Optional<FileReader> getFileReader(String sourcePath,
                                                      String file) {
@@ -184,6 +185,12 @@ public class Util {
         }
     }
 
+    /**
+     * Typechecks the Xi file located at sourcePath + file.
+     * Writes the output to diagnosticPath + file.
+     * libPath is the path where the interface files (.ixi)
+     * are found.
+     */
     public static void typeCheck(String sourcePath,
                                  String diagnosticPath,
                                  String libPath,
@@ -205,6 +212,7 @@ public class Util {
         Optional<Symbol> result = parseHelper(parser, parseLines);
         if (!result.isPresent()) {
             // TODO: syntactic error. what do we do?
+            // System printing is already taken care of
             return;
         }
 
@@ -213,7 +221,6 @@ public class Util {
 
         // attempt typechecking
         try {
-            System.out.println();
             System.out.println(output);
             ((Program) result.get().value).accept(visitor);
             System.out.println("typed");
@@ -224,6 +231,20 @@ public class Util {
         }
     }
 
+    /**
+     * A helper function for parsing. Parses with the given parser.
+     * Mutates the given list by adding the lines of the output.
+     * If there is a syntax error, the given list is cleared and a
+     * single String containing the parser's error message is added.
+     *
+     * If an exception is thrown during parsing or if there is a syntax
+     * error, an empty Optional is returned. If the parsing is successful,
+     * an Optional containing the result is returned.
+     *
+     * @param parser a Parser object
+     * @param lines a List<String> for storing the output
+     * @return an Optional that might contain the result of the parsing
+     */
     public static Optional<Symbol> parseHelper(Parser parser,
                                                List<String> lines) {
         Symbol result;
@@ -236,14 +257,14 @@ public class Util {
 
         if (parser.hasSyntaxError) {
             // handle syntax error, output to file
-            if (Main.debugOn()) {
-                System.out.println("DEBUG: Syntax error.");
-            }
-
+            String errMessage = parser.syntaxErrMessage;
             parser.hasSyntaxError = false;
-            lines.clear();
-            lines.add(parser.syntaxErrMessage);
             parser.syntaxErrMessage = "";
+            lines.clear();
+            lines.add(errMessage);
+
+            printError("Syntax", parser.syntaxErrMessage);
+
             return Optional.empty();
         }
 
@@ -260,6 +281,11 @@ public class Util {
         return Optional.of(result);
     }
 
+    /**
+     * Parses the Xi file located at sourcePath + file.
+     * Writes the output to diagnosticPath + file.
+     * The output is an S-expression representing the AST of the given program.
+     */
     public static void parseFile(String sourcePath,
                                  String diagnosticPath,
                                  String file) {
@@ -277,6 +303,13 @@ public class Util {
         writeHelper(file, "parsed", diagnosticPath, lines);
     }
 
+    /**
+     * A helper function for lexing. Lexes with the given lexer.
+     * Mutates the given list by adding the lines of the output.
+     *
+     * @param lexer a Lexer object
+     * @param lines a List<String> for storing the output
+     */
     public static void lexHelper(Lexer lexer, List<String> lines) {
         try {
             Symbol next = lexer.next_token();
@@ -289,9 +322,7 @@ public class Util {
                 }
                 lines.add(line);
                 if (next.sym == ParserSym.error) {
-                    if (Main.debugOn()) {
-                        System.out.println("DEBUG: Lexical error.");
-                    }
+                    printError("Lexical", lines.get(lines.size() - 1));
                     break;
                 }
                 next = lexer.next_token();
@@ -301,6 +332,10 @@ public class Util {
         }
     }
 
+    /**
+     * Lexes the Xi file located at sourcePath + file.
+     * Writes the output to diagnosticPath + file.
+     */
     public static void lexFile(String sourcePath,
                                String diagnosticPath,
                                String file) {
@@ -315,5 +350,25 @@ public class Util {
         List<String> lines = new ArrayList<>();
         lexHelper(lexer, lines);
         writeHelper(file, "lexed", diagnosticPath, lines);
+    }
+
+    /**
+     * Reformats the given error message into:
+     * <kind> error beginning at <line>:<column>: <description>
+     * Prints this to System.out
+     *
+     * @param errorType The type of error.
+     * @param errorMessage Must be of the form:
+     *                     <line>:<column> error:<description>
+     */
+    public static void printError(String errorType, String errorMessage) {
+        int firstColon = errorMessage.charAt(':');
+        int lineNum = Integer.parseInt(errorMessage.substring(0, firstColon));
+        int columnNum = Integer.parseInt(errorMessage.substring(
+                firstColon + 1, errorMessage.indexOf(' ')));
+        String description = errorMessage
+                .substring(errorMessage.lastIndexOf(':'));
+        System.out.println(errorType + " error: beginning at "
+                + lineNum + ":" + columnNum + ": " + description);
     }
 }
