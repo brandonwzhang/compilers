@@ -371,4 +371,25 @@ public class Util {
         System.out.println(errorType + " error: beginning at "
                 + lineNum + ":" + columnNum + ":" + description);
     }
+
+    /**
+     * Returns a list of file names in a given directory
+     * @param directoryPath a String of the path to the directory
+     * @return a List<String> of all the file names in the directory
+     */
+    public static List<String> getDirectoryFiles(String directoryPath) {
+        List<String> files = new ArrayList<>();
+        try {
+            Files.walk(Paths.get(directoryPath)).forEach(filePath -> {
+                if (Files.isRegularFile(filePath)) {
+                    String filePathStr = filePath.toString();
+                    String file = filePathStr.substring(filePathStr.lastIndexOf('/') + 1, filePathStr.length());
+                    files.add(file);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return files;
+    }
 }

@@ -1,6 +1,8 @@
 package com.bwz6jk2227esl89ahj34;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class Main {
@@ -44,7 +46,7 @@ public class Main {
                 "Typecheck the .xi source files",
                 files -> Arrays.stream(files).forEach(file ->
                                 Util.typeCheck(sourcePath, diagnosticPath,
-                                        sourcePath, file)),
+                                        libPath, file)),
                 0);
         cli.execute(args);
 
@@ -104,23 +106,16 @@ public class Main {
      */
     public static void typeCheckTests() {
 
-        String[] passFileNames = {"array_access.xi", "array_add.xi",
-                "arraydecl.xi", "binop_bool.xi", "binop_int.xi",
-                "funcreturn1.xi", "functions.xi", "io_test.xi", "length.xi",
-                "mdarrays.xi", "unop.xi", "while.xi"};
-        for (String filename : passFileNames) {
+        System.out.println("================Passed Tests================");
+        for (String filename : Util.getDirectoryFiles("typecheck/passtests/")) {
             Util.typeCheck("typecheck/passtests/", "typecheck/passtests/",
-                    "typecheck/passtests/", filename);
+                    "typecheck/lib/", filename);
         }
 
-        String[] failFileNames = {"invalid_assign.xi", "invalid_function.xi",
-                "invalid_length.xi", "invalid_multireturn.xi",
-                "invalid_multireturn2.xi", "invalid_operand.xi",
-                "invalid_proccall.xi", "invalid_type.xi",
-                "invalid_underscore.xi"};
-        for (String filename : failFileNames) {
+        System.out.println("================Failed Tests================");
+        for (String filename : Util.getDirectoryFiles("typecheck/failtests/")) {
             Util.typeCheck("typecheck/failtests/", "typecheck/failtests/",
-                    "typecheck/passtests/", filename);
+                    "typecheck/lib/", filename);
         }
     }
 
