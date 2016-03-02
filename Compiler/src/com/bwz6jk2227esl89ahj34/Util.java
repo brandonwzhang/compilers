@@ -205,6 +205,7 @@ public class Util {
         Optional<Symbol> result = parseHelper(parser, parseLines);
         if (!result.isPresent()) {
             // TODO: syntactic error. what do we do?
+            // System printing is already taken care of
             return;
         }
 
@@ -236,14 +237,14 @@ public class Util {
 
         if (parser.hasSyntaxError) {
             // handle syntax error, output to file
-            if (Main.debugOn()) {
-                System.out.println("DEBUG: Syntax error.");
-            }
-
+            String errMessage = parser.syntaxErrMessage;
             parser.hasSyntaxError = false;
-            lines.clear();
-            lines.add(parser.syntaxErrMessage);
             parser.syntaxErrMessage = "";
+            lines.clear();
+            lines.add(errMessage);
+
+            printError("Syntax", parser.syntaxErrMessage);
+
             return Optional.empty();
         }
 
@@ -289,9 +290,7 @@ public class Util {
                 }
                 lines.add(line);
                 if (next.sym == ParserSym.error) {
-                    if (Main.debugOn()) {
-                        System.out.println("DEBUG: Lexical error.");
-                    }
+                    printError("Lexical", lines.get(lines.size() - 1));
                     break;
                 }
                 next = lexer.next_token();
@@ -315,5 +314,22 @@ public class Util {
         List<String> lines = new ArrayList<>();
         lexHelper(lexer, lines);
         writeHelper(file, "lexed", diagnosticPath, lines);
+    }
+
+    /**
+     * Reformats the given error message and prints to System.out.
+     * @param errorType The type of error.
+     * @param errorMessage Must be of the form:
+     *                     <line>:<column> error:<description>
+     */
+    public static void printError(String errorType, String errorMessage) {
+        int firstColon = errorMessage.charAt(':');
+        int lineNum = Integer.parseInt(errorMessage.substring(0, firstColon));
+        int columnNum = Integer.parseInt(errorMessage.substring(
+                firstColon + 1, errorMessage.indexOf(' ')));
+        String description = errorMessage
+                .substring(errorMessage.lastIndexOf(':'));
+        System.out.println(errorType + " error: beginning at "
+                + lineNum + ":" + columnNum + ": " + description);
     }
 }
