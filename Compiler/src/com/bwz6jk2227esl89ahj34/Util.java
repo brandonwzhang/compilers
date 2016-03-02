@@ -162,8 +162,9 @@ public class Util {
     }
 
     /**
-     * Returns Optional of FileReader. If the file doesn't exist,
-     * an empty Optional is returned.
+     * Creates a FileReader for sourcePath + file and returns it inside
+     * an Optional. If the file is not found, then an empty Optional
+     * is returned.
      */
     public static Optional<FileReader> getFileReader(String sourcePath,
                                                      String file) {
@@ -184,6 +185,12 @@ public class Util {
         }
     }
 
+    /**
+     * Typechecks the Xi file located at sourcePath + file.
+     * Writes the output to diagnosticPath + file.
+     * libPath is the path where the interface files (.ixi)
+     * are found.
+     */
     public static void typeCheck(String sourcePath,
                                  String diagnosticPath,
                                  String libPath,
@@ -224,6 +231,20 @@ public class Util {
         }
     }
 
+    /**
+     * A helper function for parsing. Parses with the given parser.
+     * Mutates the given list by adding the lines of the output.
+     * If there is a syntax error, the given list is cleared and a
+     * single String containing the parser's error message is added.
+     *
+     * If an exception is thrown during parsing or if there is a syntax
+     * error, an empty Optional is returned. If the parsing is successful,
+     * an Optional containing the result is returned.
+     *
+     * @param parser a Parser object
+     * @param lines a List<String> for storing the output
+     * @return an Optional that might contain the result of the parsing
+     */
     public static Optional<Symbol> parseHelper(Parser parser,
                                                List<String> lines) {
         Symbol result;
@@ -281,7 +302,14 @@ public class Util {
         parseHelper(parser, lines);
         writeHelper(file, "parsed", diagnosticPath, lines);
     }
-    
+
+    /**
+     * A helper function for lexing. Lexes with the given lexer.
+     * Mutates the given list by adding the lines of the output.
+     *
+     * @param lexer a Lexer object
+     * @param lines a List<String> for storing the output
+     */
     public static void lexHelper(Lexer lexer, List<String> lines) {
         try {
             Symbol next = lexer.next_token();
@@ -306,7 +334,7 @@ public class Util {
 
     /**
      * Lexes the Xi file located at sourcePath + file.
-     * Writes the lexed output to diagnosticPath + file.
+     * Writes the output to diagnosticPath + file.
      */
     public static void lexFile(String sourcePath,
                                String diagnosticPath,
@@ -325,7 +353,10 @@ public class Util {
     }
 
     /**
-     * Reformats the given error message and prints to System.out.
+     * Reformats the given error message into:
+     * <kind> error beginning at <line>:<column>: <description>
+     * Prints this to System.out
+     *
      * @param errorType The type of error.
      * @param errorMessage Must be of the form:
      *                     <line>:<column> error:<description>
