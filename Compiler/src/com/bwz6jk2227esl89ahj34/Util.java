@@ -263,7 +263,7 @@ public class Util {
             lines.clear();
             lines.add(errMessage);
 
-            printError("Syntax", parser.syntaxErrMessage);
+            printError("Syntax", lines.get(0));
 
             return Optional.empty();
         }
@@ -362,13 +362,13 @@ public class Util {
      *                     <line>:<column> error:<description>
      */
     public static void printError(String errorType, String errorMessage) {
-        int firstColon = errorMessage.charAt(':');
+        int firstColon = errorMessage.indexOf(':');
         int lineNum = Integer.parseInt(errorMessage.substring(0, firstColon));
         int columnNum = Integer.parseInt(errorMessage.substring(
                 firstColon + 1, errorMessage.indexOf(' ')));
         String description = errorMessage
-                .substring(errorMessage.lastIndexOf(':'));
+                .substring(errorMessage.lastIndexOf(':') + 1);
         System.out.println(errorType + " error: beginning at "
-                + lineNum + ":" + columnNum + ": " + description);
+                + lineNum + ":" + columnNum + ":" + description);
     }
 }

@@ -104,19 +104,23 @@ public class Main {
      */
     public static void typeCheckTests() {
 
-        String[] passFileNames = {"mdarrays.xi"};
+        String[] passFileNames = {"array_access.xi", "array_add.xi",
+                "arraydecl.xi", "binop_bool.xi", "binop_int.xi",
+                "funcreturn1.xi", "functions.xi", "io_test.xi", "length.xi",
+                "mdarrays.xi", "unop.xi", "while.xi"};
         for (String filename : passFileNames) {
             Util.typeCheck("typecheck/passtests/", "typecheck/passtests/",
-                    libPath, filename);
+                    "typecheck/passtests/", filename);
         }
 
         String[] failFileNames = {"invalid_assign.xi", "invalid_function.xi",
-                "invalid_multireturn.xi", "invalid_multireturn2.xi",
-                "invalid_operand.xi", "invalid_proccall.xi",
-                "invalid_type.xi", "invalid_underscore.xi"};
+                "invalid_length.xi", "invalid_multireturn.xi",
+                "invalid_multireturn2.xi", "invalid_operand.xi",
+                "invalid_proccall.xi", "invalid_type.xi",
+                "invalid_underscore.xi"};
         for (String filename : failFileNames) {
             Util.typeCheck("typecheck/failtests/", "typecheck/failtests/",
-                    libPath, filename);
+                    "typecheck/passtests/", filename);
         }
     }
 
