@@ -80,6 +80,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(ArrayLiteral node) {
+        // empty array case ({})
         if (node.getValues().size() == 0) {
             node.setType(new VariableType(PrimitiveType.INT, 1));
             return;
@@ -89,16 +90,29 @@ public class TypeCheckVisitor implements NodeVisitor {
         Type firstType = null;
         for (Expression e : node.getValues()) {
             e.accept(this);
-            Type type = e.getType();
-            if (type instanceof VariableType) {
-                if (firstType == null) {
-                    firstType = type;
-                } else if (!firstType.equals(type)) {
-                    throw new TypeException("Types in the array literal must all match", node.getRow(), node.getCol());
-                }
+            Type elementType = e.getType();
+            if (elementType instanceof VariableTypeList) {
+                List<VariableType> returnTypes =
+                        ((VariableTypeList) elementType).getVariableTypeList();
+                int size = returnTypes.size();
+                if (size == 0) {
+                    throw new TypeException("Function calls inside " +
+                            "array literals must return a value",
+                            node.getRow(), node.getCol());
 
-            } else {
-                throw new TypeException("Element of array literal must be a variable type", node.getRow(), node.getCol());
+                } else if (size > 1) {
+                    throw new TypeException("Function calls inside " +
+                            "array literals cannot return more than one value",
+                            node.getRow(), node.getCol());
+                }
+                elementType = returnTypes.get(0);
+            }
+
+            if (firstType == null) {
+                firstType = elementType;
+            } else if (!firstType.equals(elementType)) {
+                throw new TypeException("Types in the array literal " +
+                        "must all match", node.getRow(), node.getCol());
             }
         }
         assert firstType != null;

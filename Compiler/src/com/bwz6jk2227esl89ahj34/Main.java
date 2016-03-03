@@ -106,13 +106,13 @@ public class Main {
      */
     public static void typeCheckTests() {
 
-        System.out.println("================Passed Tests================");
+        System.out.println("\n================Passed Tests================");
         for (String filename : Util.getDirectoryFiles("typecheck/passtests/")) {
             Util.typeCheck("typecheck/passtests/", "typecheck/passtests/",
                     "typecheck/lib/", filename);
         }
 
-        System.out.println("================Failed Tests================");
+        System.out.println("\n================Failed Tests================");
         for (String filename : Util.getDirectoryFiles("typecheck/failtests/")) {
             Util.typeCheck("typecheck/failtests/", "typecheck/failtests/",
                     "typecheck/lib/", filename);
