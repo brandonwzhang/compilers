@@ -71,16 +71,12 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         Type type = node.getArrayRef().getType();
-        if (type instanceof VariableType) {
-            VariableType arrayType = (VariableType) type;
-            if(arrayType.getNumBrackets() < 1) {
-                throw new TypeException("Indexed element must be an array of at least dimension 1", node.getRow(), node.getCol());
-            }
-            node.setType(new VariableType(arrayType.getPrimitiveType(), arrayType.getNumBrackets() - 1));
-
-        } else { //arrayType instanceof FuncType of VarTypeList
-            throw new TypeException("Should not reach", node.getRow(), node.getCol());
+        assert type instanceof VariableType;
+        VariableType arrayType = (VariableType) type;
+        if(arrayType.getNumBrackets() < 1) {
+            throw new TypeException("Indexed element must be an array of at least dimension 1", node.getRow(), node.getCol());
         }
+        node.setType(new VariableType(arrayType.getPrimitiveType(), arrayType.getNumBrackets() - 1));
     }
 
     public void visit(ArrayLiteral node) {
