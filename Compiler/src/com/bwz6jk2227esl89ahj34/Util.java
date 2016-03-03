@@ -224,6 +224,12 @@ public class Util {
             System.out.println(output);
             ((Program) result.get().value).accept(visitor);
             System.out.println("typed");
+
+            // print to file
+            ArrayList<String> lines = new ArrayList<String>();
+            lines.add("Valid Xi Program");
+            writeHelper(file, "typed", diagnosticPath,lines);
+
         } catch (TypeException e) {
             System.out.println(e.toString());
             //e.printStackTrace();
