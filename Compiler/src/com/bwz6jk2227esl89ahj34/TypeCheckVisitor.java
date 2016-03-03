@@ -354,7 +354,7 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         FunctionType funcType = new FunctionType(argumentTypes, new VariableTypeList(new ArrayList<>()));
         if (!funcType.equals(context.get(id))) {
-            throw new TypeException("TODO: argument types do not match with procedure definition", node.getRow(), node.getCol());
+            throw new TypeException("Argument types do not match procedure definition", node.getRow(), node.getCol());
         }
 
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
@@ -372,28 +372,9 @@ public class TypeCheckVisitor implements NodeVisitor {
             contexts.peek().put(funcName, funcType);
         }
 
-        // If the interface matches our source file name, we check to make sure
-        // its declarations match.
+        // Add function declarations from interface files
         for (UseStatement useStatement : node.getUseBlock()) {
-            String interfaceName = useStatement.getIdentifier().getName();
-            if (interfaceName.equals(sourceFileName)) {
-                String error = checkInterface(libPath, interfaceName, contexts.peek());
-                if (error != null) {
-                    throw new TypeException(error, node.getRow(), node.getCol());
-                }
-            }
-            useStatement.setType(new VariableType(PrimitiveType.UNIT, 0));
-        }
-        // If not, add the declarations to the context.
-        for (UseStatement useStatement : node.getUseBlock()) {
-            String interfaceName = useStatement.getIdentifier().getName();
-            if (!interfaceName.equals(sourceFileName)) {
-                String error = addInterface(libPath, interfaceName, contexts.peek());
-                if (error != null) {
-                    throw new TypeException(error, node.getRow(), node.getCol());
-                }
-            }
-            useStatement.setType(new VariableType(PrimitiveType.UNIT, 0));
+            useStatement.accept(this);
         }
 
         // Second pass typechecks all the function bodies
@@ -467,7 +448,12 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(UseStatement node) {
-        // Use statements are handled in visit(Program node)
+        String interfaceName = node.getIdentifier().getName();
+        String error = addInterface(libPath, interfaceName, contexts.peek());
+        if (error != null) {
+            throw new TypeException(error, node.getRow(), node.getCol());
+        }
+        node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
 
     public void visit(WhileStatement node) {
@@ -497,34 +483,17 @@ public class TypeCheckVisitor implements NodeVisitor {
         String error = InterfaceParser.parseInterface(libPath, interfaceName, declarations);
         for (FunctionDeclaration declaration : declarations) {
             // Error if function already exists in context with different type
-            if (context.get(declaration.getIdentifier()) != null &&
-                    !context.get(declaration.getIdentifier()).equals
-                            (declaration.getFunctionType())) {
-                return declaration.getIdentifier().getName() +
-                        " already declared with different type";
+            FunctionType existingDeclarationType =
+                    (FunctionType) context.get(declaration.getIdentifier());
+            if (existingDeclarationType != null) {
+                if (existingDeclarationType.equals(declaration.getFunctionType())) {
+                    return declaration.getIdentifier().getName() +
+                            " already declared with different type";
+                }
             }
-            context.put(declaration.getIdentifier(), declaration.getFunctionType());
-        }
-        return error;
-    }
 
-    /**
-     * Checks that all declarations in an interface file are implemented in its associated in its xi file
-     * @param libPath       a String of the path to the interface files
-     * @param interfaceName a String of the name of the interface
-     * @param context       a Context to add the function declarations to
-     * @return              a String of the error or null if no error
-     */
-    public String checkInterface(String libPath, String interfaceName, Context context) {
-        List<FunctionDeclaration> declarations = new LinkedList<>();
-        String error = InterfaceParser.parseInterface(libPath, interfaceName, declarations);
-        for (FunctionDeclaration declaration : declarations) {
-            // Error if function isn't implemented or has different type
-            if (context.get(declaration.getIdentifier()) == null ||
-                    !context.get(declaration.getIdentifier()).equals
-                            (declaration.getFunctionType())) {
-                return declaration.getIdentifier().getName() + " is not implemented";
-            }
+            // Add the declaration to the context otherwise
+            context.put(declaration.getIdentifier(), declaration.getFunctionType());
         }
         return error;
     }
