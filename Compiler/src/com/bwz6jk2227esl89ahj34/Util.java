@@ -213,9 +213,7 @@ public class Util {
                 if (Files.isRegularFile(filePath)) {
                     String filePathStr = filePath.toString();
                     String file = filePathStr.substring(filePathStr.lastIndexOf('/') + 1, filePathStr.length());
-                    if (file.contains(".xi")) {
-                        files.add(file);
-                    }
+                    files.add(file);
                 }
             });
         } catch (Exception e) {

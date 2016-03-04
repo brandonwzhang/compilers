@@ -17,7 +17,6 @@ public class TypeException extends RuntimeException {
 
     @Override
     public String toString() {
-        return "Semantic error: beginning at "
-                + row + ":" + col + ": " + this.errMessage;
+        return row + ":" + col + " error:" + this.errMessage;
     }
 }

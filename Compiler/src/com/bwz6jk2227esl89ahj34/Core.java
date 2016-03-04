@@ -7,6 +7,7 @@ import java_cup.runtime.Symbol;
 import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -179,14 +180,14 @@ public class Core {
             System.out.println("typed");
 
             // print to file
-            ArrayList<String> lines = new ArrayList<>();
-            lines.add("Valid Xi Program");
+            List<String> lines = Collections.singletonList("Valid Xi Program");
             Util.writeHelper(file, "typed", diagnosticPath, lines);
 
         } catch (TypeException e) {
-            System.out.println(e.toString());
-            //e.printStackTrace();
-            //TODO: write diagnostic
+            String errorMessage = e.toString();
+            Util.printError("Semantic", errorMessage);
+            List<String> lines = Collections.singletonList(errorMessage);
+            Util.writeHelper(file, "typed", diagnosticPath, lines);
         }
     }
 }

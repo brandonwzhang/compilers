@@ -115,18 +115,18 @@ public class Main {
         System.out.println("\n================Typecheck Tests================");
 
         System.out.println("\n================Passed Tests================");
-        for (String filename : Util.getDirectoryFiles("typecheck/passtests/")) {
-            Core.typeCheck("typecheck/passtests/",
-                    "typecheck/passtests/diagnostics/",
-                    "typecheck/lib/", filename);
-        }
+        Util.getDirectoryFiles("typecheck/passtests/").stream()
+                .filter(filename -> filename.contains(".xi"))
+                .forEach(filename -> Core.typeCheck("typecheck/passtests/",
+                        "typecheck/passtests/diagnostics/",
+                        "typecheck/lib/", filename));
 
         System.out.println("\n================Failed Tests================");
-        for (String filename : Util.getDirectoryFiles("typecheck/failtests/")) {
-            Core.typeCheck("typecheck/failtests/",
-                    "typecheck/failtests/diagnostics/",
-                    "typecheck/lib/", filename);
-        }
+        Util.getDirectoryFiles("typecheck/failtests/").stream()
+                .filter(filename -> filename.contains(".xi"))
+                .forEach(filename -> Core.typeCheck("typecheck/failtests/",
+                        "typecheck/failtests/diagnostics/",
+                        "typecheck/lib/", filename));
     }
 
     /**
