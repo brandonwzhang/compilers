@@ -54,12 +54,14 @@ public class Core {
                 }
                 lines.add(line);
                 if (next.sym == ParserSym.error) {
+                    // lex error occurred
                     Util.printError("Lexical", lines.get(lines.size() - 1));
                     break;
                 }
                 next = lexer.next_token();
             }
         } catch (Exception e) {
+            // something is wrong with the lexer
             e.printStackTrace();
         }
     }
@@ -107,11 +109,13 @@ public class Core {
             result = parser.parse();
         } catch (Exception e) {
             e.printStackTrace();
+            // something is wrong with the parser
             return Optional.empty();
         }
 
         if (parser.hasSyntaxError) {
-            // handle syntax error, output to file
+            // there was a syntax error
+            // update lines and return no result
             String errMessage = parser.syntaxErrMessage;
             parser.hasSyntaxError = false;
             parser.syntaxErrMessage = "";
@@ -123,6 +127,7 @@ public class Core {
             return Optional.empty();
         }
 
+        // print the AST, update lines, and return the result
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CodeWriterSExpPrinter printer =
                 new CodeWriterSExpPrinter(baos);
@@ -155,11 +160,12 @@ public class Core {
         Lexer lexer = new Lexer(reader.get());
         Parser parser = new Parser(lexer);
 
+        // parse the file
         List<String> parseLines = new ArrayList<>();
         Optional<Symbol> result = parseHelper(parser, parseLines);
         if (!result.isPresent()) {
             // TODO: syntactic error. what do we do?
-            // System printing is already taken care of
+            // printing to standard output is already taken care of
             return;
         }
 
@@ -173,9 +179,9 @@ public class Core {
             System.out.println("typed");
 
             // print to file
-            ArrayList<String> lines = new ArrayList<String>();
+            ArrayList<String> lines = new ArrayList<>();
             lines.add("Valid Xi Program");
-            Util.writeHelper(file, "typed", diagnosticPath,lines);
+            Util.writeHelper(file, "typed", diagnosticPath, lines);
 
         } catch (TypeException e) {
             System.out.println(e.toString());
