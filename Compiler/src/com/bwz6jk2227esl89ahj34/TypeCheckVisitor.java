@@ -128,6 +128,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
         Expression expression = node.getExpression();
         expression.accept(this);
+        assert !(expression.getType() instanceof FunctionType);
 
         // If LHS has more than one element, RHS must be VariableTypeList
         if (expression.getType() instanceof VariableTypeList) {
@@ -140,17 +141,12 @@ public class TypeCheckVisitor implements NodeVisitor {
                 Type leftType = variables.get(i).getType();
                 Type rightType = rhs.getVariableTypeList().get(i);
 
-                if (!(leftType instanceof VariableType)) {
-                    throw new TypeException("LHS variables must be variable types", node.getRow(), node.getCol());
-                }
+                assert leftType instanceof VariableType;
 
                 if (!leftType.equals(UNIT_TYPE) && !leftType.equals(rightType)) {
                     throw new TypeException("Type on left hand must match type on right hand", node.getRow(), node.getCol());
                 }
             }
-
-        } else if (expression.getType() instanceof FunctionType) {
-            throw new TypeException("Right hand side cannot be Function Type", node.getRow(), node.getCol());
 
         } else if (variables.size() > 1) {
             throw new TypeException("Too many elements on LHS of Assignment", node.getRow(), node.getCol());
@@ -250,7 +246,6 @@ public class TypeCheckVisitor implements NodeVisitor {
         List<VariableType> argumentTypes = new ArrayList<>();
         for (Expression argument : node.getArguments()) {
             argument.accept(this);
-
             assert argument.getType() instanceof VariableType;
             VariableType argType = (VariableType) argument.getType();
             argumentTypes.add(argType);
