@@ -54,6 +54,8 @@ public class TypeCheckVisitor implements NodeVisitor {
         contexts = new Stack<>();
         // initialize first context with length function
         Context initContext = new Context();
+
+        // made length int[] -> int, we handle it later when we call it
         List<VariableType> lengthArgType = Collections.singletonList(new VariableType(PrimitiveType.INT, 1));
         VariableTypeList lengthReturnType =
                 new VariableTypeList(Collections.singletonList(new VariableType(PrimitiveType.INT, 0)));
