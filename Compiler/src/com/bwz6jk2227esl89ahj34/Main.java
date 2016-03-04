@@ -1,8 +1,6 @@
 package com.bwz6jk2227esl89ahj34;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class Main {
@@ -36,23 +34,31 @@ public class Main {
                 1);
         cli.addOption("--lex",
                 "Lex the .xi source files to .lexed files.",
-                files -> Lexer.lexFile(sourcePath, diagnosticPath, files),
+                files -> Arrays.stream(files).forEach(file ->
+                        Core.lexFile(sourcePath, diagnosticPath,
+                                file)),
                 0);
         cli.addOption("--parse",
                 "Parse the .xi source files to .parsed files.",
-                files -> Parser.parseFile(sourcePath, diagnosticPath, files),
+                files -> Arrays.stream(files).forEach(file ->
+                        Core.parseFile(sourcePath, diagnosticPath,
+                                file)),
                 0);
         cli.addOption("--typecheck",
                 "Typecheck the .xi source files",
                 files -> Arrays.stream(files).forEach(file ->
-                                Util.typeCheck(sourcePath, diagnosticPath,
+                                Core.typeCheck(sourcePath, diagnosticPath,
                                         libPath, file)),
                 0);
         cli.execute(args);
 
         if(debug) {
             // put debug mode behaviors here
-            //parseTestHarness();
+            try {
+                parseTestHarness();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             typeCheckTests();
         }
     }
@@ -106,15 +112,19 @@ public class Main {
      */
     public static void typeCheckTests() {
 
+        System.out.println("\n================Typecheck Tests================");
+
         System.out.println("\n================Passed Tests================");
         for (String filename : Util.getDirectoryFiles("typecheck/passtests/")) {
-            Util.typeCheck("typecheck/passtests/", "typecheck/passtests/",
+            Core.typeCheck("typecheck/passtests/",
+                    "typecheck/passtests/diagnostics/",
                     "typecheck/lib/", filename);
         }
 
         System.out.println("\n================Failed Tests================");
         for (String filename : Util.getDirectoryFiles("typecheck/failtests/")) {
-            Util.typeCheck("typecheck/failtests/", "typecheck/failtests/",
+            Core.typeCheck("typecheck/failtests/",
+                    "typecheck/failtests/diagnostics/",
                     "typecheck/lib/", filename);
         }
     }
