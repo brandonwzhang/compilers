@@ -198,7 +198,7 @@ public class Util {
         String description = errorMessage
                 .substring(errorMessage.lastIndexOf(':') + 1);
         System.out.println(errorType + " error: beginning at "
-                + lineNum + ":" + columnNum + ":" + description);
+                + lineNum + ":" + columnNum + ": " + description);
     }
 
     /**

@@ -175,9 +175,10 @@ public class Core {
 
         // attempt typechecking
         try {
-            System.out.println(file);
             ((Program) result.get().value).accept(visitor);
-            System.out.println("typed");
+            if (Main.debugOn()) {
+                System.out.println("DEBUG: typed");
+            }
 
             // print to file
             List<String> lines = Collections.singletonList("Valid Xi Program");
