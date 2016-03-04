@@ -1,2 +1,5 @@
 vm/*
 .DS_Store
+*.typed
+*.parsed
+*.lexed
