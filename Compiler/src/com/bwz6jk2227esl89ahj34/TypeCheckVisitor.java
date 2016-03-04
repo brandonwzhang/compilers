@@ -200,6 +200,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(BlockList node) {
+        contexts.push(new Context(contexts.peek()));
         List<Block> blockList = node.getBlockList();
         for (Block block : blockList) {
             block.accept(this);
@@ -211,6 +212,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             Type lastType = blockList.get(size - 1).getType();
             node.setType(lastType);
         }
+        contexts.pop();
     }
 
     public void visit(BooleanLiteral node) {
@@ -222,8 +224,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(FunctionBlock node) {
-        Context newContext = new Context(contexts.peek());
-        contexts.push(newContext);
+        contexts.push(new Context(contexts.peek()));
 
         BlockList blockList = node.getBlockList();
         ReturnStatement returnStatement = node.getReturnStatement();
