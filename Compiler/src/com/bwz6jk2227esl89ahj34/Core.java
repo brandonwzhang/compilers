@@ -167,6 +167,7 @@ public class Core {
         if (!result.isPresent()) {
             // TODO: syntactic error. what do we do?
             // printing to standard output is already taken care of
+            Util.writeHelper(file, "typed", diagnosticPath, parseLines);
             return;
         }
 
