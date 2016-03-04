@@ -17,44 +17,6 @@ import java.io.PrintWriter;
 %eofval}
 
 %{
-  public static void lexFile(String sourcePath,
-                             String diagnosticPath,
-                             String[] files) {
-    try {
-      for (String file : files) {
-        if (!file.contains(".xi")) {
-          System.out.println(file +
-                  "is not a .xi file. This file will not be lexed.");
-          continue;
-        }
-        ArrayList<String> lines = new ArrayList<>();
-        FileReader reader = new FileReader(sourcePath + file);
-        Lexer lexer = new Lexer(reader);
-        Symbol next = lexer.next_token();
-        while (next.sym != ParserSym.EOF) {
-          String line = next.left + ":" +
-                        next.right + " " +
-                        Util.symbolTranslation.get(next.sym);
-          if (next.value != null) {
-            line += " " + next.value;
-          }
-          lines.add(line);
-          if (next.sym == ParserSym.error) {
-            break;
-          }
-          next = lexer.next_token();
-        }
-
-        String output = file.replace(".xi", ".lexed");
-        String writeFile = diagnosticPath + output;
-        Util.makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
-        Util.writeAndClose(writeFile, lines);
-      }
-    } catch(Exception e) {
-      e.printStackTrace();
-    }
-  }
-
   StringBuffer string = new StringBuffer();
   int stringStartCol = -1;
   int stringStartRow = -1;
@@ -83,6 +45,7 @@ WhiteSpace     = {LineTerminator} | [ \t\f]
 Comment = "//" {InputCharacter}* {LineTerminator}?
 Letter = [A-Za-z]
 Identifier = {Letter} ({Letter} | [0-9_'])*
+DecIntegerLiteralNegativeBound = 9223372036854775808
 DecIntegerLiteral = 0 | [1-9][0-9]*
 
 HexChar = \\x[2-7][0-9A-E]
@@ -106,7 +69,8 @@ HexChar = \\x[2-7][0-9A-E]
  {Identifier}                       { return symbol(ParserSym.IDENTIFIER, yytext()); }
 
  /* literals */
- {DecIntegerLiteral}                { if(yytext().length() > "9223372036854775808".length() || yytext().compareTo("9223372036854775808") > 0) { return symbol(ParserSym.error, "Integer literal is too big to process"); } else {return symbol(ParserSym.INTEGER_LITERAL, yytext()); } }
+ {DecIntegerLiteralNegativeBound}   { return symbol(ParserSym.NEGATIVE_INT_BOUND); }
+ {DecIntegerLiteral}                { if(yytext().length() > "9223372036854775807".length() || yytext().compareTo("9223372036854775807") > 0) { return symbol(ParserSym.error, "Integer literal is too big to process"); } else {return symbol(ParserSym.INTEGER_LITERAL, yytext()); } }
  \"                                 { string.setLength(0); stringStartRow = yyline + 1; stringStartCol = yycolumn + 1; yybegin(STRING); }
 
  /* char literals */

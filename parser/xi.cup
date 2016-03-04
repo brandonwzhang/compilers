@@ -82,7 +82,7 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, LENGTH, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND;
 
 nonterminal Program program;
 
@@ -156,11 +156,12 @@ identifier ::= IDENTIFIER:id {: RESULT = new Identifier(id); RESULT.setLocation(
              ;
 
 minus_list ::= MINUS minus_list:m {: RESULT = new Unary(UnaryOperator.MINUS, m); RESULT.setLocation(parser.cur_token); :}
+             | MINUS NEGATIVE_INT_BOUND:i {: RESULT = new Unary(UnaryOperator.MINUS, new IntegerLiteral("9223372036854775808")); RESULT.setLocation(parser.cur_token); :}
              | MINUS H:h {: RESULT = new Unary(UnaryOperator.MINUS, h); RESULT.setLocation(parser.cur_token); :} 
              ;
 
 not_list ::= NOT not_list:n {: RESULT = new Unary(UnaryOperator.NOT, n); RESULT.setLocation(parser.cur_token); :} 
-           |NOT H:h {: RESULT = new Unary(UnaryOperator.NOT, h); RESULT.setLocation(parser.cur_token); :}
+           | NOT H:h {: RESULT = new Unary(UnaryOperator.NOT, h); RESULT.setLocation(parser.cur_token); :}
            ;
 
 boolean_literal ::= TRUE  {: RESULT = new BooleanLiteral(true); RESULT.setLocation(parser.cur_token); :}

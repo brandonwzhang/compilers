@@ -15,6 +15,7 @@ public class ParserSym {
   public static final int INTEGER_LITERAL = 5;
   public static final int error = 1;
   public static final int INT = 8;
+  public static final int NEGATIVE_INT_BOUND = 43;
   public static final int MINUS = 18;
   public static final int DIVIDE = 20;
   public static final int RETURN = 14;
@@ -94,7 +95,8 @@ public class ParserSym {
   "COMMA",
   "SEMICOLON",
   "UNDERSCORE",
-  "HIGH_MULT"
+  "HIGH_MULT",
+  "NEGATIVE_INT_BOUND"
   };
 }
 
