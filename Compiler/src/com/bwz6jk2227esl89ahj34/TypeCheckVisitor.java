@@ -80,13 +80,13 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(ArrayLiteral node) {
-        // empty array case ({})
+        // Empty array case ({})
         if (node.getValues().size() == 0) {
             node.setType(new VariableType(PrimitiveType.INT, 1));
             return;
         }
 
-        // check all types equal to the first type
+        // Check all types equal to the first type
         Type firstType = null;
         for (Expression e : node.getValues()) {
             e.accept(this);
@@ -129,7 +129,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         Expression expression = node.getExpression();
         expression.accept(this);
 
-        // if LHS has more than one element, RHS must be VariableTypeList
+        // If LHS has more than one element, RHS must be VariableTypeList
         if (expression.getType() instanceof VariableTypeList) {
             VariableTypeList rhs = (VariableTypeList) expression.getType();
             if (variables.size() != rhs.getVariableTypeList().size()) {
@@ -192,15 +192,9 @@ public class TypeCheckVisitor implements NodeVisitor {
             } else if (ARRAY_BINARY_OPERATOR_BOOL.contains(binop) && !isBool && !isInteger) {
                 node.setType(new VariableType(PrimitiveType.BOOL, 0));
             } else if (binop.equals(BinaryOperator.PLUS) && !isBool && !isInteger) {
-
-                if (left.getType() instanceof VariableType) {
-                    VariableType leftType = (VariableType) left.getType();
-                    node.setType(new VariableType(leftType.getPrimitiveType(), leftType.getNumBrackets()));
-
-                } else {
-                    throw new TypeException("Left must be Variable Type", node.getRow(), node.getCol());
-                }
-
+                assert left.getType() instanceof VariableType;
+                VariableType leftType = (VariableType) left.getType();
+                node.setType(new VariableType(leftType.getPrimitiveType(), leftType.getNumBrackets()));
             } else {
                 throw new TypeException("Invalid binary operator", node.getRow(), node.getCol());
             }
@@ -257,12 +251,9 @@ public class TypeCheckVisitor implements NodeVisitor {
         for (Expression argument : node.getArguments()) {
             argument.accept(this);
 
-            if (argument.getType() instanceof VariableType) {
-                VariableType argType = (VariableType) argument.getType();
-                argumentTypes.add(argType);
-            } else {
-                throw new TypeException("Argument is not Variable Type", node.getRow(), node.getCol());
-            }
+            assert argument.getType() instanceof VariableType;
+            VariableType argType = (VariableType) argument.getType();
+            argumentTypes.add(argType);
         }
 
         Type type = context.get(node.getIdentifier());
