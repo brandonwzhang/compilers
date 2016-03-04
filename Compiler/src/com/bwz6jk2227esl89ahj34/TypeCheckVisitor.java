@@ -310,11 +310,27 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         Block trueBlock = node.getTrueBlock();
+        boolean trueBlockIsStatement = trueBlock instanceof Statement;
+        // We need create and pop a new context if the block is just a statement
+        if (trueBlockIsStatement) {
+            contexts.push(new Context(contexts.peek()));
+        }
         trueBlock.accept(this);
+        if (trueBlockIsStatement) {
+            contexts.pop();
+        }
 
         Optional<Block> falseBlock = node.getFalseBlock();
         if (falseBlock.isPresent()) {
+            boolean falseBlockIsStatement = falseBlock.get() instanceof Statement;
+            // We need create and pop a new context if the block is just a statement
+            if (falseBlockIsStatement) {
+                contexts.push(new Context(contexts.peek()));
+            }
             falseBlock.get().accept(this);
+            if (falseBlockIsStatement) {
+                contexts.pop();
+            }
             PrimitiveType r1 = ((VariableType) trueBlock.getType()).getPrimitiveType();
             PrimitiveType r2 = ((VariableType) falseBlock.get().getType()).getPrimitiveType();
             // If has type void iff both blocks have type void
@@ -464,9 +480,18 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         Block block = node.getBlock();
+        boolean blockIsStatement = block instanceof Statement;
+        // We need create and pop a new context if the block is just a statement
+        if (blockIsStatement) {
+            contexts.push(new Context(contexts.peek()));
+        }
         block.accept(this);
         // Blocks should only have either unit or void type
         assert block.getType().equals(UNIT_TYPE) || block.getType().equals(VOID_TYPE);
+        if (blockIsStatement) {
+            // Pop off the context for the statement
+            contexts.pop();
+        }
 
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
