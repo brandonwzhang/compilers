@@ -189,6 +189,7 @@ public class Core {
             Util.printError("Semantic", errorMessage);
             List<String> lines = Collections.singletonList(errorMessage);
             Util.writeHelper(file, "typed", diagnosticPath, lines);
+            //e.printStackTrace();
         }
     }
 }

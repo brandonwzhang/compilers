@@ -14,6 +14,8 @@ public class TypeCheckVisitor implements NodeVisitor {
     // Context field
     private Stack<Context> contexts;
 
+    private Context lastPoppedContext;
+
     // AST field (that we build up as we visit) TODO
 
     // Local variable that stores current function in scope with a stack, used for return statements
@@ -212,7 +214,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             Type lastType = blockList.get(size - 1).getType();
             node.setType(lastType);
         }
-        contexts.pop();
+        lastPoppedContext = contexts.pop();
     }
 
     public void visit(BooleanLiteral node) {
@@ -230,7 +232,9 @@ public class TypeCheckVisitor implements NodeVisitor {
         ReturnStatement returnStatement = node.getReturnStatement();
 
         blockList.accept(this);
+        contexts.push(lastPoppedContext);
         returnStatement.accept(this);
+        contexts.pop();
 
         // sanity check
         assert blockList.getType().equals(UNIT_TYPE) || returnStatement.getType().equals(VOID_TYPE);
