@@ -165,7 +165,14 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException("Expression only evaluates to single value", expression.getRow(), expression.getCol());
 
         } else if (variables.size() == 1) {
-            if (!variables.get(0).getType().equals(expression.getType())) {
+            Assignable leftExpression = variables.get(0);
+            Type leftType = leftExpression.getType();
+            // If leftExpression is a TypedDeclaration, we need to get the
+            // type of the variable that was declared, not unit.
+            if (leftExpression instanceof TypedDeclaration) {
+                leftType = ((TypedDeclaration) leftExpression).getDeclarationType();
+            }
+            if (!leftType.equals(expression.getType())) {
                 throw new TypeException("Types on LHS and RHS must match", expression.getRow(), expression.getCol());
             }
         }
