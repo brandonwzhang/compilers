@@ -50,7 +50,11 @@ public class TypeCheckVisitor implements NodeVisitor {
     private final Set<BinaryOperator> BOOL_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(bool_binary_operator_bool));
     private final Set<BinaryOperator> ARRAY_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(array_binary_operator_bool));
 
-    public TypeCheckVisitor(String sourceFileName, String libPath) {
+    /**
+     * Constructor for TypeCheckVisitor
+     * @param libPath the directory for where to find the interface files.
+     */
+    public TypeCheckVisitor(String libPath) {
         contexts = new Stack<>();
         // initialize first context with length function
         Context initContext = new Context();
@@ -62,7 +66,6 @@ public class TypeCheckVisitor implements NodeVisitor {
         initContext.put(new Identifier("length"), new FunctionType(lengthArgType, lengthReturnType));
 
         contexts.push(initContext);
-        this.sourceFileName = sourceFileName;
         this.libPath = libPath;
     }
 
