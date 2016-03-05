@@ -601,7 +601,7 @@ public class TypeCheckVisitor implements NodeVisitor {
                     " already declared in scope", node.getRow(), node.getCol());
         }
         context.put(identifier, node.getDeclarationType());
-        node.setType(node.getDeclarationType());
+        node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
 
     /***
