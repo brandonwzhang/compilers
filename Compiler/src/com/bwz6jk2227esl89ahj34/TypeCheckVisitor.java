@@ -144,7 +144,14 @@ public class TypeCheckVisitor implements NodeVisitor {
 
             // Compare each LHS type with RHS type
             for (int i = 0; i < variables.size(); i++) {
-                Type leftType = variables.get(i).getType();
+                Assignable leftExpression = variables.get(i);
+                Type leftType = leftExpression.getType();
+                // If leftExpression is a TypedDeclaration, we need to get the
+                // type of the variable that was declared, not unit.
+                if (leftExpression instanceof TypedDeclaration) {
+                    leftType = ((TypedDeclaration) leftExpression).getDeclarationType();
+                }
+
                 Type rightType = rhs.getVariableTypeList().get(i);
 
                 assert leftType instanceof VariableType;
