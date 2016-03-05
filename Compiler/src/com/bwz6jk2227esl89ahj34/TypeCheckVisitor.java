@@ -11,12 +11,10 @@ public class TypeCheckVisitor implements NodeVisitor {
     // Path to interface files
     private String libPath;
 
-    // Context field
+    // Maintain a stack of contexts (identifier -> type map) for scoping
     private Stack<Context> contexts;
 
     private Context lastPoppedContext;
-
-    // AST field (that we build up as we visit) TODO
 
     // Local variable that stores current function in scope with a stack, used for return statements
     private FunctionType currentFunctionType;
@@ -56,19 +54,22 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public TypeCheckVisitor(String libPath) {
         contexts = new Stack<>();
-        // initialize first context with length function
+        // initialize first context with length function, int[] -> int
+        // when it should take bool[]. We handle this later below
         Context initContext = new Context();
-
-        // made length int[] -> int, we handle it later when we call it
         List<VariableType> lengthArgType = Collections.singletonList(new VariableType(PrimitiveType.INT, 1));
         VariableTypeList lengthReturnType =
                 new VariableTypeList(Collections.singletonList(new VariableType(PrimitiveType.INT, 0)));
         initContext.put(new Identifier("length"), new FunctionType(lengthArgType, lengthReturnType));
-
         contexts.push(initContext);
+
         this.libPath = libPath;
     }
 
+    /**
+     * Visits an ArrayIndex node.
+     * @param node
+     */
     public void visit(ArrayIndex node) {
         Expression arrayRef = node.getArrayRef();
         Expression index = node.getIndex();
