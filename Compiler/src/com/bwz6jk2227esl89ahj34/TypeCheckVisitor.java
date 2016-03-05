@@ -390,13 +390,28 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
 
+    /***
+     * First, we sweep through the program and put all of the function
+     * names in the context with its associated return type into the context
+     * so that functions can use other functions.
+     *
+     * Then, it goes through the use statements to collect the methods
+     * mentioned in the specified interface files.
+     *
+     * Then, all of the functions in the file are type checked.
+     *
+     * At any point when there is a conflict in the context, a TypeException
+     * is thrown
+     * @param node
+     */
     public void visit(Program node) {
         // First pass collects all function types, adds to context
         for (FunctionDeclaration funcDec : node.getFuncDecs()) {
             Identifier funcName = funcDec.getIdentifier();
             // Disallow overloading and shadowing
             if (contexts.peek().get(funcName) != null) {
-                throw new TypeException(funcName.getName() + "declared multiple times", funcName.getRow(), funcName.getCol());
+                throw new TypeException(funcName.getName() + "declared multiple times",
+                        funcName.getRow(), funcName.getCol());
             }
             FunctionType funcType = funcDec.getFunctionType();
             contexts.peek().put(funcName, funcType);
@@ -415,6 +430,15 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
 
+    /***
+     * precondition: When we are at a return statement, currentFunctionType
+     * will not be null (aka a return statement will only be inside functions,
+     * which currentFunctionType keeps track of)
+     * postcondition: If every expression being returned by the return statement
+     * matches the currentFunctionType, then the type of the return statement
+     * is set to VOID as it interrupts the program
+     * @param node
+     */
     public void visit(ReturnStatement node) {
         // Checks if the return types match those outlined in the function declaration
         List<VariableType> functionReturnTypes = currentFunctionType
@@ -423,7 +447,8 @@ public class TypeCheckVisitor implements NodeVisitor {
         List<Expression> returnValues = node.getValues();
         // Check for correct number of return values
         if(functionReturnTypes.size() != returnValues.size()) {
-            throw new TypeException("Number of return values does not match function declaration", node.getRow(), node.getCol());
+            throw new TypeException("Number of return values does not match function declaration",
+                    node.getRow(), node.getCol());
         }
 
         for (int i = 0; i < returnValues.size(); i++) {
@@ -433,45 +458,81 @@ public class TypeCheckVisitor implements NodeVisitor {
             assert expression.getType() instanceof VariableType;
             VariableType type = (VariableType) expression.getType();
             if (!functionReturnTypes.get(i).equals(type)) {
-                throw new TypeException("Return values do not match types in function declaration", expression.getRow(), expression.getCol());
+                throw new TypeException("Return values do not match types in function declaration",
+                        expression.getRow(), expression.getCol());
             }
         }
         node.setType(new VariableType(PrimitiveType.VOID, 0));
     }
 
+    /***
+     * A String literal in Xi will always have the type of an int array
+     * @param node
+     */
     public void visit(StringLiteral node) {
         node.setType(new VariableType(PrimitiveType.INT, 1));
     }
 
+    /***
+     * A TypedDeclaration is a declaration that initializes the variable
+     * and declares it a certain type
+     * If that variable is already defined in the context, a TypeException
+     * will be thrown
+     * @param node
+     */
     public void visit(TypedDeclaration node) {
         Identifier identifier = node.getIdentifier();
         Context context = contexts.peek();
         if (context.containsKey(identifier)) {
-            throw new TypeException("Variable " + identifier.getName() + " already declared in scope",
-                    node.getRow(), node.getCol());
+            throw new TypeException("Variable " + identifier.getName() +
+                    " already declared in scope", node.getRow(), node.getCol());
         }
         context.put(identifier, node.getDeclarationType());
         node.setType(node.getDeclarationType());
     }
 
+    /***
+     * A unary node that is wrapping either a negative number or a negation
+     * of a boolean
+     * for a negative number, if the expression wrapped in the unary node is an
+     * int, then the unary node will have type int
+     * for a negation of a boolean, if the expression wrapped in the unary
+     * node is in a bool, then the unary node will have type bool
+     * @param node
+     */
     public void visit(Unary node) {
         Expression expression = node.getExpression();
         expression.accept(this);
 
         UnaryOperator unop = node.getOp();
-        if (expression.getType().equals(INT_TYPE) && unop == UnaryOperator.MINUS) {
+        if (expression.getType().equals(INT_TYPE) && unop ==
+                UnaryOperator.MINUS) {
             node.setType(new VariableType(PrimitiveType.INT, 0));
-        } else if (expression.getType().equals(BOOL_TYPE) && unop == UnaryOperator.NOT) {
+        } else if (expression.getType().equals(BOOL_TYPE) && unop ==
+                UnaryOperator.NOT) {
             node.setType(new VariableType(PrimitiveType.BOOL, 0));
         } else {
-            throw new TypeException("Invalid unary operator", node.getRow(), node.getCol());
+            throw new TypeException("Invalid unary operator",
+                    node.getRow(), node.getCol());
         }
     }
 
+    /**
+     * A node of type underscore will always be set to type UNIT
+     * @param node
+     */
     public void visit(Underscore node) {
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
 
+    /***
+     * When we encounter a node that represents a use statement
+     * we invoke the addInterface method to properly add all of the
+     * methods in the specified ixi file
+     * if there is an error in the ixi file then a type exception is thrown
+     * otherwise, the type of the use statement is set to type unit
+     * @param node
+     */
     public void visit(UseStatement node) {
         String interfaceName = node.getIdentifier().getName();
         String error = addInterface(libPath, interfaceName, contexts.peek());
@@ -481,11 +542,20 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
 
+    /**
+     * If the expression in the guard is a bool
+     * and the statement is a type R that produces a new context
+     * then the while statement type-checks as a valid while statement
+     * that is of type UNIT with the same environment prior to entering the
+     * while statement
+     * @param node
+     */
     public void visit(WhileStatement node) {
         Expression guard = node.getGuard();
         guard.accept(this);
         if (!guard.getType().equals(BOOL_TYPE)) {
-            throw new TypeException("While statement guard must be of type bool", guard.getRow(), guard.getCol());
+            throw new TypeException("While statement guard must be of type bool",
+                    guard.getRow(), guard.getCol());
         }
 
         Block block = node.getBlock();
@@ -496,7 +566,8 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
         block.accept(this);
         // Blocks should only have either unit or void type
-        assert block.getType().equals(UNIT_TYPE) || block.getType().equals(VOID_TYPE);
+        assert block.getType().equals(UNIT_TYPE) ||
+                block.getType().equals(VOID_TYPE);
         if (blockIsStatement) {
             // Pop off the context for the statement
             contexts.pop();
@@ -512,9 +583,11 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param context       a Context to add the function declarations to
      * @return              a String of the error or null if no error
      */
-    public String addInterface(String libPath, String interfaceName, Context context) {
+    public String addInterface(String libPath, String interfaceName,
+                               Context context) {
         List<FunctionDeclaration> declarations = new LinkedList<>();
-        String error = InterfaceParser.parseInterface(libPath, interfaceName, declarations);
+        String error = InterfaceParser.parseInterface(libPath,
+                interfaceName, declarations);
         for (FunctionDeclaration declaration : declarations) {
             // Error if function already exists in context with different type
             FunctionType existingDeclarationType =
@@ -533,6 +606,16 @@ public class TypeCheckVisitor implements NodeVisitor {
         return error;
     }
 
+    /**
+     * precondition: one and two are both either UNIT or VOID
+     * postcondition: if either one or two are UNIT then UNIT will be returned
+     * else VOID is returned
+     *
+     * @param one the first input to the lub function (UNIT or VOID)
+     * @param two the second input to the lub function (UNIT or VOID)
+     * @return the output of the function lub as specified in the Xi Type Spec
+     *
+     */
     public PrimitiveType lub(PrimitiveType one, PrimitiveType two) {
         assert one == PrimitiveType.UNIT || one == PrimitiveType.VOID;
         assert two == PrimitiveType.UNIT || two == PrimitiveType.VOID;
