@@ -205,6 +205,12 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
     }
 
+    /**
+     * BlockList will typecheck if all of its blocks typecheck.
+     * The type of BlockList is the type of its last block, or
+     * unit if there are no blocks.
+     * @param node
+     */
     public void visit(BlockList node) {
         contexts.push(new Context(contexts.peek()));
         List<Block> blockList = node.getBlockList();
@@ -221,14 +227,28 @@ public class TypeCheckVisitor implements NodeVisitor {
         lastPoppedContext = contexts.pop();
     }
 
+    /**
+     * BooleanLiteral has type bool.
+     * @param node
+     */
     public void visit(BooleanLiteral node) {
         node.setType(new VariableType(PrimitiveType.BOOL, 0));
     }
 
+    /**
+     * CharacterLiteral has type int.
+     * @param node
+     */
     public void visit(CharacterLiteral node) {
         node.setType(new VariableType(PrimitiveType.INT, 0));
     }
 
+    /**
+     * FunctionBlock typechecks if its BlockList and ReturnStatement
+     * typecheck. The ReturnStatement must be able to access the same
+     * context that the BlockList had. The type of FunctionBlock is unit.
+     * @param node
+     */
     public void visit(FunctionBlock node) {
         contexts.push(new Context(contexts.peek()));
 
@@ -248,6 +268,12 @@ public class TypeCheckVisitor implements NodeVisitor {
         contexts.pop();
     }
 
+    /**
+     * The method called must exist in the context and the types of the
+     * given arguments must match the argument types of the method.
+     * The type of FunctionCall is the return type of the called method.
+     * @param node
+     */
     public void visit(FunctionCall node) {
         Context context = contexts.peek();
         Identifier id = node.getIdentifier();
@@ -281,6 +307,12 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(thisFuncType.getReturnTypeList());
     }
 
+    /**
+     * This node's MethodBlock must typecheck in a context that includes the
+     * arguments in the method signature.
+     * FunctionDeclaration has type unit.
+     * @param node
+     */
     public void visit(FunctionDeclaration node) {
         currentFunctionType = node.getFunctionType();
         List<Identifier> argList = node.getArgList();
@@ -302,6 +334,12 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(UNIT_TYPE);
     }
 
+    /**
+     * The type of the Identifier should be in the context. If an Identifier
+     * is visited and it is not already in the context, then it has not
+     * been declared yet (type error).
+     * @param node
+     */
     public void visit(Identifier node) {
         // Check if identifier is in context
         Type type = contexts.peek().get(node);
@@ -311,6 +349,13 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(type);
     }
 
+    /**
+     * The guard of an IfStatement must be a bool. If there is no false block,
+     * then the type of IfStatement is unit. If there is a false block, the
+     * type of IfStatement is lub(r1,r2) where r1 is the type of the true block
+     * and r2 is the type of the false block.
+     * @param node
+     */
     public void visit(IfStatement node) {
         Expression guard = node.getGuard();
         guard.accept(this);
@@ -349,10 +394,19 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
     }
 
+    /**
+     * IntegerLiteral has type int.
+     * @param node
+     */
     public void visit(IntegerLiteral node) {
         node.setType(new VariableType(PrimitiveType.INT, 0));
     }
 
+    /**
+     * ProcedureBlock typechecks if its BlockList typechecks.
+     * The type of ProcedureBlock is unit.
+     * @param node
+     */
     public void visit(ProcedureBlock node) {
         Context newContext = new Context(contexts.peek());
         contexts.push(newContext);
@@ -361,6 +415,13 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
 
+    /**
+     * The method called must exist in the context and the types of the
+     * given arguments must match the argument types of the method.
+     * The method called cannot have a return type.
+     * ProcedureCall has type unit.
+     * @param node
+     */
     public void visit(ProcedureCall node) {
         Context context = contexts.peek();
         Identifier id = node.getIdentifier();
@@ -385,6 +446,8 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         FunctionType funcType = new FunctionType(argumentTypes, new VariableTypeList(new ArrayList<>()));
         if (!funcType.equals(context.get(id))) {
+            throw new TypeException("You cannot call a method with a return " +
+                    "value as a procedure.", id.getRow(), id.getCol());
         }
 
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
