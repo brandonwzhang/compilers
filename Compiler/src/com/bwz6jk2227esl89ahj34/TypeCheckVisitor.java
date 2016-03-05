@@ -330,7 +330,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         methodBlock.accept(this);
         contexts.pop();
 
-        assert(methodBlock.getType() == UNIT_TYPE || methodBlock.getType() == VOID_TYPE);
+        assert methodBlock.getType().equals(UNIT_TYPE) || methodBlock.getType().equals(VOID_TYPE);
         node.setType(UNIT_TYPE);
     }
 
