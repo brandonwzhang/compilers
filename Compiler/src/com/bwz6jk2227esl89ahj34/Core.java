@@ -172,7 +172,7 @@ public class Core {
         }
 
         NodeVisitor visitor =
-                new TypeCheckVisitor(file.replace(".xi", ""), libPath);
+                new TypeCheckVisitor(libPath);
 
         // attempt typechecking
         try {
