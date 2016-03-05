@@ -41,7 +41,9 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     /**
-     * Visits an ArrayIndex node.
+     * Visits an ArrayIndex node. The arrayRef must type to a VariableType t with
+     * at least one bracket, the index must type to int, and the overall type of
+     * ArrayIndex is t with one less bracket.
      * @param node
      */
     public void visit(ArrayIndex node) {
@@ -63,6 +65,12 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new VariableType(arrayType.getPrimitiveType(), arrayType.getNumBrackets() - 1));
     }
 
+    /**
+     * Visits an ArrayLiteral node. An empty array literal types to int[].
+     * Otherwise, all elements of the ArrayLiteral must have the same type t as
+     * the first element; then, the ArrayLiteral will have type t[].
+     * @param node
+     */
     public void visit(ArrayLiteral node) {
         // Empty array case ({})
         if (node.getValues().size() == 0) {
@@ -75,6 +83,9 @@ public class TypeCheckVisitor implements NodeVisitor {
         for (Expression e : node.getValues()) {
             e.accept(this);
             Type elementType = e.getType();
+
+            // If element is a function call, it must return exactly one element
+            // We extract that element's type and store it as a VariableType
             if (elementType instanceof VariableTypeList) {
                 List<VariableType> returnTypes =
                         ((VariableTypeList) elementType).getVariableTypeList();
@@ -89,6 +100,7 @@ public class TypeCheckVisitor implements NodeVisitor {
                             "array literals cannot return more than one value",
                             e.getRow(), e.getCol());
                 }
+                // Extract the type from the VariableTypeList
                 elementType = returnTypes.get(0);
             }
 
@@ -106,7 +118,15 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new VariableType(type.getPrimitiveType(), type.getNumBrackets() + 1));
     }
 
+    /**
+     * Visits an Assignment node. The number of elements in the node's Variables
+     * (LHS) must equal the number of elements on the RHS (VariableTypeList if
+     * there's more than one). Then, each type on the LHS must be the same as
+     * its respective element on the RHS. The Assignment has type Unit overall.
+     * @param node
+     */
     public void visit(Assignment node) {
+        // Visit children
         List<Assignable> variables = node.getVariables();
         for (Assignable a : variables) {
             a.accept(this);
@@ -115,13 +135,14 @@ public class TypeCheckVisitor implements NodeVisitor {
         expression.accept(this);
         assert !(expression.getType() instanceof FunctionType);
 
-        // If LHS has more than one element, RHS must be VariableTypeList
+        // If LHS has more than one element, RHS must be VariableTypeList (func call)
         if (expression.getType() instanceof VariableTypeList) {
             VariableTypeList rhs = (VariableTypeList) expression.getType();
             if (variables.size() != rhs.getVariableTypeList().size()) {
                 throw new TypeException("Assignment must have same number of elements on both sides", expression.getRow(), expression.getCol());
             }
 
+            // Compare each LHS type with RHS type
             for (int i = 0; i < variables.size(); i++) {
                 Type leftType = variables.get(i).getType();
                 Type rightType = rhs.getVariableTypeList().get(i);
@@ -145,21 +166,51 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
 
+    /**
+     * Visits a Binary node. The left and right operands must be the same type
+     * and check to the same type as the operand expects. Then the overall type
+     * of the Binary will depend on the operand's return type.
+     * @param node
+     */
     public void visit(Binary node) {
         Expression left = node.getLeft();
         Expression right = node.getRight();
         left.accept(this);
         right.accept(this);
 
-        // precondition: left and right only check to a VariableType
-        assert left.getType() instanceof VariableType;
-        assert right.getType() instanceof VariableType;
-        if (!left.getType().equals(right.getType())) {
+        // Extract single types if operands are function calls
+        VariableType lefttype;
+        VariableType righttype;
+        if (left.getType() instanceof VariableTypeList) {
+            List<VariableType> lefttypelist = ((VariableTypeList)left.getType()).getVariableTypeList();
+            if(lefttypelist.size() != 1){
+                throw new TypeException("Operand must return single value", left.getRow(), left.getCol());
+            }
+            lefttype = lefttypelist.get(0);
+        }
+        else {
+            assert left.getType() instanceof VariableType;
+            lefttype = (VariableType)left.getType();
+        }
+        if (right.getType() instanceof VariableTypeList) {
+            List<VariableType> righttypelist = ((VariableTypeList)right.getType()).getVariableTypeList();
+            if(righttypelist.size() != 1){
+                throw new TypeException("Operand must be single value", right.getRow(), right.getCol());
+            }
+            righttype = righttypelist.get(0);
+        }
+        else {
+            assert right.getType() instanceof VariableType;
+            righttype = (VariableType)right.getType();
+        }
+
+
+        if (!lefttype.equals(righttype)) {
             throw new TypeException("Operands must be the same valid type", left.getRow(), left.getCol());
         }
         BinaryOperator binop = node.getOp();
-        boolean isInteger = left.getType().equals(INT_TYPE);
-        boolean isBool = left.getType().equals(BOOL_TYPE);
+        boolean isInteger = lefttype.equals(INT_TYPE);
+        boolean isBool = lefttype.equals(BOOL_TYPE);
 
         BinaryOperator[] int_binary_operator_int = new BinaryOperator[] {
                 BinaryOperator.PLUS, BinaryOperator.MINUS, BinaryOperator.TIMES, BinaryOperator.DIVIDE, BinaryOperator.MODULO,
@@ -197,9 +248,8 @@ public class TypeCheckVisitor implements NodeVisitor {
         } else if (ARRAY_BINARY_OPERATOR_BOOL.contains(binop) && !isBool && !isInteger) {
             node.setType(new VariableType(PrimitiveType.BOOL, 0));
         } else if (binop.equals(BinaryOperator.PLUS) && !isBool && !isInteger) {
-            assert left.getType() instanceof VariableType;
-            VariableType leftType = (VariableType) left.getType();
-            node.setType(new VariableType(leftType.getPrimitiveType(), leftType.getNumBrackets()));
+            assert lefttype instanceof VariableType;
+            node.setType(new VariableType(lefttype.getPrimitiveType(), lefttype.getNumBrackets()));
         } else {
             throw new TypeException("Invalid binary operation", left.getRow(), left.getCol());
         }
