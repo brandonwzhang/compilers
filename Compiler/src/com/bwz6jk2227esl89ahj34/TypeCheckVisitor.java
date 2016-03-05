@@ -5,9 +5,6 @@ import com.bwz6jk2227esl89ahj34.AST.*;
 import java.util.*;
 
 public class TypeCheckVisitor implements NodeVisitor {
-    // Name of the source file. Used for interface checking.
-    private String sourceFileName;
-
     // Path to interface files
     private String libPath;
 
