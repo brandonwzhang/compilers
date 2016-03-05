@@ -25,29 +25,6 @@ public class TypeCheckVisitor implements NodeVisitor {
     private final VariableType INT_TYPE = new VariableType(PrimitiveType.INT, 0);
     private final VariableType BOOL_TYPE = new VariableType(PrimitiveType.BOOL, 0);
 
-    private static BinaryOperator[] int_binary_operator_int = new BinaryOperator[] {
-            BinaryOperator.PLUS, BinaryOperator.MINUS, BinaryOperator.TIMES, BinaryOperator.DIVIDE, BinaryOperator.MODULO,
-            BinaryOperator.HIGH_MULT
-    };
-
-    private static BinaryOperator[] int_binary_operator_bool = new BinaryOperator[] {
-            BinaryOperator.EQUAL, BinaryOperator.NOT_EQUAL, BinaryOperator.LT, BinaryOperator.LEQ,
-            BinaryOperator.GT, BinaryOperator.GEQ
-    };
-
-    private static BinaryOperator[] bool_binary_operator_bool = new BinaryOperator[] {
-            BinaryOperator.EQUAL, BinaryOperator.NOT_EQUAL, BinaryOperator.AND, BinaryOperator.OR
-    };
-
-    private static BinaryOperator[] array_binary_operator_bool = new BinaryOperator[] {
-            BinaryOperator.EQUAL, BinaryOperator.NOT_EQUAL
-    };
-
-    private final Set<BinaryOperator> INT_BINARY_OPERATOR_INT = new HashSet<>(Arrays.asList(int_binary_operator_int));
-    private final Set<BinaryOperator> INT_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(int_binary_operator_bool));
-    private final Set<BinaryOperator> BOOL_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(bool_binary_operator_bool));
-    private final Set<BinaryOperator> ARRAY_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(array_binary_operator_bool));
-
     /**
      * Constructor for TypeCheckVisitor
      * @param libPath the directory for where to find the interface files.
@@ -108,12 +85,12 @@ public class TypeCheckVisitor implements NodeVisitor {
                 if (size == 0) {
                     throw new TypeException("Function calls inside " +
                             "array literals must return a value",
-                            node.getRow(), node.getCol());
+                            e.getRow(), e.getCol());
 
                 } else if (size > 1) {
                     throw new TypeException("Function calls inside " +
                             "array literals cannot return more than one value",
-                            node.getRow(), node.getCol());
+                            e.getRow(), e.getCol());
                 }
                 elementType = returnTypes.get(0);
             }
@@ -122,10 +99,11 @@ public class TypeCheckVisitor implements NodeVisitor {
                 firstType = elementType;
             } else if (!firstType.equals(elementType)) {
                 throw new TypeException("Types in the array literal " +
-                        "must all match", node.getRow(), node.getCol());
+                        "must all match", e.getRow(), e.getCol());
             }
         }
         assert firstType != null;
+        assert firstType instanceof VariableType;
 
         VariableType type = (VariableType) firstType;
         node.setType(new VariableType(type.getPrimitiveType(), type.getNumBrackets() + 1));
@@ -144,7 +122,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (expression.getType() instanceof VariableTypeList) {
             VariableTypeList rhs = (VariableTypeList) expression.getType();
             if (variables.size() != rhs.getVariableTypeList().size()) {
-                throw new TypeException("Assignment must have same number of elements on both sides", node.getRow(), node.getCol());
+                throw new TypeException("Assignment must have same number of elements on both sides", expression.getRow(), expression.getCol());
             }
 
             for (int i = 0; i < variables.size(); i++) {
@@ -154,16 +132,16 @@ public class TypeCheckVisitor implements NodeVisitor {
                 assert leftType instanceof VariableType;
 
                 if (!leftType.equals(UNIT_TYPE) && !leftType.equals(rightType)) {
-                    throw new TypeException("Type on left hand must match type on right hand", node.getRow(), node.getCol());
+                    throw new TypeException("Type on left hand must match type on right hand", expression.getRow(), expression.getCol());
                 }
             }
 
         } else if (variables.size() > 1) {
-            throw new TypeException("Too many elements on LHS of Assignment", node.getRow(), node.getCol());
+            throw new TypeException("Expression only evaluates to single value", expression.getRow(), expression.getCol());
 
         } else if (variables.size() == 1) {
             if (!variables.get(0).getType().equals(expression.getType())) {
-                throw new TypeException("Types on LHS and RHS must match", node.getRow(), node.getCol());
+                throw new TypeException("Types on LHS and RHS must match", expression.getRow(), expression.getCol());
             }
         }
 
@@ -177,33 +155,56 @@ public class TypeCheckVisitor implements NodeVisitor {
         right.accept(this);
 
         // precondition: left and right only check to a VariableType
+        assert left.getType() instanceof VariableType;
+        assert right.getType() instanceof VariableType;
         if (!left.getType().equals(right.getType())) {
-            throw new TypeException("Operands must be the same valid type", node.getRow(), node.getCol());
+            throw new TypeException("Operands must be the same valid type", left.getRow(), left.getCol());
+        }
+        BinaryOperator binop = node.getOp();
+        boolean isInteger = left.getType().equals(INT_TYPE);
+        boolean isBool = left.getType().equals(BOOL_TYPE);
 
+        BinaryOperator[] int_binary_operator_int = new BinaryOperator[] {
+                BinaryOperator.PLUS, BinaryOperator.MINUS, BinaryOperator.TIMES, BinaryOperator.DIVIDE, BinaryOperator.MODULO,
+                BinaryOperator.HIGH_MULT
+        };
+
+        BinaryOperator[] int_binary_operator_bool = new BinaryOperator[] {
+                BinaryOperator.EQUAL, BinaryOperator.NOT_EQUAL, BinaryOperator.LT, BinaryOperator.LEQ,
+                BinaryOperator.GT, BinaryOperator.GEQ
+        };
+
+        BinaryOperator[] bool_binary_operator_bool = new BinaryOperator[] {
+                BinaryOperator.EQUAL, BinaryOperator.NOT_EQUAL, BinaryOperator.AND, BinaryOperator.OR
+        };
+
+        BinaryOperator[] array_binary_operator_bool = new BinaryOperator[] {
+                BinaryOperator.EQUAL, BinaryOperator.NOT_EQUAL
+        };
+
+        final Set<BinaryOperator> INT_BINARY_OPERATOR_INT = new HashSet<>(Arrays.asList(int_binary_operator_int));
+        final Set<BinaryOperator> INT_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(int_binary_operator_bool));
+        final Set<BinaryOperator> BOOL_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(bool_binary_operator_bool));
+        final Set<BinaryOperator> ARRAY_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(array_binary_operator_bool));
+
+        boolean valid_int_binary_operator_int = INT_BINARY_OPERATOR_INT.contains(binop) && isInteger;
+        boolean valid_int_binary_operator_bool = INT_BINARY_OPERATOR_BOOL.contains(binop) && isInteger;
+        boolean valid_bool_binary_operator_bool = BOOL_BINARY_OPERATOR_BOOL.contains(binop) && isBool;
+
+        if (valid_int_binary_operator_int) {
+            node.setType(new VariableType(PrimitiveType.INT, 0));
+        } else if (valid_int_binary_operator_bool) {
+            node.setType(new VariableType(PrimitiveType.BOOL, 0));
+        } else if (valid_bool_binary_operator_bool) {
+            node.setType(new VariableType(PrimitiveType.BOOL, 0));
+        } else if (ARRAY_BINARY_OPERATOR_BOOL.contains(binop) && !isBool && !isInteger) {
+            node.setType(new VariableType(PrimitiveType.BOOL, 0));
+        } else if (binop.equals(BinaryOperator.PLUS) && !isBool && !isInteger) {
+            assert left.getType() instanceof VariableType;
+            VariableType leftType = (VariableType) left.getType();
+            node.setType(new VariableType(leftType.getPrimitiveType(), leftType.getNumBrackets()));
         } else {
-            BinaryOperator binop = node.getOp();
-            boolean isInteger = left.getType().equals(INT_TYPE);
-            boolean isBool = left.getType().equals(BOOL_TYPE);
-
-            boolean valid_int_binary_operator_int = INT_BINARY_OPERATOR_INT.contains(binop) && isInteger;
-            boolean valid_int_binary_operator_bool = INT_BINARY_OPERATOR_BOOL.contains(binop) && isInteger;
-            boolean valid_bool_binary_operator_bool = BOOL_BINARY_OPERATOR_BOOL.contains(binop) && isBool;
-
-            if (valid_int_binary_operator_int) {
-                node.setType(new VariableType(PrimitiveType.INT, 0));
-            } else if (valid_int_binary_operator_bool) {
-                node.setType(new VariableType(PrimitiveType.BOOL, 0));
-            } else if (valid_bool_binary_operator_bool) {
-                node.setType(new VariableType(PrimitiveType.BOOL, 0));
-            } else if (ARRAY_BINARY_OPERATOR_BOOL.contains(binop) && !isBool && !isInteger) {
-                node.setType(new VariableType(PrimitiveType.BOOL, 0));
-            } else if (binop.equals(BinaryOperator.PLUS) && !isBool && !isInteger) {
-                assert left.getType() instanceof VariableType;
-                VariableType leftType = (VariableType) left.getType();
-                node.setType(new VariableType(leftType.getPrimitiveType(), leftType.getNumBrackets()));
-            } else {
-                throw new TypeException("Invalid binary operator", node.getRow(), node.getCol());
-            }
+            throw new TypeException("Invalid binary operation", left.getRow(), left.getCol());
         }
     }
 
@@ -252,8 +253,9 @@ public class TypeCheckVisitor implements NodeVisitor {
 
     public void visit(FunctionCall node) {
         Context context = contexts.peek();
-        if (!context.containsKey(node.getIdentifier())) {
-            throw new TypeException("Function not defined", node.getRow(), node.getCol());
+        Identifier id = node.getIdentifier();
+        if (!context.containsKey(id)) {
+            throw new TypeException("Function not defined", id.getRow(), id.getCol());
         }
 
         List<VariableType> argumentTypes = new ArrayList<>();
@@ -264,19 +266,19 @@ public class TypeCheckVisitor implements NodeVisitor {
             argumentTypes.add(argType);
         }
 
-        Type type = context.get(node.getIdentifier());
+        Type type = context.get(id);
         if (!(type instanceof FunctionType)) {
-            throw new TypeException("This identifier doesn't point to a function", node.getRow(), node.getCol());
+            throw new TypeException(id + " is not a function", id.getRow(), id.getCol());
         }
 
         FunctionType thisFuncType = (FunctionType) type;
         FunctionType funcType = new FunctionType(argumentTypes, thisFuncType.getReturnTypeList());
-        //function call don't match arguments AND
-        //not a valid length call...
+        // Function call don't match arguments AND
+        // Not a valid length call...
         if (!thisFuncType.equals(funcType) && 
-                !(node.getIdentifier().getName().equals("length")
+                !(id.getName().equals("length")
                 && argumentTypes.size() == 1 && argumentTypes.get(0).getNumBrackets() > 0)) {
-            throw new TypeException("Argument types do not match with function definition", node.getRow(), node.getCol());
+            throw new TypeException("Argument types do not match with function definition", id.getRow(), id.getCol());
         }
 
         node.setType(thisFuncType.getReturnTypeList());

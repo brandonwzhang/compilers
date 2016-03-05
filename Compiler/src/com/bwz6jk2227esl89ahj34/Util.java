@@ -20,7 +20,6 @@ public class Util {
         put(ParserSym.WHILE, "while");
         put(ParserSym.ELSE, "else");
         put(ParserSym.RETURN, "return");
-        put(ParserSym.LENGTH, "length");
         put(ParserSym.INT, "int");
         put(ParserSym.BOOL, "bool");
         put(ParserSym.TRUE, "true");

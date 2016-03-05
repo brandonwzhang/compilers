@@ -60,7 +60,6 @@ HexChar = \\x[2-7][0-9A-E]
 "while"                             { return symbol(ParserSym.WHILE); }
 "else"                              { return symbol(ParserSym.ELSE); }
 "return"                            { return symbol(ParserSym.RETURN); }
-"length"                            { return symbol(ParserSym.LENGTH); }
 "int"                               { return symbol(ParserSym.INT); }
 "bool"                              { return symbol(ParserSym.BOOL); }
 "true"                              { return symbol(ParserSym.TRUE); }
@@ -129,7 +128,7 @@ HexChar = \\x[2-7][0-9A-E]
     \\n                               { string.append("\\n"); }
 
     \\r                               { string.append("\\r"); }
- 
+
     \\\"                              { string.append('\"'); }
     \\                                { string.append('\\'); }
 }

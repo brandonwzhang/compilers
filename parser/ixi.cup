@@ -40,10 +40,10 @@ parser code {:
 
     public boolean hasSyntaxError = false;
     public String syntaxErrMessage = "";
-    
+
     public void syntax_error(java_cup.runtime.Symbol cur_token){
         hasSyntaxError = true;
-        syntaxErrMessage = cur_token.left + ":" + cur_token.right + 
+        syntaxErrMessage = cur_token.left + ":" + cur_token.right +
           " error: Unexpected token " + Util.symbolTranslation.get(cur_token.sym);
         if (cur_token.value != null) {
             syntaxErrMessage += " " + cur_token.value;
@@ -59,7 +59,7 @@ terminal String INTEGER_LITERAL;
 terminal TRUE, FALSE;
 terminal INT, BOOL;
 
-terminal IF, ELSE, WHILE, BREAK, RETURN, USE, LENGTH, PLUS, MINUS, TIMES,
+terminal IF, ELSE, WHILE, BREAK, RETURN, USE, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
   COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND;
@@ -70,8 +70,8 @@ nonterminal PrimitiveType primitive_type;
 nonterminal VariableType var_type;
 nonterminal Integer array_no_size_type;
 
-nonterminal List<VariableType> function_declaration_return_types; 
-nonterminal SimpleEntry<Identifier, VariableType> function_declaration_argument_single; 
+nonterminal List<VariableType> function_declaration_return_types;
+nonterminal SimpleEntry<Identifier, VariableType> function_declaration_argument_single;
 nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_argument_list;
 nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_argument;
 
@@ -84,18 +84,18 @@ empty ::= ;
 
 primitive_type ::= INT {: RESULT = PrimitiveType.INT; :}
                  | BOOL {: RESULT = PrimitiveType.BOOL; :}
-                 ; 
+                 ;
 
 array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type:anst {: RESULT = anst + 1; :}
-                     | empty {: RESULT = 0; :} 
+                     | empty {: RESULT = 0; :}
                      ;
 
 var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new VariableType(pt, anst); :}
        ;
-       
-function_declaration_return_types ::= var_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :} 
+
+function_declaration_return_types ::= var_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :}
        | var_type:t  {: List<VariableType> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; :}
-       ; 
+       ;
 
 function_declaration_argument_single ::= IDENTIFIER:i COLON var_type:t {: RESULT = new SimpleEntry<Identifier, VariableType>(new Identifier(i), t); :}
                                        ;
@@ -107,7 +107,7 @@ function_declaration_argument_list ::= function_declaration_argument_single:fdas
 function_declaration_argument ::= function_declaration_argument_list:lst {: RESULT = lst; :}
                                 | empty {: RESULT = new LinkedList<>(); :}
                                 ;
-                
+
 function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, null); :}
                        | IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, null); :}
                        ;

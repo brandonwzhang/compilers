@@ -10,6 +10,15 @@ public abstract class Node {
     private int col = -1;
 
     /**
+     * Sets this node's location to that of the given node
+     * @param node
+     */
+    public void setLocation(Node node) {
+        this.row = (this.row == -1) ? node.getRow(): this.row;
+        this.col = (this.col == -1) ? node.getCol(): this.col;
+    }
+
+    /**
      * Takes in the parser's cur_token, and saves location data. Only called
      * in the parser.
      * @param symbol
