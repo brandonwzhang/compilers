@@ -140,9 +140,8 @@ public class Main {
 
         for (int i = 0; i < testFileNames.length; i++) {
             testFileNames[i] = testFileNames[i] + ".xi";
+            Core.parseFile("parser/tests/", "parser/tests/", testFileNames[i]);
         }
-
-        Parser.parseFile("parser/tests/", "parser/tests/", testFileNames);
 
         for (String file : testFileNames) {
             String sExpFile1 =
