@@ -11,7 +11,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class Program extends Node {
     private List<UseStatement> useBlock;
-    private List<FunctionDeclaration> funcDecs;
+    private List<FunctionDeclaration> functionDeclarationList;
 
     public void accept(NodeVisitor v){
         v.visit(this);
