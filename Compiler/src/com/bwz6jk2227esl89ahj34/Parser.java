@@ -729,8 +729,8 @@ class CUP$Parser$actions {
                 Identifier RESULT = null;
                 int idleft = CUP$Parser$stack.peek().left;
                 int idright = CUP$Parser$stack.peek().right;
-                Symbol id = CUP$Parser$stack.peek().<Symbol> value();
-                 RESULT = new Identifier((String)id.value); RESULT.setLocation(parser.cur_token); 
+                String id = CUP$Parser$stack.peek().<String> value();
+                 RESULT = new Identifier(id); RESULT.setLocation(parser.stack.peek()); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("identifier",2, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -754,7 +754,7 @@ class CUP$Parser$actions {
                 int ileft = CUP$Parser$stack.peek().left;
                 int iright = CUP$Parser$stack.peek().right;
                 Object i = CUP$Parser$stack.peek().<Object> value();
-                 RESULT = new Unary(UnaryOperator.MINUS, new IntegerLiteral("9223372036854775808")); RESULT.setLocation(parser.cur_token); 
+                 RESULT = new Unary(UnaryOperator.MINUS, new IntegerLiteral("9223372036854775808")); RESULT.setLocation(parser.stack.peek()); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("minus_list",4, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -799,7 +799,7 @@ class CUP$Parser$actions {
         case 8: // boolean_literal ::= TRUE 
             {
                 BooleanLiteral RESULT = null;
-                 RESULT = new BooleanLiteral(true); RESULT.setLocation(parser.cur_token); 
+                 RESULT = new BooleanLiteral(true); RESULT.setLocation(parser.stack.peek()); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("boolean_literal",15, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -808,7 +808,7 @@ class CUP$Parser$actions {
         case 9: // boolean_literal ::= FALSE 
             {
                 BooleanLiteral RESULT = null;
-                 RESULT = new BooleanLiteral(false); RESULT.setLocation(parser.cur_token); 
+                 RESULT = new BooleanLiteral(false); RESULT.setLocation(parser.stack.peek()); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("boolean_literal",15, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1189,7 +1189,7 @@ class CUP$Parser$actions {
                 int ileft = CUP$Parser$stack.peek().left;
                 int iright = CUP$Parser$stack.peek().right;
                 String i = CUP$Parser$stack.peek().<String> value();
-                 RESULT = new IntegerLiteral(i); RESULT.setLocation(parser.cur_token); 
+                 RESULT = new IntegerLiteral(i); RESULT.setLocation(parser.stack.peek()); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("I",14, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1225,7 +1225,7 @@ class CUP$Parser$actions {
                 int sleft = CUP$Parser$stack.peek().left;
                 int sright = CUP$Parser$stack.peek().right;
                 String s = CUP$Parser$stack.peek().<String> value();
-                 RESULT = new StringLiteral(s); RESULT.setLocation(parser.cur_token); 
+                 RESULT = new StringLiteral(s); RESULT.setLocation(parser.stack.peek()); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("I",14, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1237,7 +1237,7 @@ class CUP$Parser$actions {
                 int cleft = CUP$Parser$stack.peek().left;
                 int cright = CUP$Parser$stack.peek().right;
                 Character c = CUP$Parser$stack.peek().<Character> value();
-                 RESULT = new CharacterLiteral(c); RESULT.setLocation(parser.cur_token); 
+                 RESULT = new CharacterLiteral(c); RESULT.setLocation(parser.stack.peek()); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("I",14, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1531,7 +1531,7 @@ class CUP$Parser$actions {
                 int sleft = CUP$Parser$stack.peek().left;
                 int sright = CUP$Parser$stack.peek().right;
                 String s = CUP$Parser$stack.peek().<String> value();
-                 RESULT = new StringLiteral(s); RESULT.setLocation(parser.cur_token); 
+                 RESULT = new StringLiteral(s); RESULT.setLocation(parser.stack.peek()); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("assignment_lhs_array",28, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;

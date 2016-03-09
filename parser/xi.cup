@@ -27,7 +27,7 @@ parser code {:
     }
 :}
 
-terminal Symbol IDENTIFIER;
+terminal String IDENTIFIER;
 terminal String STRING_LITERAL;
 terminal Character CHARACTER_LITERAL;
 terminal String INTEGER_LITERAL;
@@ -107,11 +107,11 @@ start with program;
 
 empty ::= ;
 
-identifier ::= IDENTIFIER:id {: RESULT = new Identifier((String)id.value); RESULT.setLocation(parser.cur_token); :}
+identifier ::= IDENTIFIER:id {: RESULT = new Identifier(id); RESULT.setLocation(parser.stack.peek()); :}
              ;
 
 minus_list ::= MINUS minus_list:m {: RESULT = new Unary(UnaryOperator.MINUS, m); RESULT.setLocation(m); :}
-             | MINUS NEGATIVE_INT_BOUND:i {: RESULT = new Unary(UnaryOperator.MINUS, new IntegerLiteral("9223372036854775808")); RESULT.setLocation(parser.cur_token); :}
+             | MINUS NEGATIVE_INT_BOUND:i {: RESULT = new Unary(UnaryOperator.MINUS, new IntegerLiteral("9223372036854775808")); RESULT.setLocation(parser.stack.peek()); :}
              | MINUS H:h {: RESULT = new Unary(UnaryOperator.MINUS, h); RESULT.setLocation(h); :}
              ;
 
@@ -119,8 +119,8 @@ not_list ::= NOT not_list:n {: RESULT = new Unary(UnaryOperator.NOT, n); RESULT.
            |NOT H:h {: RESULT = new Unary(UnaryOperator.NOT, h); RESULT.setLocation(h); :}
            ;
 
-boolean_literal ::= TRUE  {: RESULT = new BooleanLiteral(true); RESULT.setLocation(parser.cur_token); :}
-          | FALSE       {: RESULT = new BooleanLiteral(false); RESULT.setLocation(parser.cur_token); :}
+boolean_literal ::= TRUE  {: RESULT = new BooleanLiteral(true); RESULT.setLocation(parser.stack.peek()); :}
+          | FALSE       {: RESULT = new BooleanLiteral(false); RESULT.setLocation(parser.stack.peek()); :}
           ;
 
 A ::= B:b {: RESULT = b; RESULT.setLocation(b); :}
@@ -166,11 +166,11 @@ H ::= I:i {: RESULT = i; RESULT.setLocation(i); :}
     ;
 
 I ::= boolean_literal:b {: RESULT = b; RESULT.setLocation(b); :}
-    | INTEGER_LITERAL:i {: RESULT = new IntegerLiteral(i); RESULT.setLocation(parser.cur_token); :}
+    | INTEGER_LITERAL:i {: RESULT = new IntegerLiteral(i); RESULT.setLocation(parser.stack.peek()); :}
     | OPEN_PAREN A:a CLOSE_PAREN {: RESULT = a; RESULT.setLocation(parser.cur_token); :}
     | identifier: i {: RESULT = i; RESULT.setLocation(parser.cur_token); :}
-    | STRING_LITERAL:s {: RESULT = new StringLiteral(s); RESULT.setLocation(parser.cur_token); :}
-    | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); RESULT.setLocation(parser.cur_token); :}
+    | STRING_LITERAL:s {: RESULT = new StringLiteral(s); RESULT.setLocation(parser.stack.peek()); :}
+    | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); RESULT.setLocation(parser.stack.peek()); :}
     | array_literal:al {: RESULT = al; RESULT.setLocation(al); :}
     ;
 
@@ -222,7 +222,7 @@ assignment_lhs_array_brackets ::= assignment_lhs_array:a OPEN_BRACKET expression
                                 ;
 
 assignment_lhs_array ::= function_call:fc {: RESULT = fc; RESULT.setLocation(fc); :}
-                       | STRING_LITERAL:s {: RESULT = new StringLiteral(s); RESULT.setLocation(parser.cur_token); :}
+                       | STRING_LITERAL:s {: RESULT = new StringLiteral(s); RESULT.setLocation(parser.stack.peek()); :}
                        | identifier:i {: RESULT = i; RESULT.setLocation(i); :}
                        | assignment_lhs_array_brackets:a {: RESULT = a; RESULT.setLocation(a); :}
                        ;

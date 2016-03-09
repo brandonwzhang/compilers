@@ -1,3 +1,3 @@
 main(){
-	x:bool = {true, 3, 5, false}
+    x:bool = {true, 3, 5, false}
 }

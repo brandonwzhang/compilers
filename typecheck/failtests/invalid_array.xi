@@ -3,5 +3,5 @@ foo(){
 }
 
 main(){
-	x:int[] = {3, foo()}
+    x:int[] = {3, foo()}
 }
