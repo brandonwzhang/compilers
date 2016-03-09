@@ -662,6 +662,9 @@ public class Parser
   @Override
   public int error_sym() {return 1;}
 
+
+
+
     public boolean hasSyntaxError = false;
     public String syntaxErrMessage = "";
 
@@ -726,8 +729,8 @@ class CUP$Parser$actions {
                 Identifier RESULT = null;
                 int idleft = CUP$Parser$stack.peek().left;
                 int idright = CUP$Parser$stack.peek().right;
-                String id = CUP$Parser$stack.peek().<String> value();
-                 RESULT = new Identifier(id); RESULT.setLocation(parser.cur_token); 
+                Symbol id = CUP$Parser$stack.peek().<Symbol> value();
+                 RESULT = new Identifier((String)id.value); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("identifier",2, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;

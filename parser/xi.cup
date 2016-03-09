@@ -27,7 +27,7 @@ parser code {:
     }
 :}
 
-terminal String IDENTIFIER;
+terminal Symbol IDENTIFIER;
 terminal String STRING_LITERAL;
 terminal Character CHARACTER_LITERAL;
 terminal String INTEGER_LITERAL;
@@ -107,7 +107,7 @@ start with program;
 
 empty ::= ;
 
-identifier ::= IDENTIFIER:id {: RESULT = new Identifier(id); RESULT.setLocation(parser.cur_token); :}
+identifier ::= IDENTIFIER:id {: RESULT = new Identifier((String)id.value); RESULT.setLocation(parser.cur_token); :}
              ;
 
 minus_list ::= MINUS minus_list:m {: RESULT = new Unary(UnaryOperator.MINUS, m); RESULT.setLocation(m); :}

@@ -30,33 +30,33 @@ public class IRDecl extends IRStmt {
         return 0;
     }
 
-    // TODO
-//    @Override
-//    public int computeMaximumCallArguments() {
-//        return 0;
-//    }
-//
-//    @Override
-//    public int nodeCount() {
-//        return 1;
-//    }
-//
-//    @Override
-//    public boolean equalsTree(Object object) {
-//        if (!(object instanceof IRDecl)) return false;
-//        return ((IRDecl) object).name.equals(name);
-//    }
-//
-//    @Override
-//    public int treeHashCode() {
-//        return name.hashCode();
-//    }
-//
-//    public Copyable copy() {
-//        return new IRDecl(name);
-//    }
-//
-//    public Copyable deepCopy() {
-//        return new IRDecl(name);
-//    }
+//     TODO
+    @Override
+    public int computeMaximumCallArguments() {
+        return 0;
+    }
+
+    @Override
+    public int nodeCount() {
+        return 1;
+    }
+
+    @Override
+    public boolean equalsTree(Object object) {
+        if (!(object instanceof IRDecl)) return false;
+        return ((IRDecl) object).name.equals(name);
+    }
+
+    @Override
+    public int treeHashCode() {
+        return name.hashCode();
+    }
+
+    public Copyable copy() {
+        return new IRDecl(name);
+    }
+
+    public Copyable deepCopy() {
+        return new IRDecl(name);
+    }
 }
