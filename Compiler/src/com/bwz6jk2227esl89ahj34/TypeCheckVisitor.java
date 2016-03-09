@@ -533,7 +533,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public void visit(Program node) {
         // First pass collects all function types, adds to context
-        for (FunctionDeclaration funcDec : node.getFuncDecs()) {
+        for (FunctionDeclaration funcDec : node.getFunctionDeclarationList()) {
             Identifier funcName = funcDec.getIdentifier();
             // Disallow overloading and shadowing
             if (contexts.peek().get(funcName) != null) {
@@ -550,8 +550,8 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         // Second pass typechecks all the function bodies
-        for (FunctionDeclaration funcDec : node.getFuncDecs()) {
-            funcDec.accept(this);
+        for (FunctionDeclaration functionDeclaration : node.getFunctionDeclarationList()) {
+            functionDeclaration.accept(this);
         }
 
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
