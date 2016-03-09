@@ -59,9 +59,9 @@ public class IRCall extends IRExpr {
         if (target != this.target) modified = true;
 
         List<IRExpr> results = new ArrayList<>(args.size());
-        for (IRExpr args : args) {
-            IRExpr newExpr = (IRExpr) v.visit(this, args);
-            if (newExpr != args) modified = true;
+        for (IRExpr arg : args) {
+            IRExpr newExpr = (IRExpr) v.visit(this, arg);
+            if (newExpr != arg) modified = true;
             results.add(newExpr);
         }
 
