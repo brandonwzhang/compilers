@@ -159,7 +159,7 @@ public class PrintVisitor implements NodeVisitor {
         }
         printer.endList();
         printer.startList();
-        for (FunctionDeclaration funcDec : node.getFuncDecs()) {
+        for (FunctionDeclaration funcDec : node.getFunctionDeclarationList()) {
             funcDec.accept(this);
         }
         printer.endList();
