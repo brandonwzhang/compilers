@@ -5,13 +5,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
 
+import edu.cornell.cs.cs4120.xic.InternalCompilerError;
 import edu.cornell.cs.cs4120.xic.ir.IRBinOp;
 import edu.cornell.cs.cs4120.xic.ir.IRCJump;
 import edu.cornell.cs.cs4120.xic.ir.IRCall;
@@ -24,9 +25,9 @@ import edu.cornell.cs.cs4120.xic.ir.IRMem;
 import edu.cornell.cs.cs4120.xic.ir.IRMove;
 import edu.cornell.cs.cs4120.xic.ir.IRName;
 import edu.cornell.cs.cs4120.xic.ir.IRNode;
+import edu.cornell.cs.cs4120.xic.ir.IRReturn;
 import edu.cornell.cs.cs4120.xic.ir.IRTemp;
 import edu.cornell.cs.cs4120.xic.ir.visit.InsnMapsBuilder;
-import edu.cornell.cs.cs4120.xic.InternalCompilerError;
 
 /**
  * A simple IR interpreter
@@ -37,9 +38,13 @@ public class IRSimulator {
 
     /** map from address to instruction */
     private Map<Long, IRNode> indexToInsn;
+    private Map<IRNode, Long> insnToIndex;
 
     /** map from labeled named to address */
     private Map<String, Long> nameToIndex;
+
+    /** a random number generator for initializing garbage */
+    protected Random r;
 
     /** simulated heap */
     private long mem[];
@@ -71,11 +76,12 @@ public class IRSimulator {
     public IRSimulator(IRCompUnit compUnit, int heapSize) {
         this.compUnit = compUnit;
 
+        r = new Random();
+
         mem = new long[heapSize];
         // initialize heap to garbage
         for (int i = 0; i < heapSize; i++)
-            mem[i] = (long) (Math.random() * Long.MIN_VALUE
-                    + Math.random() * Long.MAX_VALUE);
+            mem[i] = r.nextLong();
         heapPtr = 0;
 
         exprStack = new ExprStack();
@@ -100,6 +106,7 @@ public class IRSimulator {
         InsnMapsBuilder imb = new InsnMapsBuilder();
         compUnit = (IRCompUnit) imb.visit(compUnit);
         indexToInsn = imb.indexToInsn();
+        insnToIndex = imb.insnToIndex();
         nameToIndex = imb.nameToIndex();
         ctors = imb.ctors();
 
@@ -115,7 +122,7 @@ public class IRSimulator {
     public long malloc(long size) {
         if (size < 0) throw new Trap("Invalid size");
         if (size % Configuration.WORD_SIZE != 0)
-            throw new InternalCompilerError("Can only allocate in chunks of "
+            throw new Trap("Can only allocate in chunks of "
                     + Configuration.WORD_SIZE + " bytes!");
 
         long retval = heapPtr;
@@ -130,7 +137,7 @@ public class IRSimulator {
      */
     public long read(long addr) {
         if (addr % Configuration.WORD_SIZE != 0)
-            throw new InternalCompilerError("Unaligned memory access!");
+            throw new Trap("Unaligned memory access!");
         return mem[(int) (addr / Configuration.WORD_SIZE)];
     }
 
@@ -141,20 +148,8 @@ public class IRSimulator {
      */
     public void store(long addr, long value) {
         if (addr % Configuration.WORD_SIZE != 0)
-            throw new InternalCompilerError("Unaligned memory access!");
+            throw new Trap("Unaligned memory access!");
         mem[(int) (addr / Configuration.WORD_SIZE)] = value;
-    }
-
-    /**
-     *
-     * @param name name of the label
-     * @return the IR node at the named label
-     */
-    private IRNode findLabel(String name) {
-        if (!nameToIndex.containsKey(name))
-            throw new InternalCompilerError("Could not find label '" + name
-                    + "'!");
-        return indexToInsn.get(nameToIndex.get(name));
     }
 
     /**
@@ -164,7 +159,7 @@ public class IRSimulator {
      *          the location of the result
      * @return the address of the result
      */
-    public long call(String name, long[] args) {
+    public long call(String name, long... args) {
         return call(name, args, mem.length * Configuration.WORD_SIZE);
     }
 
@@ -255,7 +250,7 @@ public class IRSimulator {
             case "_Ieof_b": {
                 return inReader.ready() ? 0 : 1;
             }
-            // conv declarations
+                // conv declarations
             case "_IunparseInt_aii": {
                 String line = String.valueOf(args[0]);
                 int len = line.length();
@@ -282,14 +277,14 @@ public class IRSimulator {
                 store(retPtr + ws, success);
                 return retPtr;
             }
-            // special declarations
+                // special declarations
             case "_I_alloc_i": {
                 return malloc(args[0]);
             }
             case "_I_outOfBounds_p": {
                 throw new Trap("Out of bounds!");
             }
-            // other declarations
+                // other declarations
             case "_Iassert_pb": {
                 if (args[0] != 1) throw new Trap("Assertion error!");
                 return 0;
@@ -300,14 +295,13 @@ public class IRSimulator {
             }
         }
         catch (IOException e) {
-            throw new Trap("I/O Exception in simulator");
+            throw new InternalCompilerError("I/O Exception in simulator");
         }
     }
 
     private void leave(ExecutionFrame frame) {
-        if (frame.ip instanceof IRConst) {
+        if (frame.ip instanceof IRConst)
             exprStack.pushValue(((IRConst) frame.ip).value());
-        }
         else if (frame.ip instanceof IRTemp) {
             String tempName = ((IRTemp) frame.ip).name();
             exprStack.pushTemp(frame.get(tempName), tempName);
@@ -384,9 +378,8 @@ public class IRSimulator {
         else if (frame.ip instanceof IRMem) {
             long addr = exprStack.popValue();
             if (addr % Configuration.WORD_SIZE != 0)
-                throw new InternalCompilerError("Unaligned memory access: "
-                        + addr + " (word size=" + Configuration.WORD_SIZE
-                        + ")");
+                throw new Trap("Unaligned memory access: " + addr
+                        + " (word size=" + Configuration.WORD_SIZE + ")");
             addr /= Configuration.WORD_SIZE;
             exprStack.pushAddr(mem[(int) addr], addr);
         }
@@ -397,19 +390,16 @@ public class IRSimulator {
                 args[i] = exprStack.popValue();
             StackItem target = exprStack.pop();
             String targetName = target.name;
-            if (target.type != StackItem.Kind.NAME) {
+            if (target.type != StackItem.Kind.NAME)
                 if (indexToInsn.containsKey(target.value)) {
-                    IRNode node = indexToInsn.get(target.value);
-                    if (node instanceof IRFuncDecl)
-                        targetName = ((IRFuncDecl) node).name();
-                    else throw new InternalCompilerError("Call to a non-function instruction!");
-                }
-                else {
-                    throw new InternalCompilerError("Invalid function call '"
-                            + frame.ip + "' (target '" + target.value
-                            + "' is unknown)!");
-                }
+                IRNode node = indexToInsn.get(target.value);
+                if (node instanceof IRFuncDecl)
+                    targetName = ((IRFuncDecl) node).name();
+                else throw new InternalCompilerError("Call to a non-function instruction!");
             }
+            else throw new InternalCompilerError("Invalid function call '"
+                    + frame.ip + "' (target '" + target.value
+                    + "' is unknown)!");
 
             long retVal =
                     call(targetName, args, frame.get(Configuration.FP_NAME));
@@ -417,9 +407,7 @@ public class IRSimulator {
         }
         else if (frame.ip instanceof IRName) {
             String name = ((IRName) frame.ip).name();
-            if (compUnit.getFunction(name) != null)
-                exprStack.pushName(nameToIndex.get(name), name);
-            else if (libraryFunctions.contains(name))
+            if (libraryFunctions.contains(name))
                 exprStack.pushName(-1, name);
             else if (nameToIndex.containsKey(name))
                 exprStack.pushName(nameToIndex.get(name), name);
@@ -439,17 +427,13 @@ public class IRSimulator {
                     System.out.println("temp[" + stackItem.temp + "]=" + r);
                 frame.put(stackItem.temp, r);
             }
-            else {
-                throw new InternalCompilerError("Invalid MOVE!");
-            }
+            else throw new InternalCompilerError("Invalid MOVE!");
         }
-        else if (frame.ip instanceof IRExp) {
+        else if (frame.ip instanceof IRExp)
             // Discard result.
             exprStack.pop();
-        }
-        else if (frame.ip instanceof IRJump) {
+        else if (frame.ip instanceof IRJump)
             frame.setIP(indexToInsn.get(exprStack.popValue()));
-        }
         else if (frame.ip instanceof IRCJump) {
             IRCJump irCJump = (IRCJump) frame.ip;
             long top = exprStack.popValue();
@@ -462,25 +446,18 @@ public class IRSimulator {
                     + top);
             if (label != null) frame.setIP(findLabel(label));
         }
+        else if (frame.ip instanceof IRReturn) frame.setIP(null);
     }
 
-    // TODO
-
-    private IRNode getParent(IRNode node, IRNode searchRoot) {
-        for (IRNode child : searchRoot.children()) {
-            if (child == node) {
-                return searchRoot;
-            }
-            else {
-                IRNode result = getParent(node, child);
-                if (result != null) return result;
-            }
-        }
-        return null;
-    }
-
-    private IRNode getParent(IRNode node) {
-        return getParent(node, compUnit);
+    /**
+     *
+     * @param name name of the label
+     * @return the IR node at the named label
+     */
+    private IRNode findLabel(String name) {
+        if (!nameToIndex.containsKey(name))
+            throw new Trap("Could not find label '" + name + "'!");
+        return indexToInsn.get(nameToIndex.get(name));
     }
 
     /**
@@ -494,12 +471,9 @@ public class IRSimulator {
         /** temporary registers (register name -> value) */
         public Map<String, Long> temps;
 
-        public boolean entering;
-
         public ExecutionFrame(IRNode ip) {
             this.ip = ip;
             temps = new HashMap<>();
-            entering = true;
         }
 
         /**
@@ -510,8 +484,8 @@ public class IRSimulator {
         public long get(String tempName) {
             if (!temps.containsKey(tempName)) {
                 /* Referencing a temp before having written to it - initialize
-                   with random contents */
-                put(tempName, (int) (Math.random() * Integer.MAX_VALUE));
+                   with garbage */
+                put(tempName, r.nextLong());
             }
             return temps.get(tempName);
         }
@@ -527,42 +501,22 @@ public class IRSimulator {
 
         /**
          * Advance the instruction pointer. Since we're dealing with a tree,
-         * this is like a DFS traversal, one step at a time.
+         * this is postorder traversal, one step at a time, modulo jumps.
          */
         public boolean advance() {
-            /* This is insanely inefficient, but will do for test cases */
-            if (entering) {
-                if (debugLevel > 1)
-                    System.out.println("Entering " + ip.label());
-                Iterator<IRNode> it = ip.children().iterator();
-                if (it.hasNext())
-                    ip = it.next();
-                else entering = false;
-            }
-            else {
-                if (debugLevel > 1) System.out.println("Leaving " + ip.label());
-                IRNode backupIP = ip;
-                leave(this);
+            long index = insnToIndex.get(ip);
+            if (debugLevel > 1) System.out.println("Evaluating " + ip.label());
+            IRNode backupIP = ip;
+            leave(this);
 
-                if (ip != backupIP) /* A jump was performed */
-                    return true;
+            if (ip == null) return false; /* RETURN */
 
-                IRNode parent = getParent(ip);
-                if (parent instanceof IRCompUnit) {
-                    ip = null;
-                    return false;
-                }
-                Iterator<IRNode> it = parent.children().iterator();
-                while (it.next() != ip);
-                if (it.hasNext()) {
-                    ip = it.next();
-                    entering = true;
-                }
-                else {
-                    ip = parent;
-                    if (!advance()) return false;
-                }
-            }
+            if (ip != backupIP) /* A jump was performed */
+                return true;
+
+            ip = indexToInsn.get(index + 1);
+            if (ip == null)
+                throw new Trap("No next instruction.  Forgot RETURN?");
             return true;
         }
 
@@ -570,7 +524,6 @@ public class IRSimulator {
             if (debugLevel > 1)
                 System.out.println("Jumping to " + node.label());
             ip = node;
-            entering = true;
         }
     };
 

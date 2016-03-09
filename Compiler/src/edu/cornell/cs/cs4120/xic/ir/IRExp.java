@@ -1,7 +1,6 @@
 package edu.cornell.cs.cs4120.xic.ir;
 
-import java.util.Arrays;
-
+import edu.cornell.cs.cs4120.util.SExpPrinter;
 import edu.cornell.cs.cs4120.xic.ir.visit.IRVisitor;
 
 /**
@@ -39,6 +38,14 @@ public class IRExp extends IRStmt {
     }
 
     @Override
+    public void printSExp(SExpPrinter p) {
+        p.startList();
+        p.printAtom("EXP");
+        expr.printSExp(p);
+        p.endList();
+    }
+
+    @Override
     public boolean containsCalls() {
         return expr.containsCalls();
     }
@@ -48,37 +55,4 @@ public class IRExp extends IRStmt {
         return expr.computeMaximumCallResults();
     }
 
-    // TODO
-//    @Override
-//    public int computeMaximumCallArguments() {
-//        return expr.computeMaximumCallArguments();
-//    }
-//
-//    @Override
-//    public int nodeCount() {
-//        return expr.nodeCount() + 1;
-//    }
-//
-//    @Override
-//    public boolean equalsTree(Object object) {
-//        if (!(object instanceof IRExp)) return false;
-//        return ((IRExp) object).expr.equalsTree(expr);
-//    }
-//
-//    @Override
-//    public int treeHashCode() {
-//        return expr.treeHashCode();
-//    }
-//
-//    public Copyable copy() {
-//        return new IRExp(expr);
-//    }
-//
-//    public Copyable deepCopy() {
-//        return new IRExp((IRExpr) expr.deepCopy());
-//    }
-    @Override
-    public Iterable<IRNode> children() {
-        return Arrays.asList(new IRNode[] { expr });
-    }
 }
