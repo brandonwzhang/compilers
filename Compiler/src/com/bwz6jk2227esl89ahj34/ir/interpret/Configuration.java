@@ -1,10 +1,10 @@
-package edu.cornell.cs.cs4120.xic.ir.interpret;
+package com.bwz6jk2227esl89ahj34.ir.interpret;
 
-import edu.cornell.cs.cs4120.xic.ir.IRBinOp;
-import edu.cornell.cs.cs4120.xic.ir.IRConst;
-import edu.cornell.cs.cs4120.xic.ir.IRExpr;
-import edu.cornell.cs.cs4120.xic.ir.IRMem;
-import edu.cornell.cs.cs4120.xic.ir.IRTemp;
+import com.bwz6jk2227esl89ahj34.ir.IRBinOp;
+import com.bwz6jk2227esl89ahj34.ir.IRConst;
+import com.bwz6jk2227esl89ahj34.ir.IRExpr;
+import com.bwz6jk2227esl89ahj34.ir.IRMem;
+import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 
 public class Configuration {
     /* Some special stack-related names that are used in the IR */

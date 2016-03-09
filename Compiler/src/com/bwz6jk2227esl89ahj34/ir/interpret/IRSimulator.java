@@ -1,4 +1,4 @@
-package edu.cornell.cs.cs4120.xic.ir.interpret;
+package com.bwz6jk2227esl89ahj34.ir.interpret;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,22 +12,22 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
 
-import edu.cornell.cs.cs4120.xic.InternalCompilerError;
-import edu.cornell.cs.cs4120.xic.ir.IRBinOp;
-import edu.cornell.cs.cs4120.xic.ir.IRCJump;
-import edu.cornell.cs.cs4120.xic.ir.IRCall;
-import edu.cornell.cs.cs4120.xic.ir.IRCompUnit;
-import edu.cornell.cs.cs4120.xic.ir.IRConst;
-import edu.cornell.cs.cs4120.xic.ir.IRExp;
-import edu.cornell.cs.cs4120.xic.ir.IRFuncDecl;
-import edu.cornell.cs.cs4120.xic.ir.IRJump;
-import edu.cornell.cs.cs4120.xic.ir.IRMem;
-import edu.cornell.cs.cs4120.xic.ir.IRMove;
-import edu.cornell.cs.cs4120.xic.ir.IRName;
-import edu.cornell.cs.cs4120.xic.ir.IRNode;
-import edu.cornell.cs.cs4120.xic.ir.IRReturn;
-import edu.cornell.cs.cs4120.xic.ir.IRTemp;
-import edu.cornell.cs.cs4120.xic.ir.visit.InsnMapsBuilder;
+import com.bwz6jk2227esl89ahj34.InternalCompilerError;
+import com.bwz6jk2227esl89ahj34.ir.IRBinOp;
+import com.bwz6jk2227esl89ahj34.ir.IRCJump;
+import com.bwz6jk2227esl89ahj34.ir.IRCall;
+import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
+import com.bwz6jk2227esl89ahj34.ir.IRConst;
+import com.bwz6jk2227esl89ahj34.ir.IRExp;
+import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
+import com.bwz6jk2227esl89ahj34.ir.IRJump;
+import com.bwz6jk2227esl89ahj34.ir.IRMem;
+import com.bwz6jk2227esl89ahj34.ir.IRMove;
+import com.bwz6jk2227esl89ahj34.ir.IRName;
+import com.bwz6jk2227esl89ahj34.ir.IRNode;
+import com.bwz6jk2227esl89ahj34.ir.IRReturn;
+import com.bwz6jk2227esl89ahj34.ir.IRTemp;
+import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 
 /**
  * A simple IR interpreter

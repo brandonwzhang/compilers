@@ -1,7 +1,7 @@
-package edu.cornell.cs.cs4120.xic.ir;
+package com.bwz6jk2227esl89ahj34.ir;
 
 import edu.cornell.cs.cs4120.util.SExpPrinter;
-import edu.cornell.cs.cs4120.xic.ir.visit.IRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 
 /**
  * An intermediate representation for evaluating an expression for side effects,

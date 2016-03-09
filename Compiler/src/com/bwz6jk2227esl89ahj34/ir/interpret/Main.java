@@ -1,19 +1,19 @@
-package edu.cornell.cs.cs4120.xic.ir.interpret;
+package com.bwz6jk2227esl89ahj34.ir.interpret;
 
 import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
 import edu.cornell.cs.cs4120.util.SExpPrinter;
-import edu.cornell.cs.cs4120.xic.ir.IRBinOp;
-import edu.cornell.cs.cs4120.xic.ir.IRBinOp.OpType;
-import edu.cornell.cs.cs4120.xic.ir.IRCall;
-import edu.cornell.cs.cs4120.xic.ir.IRCompUnit;
-import edu.cornell.cs.cs4120.xic.ir.IRConst;
-import edu.cornell.cs.cs4120.xic.ir.IRFuncDecl;
-import edu.cornell.cs.cs4120.xic.ir.IRMove;
-import edu.cornell.cs.cs4120.xic.ir.IRName;
-import edu.cornell.cs.cs4120.xic.ir.IRReturn;
-import edu.cornell.cs.cs4120.xic.ir.IRSeq;
-import edu.cornell.cs.cs4120.xic.ir.IRStmt;
-import edu.cornell.cs.cs4120.xic.ir.IRTemp;
+import com.bwz6jk2227esl89ahj34.ir.IRBinOp;
+import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
+import com.bwz6jk2227esl89ahj34.ir.IRCall;
+import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
+import com.bwz6jk2227esl89ahj34.ir.IRConst;
+import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
+import com.bwz6jk2227esl89ahj34.ir.IRMove;
+import com.bwz6jk2227esl89ahj34.ir.IRName;
+import com.bwz6jk2227esl89ahj34.ir.IRReturn;
+import com.bwz6jk2227esl89ahj34.ir.IRSeq;
+import com.bwz6jk2227esl89ahj34.ir.IRStmt;
+import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 
 public class Main {
 

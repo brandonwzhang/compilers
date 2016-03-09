@@ -1,19 +1,19 @@
-package edu.cornell.cs.cs4120.xic.ir;
+package com.bwz6jk2227esl89ahj34.ir;
 
 import edu.cornell.cs.cs4120.util.SExpPrinter;
-import edu.cornell.cs.cs4120.xic.ir.visit.InsnMapsBuilder;
 
 /**
- * An intermediate representation for naming a memory address
+ * An intermediate representation for named memory address
+ * NAME(n)
  */
-public class IRLabel extends IRStmt {
+public class IRName extends IRExpr {
     private String name;
 
     /**
      *
      * @param name name of this memory address
      */
-    public IRLabel(String name) {
+    public IRName(String name) {
         this.name = name;
     }
 
@@ -23,19 +23,13 @@ public class IRLabel extends IRStmt {
 
     @Override
     public String label() {
-        return "LABEL(" + name + ")";
-    }
-
-    @Override
-    public InsnMapsBuilder buildInsnMapsEnter(InsnMapsBuilder v) {
-        v.addNameToCurrentIndex(name);
-        return v;
+        return "NAME(" + name + ")";
     }
 
     @Override
     public void printSExp(SExpPrinter p) {
         p.startList();
-        p.printAtom("LABEL");
+        p.printAtom("NAME");
         p.printAtom(name);
         p.endList();
     }

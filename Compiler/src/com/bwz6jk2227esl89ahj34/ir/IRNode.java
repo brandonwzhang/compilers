@@ -1,8 +1,8 @@
-package edu.cornell.cs.cs4120.xic.ir;
+package com.bwz6jk2227esl89ahj34.ir;
 
 import edu.cornell.cs.cs4120.util.SExpPrinter;
-import edu.cornell.cs.cs4120.xic.ir.visit.IRVisitor;
-import edu.cornell.cs.cs4120.xic.ir.visit.InsnMapsBuilder;
+import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 
 /**
  * A node in an intermediate-representation abstract syntax tree.
