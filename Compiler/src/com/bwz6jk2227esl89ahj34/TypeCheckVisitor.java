@@ -226,32 +226,9 @@ public class TypeCheckVisitor implements NodeVisitor {
         boolean isInteger = lefttype.equals(INT_TYPE);
         boolean isBool = lefttype.equals(BOOL_TYPE);
 
-        BinaryOperator[] int_binary_operator_int = new BinaryOperator[] {
-                BinaryOperator.PLUS, BinaryOperator.MINUS, BinaryOperator.TIMES, BinaryOperator.DIVIDE, BinaryOperator.MODULO,
-                BinaryOperator.HIGH_MULT
-        };
-
-        BinaryOperator[] int_binary_operator_bool = new BinaryOperator[] {
-                BinaryOperator.EQUAL, BinaryOperator.NOT_EQUAL, BinaryOperator.LT, BinaryOperator.LEQ,
-                BinaryOperator.GT, BinaryOperator.GEQ
-        };
-
-        BinaryOperator[] bool_binary_operator_bool = new BinaryOperator[] {
-                BinaryOperator.EQUAL, BinaryOperator.NOT_EQUAL, BinaryOperator.AND, BinaryOperator.OR
-        };
-
-        BinaryOperator[] array_binary_operator_bool = new BinaryOperator[] {
-                BinaryOperator.EQUAL, BinaryOperator.NOT_EQUAL
-        };
-
-        final Set<BinaryOperator> INT_BINARY_OPERATOR_INT = new HashSet<>(Arrays.asList(int_binary_operator_int));
-        final Set<BinaryOperator> INT_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(int_binary_operator_bool));
-        final Set<BinaryOperator> BOOL_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(bool_binary_operator_bool));
-        final Set<BinaryOperator> ARRAY_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(array_binary_operator_bool));
-
-        boolean valid_int_binary_operator_int = INT_BINARY_OPERATOR_INT.contains(binop) && isInteger;
-        boolean valid_int_binary_operator_bool = INT_BINARY_OPERATOR_BOOL.contains(binop) && isInteger;
-        boolean valid_bool_binary_operator_bool = BOOL_BINARY_OPERATOR_BOOL.contains(binop) && isBool;
+        boolean valid_int_binary_operator_int = BinarySymbol.INT_BINARY_OPERATOR_INT.contains(binop) && isInteger;
+        boolean valid_int_binary_operator_bool = BinarySymbol.INT_BINARY_OPERATOR_BOOL.contains(binop) && isInteger;
+        boolean valid_bool_binary_operator_bool = BinarySymbol.BOOL_BINARY_OPERATOR_BOOL.contains(binop) && isBool;
 
         if (valid_int_binary_operator_int) {
             node.setType(new VariableType(PrimitiveType.INT, 0));
@@ -259,7 +236,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             node.setType(new VariableType(PrimitiveType.BOOL, 0));
         } else if (valid_bool_binary_operator_bool) {
             node.setType(new VariableType(PrimitiveType.BOOL, 0));
-        } else if (ARRAY_BINARY_OPERATOR_BOOL.contains(binop) && !isBool && !isInteger) {
+        } else if (BinarySymbol.ARRAY_BINARY_OPERATOR_BOOL.contains(binop) && !isBool && !isInteger) {
             node.setType(new VariableType(PrimitiveType.BOOL, 0));
         } else if (binop.equals(BinaryOperator.PLUS) && !isBool && !isInteger) {
             assert lefttype instanceof VariableType;
