@@ -91,8 +91,7 @@ public class IRBinOp extends IRExpr {
     @Override
     public IRNode visitChildren(IRVisitor v) {
         IRExpr left = (IRExpr) v.visit(this, this.left);
-        IRExpr right =
-                this.right != null ? (IRExpr) v.visit(this, this.right) : null;
+        IRExpr right = (IRExpr) v.visit(this, this.right);
 
         if (left != this.left || right != this.right)
             return new IRBinOp(type, left, right);

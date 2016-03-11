@@ -13,7 +13,6 @@ import edu.cornell.cs.cs4120.xic.ir.visit.IRVisitor;
 public class IRCompUnit extends IRNode {
     private String name;
     private Map<String, IRFuncDecl> functions;
-    private IRSeq seq;
 
     public IRCompUnit(String name) {
         this.name = name;
@@ -21,14 +20,8 @@ public class IRCompUnit extends IRNode {
     }
 
     public IRCompUnit(String name, Map<String, IRFuncDecl> functions) {
-        this(name, functions, null);
-    }
-
-    public IRCompUnit(String name, Map<String, IRFuncDecl> functions,
-            IRSeq seq) {
         this.name = name;
         this.functions = functions;
-        this.seq = seq;
     }
 
     public void appendFunc(IRFuncDecl func) {
@@ -63,14 +56,7 @@ public class IRCompUnit extends IRNode {
             results.put(newFunc.name(), newFunc);
         }
 
-        IRSeq newSeq = seq;
-
-        if (hasExtraSequence()) {
-            newSeq = (IRSeq) v.visit(this, seq);
-            if (newSeq != seq) modified = true;
-        }
-
-        if (modified) return new IRCompUnit(name, results, newSeq);
+        if (modified) return new IRCompUnit(name, results);
 
         return this;
     }
@@ -80,7 +66,6 @@ public class IRCompUnit extends IRNode {
         T result = v.unit();
         for (IRFuncDecl func : functions.values())
             result = v.bind(result, v.visit(func));
-        if (hasExtraSequence()) result = v.bind(result, v.visit(seq));
         return result;
     }
 
@@ -93,9 +78,4 @@ public class IRCompUnit extends IRNode {
             func.printSExp(p);
         p.endList();
     }
-
-    public boolean hasExtraSequence() {
-        return seq != null;
-    }
-
 }
