@@ -15,21 +15,29 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(ArrayIndex node) {
-        node.getArrayRef().accept(this);
         node.getIndex().accept(this);
+        assert lst.size() == 1;
+        node.setIndex(lst.get(0));
+
+        lst = new LinkedList<>();
+        lst.add(node);
     }
 
     public void visit(ArrayLiteral node) {
+        List<Expression> temp = new LinkedList<>();
         for(Expression e : node.getValues()) {
             e.accept(this);
+            temp.add(lst.get(lst.size()-1));
         }
-        node.setValues(new LinkedList<>(lst));
+        node.setValues(temp);
         lst = new LinkedList<>();
+        lst.add(node);
 
     }
 
     public void visit(Assignment node) {
         node.getExpression().accept(this);
+        assert lst.size() == 1;
         node.setExpression(lst.get(0));
         lst = new LinkedList<>();
     }
@@ -37,13 +45,11 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     public void visit(Binary node) {
         //TODO
         node.getLeft().accept(this);
-        node.setLeft(lst.get(0));
-        lst = new LinkedList<>();
+        node.setLeft(lst.get(lst.size()-1));
 
         node.getRight().accept(this);
-        node.setRight(lst.get(0));
+        node.setRight(lst.get(lst.size()-1));
         lst = new LinkedList<>();
-
         lst.add(node);
     }
 
@@ -66,7 +72,6 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         ReturnStatement returnStatement = node.getReturnStatement();
         blockList.accept(this);
         returnStatement.accept(this);
-        returnStatement.setValues(new LinkedList<>(lst));
         lst = new LinkedList<>();
     }
 
@@ -76,6 +81,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         }
         node.setArguments(new LinkedList<>(lst));
         lst = new LinkedList<>();
+        lst.add(node);
     }
 
     public void visit(FunctionDeclaration node) {
@@ -120,12 +126,14 @@ public class ConstantFoldingVisitor implements NodeVisitor {
 
     public void visit(ReturnStatement node) {
         List<Expression> returnValues = node.getValues();
+        List<Expression> temp = new LinkedList<>();
         for (int i = 0; i < returnValues.size(); i++) {
             Expression expression = returnValues.get(i);
             expression.accept(this);
+            temp.add(lst.get(0));
+            lst = new LinkedList<>();
         }
-        node.setValues(new LinkedList<>(lst));
-        lst = new LinkedList<>();
+        node.setValues(temp);
     }
 
     public void visit(StringLiteral node) {
@@ -142,15 +150,18 @@ public class ConstantFoldingVisitor implements NodeVisitor {
 
     public void visit(Unary node) {
         Expression temp = node;
-        int count = 0;
+        int count = 1;
         while(((Unary)temp).getExpression() instanceof Unary) {
             temp = ((Unary)temp).getExpression();
             count += 1;
         }
         if(count % 2 == 0) {
-            lst.add(temp);
+            System.out.println(count);
+            //lst.add(temp);
+            lst.add(((Unary)temp).getExpression());
         } else {
-            lst.add(new Unary(node.getOp(), temp));
+            System.out.println(count);
+            lst.add(temp);
         }
     }
 
