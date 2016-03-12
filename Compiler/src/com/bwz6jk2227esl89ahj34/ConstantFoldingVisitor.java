@@ -16,10 +16,11 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(ArrayIndex node) {
+        System.out.println("hello");
         node.getIndex().accept(this);
         assert lst.size() == 1;
+        System.out.println(lst.get(0));
         node.setIndex(lst.get(0));
-
         lst = new LinkedList<>();
         lst.add(node);
     }
@@ -37,9 +38,19 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(Assignment node) {
+        List<Assignable> assignables = node.getVariables();
+        List<Assignable> newAssignables = new LinkedList<>();
+        for (Assignable a : assignables) {
+            if (a instanceof ArrayIndex) {
+                a.accept(this);
+                newAssignables.add((Assignable)(lst.get(0)));
+                lst = new LinkedList<>();
+            } else {
+                newAssignables.add(a);
+            }
+        }
         node.getExpression().accept(this);
         assert lst.size() == 1;
-        System.out.println("nice");
         node.setExpression(lst.get(0));
         lst = new LinkedList<>();
     }
@@ -47,11 +58,9 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     public void visit(Binary node) {
         node.getLeft().accept(this);
         node.setLeft(lst.get(lst.size()-1));
-        System.out.println(lst.get(lst.size()-1));
 
         node.getRight().accept(this);
         node.setRight(lst.get(lst.size()-1));
-        System.out.println(lst.get(lst.size()-1));
         lst = new LinkedList<>();
         lst.add(BinarySymbol.compute(node));
     }
@@ -77,7 +86,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
                 if (bool) {
                     blockList.add(((WhileStatement)b).getBlock());
                 }
-                //else we don't add anything so nothing to do 
+                //else we don't add anything so nothing to do
             } else {
                 blockList.add(b);
             }
@@ -146,7 +155,6 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(Program node) {
-        System.out.println("test");
         for (FunctionDeclaration functionDeclaration : node.getFunctionDeclarationList()) {
             functionDeclaration.accept(this);
         }
