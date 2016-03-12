@@ -4,6 +4,7 @@ import com.bwz6jk2227esl89ahj34.AST.*;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by jihunkim on 3/11/16.
@@ -38,12 +39,12 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     public void visit(Assignment node) {
         node.getExpression().accept(this);
         assert lst.size() == 1;
+        System.out.println("nice");
         node.setExpression(lst.get(0));
         lst = new LinkedList<>();
     }
 
     public void visit(Binary node) {
-        //TODO
         node.getLeft().accept(this);
         node.setLeft(lst.get(lst.size()-1));
         System.out.println(lst.get(lst.size()-1));
@@ -56,9 +57,32 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(BlockList node) {
+        List<Block> blockList = new LinkedList<>();
         for(Block b : node.getBlockList()) {
             b.accept(this);
+            if (b instanceof IfStatement &&
+                    ((IfStatement)b).getGuard() instanceof BooleanLiteral) {
+                boolean bool = ((BooleanLiteral)(((IfStatement)b).getGuard())).getValue();
+                if (bool) {
+                    blockList.add(((IfStatement)(b)).getTrueBlock());
+                } else {
+                    Optional<Block> fb = ((IfStatement)(b)).getFalseBlock();
+                    if (!fb.equals(Optional.empty())) {
+                        blockList.add(fb.get());
+                    }
+                }
+            } else if (b instanceof WhileStatement &&
+                    ((WhileStatement)b).getGuard() instanceof BooleanLiteral) {
+                boolean bool =  ((BooleanLiteral)((WhileStatement)b).getGuard()).getValue();
+                if (bool) {
+                    blockList.add(((WhileStatement)b).getBlock());
+                }
+                //else we don't add anything so nothing to do 
+            } else {
+                blockList.add(b);
+            }
         }
+        node.setBlockList(new LinkedList<>(blockList));
     }
 
     public void visit(BooleanLiteral node) {
@@ -122,6 +146,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(Program node) {
+        System.out.println("test");
         for (FunctionDeclaration functionDeclaration : node.getFunctionDeclarationList()) {
             functionDeclaration.accept(this);
         }
@@ -165,15 +190,22 @@ public class ConstantFoldingVisitor implements NodeVisitor {
             temp = ((Unary)temp).getExpression();
             count += 1;
         }
+        Expression val = ((Unary)temp).getExpression();
+        val.accept(this);
         if(count % 2 == 0) {
-            Expression val = ((Unary)temp).getExpression();
             if(((IntegerLiteral)val).getValue().compareTo("9223372036854775808") > 0) {
                 throw new TypeException("Number too big after constant folding performed");
             } else {
                 lst.add(val);
             }
         } else {
-            lst.add(temp);
+            if(val instanceof IntegerLiteral) {
+                int intValue = Integer.parseInt(((IntegerLiteral)val).getValue());
+                intValue = -1 * intValue;
+                lst.add(new IntegerLiteral(""+intValue));
+            } else {
+                lst.add(temp);
+            }
         }
     }
 
