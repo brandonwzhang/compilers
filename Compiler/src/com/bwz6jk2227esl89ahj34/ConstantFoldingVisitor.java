@@ -16,13 +16,18 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(ArrayIndex node) {
-        System.out.println("hello");
         node.getIndex().accept(this);
         assert lst.size() == 1;
         System.out.println(lst.get(0));
         node.setIndex(lst.get(0));
         lst = new LinkedList<>();
-        lst.add(node);
+        if (node.getArrayRef() instanceof ArrayLiteral &&
+                node.getIndex() instanceof IntegerLiteral) {
+            int index = Integer.parseInt(((IntegerLiteral)(node.getIndex())).getValue());
+            lst.add(((ArrayLiteral)(node.getArrayRef())).getValues().get(index));
+        } else {
+            lst.add(node);
+        }
     }
 
     public void visit(ArrayLiteral node) {
@@ -51,6 +56,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         }
         node.getExpression().accept(this);
         assert lst.size() == 1;
+        System.out.println("I am adding this to "+ lst.get(0));
         node.setExpression(lst.get(0));
         lst = new LinkedList<>();
     }
@@ -196,23 +202,31 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         int count = 1;
         while(((Unary)temp).getExpression() instanceof Unary) {
             temp = ((Unary)temp).getExpression();
+            System.out.println(temp);
             count += 1;
         }
+        System.out.println(temp);
+        System.out.println(count);
         Expression val = ((Unary)temp).getExpression();
         val.accept(this);
         if(count % 2 == 0) {
-            if(((IntegerLiteral)val).getValue().compareTo("9223372036854775808") > 0) {
+            if(val instanceof IntegerLiteral &&
+                    ((IntegerLiteral)val).getValue()
+                            .compareTo("9223372036854775808") > 0) {
                 throw new TypeException("Number too big after constant folding performed");
             } else {
-                lst.add(val);
+                //lst.add(val); val is already added so we don't need it
             }
         } else {
             if(val instanceof IntegerLiteral) {
-                int intValue = Integer.parseInt(((IntegerLiteral)val).getValue());
+                int intValue = Integer.parseInt(((IntegerLiteral)(lst.get(0))).getValue());
+                lst = new LinkedList<>();
                 intValue = -1 * intValue;
                 lst.add(new IntegerLiteral(""+intValue));
             } else {
-                lst.add(temp);
+                val = lst.get(0);
+                lst = new LinkedList<>();
+                lst.add(new Unary(UnaryOperator.NOT, val));
             }
         }
     }

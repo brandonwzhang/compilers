@@ -156,8 +156,8 @@ public class BinarySymbol {
             }
         }
         else if (binop == BinaryOperator.PLUS
-                && b.getLeft().getType() instanceof VariableType
-                && b.getRight().getType() instanceof VariableType
+                && b.getLeft() instanceof ArrayLiteral
+                && b.getRight() instanceof ArrayLiteral
                 ) {
             ArrayLiteral left = (ArrayLiteral)(b.getLeft());
             ArrayLiteral right = (ArrayLiteral)(b.getRight());
@@ -169,8 +169,8 @@ public class BinarySymbol {
             return result;
         }
         else if (ARRAY_BINARY_OPERATOR_BOOL.contains(binop)
-            && b.getLeft().getType() instanceof VariableType
-            && b.getRight().getType() instanceof VariableType) {
+            && b.getLeft() instanceof ArrayLiteral
+            && b.getRight() instanceof ArrayLiteral) {
             List<Expression> left = ((ArrayLiteral)(b.getLeft())).getValues();
             List<Expression> right = ((ArrayLiteral)(b.getRight())).getValues();
             Expression result;
