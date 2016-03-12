@@ -1,6 +1,8 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
-import edu.cornell.cs.cs4120.util.SExpPrinter;
+import com.bwz6jk2227esl89ahj34.util.SExpPrinter;
+import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 
 /**
@@ -66,22 +68,24 @@ public class IRCJump extends IRStmt {
     }
 
     @Override
+    public <T> T aggregateChildren(AggregateVisitor<T> v) {
+        T result = v.unit();
+        result = v.bind(result, v.visit(expr));
+        return result;
+    }
+
+    @Override
+    public boolean isCanonical(CheckCanonicalIRVisitor v) {
+        return !hasFalseLabel();
+    }
+
+    @Override
     public void printSExp(SExpPrinter p) {
         p.startList();
         p.printAtom("CJUMP");
+        expr.printSExp(p);
         p.printAtom(trueLabel);
         if (hasFalseLabel()) p.printAtom(falseLabel);
         p.endList();
     }
-
-    @Override
-    public boolean containsCalls() {
-        return expr.containsCalls();
-    }
-
-    @Override
-    public int computeMaximumCallResults() {
-        return 0;
-    }
-
 }

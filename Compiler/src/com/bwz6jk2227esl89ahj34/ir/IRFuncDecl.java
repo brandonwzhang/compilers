@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
-import edu.cornell.cs.cs4120.util.SExpPrinter;
+import com.bwz6jk2227esl89ahj34.util.SExpPrinter;
+import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 
@@ -8,12 +9,10 @@ import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 public class IRFuncDecl extends IRNode {
     private String name;
     private IRStmt body;
-    private boolean isProcedure;
 
-    public IRFuncDecl(String name, IRStmt stmt, boolean isProcedure) {
+    public IRFuncDecl(String name, IRStmt stmt) {
         this.name = name;
         body = stmt;
-        this.isProcedure = isProcedure;
     }
 
     public String name() {
@@ -33,9 +32,16 @@ public class IRFuncDecl extends IRNode {
     public IRNode visitChildren(IRVisitor v) {
         IRStmt stmt = (IRStmt) v.visit(this, body);
 
-        if (stmt != body) return new IRFuncDecl(name, stmt, isProcedure);
+        if (stmt != body) return new IRFuncDecl(name, stmt);
 
         return this;
+    }
+
+    @Override
+    public <T> T aggregateChildren(AggregateVisitor<T> v) {
+        T result = v.unit();
+        result = v.bind(result, v.visit(body));
+        return result;
     }
 
     @Override
@@ -58,15 +64,4 @@ public class IRFuncDecl extends IRNode {
         body.printSExp(p);
         p.endList();
     }
-
-    @Override
-    public boolean containsCalls() {
-        return body.containsCalls();
-    }
-
-    @Override
-    public int computeMaximumCallResults() {
-        return body.computeMaximumCallResults();
-    }
-
 }

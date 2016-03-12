@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ir.visit;
 
-import com.bwz6jk2227esl89ahj34.InternalCompilerError;
+import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
 import com.bwz6jk2227esl89ahj34.ir.IRNode;
 
 public abstract class IRVisitor {

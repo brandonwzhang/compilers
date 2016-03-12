@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
-import edu.cornell.cs.cs4120.util.SExpPrinter;
+import com.bwz6jk2227esl89ahj34.util.SExpPrinter;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 
 /**
@@ -39,15 +39,4 @@ public class IRLabel extends IRStmt {
         p.printAtom(name);
         p.endList();
     }
-
-    @Override
-    public boolean containsCalls() {
-        return false;
-    }
-
-    @Override
-    public int computeMaximumCallResults() {
-        return 0;
-    }
-
 }

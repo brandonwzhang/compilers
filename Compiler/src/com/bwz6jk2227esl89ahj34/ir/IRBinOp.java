@@ -1,7 +1,8 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
-import edu.cornell.cs.cs4120.util.SExpPrinter;
-import com.bwz6jk2227esl89ahj34.InternalCompilerError;
+import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
+import com.bwz6jk2227esl89ahj34.util.SExpPrinter;
+import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 
 /**
@@ -99,24 +100,20 @@ public class IRBinOp extends IRExpr {
     }
 
     @Override
+    public <T> T aggregateChildren(AggregateVisitor<T> v) {
+        T result = v.unit();
+        result = v.bind(result, v.visit(left));
+        result = v.bind(result, v.visit(right));
+        return result;
+    }
+
+    @Override
     public void printSExp(SExpPrinter p) {
         p.startList();
         p.printAtom(type.toString());
         left.printSExp(p);
         right.printSExp(p);
         p.endList();
-    }
-
-    @Override
-    public boolean containsCalls() {
-        return left.containsCalls() || right.containsCalls();
-    }
-
-    @Override
-    public int computeMaximumCallResults() {
-        int l = left.computeMaximumCallResults();
-        int r = right.computeMaximumCallResults();
-        return Math.max(l, r);
     }
 
 }

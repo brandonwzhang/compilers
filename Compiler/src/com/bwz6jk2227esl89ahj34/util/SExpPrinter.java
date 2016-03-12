@@ -1,4 +1,4 @@
-package edu.cornell.cs.cs4120.util;
+package com.bwz6jk2227esl89ahj34.util;
 
 /**
  * A pretty-printer for S-expressions.
@@ -16,6 +16,16 @@ public interface SExpPrinter extends AutoCloseable {
      * Prints the open parenthesis of an S-expression list.
      */
     void startList();
+
+    /**
+     * Prints the open parenthesis of an S-expression list,
+     * and requires that if a line break is required to separate any two
+     * elements of this list, then all elements of this list must be separated
+     * by a line break (optional operation).
+     */
+    default void startUnifiedList() {
+        startList();
+    }
 
     /**
      * Prints the close parenthesis of an S-expression list.

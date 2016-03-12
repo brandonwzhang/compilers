@@ -1,6 +1,6 @@
-package edu.cornell.cs.cs4120.xic.ir.visit;
+package com.bwz6jk2227esl89ahj34.ir.visit;
 
-import edu.cornell.cs.cs4120.xic.ir.IRNode;
+import com.bwz6jk2227esl89ahj34.ir.IRNode;
 
 public class CheckCanonicalIRVisitor extends AggregateVisitor<Boolean> {
 

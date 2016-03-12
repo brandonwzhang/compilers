@@ -1,6 +1,8 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
-import edu.cornell.cs.cs4120.util.SExpPrinter;
+import com.bwz6jk2227esl89ahj34.util.SExpPrinter;
+import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 
 /**
@@ -46,6 +48,19 @@ public class IRESeq extends IRExpr {
     }
 
     @Override
+    public <T> T aggregateChildren(AggregateVisitor<T> v) {
+        T result = v.unit();
+        result = v.bind(result, v.visit(stmt));
+        result = v.bind(result, v.visit(expr));
+        return result;
+    }
+
+    @Override
+    public boolean isCanonical(CheckCanonicalIRVisitor v) {
+        return false;
+    }
+
+    @Override
     public void printSExp(SExpPrinter p) {
         p.startList();
         p.printAtom("ESEQ");
@@ -53,17 +68,4 @@ public class IRESeq extends IRExpr {
         expr.printSExp(p);
         p.endList();
     }
-
-    @Override
-    public boolean containsCalls() {
-        return stmt.containsCalls() || expr.containsCalls();
-    }
-
-    @Override
-    public int computeMaximumCallResults() {
-        int l = stmt.computeMaximumCallResults();
-        int r = expr.computeMaximumCallResults();
-        return Math.max(l, r);
-    }
-
 }

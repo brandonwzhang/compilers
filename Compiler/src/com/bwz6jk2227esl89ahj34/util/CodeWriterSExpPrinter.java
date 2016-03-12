@@ -1,8 +1,10 @@
-package edu.cornell.cs.cs4120.util;
+package com.bwz6jk2227esl89ahj34.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
 
 import polyglot.util.CodeWriter;
 import polyglot.util.OptimalCodeWriter;
@@ -15,6 +17,7 @@ public class CodeWriterSExpPrinter implements SExpPrinter {
     private final CodeWriter writer;
 
     private boolean addSpace;
+    private List<Boolean> lists = new LinkedList<>();
 
     /**
      * Constructs a new {@linkplain SExpPrinter} instance that prints programs
@@ -53,15 +56,25 @@ public class CodeWriterSExpPrinter implements SExpPrinter {
 
     @Override
     public void printAtom(String atom) {
-        if (addSpace)
-            writer.allowBreak(0);
-        else addSpace = true;
+        startElement();
         writer.write(atom);
+        addSpace = true;
     }
 
     @Override
     public void startList() {
-        if (addSpace) writer.allowBreak(0);
+        startEveryList();
+        lists.add(0, false);
+    }
+
+    @Override
+    public void startUnifiedList() {
+        startEveryList();
+        lists.add(0, true);
+    }
+
+    protected void startEveryList() {
+        startElement();
         writer.write("(");
         writer.allowBreak(2, 2, "", 0); // miser mode
         writer.begin(0);
@@ -73,6 +86,15 @@ public class CodeWriterSExpPrinter implements SExpPrinter {
         writer.end();
         writer.write(")");
         addSpace = true;
+        lists.remove(0);
+    }
+
+    protected void startElement() {
+        if (addSpace) {
+            if (!lists.isEmpty() && lists.get(0))
+                writer.unifiedBreak(0);
+            else writer.allowBreak(0);
+        }
     }
 
     @Override

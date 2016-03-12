@@ -6,10 +6,8 @@
 package com.bwz6jk2227esl89ahj34;
 
 import com.bwz6jk2227esl89ahj34.AST.*;
-import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
-import java.io.File;
-import java.io.FileOutputStream;
+
 import java.io.FileReader;
 import java.util.*;
 import java.util.AbstractMap.*;
