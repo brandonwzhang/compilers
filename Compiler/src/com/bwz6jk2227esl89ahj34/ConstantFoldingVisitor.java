@@ -46,11 +46,13 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         //TODO
         node.getLeft().accept(this);
         node.setLeft(lst.get(lst.size()-1));
+        System.out.println(lst.get(lst.size()-1));
 
         node.getRight().accept(this);
         node.setRight(lst.get(lst.size()-1));
+        System.out.println(lst.get(lst.size()-1));
         lst = new LinkedList<>();
-        lst.add(node);
+        lst.add(BinarySymbol.compute(node));
     }
 
     public void visit(BlockList node) {
@@ -64,7 +66,8 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(CharacterLiteral node) {
-        lst.add(node);
+        Expression integerLiteral = new IntegerLiteral(""+(int)(node.getValue()));
+        lst.add(integerLiteral);
     }
 
     public void visit(FunctionBlock node) {
@@ -137,7 +140,14 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(StringLiteral node) {
-        lst.add(node);
+        char[] str = node.getValue().toCharArray();
+        List<Expression> expressions = new LinkedList<>();
+        for (int i = 0; i < str.length; i++) {
+            expressions.add(new IntegerLiteral(""+(int)(str[i])));
+        }
+        Expression arr = new ArrayLiteral(expressions);
+
+        lst.add(arr);
     }
 
     public void visit(TypedDeclaration node) {
@@ -156,11 +166,13 @@ public class ConstantFoldingVisitor implements NodeVisitor {
             count += 1;
         }
         if(count % 2 == 0) {
-            System.out.println(count);
-            //lst.add(temp);
-            lst.add(((Unary)temp).getExpression());
+            Expression val = ((Unary)temp).getExpression();
+            if(((IntegerLiteral)val).getValue().compareTo("9223372036854775808") > 0) {
+                throw new TypeException("Number too big after constant folding performed");
+            } else {
+                lst.add(val);
+            }
         } else {
-            System.out.println(count);
             lst.add(temp);
         }
     }

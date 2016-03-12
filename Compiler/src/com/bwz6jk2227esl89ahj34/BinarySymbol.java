@@ -1,10 +1,9 @@
 package com.bwz6jk2227esl89ahj34;
 
-import com.bwz6jk2227esl89ahj34.AST.BinaryOperator;
+import com.bwz6jk2227esl89ahj34.AST.*;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * Created by jihunkim on 3/11/16.
@@ -32,4 +31,162 @@ public class BinarySymbol {
     static final Set<BinaryOperator> INT_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(int_binary_operator_bool));
     static final Set<BinaryOperator> BOOL_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(bool_binary_operator_bool));
     static final Set<BinaryOperator> ARRAY_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(array_binary_operator_bool));
+
+    private static final VariableType INT_TYPE = new VariableType(PrimitiveType.INT, 0);
+    private static final VariableType BOOL_TYPE = new VariableType(PrimitiveType.BOOL, 0);
+
+    /**
+     * precondition: the code has already gone through the
+     * typechecking phase, so we know that b is a valid Binary object
+     * that abides by the rules of Xi
+     * @param b
+     * @return
+     */
+    public static Expression compute(Binary b) {
+        BinaryOperator binop = b.getOp();
+        if (b.getLeft() instanceof IntegerLiteral &&
+                b.getRight() instanceof IntegerLiteral) {
+            IntegerLiteral left = (IntegerLiteral)(b.getLeft());
+            IntegerLiteral right = (IntegerLiteral)(b.getRight());
+            BigInteger leftValueBigInt = new BigInteger(left.getValue());
+            BigInteger rightValueBigInt = new BigInteger(right.getValue());
+            long leftValue = leftValueBigInt.longValue();
+            long rightValue = rightValueBigInt.longValue();
+            if (BinarySymbol.INT_BINARY_OPERATOR_INT.contains(binop)) {
+                switch (binop) {
+                    case PLUS:
+                        BigInteger sumBigInt = leftValueBigInt.add(rightValueBigInt);
+                        long sum = leftValue + rightValue;
+                        if (sumBigInt.compareTo(BigInteger.valueOf(sum)) == 0) {
+                            return new IntegerLiteral(sumBigInt.toString());
+                        }
+                        break;
+                    case MINUS:
+                        BigInteger subtractionBigInt = leftValueBigInt.subtract(rightValueBigInt);
+                        long subtraction = leftValue - rightValue;
+                        if (subtractionBigInt.compareTo(BigInteger.valueOf(subtraction)) == 0) {
+                            return new IntegerLiteral(subtractionBigInt.toString());
+                        }
+                        break;
+                    case TIMES:
+                        BigInteger multipleBigInt = leftValueBigInt.multiply(rightValueBigInt);
+                        long multiple = leftValue * rightValue;
+                        if (multipleBigInt .compareTo(BigInteger.valueOf(multiple)) == 0) {
+                            return new IntegerLiteral(multipleBigInt.toString());
+                        }
+                        break;
+                    case DIVIDE:
+                        BigInteger divideBigInt = leftValueBigInt.divide(rightValueBigInt);
+                        long divide = leftValue / rightValue;
+                        if (divideBigInt.compareTo(BigInteger.valueOf(divide)) == 0) {
+                            return new IntegerLiteral(divideBigInt.toString());
+                        }
+                        break;
+                    case MODULO:
+                        BigInteger moduloBigInt = leftValueBigInt.remainder(rightValueBigInt);
+                        long modulo = leftValue % rightValue;
+                        if (moduloBigInt.compareTo(BigInteger.valueOf(modulo)) == 0) {
+                            return new IntegerLiteral(moduloBigInt.toString());
+                        }
+                        break;
+                    case HIGH_MULT: //TOOD: look over
+                        BigInteger highMultBigInt = leftValueBigInt.multiply(rightValueBigInt).shiftRight(64);
+                        return new IntegerLiteral(highMultBigInt.toString());
+                    default:
+                        throw new TypeException("Number too big after constant folding performed");
+                }
+            } else if (BinarySymbol.INT_BINARY_OPERATOR_BOOL.contains(binop)) {
+                switch (binop) {
+                    case EQUAL:
+                        return new BooleanLiteral(leftValueBigInt.equals(rightValueBigInt));
+                    case NOT_EQUAL:
+                        return new BooleanLiteral(!leftValueBigInt.equals(rightValueBigInt));
+                    case LT:
+                        return new BooleanLiteral(leftValueBigInt.compareTo(rightValueBigInt) < 0);
+                    case LEQ:
+                        return new BooleanLiteral(leftValueBigInt.compareTo(rightValueBigInt) <= 0);
+                    case GT:
+                        return new BooleanLiteral(leftValueBigInt.compareTo(rightValueBigInt) > 0);
+                    case GEQ:
+                        return new BooleanLiteral(leftValueBigInt.compareTo(rightValueBigInt) >= 0);
+                    default:
+                        throw new TypeException("Should never reach here");
+                }
+            }
+        }
+        else if (b.getLeft() instanceof BooleanLiteral
+                && b.getRight() instanceof BooleanLiteral) {
+            Boolean leftValue = ((BooleanLiteral)b.getLeft()).getValue();
+            Boolean rightValue = ((BooleanLiteral)b.getRight()).getValue();
+            switch(binop) {
+                case EQUAL:
+                    return new BooleanLiteral(leftValue.equals(rightValue));
+                case NOT_EQUAL:
+                    return new BooleanLiteral(!leftValue.equals(rightValue));
+                case AND:
+                    if (leftValue.booleanValue() == true)
+                        return new BooleanLiteral(rightValue);
+                    else
+                        return new BooleanLiteral(false);
+                case OR:
+                    if (leftValue.booleanValue() == true)
+                        return new BooleanLiteral(true);
+                    else
+                        return new BooleanLiteral(rightValue);
+                default:
+                    throw new TypeException("Should never reach here");
+            }
+
+        }
+        else if (b.getLeft() instanceof BooleanLiteral) {
+            Boolean leftValue = ((BooleanLiteral) b.getLeft()).getValue();
+            switch (binop) {
+                case AND:
+                    if (leftValue.booleanValue() == true)
+                        return b.getRight();
+                    else
+                        return new BooleanLiteral(false);
+                case OR:
+                    if (leftValue.booleanValue() == true)
+                        return new BooleanLiteral(true);
+                    else
+                        return b.getRight();
+                default:
+                    return b;
+            }
+        }
+        else if (binop == BinaryOperator.PLUS
+                && b.getLeft().getType() instanceof VariableType
+                && b.getRight().getType() instanceof VariableType
+                ) {
+            ArrayLiteral left = (ArrayLiteral)(b.getLeft());
+            ArrayLiteral right = (ArrayLiteral)(b.getRight());
+            Expression result;
+            List<Expression> arrayLiteral = new LinkedList<>(left.getValues());
+            arrayLiteral.addAll(right.getValues());
+
+            result = new ArrayLiteral(arrayLiteral);
+            return result;
+        }
+        else if (ARRAY_BINARY_OPERATOR_BOOL.contains(binop)
+            && b.getLeft().getType() instanceof VariableType
+            && b.getRight().getType() instanceof VariableType) {
+            List<Expression> left = ((ArrayLiteral)(b.getLeft())).getValues();
+            List<Expression> right = ((ArrayLiteral)(b.getRight())).getValues();
+            Expression result;
+            switch(binop) {
+                case EQUAL:
+                    result = new BooleanLiteral(left.equals(right));
+                    return result;
+                case NOT_EQUAL:
+                    result = new BooleanLiteral(!left.equals(right));
+                    return result;
+                default:
+                    throw new TypeException("Should never reach here");
+            }
+        } else {
+                return b;
+        }
+        return b;
+    }
 }
