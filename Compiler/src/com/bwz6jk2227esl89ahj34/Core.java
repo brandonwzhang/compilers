@@ -1,7 +1,7 @@
 package com.bwz6jk2227esl89ahj34;
 
 import com.bwz6jk2227esl89ahj34.AST.Program;
-import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
+import com.bwz6jk2227esl89ahj34.util.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
 
 import java.io.ByteArrayOutputStream;

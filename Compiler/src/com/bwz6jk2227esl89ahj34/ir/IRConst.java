@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
-import edu.cornell.cs.cs4120.util.SExpPrinter;
+import com.bwz6jk2227esl89ahj34.util.SExpPrinter;
 
 /**
  * An intermediate representation for a 64-bit integer constant.
@@ -33,15 +33,4 @@ public class IRConst extends IRExpr {
         p.printAtom(String.valueOf(value));
         p.endList();
     }
-
-    @Override
-    public boolean containsCalls() {
-        return false;
-    }
-
-    @Override
-    public int computeMaximumCallResults() {
-        return 0;
-    }
-
 }
