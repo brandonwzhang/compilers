@@ -9,6 +9,8 @@ import java.util.Optional;
 /**
  * Created by jihunkim on 3/11/16.
  */
+
+//TODO: for if/while statements, constant fold on the block
 public class ConstantFoldingVisitor implements NodeVisitor {
     private List<Expression> lst;
     public ConstantFoldingVisitor() {
@@ -16,9 +18,13 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(ArrayIndex node) {
+        node.getArrayRef().accept(this);
+        assert lst.size() == 1;
+        node.setArrayRef(lst.get(0));
+        lst = new LinkedList<>();
+
         node.getIndex().accept(this);
         assert lst.size() == 1;
-        System.out.println(lst.get(0));
         node.setIndex(lst.get(0));
         lst = new LinkedList<>();
         if (node.getArrayRef() instanceof ArrayLiteral &&
@@ -56,7 +62,6 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         }
         node.getExpression().accept(this);
         assert lst.size() == 1;
-        System.out.println("I am adding this to "+ lst.get(0));
         node.setExpression(lst.get(0));
         lst = new LinkedList<>();
     }
@@ -72,6 +77,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(BlockList node) {
+        System.out.println("hello");
         List<Block> blockList = new LinkedList<>();
         for(Block b : node.getBlockList()) {
             b.accept(this);
@@ -97,6 +103,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
                 blockList.add(b);
             }
         }
+        System.out.println(blockList);
         node.setBlockList(new LinkedList<>(blockList));
     }
 
@@ -140,6 +147,10 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         assert lst.size() == 1;
         node.setGuard(lst.get(0));
         lst = new LinkedList<>();
+        node.getTrueBlock().accept(this);
+        if (node.getFalseBlock().isPresent()) {
+            node.getFalseBlock().get().accept(this);
+        }
     }
 
     public void visit(IntegerLiteral node) {
@@ -147,9 +158,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(ProcedureBlock node) {
-        for(Block b : node.getBlockList().getBlockList()) {
-            b.accept(this);
-        }
+        node.getBlockList().accept(this);
     }
 
     public void visit(ProcedureCall node) {
@@ -202,11 +211,8 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         int count = 1;
         while(((Unary)temp).getExpression() instanceof Unary) {
             temp = ((Unary)temp).getExpression();
-            System.out.println(temp);
             count += 1;
         }
-        System.out.println(temp);
-        System.out.println(count);
         Expression val = ((Unary)temp).getExpression();
         val.accept(this);
         if(count % 2 == 0) {
@@ -244,5 +250,6 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         assert lst.size() == 1;
         node.setGuard(lst.get(0));
         lst = new LinkedList<>();
+        node.getBlock().accept(this);
     }
 }
