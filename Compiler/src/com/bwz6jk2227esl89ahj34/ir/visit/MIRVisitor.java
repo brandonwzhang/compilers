@@ -61,8 +61,9 @@ public class MIRVisitor extends IRVisitor{
 
     protected IRNode leave(IRNode parent, IRNode n, IRNode n_,
                            IRVisitor v_) {
-
-        if (n instanceof IRSeq) {
+        if (n instanceof IRCompUnit || n instanceof IRFuncDecl) {
+          return n_;
+        } else if (n instanceof IRSeq) {
             assert n_ instanceof IRSeq;
             List<IRStmt> flattenedResult = new LinkedList<>();
             for (IRStmt r : ((IRSeq)n_).stmts()) {
