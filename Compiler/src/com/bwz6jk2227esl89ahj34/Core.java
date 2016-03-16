@@ -231,7 +231,7 @@ public class Core {
         MIRGenerateVisitor visitor = new MIRGenerateVisitor("");
         root.accept(visitor);
         IRSimulator sim = new IRSimulator(visitor.getIRRoot());
-        long callResult = sim.call("main", 0);
+        long callResult = sim.call("_Imain_p", 0);
         System.out.println(callResult);
 
     }

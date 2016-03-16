@@ -336,26 +336,74 @@ public class MIRGenerateVisitor implements NodeVisitor {
             arguments.add(argument);
         }
         // Pass the function name and arguments to an IRCall
-        IRCall call = new IRCall(new IRName(name), arguments);
+        IRCall call = new IRCall(new IRName(storedNames.get(name)), arguments);
         generatedNodes.push(call);
     }
 
-    public void visit(FunctionDeclaration node) {
-        String name = node.getIdentifier().getName();
+    public static String getTypeString(VariableType type) {
+        String typeString = "";
+        switch (type.getPrimitiveType()) {
+            case BOOL:
+                typeString = "b";
+                break;
+            case INT:
+                typeString = "i";
+                break;
+            default:
+                throw new RuntimeException("Invalid type");
+        }
+        for (int i = 0; i < type.getNumBrackets(); i++) {
+            typeString = "a" + typeString;
+        }
+        return typeString;
+    }
 
+    private HashMap<String, String> storedNames = new HashMap<>();
+    public String getIRFunctionName(FunctionDeclaration node) {
+        String funcName = node.getIdentifier().getName();
+        // First check if we've already made this name
+        String storedName = storedNames.get(funcName);
+        if (storedName != null) {
+            return storedName;
+        }
+        FunctionType funcType = node.getFunctionType();
+        String irName = "_I" + funcName + "_";
+
+        String ret = "";
+        List<VariableType> retList = funcType.getReturnTypeList().getVariableTypeList();
+        if (retList.size() > 1) {
+            ret = "t" + retList.size();
+        } else if (retList.size() == 0) {
+            ret = "p";
+        }
+        for (VariableType type : retList) {
+            ret += getTypeString(type);
+        }
+
+        String arg = "";
+        List<VariableType> argList = funcType.getArgTypeList();
+        for (VariableType type : argList) {
+            arg += getTypeString(type);
+        }
+        irName += ret + arg;
+        storedNames.put(funcName, irName);
+        return irName;
+    }
+
+    public void visit(FunctionDeclaration node) {
         node.getMethodBlock().accept(this);
         assert generatedNodes.peek() instanceof IRStmt;
         IRStmt body = (IRStmt) generatedNodes.pop();
 
         assert body instanceof IRSeq;
-        ((IRSeq) body).stmts().add(0, new IRLabel(name));
+//        ((IRSeq) body).stmts().add(0, new IRLabel(name));
 
 //        boolean isProcedure = false;
 //        if (node.getFunctionType().getReturnTypeList().getVariableTypeList().size() == 0) {
 //            isProcedure = true;
 //        }
 
-        IRFuncDecl irfd = new IRFuncDecl(name, body);
+        IRFuncDecl irfd = new IRFuncDecl(getIRFunctionName(node), body);
         generatedNodes.push(irfd);
     }
 
@@ -401,6 +449,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         statements.add(trueLabel);
         statements.add(trueBlock);
         statements.add(endLabel);
+        generatedNodes.push(new IRSeq(statements));
     }
 
     public void visit(IntegerLiteral node) {
@@ -424,7 +473,19 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(ProcedureCall node) {
-
+        String name = node.getIdentifier().getName();
+        List<IRExpr> arguments = new ArrayList<>();
+        // Store all arguments in a list
+        for (Expression expression : node.getArguments()) {
+            assert expression.getType() instanceof VariableType;
+            expression.accept(this);
+            assert generatedNodes.peek() instanceof IRExpr;
+            IRExpr argument = (IRExpr) generatedNodes.pop();
+            arguments.add(argument);
+        }
+        // Pass the function name and arguments to an IRCall
+        IRCall call = new IRCall(new IRName(storedNames.get(name)), arguments);
+        generatedNodes.push(call);
     }
 
     public void visit(Program node) {
@@ -433,7 +494,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         for (FunctionDeclaration fd : node.getFunctionDeclarationList()) {
             fd.accept(this);
             assert generatedNodes.peek() instanceof IRFuncDecl;
-            functions.put(fd.getIdentifier().getName(), (IRFuncDecl) generatedNodes.pop());
+            functions.put(getIRFunctionName(fd), (IRFuncDecl) generatedNodes.pop());
         }
 
         IRRoot = new IRCompUnit(name, functions);
