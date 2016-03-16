@@ -21,6 +21,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
     public MIRGenerateVisitor(String name) {
         this.name = name;
+        generatedNodes = new Stack<>();
+    }
+
+    public IRCompUnit getIRRoot() {
+        return IRRoot;
     }
 
     private String getFreshVariable() {
@@ -130,6 +135,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 IRMove move = new IRMove(temp, evaluatedExpression);
                 statements.add(move);
                 generatedNodes.push(new IRSeq(statements));
+                return;
             }
             variable.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
@@ -427,7 +433,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         for (FunctionDeclaration fd : node.getFunctionDeclarationList()) {
             fd.accept(this);
             assert generatedNodes.peek() instanceof IRFuncDecl;
-            functions.put(name, (IRFuncDecl) generatedNodes.pop());
+            functions.put(fd.getIdentifier().getName(), (IRFuncDecl) generatedNodes.pop());
         }
 
         IRRoot = new IRCompUnit(name, functions);
