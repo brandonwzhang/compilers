@@ -325,18 +325,24 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(FunctionCall node) {
-        String name = node.getIdentifier().getName();
         List<IRExpr> arguments = new ArrayList<>();
+        List<VariableType> argTypeList = new ArrayList<>();
         // Store all arguments in a list
         for (Expression expression : node.getArguments()) {
             assert expression.getType() instanceof VariableType;
+            argTypeList.add((VariableType) expression.getType());
             expression.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
             IRExpr argument = (IRExpr) generatedNodes.pop();
             arguments.add(argument);
         }
+
+        assert node.getType() instanceof VariableTypeList;
+        FunctionType funcType = new FunctionType(argTypeList, (VariableTypeList) node.getType());
+        FunctionDeclaration tempFuncDec = new FunctionDeclaration(node.getIdentifier(), funcType, null, null);
+
         // Pass the function name and arguments to an IRCall
-        IRCall call = new IRCall(new IRName(storedNames.get(name)), arguments);
+        IRCall call = new IRCall(new IRName(getIRFunctionName(tempFuncDec)), arguments);
         generatedNodes.push(call);
     }
 
@@ -358,14 +364,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
         return typeString;
     }
 
-    private HashMap<String, String> storedNames = new HashMap<>();
     public String getIRFunctionName(FunctionDeclaration node) {
         String funcName = node.getIdentifier().getName();
-        // First check if we've already made this name
-        String storedName = storedNames.get(funcName);
-        if (storedName != null) {
-            return storedName;
-        }
         FunctionType funcType = node.getFunctionType();
         String irName = "_I" + funcName + "_";
 
@@ -386,7 +386,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
             arg += getTypeString(type);
         }
         irName += ret + arg;
-        storedNames.put(funcName, irName);
         return irName;
     }
 
@@ -394,14 +393,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
         node.getMethodBlock().accept(this);
         assert generatedNodes.peek() instanceof IRStmt;
         IRStmt body = (IRStmt) generatedNodes.pop();
-
-        assert body instanceof IRSeq;
-//        ((IRSeq) body).stmts().add(0, new IRLabel(name));
-
-//        boolean isProcedure = false;
-//        if (node.getFunctionType().getReturnTypeList().getVariableTypeList().size() == 0) {
-//            isProcedure = true;
-//        }
 
         IRFuncDecl irfd = new IRFuncDecl(getIRFunctionName(node), body);
         generatedNodes.push(irfd);
@@ -473,19 +464,25 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(ProcedureCall node) {
-        String name = node.getIdentifier().getName();
         List<IRExpr> arguments = new ArrayList<>();
+        List<VariableType> argTypeList = new ArrayList<>();
         // Store all arguments in a list
         for (Expression expression : node.getArguments()) {
             assert expression.getType() instanceof VariableType;
+            argTypeList.add((VariableType) expression.getType());
             expression.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
             IRExpr argument = (IRExpr) generatedNodes.pop();
             arguments.add(argument);
         }
+
+        FunctionType funcType = new FunctionType(argTypeList, new VariableTypeList(new ArrayList<>()));
+        FunctionDeclaration tempFuncDec = new FunctionDeclaration(node.getIdentifier(), funcType, null, null);
+
         // Pass the function name and arguments to an IRCall
-        IRCall call = new IRCall(new IRName(storedNames.get(name)), arguments);
-        generatedNodes.push(call);
+        IRCall call = new IRCall(new IRName(getIRFunctionName(tempFuncDec)), arguments);
+        // We need to throw out the return value;
+        generatedNodes.push(new IRExp(call));
     }
 
     public void visit(Program node) {
