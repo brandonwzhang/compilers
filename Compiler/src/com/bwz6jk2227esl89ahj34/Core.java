@@ -1,7 +1,9 @@
 package com.bwz6jk2227esl89ahj34;
 
 import com.bwz6jk2227esl89ahj34.AST.Program;
+import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
+import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.util.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
 
@@ -174,7 +176,7 @@ public class Core {
 
         Program program = (Program) result.get().value;
         Optional<String> typeCheckErrorMessage = typeCheckHelper(program, libPath);
-        
+
         if (!typeCheckErrorMessage.isPresent()) {
             if (Main.debugOn()) {
                 System.out.println("DEBUG: typed");
@@ -210,6 +212,30 @@ public class Core {
             String errorMessage = e.toString();
             return Optional.of(errorMessage);
         }
+    }
+
+    public static void irGen(String sourcePath,
+                             String diagnosticPath,
+                             String libPath,
+                             String file) {
+        Optional<Program> root = typeCheck(sourcePath, diagnosticPath, libPath, file);
+        if (!root.isPresent()) {
+            return;
+        }
+
+        MIRGenerateVisitor visitor = new MIRGenerateVisitor("");
+        root.get().accept(visitor);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        CodeWriterSExpPrinter printer =
+                new CodeWriterSExpPrinter(baos);
+        IRVisitor irVisitor = new IRSexyPrintVisitor(printer);
+
+        irVisitor.visit(visitor.getIRRoot());
+
+        printer.flush();
+        List<String> lines = Collections.singletonList(baos.toString());
+        Util.writeHelper(file, "ir", diagnosticPath, lines);
     }
 
     public static void irRun(String sourcePath,

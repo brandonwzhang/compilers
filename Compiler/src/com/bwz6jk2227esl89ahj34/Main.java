@@ -49,6 +49,11 @@ public class Main {
                                 Core.typeCheck(sourcePath, diagnosticPath,
                                         libPath, file)),
                 0);
+        cli.addOption("--irgen",
+                "Generate intermediate code and write its S-expression representation.",
+                files -> Arrays.stream(files).forEach(file ->
+                        Core.irGen(sourcePath, diagnosticPath, libPath, file)),
+                0);
         cli.addOption("--irrun",
                 "Generate and interpret intermediate code",
                 files -> Arrays.stream(files).forEach(file ->
