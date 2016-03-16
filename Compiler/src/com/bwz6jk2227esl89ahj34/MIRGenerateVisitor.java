@@ -268,7 +268,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             // save length in MEM(combinedArray)
             IRMove saveLength = new IRMove(new IRMem(combinedArray), combinedLength);
             // shift array up to 0th index
-            IRMove shift = new IRMove(combinedArray, new IRBinOp(OpType.ADD, combinedArray, new IRConst(1)));
+            IRMove shift = new IRMove(combinedArray, new IRBinOp(OpType.ADD, combinedArray, new IRConst(WORD_SIZE)));
 
             stmts.add(storeArrayPtr);
             stmts.add(saveLength);
