@@ -1,6 +1,5 @@
 package com.bwz6jk2227esl89ahj34;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 public class Main {
@@ -57,16 +56,15 @@ public class Main {
                 0);
         cli.execute(args);
 
-        if(debug) {
-            // put debug mode behaviors here
+        if(debug) { // put debug mode behaviors here
             try {
-                //Tests.parseTestHarness();
-                Tests.constantFoldTest();
+                //Tests.parseTests();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            //Tests.typeCheckTests();
 
+            Tests.constantFoldTests();
+            //Tests.typeCheckTests();
         }
     }
 
