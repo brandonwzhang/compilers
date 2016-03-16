@@ -1,6 +1,5 @@
 package com.bwz6jk2227esl89ahj34;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 public class Main {
@@ -50,23 +49,27 @@ public class Main {
                                 Core.typeCheck(sourcePath, diagnosticPath,
                                         libPath, file)),
                 0);
+        cli.addOption("--irgen",
+                "Generate intermediate code and write its S-expression representation.",
+                files -> Arrays.stream(files).forEach(file ->
+                        Core.irGen(sourcePath, diagnosticPath, libPath, file)),
+                0);
         cli.addOption("--irrun",
                 "Generate and interpret intermediate code",
                 files -> Arrays.stream(files).forEach(file ->
-                        Core.irRun(sourcePath, libPath, file)),
+                        Core.irRun(sourcePath, diagnosticPath, libPath, file)),
                 0);
         cli.execute(args);
 
-        if(debug) {
-            // put debug mode behaviors here
+        if(debug) { // put debug mode behaviors here
             try {
-                //Tests.parseTestHarness();
-                Tests.constantFoldTest();
+                //Tests.parseTests();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            //Tests.typeCheckTests();
 
+            Tests.constantFoldTests();
+            //Tests.typeCheckTests();
         }
     }
 

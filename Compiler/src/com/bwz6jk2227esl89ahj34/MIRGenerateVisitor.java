@@ -53,7 +53,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
         assert generatedNodes.peek() instanceof IRExpr;
         IRExpr index = (IRExpr)generatedNodes.pop();
 
-        IRMem location = new IRMem(new IRBinOp(IRBinOp.OpType.ADD, array, index)); // TODO double check
+        IRMem location = new IRMem(new IRBinOp(IRBinOp.OpType.ADD, array, new IRBinOp(OpType.MUL, index, new IRConst(WORD_SIZE)))); // TODO double check
+        location.setType(array.getType());
 
         generatedNodes.push(location);
     }
@@ -99,10 +100,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
         }
 
         // move array pointer back to index 0
-        stmts.add(new IRMove(array, new IRBinOp(OpType.ADD, array, new IRConst(WORD_SIZE * length))));
+        stmts.add(new IRMove(array, new IRBinOp(OpType.SUB, array, new IRConst(WORD_SIZE * length))));
 
         IRSeq seq = new IRSeq(stmts);
-        IRESeq eseq = new IRESeq(seq, new IRMem(array));
+        IRESeq eseq = new IRESeq(seq, array);
 
         generatedNodes.push(eseq);
     }
@@ -186,6 +187,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
     public void visit(Binary node) {
         OpType optype;
         IRExpr left, right;
+        VariableType nodeType = null;
         // get IR op type
         switch(node.getOp()){
             case PLUS:
@@ -241,6 +243,107 @@ public class MIRGenerateVisitor implements NodeVisitor {
         node.getRight().accept(this);
         assert generatedNodes.peek() instanceof IRExpr;
         right = (IRExpr)generatedNodes.pop();
+
+        // array addition case
+        if (optype == OpType.ADD && ((VariableType)node.getLeft().getType()).getNumBrackets() > 0) {
+            assert ((VariableType)node.getRight().getType()).getNumBrackets() > 0;
+            assert left instanceof IRTemp;
+            assert right instanceof IRTemp;
+            // get length of operands
+            IRMem leftLength = new IRMem(new IRBinOp(OpType.SUB, left, new IRConst(WORD_SIZE)));
+            IRMem rightLength = new IRMem(new IRBinOp(OpType.SUB, right, new IRConst(WORD_SIZE)));
+            IRBinOp combinedLength = new IRBinOp(OpType.ADD, leftLength, rightLength);
+
+            /* Allocate space for new array */
+            IRTemp combinedArray = new IRTemp(getFreshVariable());
+            List<IRStmt> stmts = new LinkedList<>();
+            // call malloc
+            IRCall malloc = new IRCall(new IRName("_I_alloc_i"),
+                    new IRBinOp(OpType.MUL,
+                            new IRBinOp(OpType.ADD, combinedLength, new IRConst(1)),
+                            new IRConst(WORD_SIZE)));
+            IRMove storeArrayPtr = new IRMove(combinedArray, malloc);
+            // TODO make first index of malloc's return IMMUTABLE IRMem
+
+            // save length in MEM(combinedArray)
+            IRMove saveLength = new IRMove(new IRMem(combinedArray), combinedLength);
+            // shift array up to 0th index
+            IRMove shift = new IRMove(combinedArray, new IRBinOp(OpType.ADD, combinedArray, new IRConst(WORD_SIZE)));
+
+            stmts.add(storeArrayPtr);
+            stmts.add(saveLength);
+            stmts.add(shift);
+
+            /* Insert elements into new array */
+            // insert elements from left array
+            IRTemp index = new IRTemp(getFreshVariable());
+            stmts.add(new IRMove(index, new IRConst(0)));
+
+            IRLabel headLabel = new IRLabel(getFreshVariable());
+            IRLabel trueLabel = new IRLabel(getFreshVariable());
+            IRLabel falseLabel = new IRLabel(getFreshVariable());
+
+            IRBinOp guard = new IRBinOp(OpType.LT, index, combinedLength);
+            IRCJump cjump = new IRCJump(guard, trueLabel.name(), falseLabel.name());
+
+            IRBinOp leftElement = new IRBinOp(OpType.ADD,
+                    new IRBinOp(OpType.MUL,
+                            index, new IRConst(WORD_SIZE)),
+                    left);
+            IRMove trueMove1 = new IRMove(new IRMem(combinedArray), new IRMem(leftElement));
+            IRMove trueMove2 = new IRMove(combinedArray,
+                    new IRBinOp(OpType.ADD, combinedArray, new IRConst(WORD_SIZE)));
+            IRJump headJump = new IRJump(new IRName(headLabel.name()));
+
+            stmts.add(headLabel);
+            stmts.add(cjump);
+            stmts.add(trueLabel);
+            stmts.add(trueMove1);
+            stmts.add(trueMove2);
+            stmts.add(headJump);
+            stmts.add(falseLabel);
+
+            // insert elements from right array
+            stmts.add(new IRMove(index, new IRConst(0))); // reset index to 0
+
+            IRLabel headLabel2 = new IRLabel(getFreshVariable());
+            IRLabel trueLabel2 = new IRLabel(getFreshVariable());
+            IRLabel falseLabel2 = new IRLabel(getFreshVariable());
+
+            IRBinOp guard2 = new IRBinOp(OpType.LT, index, combinedLength);
+            IRCJump cjump2 = new IRCJump(guard2, trueLabel2.name(), falseLabel2.name());
+
+            IRBinOp rightElement = new IRBinOp(OpType.ADD,
+                    new IRBinOp(OpType.MUL,
+                            index, new IRConst(WORD_SIZE)),
+                    right);
+            IRMove trueMove1_ = new IRMove(new IRMem(combinedArray), new IRMem(rightElement));
+            IRMove trueMove2_ = new IRMove(combinedArray,
+                    new IRBinOp(OpType.ADD, combinedArray, new IRConst(WORD_SIZE)));
+            IRJump headJump2 = new IRJump(new IRName(headLabel2.name()));
+
+            stmts.add(headLabel2);
+            stmts.add(cjump2);
+            stmts.add(trueLabel2);
+            stmts.add(trueMove1_);
+            stmts.add(trueMove2_);
+            stmts.add(headJump2);
+            stmts.add(falseLabel2);
+
+            /* return combinedArray to index 0 address */
+            stmts.add(new IRMove(combinedArray,
+                    new IRBinOp(OpType.SUB,
+                            combinedArray,
+                            new IRBinOp(OpType.MUL, new IRConst(WORD_SIZE), combinedLength)
+                    ))
+            );
+
+            IRSeq seq = new IRSeq(stmts);
+            IRESeq eseq = new IRESeq(seq, combinedArray);
+
+            generatedNodes.push(eseq);
+            return;
+        }
 
         // short circuit cases
         if (optype == OpType.AND) {

@@ -7,10 +7,49 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Optional;
 
-/**
- * Created by andy on 3/15/16.
- */
 public class Tests {
+
+    /**
+     * Automated tests for ConstantFoldingVisitor.
+     */
+    public static void constantFoldTests() {
+        System.out.println("\n==CONSTANT FOLD TESTS==");
+
+        Util.getDirectoryFiles("constantfold/").stream()
+                .filter(filename -> filename.contains(".xi"))
+                .forEach(Tests::constantFoldHelper);
+    }
+
+    /**
+     * Prints the result of constant folding (before IR translation)
+     * on a single Xi program.
+     */
+    public static void constantFoldHelper(String filename) {
+
+        Optional<Program> program =
+                Core.typeCheck("constantfold/", "constantfold/", "", filename);
+
+        if (!program.isPresent()) {
+            System.out.println("type checking failed");
+            return;
+        }
+
+        ConstantFoldingVisitor cfv = new ConstantFoldingVisitor();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        CodeWriterSExpPrinter printer =
+                new CodeWriterSExpPrinter(baos);
+        NodeVisitor visitor = new PrintVisitor(printer);
+
+        program.get().accept(cfv);
+        program.get().accept(visitor);
+        printer.flush();
+        System.out.println(baos.toString().replaceAll("\\s+", " ")
+                .replaceAll("\\(\\s?", "(")
+                .replaceAll("\\s?\\)", ")")
+                .trim());
+    }
+
     /**
      * Automated tests for typecheck.
      */
@@ -37,7 +76,7 @@ public class Tests {
      * Executes parseFile on a list of filenames. For debugging purposes only.
      * @throws IOException
      */
-    public static void parseTestHarness() throws IOException {
+    public static void parseTests() throws IOException {
         String[] testFileNames = new String[] {"arrayinit", "arrayinit2",
                 "ex1", "ex2", "gcd", "insertionsort", "mdarrays", "ratadd",
                 "ratadduse", "spec1", "spec2", "spec3" };
@@ -54,38 +93,6 @@ public class Tests {
                     "parser/tests/" + file.replace(".xi", ".parsed");
             System.out.println();
             System.out.println(Util.compareSExpFiles(sExpFile1, sExpFile2));
-        }
-    }
-
-    public static void constantFoldTest() throws IOException {
-        String [] testFileNames = new String[] {"test"};
-
-        System.out.println();
-        System.out.println("==CONSTANT FOLD TESTS==");
-        for (int i = 0; i < testFileNames.length; i++) {
-            testFileNames[i] = testFileNames[i] + ".xi";
-            Optional<Program> program =
-                    Core.typeCheck("constantfold/", "constantfold/", "", testFileNames[i]);
-
-            if (!program.isPresent()) {
-                System.out.println("type checking failed");
-                continue;
-            }
-
-            ConstantFoldingVisitor cfv = new ConstantFoldingVisitor();
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            CodeWriterSExpPrinter printer =
-                    new CodeWriterSExpPrinter(baos);
-            NodeVisitor visitor = new PrintVisitor(printer);
-
-            program.get().accept(cfv);
-            program.get().accept(visitor);
-            printer.flush();
-            System.out.println(baos.toString().replaceAll("\\s+", " ")
-                    .replaceAll("\\(\\s?", "(")
-                    .replaceAll("\\s?\\)", ")")
-                    .trim());
         }
     }
 }

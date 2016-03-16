@@ -1,7 +1,9 @@
 package com.bwz6jk2227esl89ahj34;
 
 import com.bwz6jk2227esl89ahj34.AST.Program;
+import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
+import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.util.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
 
@@ -148,6 +150,8 @@ public class Core {
      * Writes the output to diagnosticPath + file.
      * libPath is the path where the interface files (.ixi)
      * are found.
+     *
+     * Returns the typechecked program if it types.
      */
     public static Optional<Program> typeCheck(String sourcePath,
                                  String diagnosticPath,
@@ -165,74 +169,89 @@ public class Core {
         List<String> parseLines = new ArrayList<>();
         Optional<Symbol> result = parseHelper(parser, parseLines);
         if (!result.isPresent()) {
-            // TODO: syntactic error. what do we do?
             // printing to standard output is already taken care of
             Util.writeHelper(file, "typed", diagnosticPath, parseLines);
             return Optional.empty();
         }
 
-        String typeCheckErrorMessage = typeCheckHelper((Program) result.get().value, libPath);
-        if (typeCheckErrorMessage == null) {
+        Program program = (Program) result.get().value;
+        Optional<String> typeCheckErrorMessage = typeCheckHelper(program, libPath);
+
+        if (!typeCheckErrorMessage.isPresent()) {
             if (Main.debugOn()) {
                 System.out.println("DEBUG: typed");
             }
 
-            // print to file
             List<String> lines = Collections.singletonList("Valid Xi Program");
             Util.writeHelper(file, "typed", diagnosticPath, lines);
 
-            return Optional.of((Program) result.get().value);
+            return Optional.of(program);
         } else {
-            Util.printError("Semantic", typeCheckErrorMessage);
-            List<String> lines = Collections.singletonList(typeCheckErrorMessage);
+            Util.printError("Semantic", typeCheckErrorMessage.get());
+            List<String> lines = Collections.singletonList(typeCheckErrorMessage.get());
             Util.writeHelper(file, "typed", diagnosticPath, lines);
             return Optional.empty();
         }
     }
 
-    public static String typeCheckHelper(Program node, String libPath) {
+    /**
+     * Typechecks the given program. Returns an error message if a type
+     * error occurs.
+     *
+     * @param node a program
+     * @param libPath the path that contains Xi interface files
+     * @return the error message wrapped in an Optional
+     */
+    public static Optional<String> typeCheckHelper(Program node, String libPath) {
         NodeVisitor visitor =
                 new TypeCheckVisitor(libPath);
         try {
             node.accept(visitor);
-            return null;
+            return Optional.empty();
         } catch (TypeException e) {
             String errorMessage = e.toString();
-            return errorMessage;
+            return Optional.of(errorMessage);
         }
     }
 
-    public static void irRun(String sourcePath,
+    public static void irGen(String sourcePath,
+                             String diagnosticPath,
                              String libPath,
                              String file) {
-        Optional<FileReader> reader = Util.getFileReader(sourcePath, file);
-        if (!reader.isPresent()) {
+        Optional<Program> root = typeCheck(sourcePath, diagnosticPath, libPath, file);
+        if (!root.isPresent()) {
             return;
         }
 
-        Lexer lexer = new Lexer(reader.get());
-        Parser parser = new Parser(lexer);
-
-        // parse the file
-        List<String> parseLines = new ArrayList<>();
-        Optional<Symbol> result = parseHelper(parser, parseLines);
-        if (!result.isPresent()) {
-            // TODO: syntactic error. what do we do?
-            // printing to standard output is already taken care of
-            return;
-        }
-
-        Program root = (Program) result.get().value;
-        String typeCheckErrorMessage = typeCheckHelper(root, libPath);
-        if (typeCheckErrorMessage != null) {
-            Util.printError("Semantic", typeCheckErrorMessage);
-            return;
-        }
         MIRGenerateVisitor visitor = new MIRGenerateVisitor("");
-        root.accept(visitor);
+        root.get().accept(visitor);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        CodeWriterSExpPrinter printer =
+                new CodeWriterSExpPrinter(baos);
+        IRVisitor irVisitor = new IRSexyPrintVisitor(printer);
+
+        irVisitor.visit(visitor.getIRRoot());
+
+        printer.flush();
+        List<String> lines = Collections.singletonList(baos.toString());
+        Util.writeHelper(file, "ir", diagnosticPath, lines);
+    }
+
+    public static void irRun(String sourcePath,
+                             String diagnosticPath,
+                             String libPath,
+                             String file) {
+
+        Optional<Program> root = typeCheck(sourcePath, diagnosticPath, libPath, file);
+        if (!root.isPresent()) {
+            return;
+        }
+
+        MIRGenerateVisitor visitor = new MIRGenerateVisitor("");
+        root.get().accept(visitor);
         IRSimulator sim = new IRSimulator(visitor.getIRRoot());
         long callResult = sim.call("_Imain_p", 0);
         System.out.println(callResult);
-
     }
 }
