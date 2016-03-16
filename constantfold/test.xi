@@ -2,6 +2,22 @@ divideByZero() {
   x:int = 10/0
 }
 
+overFlow() {
+  x:int = -(-9223372036854775808)
+}
+
+overFlow2() {
+  x:int = --9223372036854775808
+}
+
+underFlow() {
+  x:int = -9223372036854775808 - 1
+}
+
+overFlow3() {
+  x:int = -9223372036854775808 - 1 + 1 
+}
+
 arrayLiteralIndexCombo(): int  {
   q:int[1+3][2+3][8-5][9]
   return {1,2,3}[0+1]
@@ -114,8 +130,4 @@ dummyProcedure(x:int, y:int, z:int) {
 testFunctionArguments() {
   dummyProcedure(5+3,3-1,5*30);
   x:int = dummyFunction(5+3,3-1,5*30);
-}
-
-overFlow() {
-  x:int = -(-9223372036854775808)
 }

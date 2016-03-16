@@ -48,51 +48,29 @@ public class BinarySymbol {
             IntegerLiteral right = (IntegerLiteral)(b.getRight());
             BigInteger leftValueBigInt = new BigInteger(left.getValue());
             BigInteger rightValueBigInt = new BigInteger(right.getValue());
-            long leftValue = leftValueBigInt.longValue();
-            long rightValue = rightValueBigInt.longValue();
             if (BinarySymbol.INT_BINARY_OPERATOR_INT.contains(binop)) {
                 switch (binop) {
                     case PLUS:
                         BigInteger sumBigInt = leftValueBigInt.add(rightValueBigInt);
-                        long sum = leftValue + rightValue;
-                        if (sumBigInt.compareTo(BigInteger.valueOf(sum)) == 0) {
-                            return new IntegerLiteral(sumBigInt.toString());
-                        }
-                        break;
+                        return new IntegerLiteral(""+sumBigInt.longValue());
                     case MINUS:
                         BigInteger subtractionBigInt = leftValueBigInt.subtract(rightValueBigInt);
-                        long subtraction = leftValue - rightValue;
-                        if (subtractionBigInt.compareTo(BigInteger.valueOf(subtraction)) == 0) {
-                            return new IntegerLiteral(subtractionBigInt.toString());
-                        }
-                        break;
+                        return new IntegerLiteral(""+subtractionBigInt.longValue());
                     case TIMES:
                         BigInteger multipleBigInt = leftValueBigInt.multiply(rightValueBigInt);
-                        long multiple = leftValue * rightValue;
-                        if (multipleBigInt .compareTo(BigInteger.valueOf(multiple)) == 0) {
-                            return new IntegerLiteral(multipleBigInt.toString());
-                        }
-                        break;
+                        return new IntegerLiteral(""+multipleBigInt.longValue());
                     case DIVIDE:
                         // for divide by 0, we believe constant folding over it
                         // doesn't make any sense, so we just return the
                         // Binary expression as is to avoid throwing an error
-                        if (rightValue == 0 ) {
+                        if (rightValueBigInt.longValue() == 0 ) {
                             return b;
                         }
                         BigInteger divideBigInt = leftValueBigInt.divide(rightValueBigInt);
-                        long divide = leftValue / rightValue;
-                        if (divideBigInt.compareTo(BigInteger.valueOf(divide)) == 0) {
-                            return new IntegerLiteral(divideBigInt.toString());
-                        }
-                        break;
+                        return new IntegerLiteral(""+divideBigInt.longValue());
                     case MODULO:
                         BigInteger moduloBigInt = leftValueBigInt.remainder(rightValueBigInt);
-                        long modulo = leftValue % rightValue;
-                        if (moduloBigInt.compareTo(BigInteger.valueOf(modulo)) == 0) {
-                            return new IntegerLiteral(moduloBigInt.toString());
-                        }
-                        break;
+                        return new IntegerLiteral(""+moduloBigInt.longValue());
                     case HIGH_MULT:
                         BigInteger highMultBigInt = leftValueBigInt.multiply(rightValueBigInt).shiftRight(64);
                         return new IntegerLiteral(highMultBigInt.toString());

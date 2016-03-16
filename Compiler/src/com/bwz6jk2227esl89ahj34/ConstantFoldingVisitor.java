@@ -378,10 +378,11 @@ public class ConstantFoldingVisitor implements NodeVisitor {
             }
         } else {
             if(val instanceof IntegerLiteral) {
-                long longValue = Long.parseLong(((IntegerLiteral)(lst.get(0))).getValue());
+                //long longValue = Long.parseLong(((IntegerLiteral)(lst.get(0))).getValue());
+                BigInteger longValue = new BigInteger(((IntegerLiteral)(lst.get(0))).getValue());
                 lst = new LinkedList<>();
-                longValue = -1 * longValue;
-                lst.add(new IntegerLiteral(""+longValue));
+                longValue = longValue.multiply(new BigInteger("-1"));
+                lst.add(new IntegerLiteral(""+longValue.longValue()));
             } else {
                 val = lst.get(0);
                 lst = new LinkedList<>();
