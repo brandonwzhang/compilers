@@ -6,17 +6,33 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by jihunkim on 3/11/16.
- */
-
-//TODO: for if/while statements, constant fold on the block
+//TODO: remove the exceptions for over/underflow
 public class ConstantFoldingVisitor implements NodeVisitor {
-    private List<Expression> lst;
+    private List<Expression> lst; //while the visitor visits, it will add to
+                                 // or retrieve from the lst an appropriate
+                                // expression depending on where they are in the
+                               // AST
+
     public ConstantFoldingVisitor() {
         lst = new LinkedList<>();
     }
 
+    /**
+     * first visit the array ref (in case it's an array literal)
+     * when it is visited, the list should contain the visited array ref
+     * set the array ref as the visited array ref
+     *
+     * then, visit the expression which is the index of the array
+     * when it is visited, the list should contain visited index; set the index
+     * of the array to this
+     *
+     * if the array ref is an array literal and the index is an integer literal
+     * then we can constant fold by extracting the element of the array
+     *
+     * we add this element to lst
+     *
+     * @param node
+     */
     public void visit(ArrayIndex node) {
         node.getArrayRef().accept(this);
         assert lst.size() == 1;
@@ -36,6 +52,11 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         }
     }
 
+    /**
+     * visit each element of the array literal and add this to a temp list
+     * then set the content of the array literal node to temp list
+     * @param node
+     */
     public void visit(ArrayLiteral node) {
         List<Expression> temp = new LinkedList<>();
         for(Expression e : node.getValues()) {
@@ -48,6 +69,13 @@ public class ConstantFoldingVisitor implements NodeVisitor {
 
     }
 
+    /**
+     * for the variables of the assignment on the LHS, if the variable
+     * is actually an index into an array, then visit it first. For all
+     * variables, add it to newAssignable. Afterwards, visit the expression,
+     * and set the expression to the new visited value
+     * @param node
+     */
     public void visit(Assignment node) {
         List<Assignable> assignables = node.getVariables();
         List<Assignable> newAssignables = new LinkedList<>();
@@ -60,12 +88,23 @@ public class ConstantFoldingVisitor implements NodeVisitor {
                 newAssignables.add(a);
             }
         }
+        node.setVariables(newAssignables);
         node.getExpression().accept(this);
         assert lst.size() == 1;
         node.setExpression(lst.get(0));
         lst = new LinkedList<>();
     }
 
+    /**
+     * visit the left expression first, and then set left to the value
+     * yielded by the visit
+     *
+     * visit the right expression and do the same
+     *
+     * then, add the result of the computation of the binary expression
+     * into lst
+     * @param node
+     */
     public void visit(Binary node) {
         node.getLeft().accept(this);
         node.setLeft(lst.get(lst.size()-1));
@@ -76,6 +115,23 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         lst.add(BinarySymbol.compute(node));
     }
 
+    /**
+     * for each block in the block list we visit
+     * if the result of the visit of the block is an if statement and the
+     * guard is a boolean literal then we can perform constant folding on it
+     * if the boolean literal is true we only keep the true block, and that block
+     * can actually stand alone without the if statement
+     * otherwise we discard the if-statement & true block and the false block
+     * can stand alone
+     *
+     * we also keep an eye out for a similar situation for the while loop, where
+     * if the guard is true then the while loop is unnecessary and the block
+     * stands alone, but if the guard is false then it just disappears
+     *
+     * as we process the blocks we add it to a blockList list and then
+     * set the blocklist of the node to the blockList we were constructing
+     * @param node
+     */
     public void visit(BlockList node) {
         List<Block> blockList = new LinkedList<>();
         for(Block b : node.getBlockList()) {
@@ -105,15 +161,33 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         node.setBlockList(new LinkedList<>(blockList));
     }
 
+    /**
+     * add the boolean literal into the list
+     * @param node
+     */
     public void visit(BooleanLiteral node) {
         lst.add(node);
     }
 
+    /**
+     * cast the character literal into its corresponding int value,
+     * and add the int value to the list
+     * @param node
+     */
     public void visit(CharacterLiteral node) {
         Expression integerLiteral = new IntegerLiteral(""+(int)(node.getValue()));
         lst.add(integerLiteral);
     }
 
+    /**
+     * for the function block, we first visit the block list
+     * that is contained in the function block
+     *
+     * then we visit the return statement
+     *
+     * afterwards we empty the lst
+     * @param node
+     */
     public void visit(FunctionBlock node) {
         BlockList blockList = node.getBlockList();
         ReturnStatement returnStatement = node.getReturnStatement();
@@ -122,24 +196,50 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         lst = new LinkedList<>();
     }
 
+    /**
+     * we simplify the arguments to the function call and add them to a
+     * newArguments list
+     *
+     * then we set newArguments to the arguments of node
+     *
+     * afterwards, we add the node to lst
+     * @param node
+     */
     public void visit(FunctionCall node) {
+        List<Expression> newArguments = new LinkedList<>();
         for(Expression e : node.getArguments()) {
             e.accept(this);
+            newArguments.add(lst.get(0));
+            lst = new LinkedList<>();
         }
-        node.setArguments(new LinkedList<>(lst));
+        node.setArguments(new LinkedList<>(newArguments));
         lst = new LinkedList<>();
         lst.add(node);
     }
 
+    /**
+     * visit the methodblock
+     * @param node
+     */
     public void visit(FunctionDeclaration node) {
         MethodBlock methodBlock = node.getMethodBlock();
         methodBlock.accept(this);
     }
 
+    /**
+     * add the Identifier to lst
+     * @param node
+     */
     public void visit(Identifier node) {
         lst.add(node);
     }
 
+    /**
+     * visit the guard, then set the guard to the visited guard
+     * then accept the true block
+     * if the false block is also present, visit it as well
+     * @param node
+     */
     public void visit(IfStatement node) {
         node.getGuard().accept(this);
         assert lst.size() == 1;
@@ -151,28 +251,59 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         }
     }
 
+    /**
+     * add integer literal to lst
+     * @param node
+     */
     public void visit(IntegerLiteral node) {
         lst.add(node);
     }
 
+    /**
+     * visit the blocklist of procedure block
+     * @param node
+     */
     public void visit(ProcedureBlock node) {
         node.getBlockList().accept(this);
     }
 
+    /**
+     * visit every argument to the procedure call
+     * and add each visited argument to a newArguments list
+     *
+     * afterwards, set the arguments of procedure call
+     * @param node
+     */
     public void visit(ProcedureCall node) {
+        List<Expression> newArguments = new LinkedList<>();
         for(Expression e : node.getArguments()) {
             e.accept(this);
+            newArguments.add(lst.get(0));
+            lst = new LinkedList<>();
         }
-        node.setArguments(new LinkedList<>(lst));
+        node.setArguments(new LinkedList<>(newArguments));
         lst = new LinkedList<>();
     }
 
+    /**
+     * for each function declaration in the program, we constant fold
+     * note that we do not care about use statements for good reason :P
+     * @param node
+     */
     public void visit(Program node) {
-        for (FunctionDeclaration functionDeclaration : node.getFunctionDeclarationList()) {
+        for (FunctionDeclaration functionDeclaration :
+                node.getFunctionDeclarationList()) {
             functionDeclaration.accept(this);
         }
     }
 
+    /**
+     * for each expression of the return statement, we visit it
+     * and add the visited value to a temp list
+     *
+     * then we set the values of the return statement to temp
+     * @param node
+     */
     public void visit(ReturnStatement node) {
         List<Expression> returnValues = node.getValues();
         List<Expression> temp = new LinkedList<>();
@@ -185,6 +316,11 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         node.setValues(temp);
     }
 
+    /**
+     * we convert the string literal to an int array
+     * and add the array into lst
+     * @param node
+     */
     public void visit(StringLiteral node) {
         char[] str = node.getValue().toCharArray();
         List<Expression> expressions = new LinkedList<>();
@@ -196,14 +332,29 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         lst.add(arr);
     }
 
+    /**
+     * for a typed declaration, if the declaration involves a fixed size
+     * arrays, then we visit each expression that specifies the size of
+     * the array
+     * @param node
+     */
     public void visit(TypedDeclaration node) {
+        List<Expression> newArraySizeList = new LinkedList<>();
         for(Expression e : node.getArraySizeList()) {
             e.accept(this);
+            newArraySizeList.add(lst.get(0));
+            lst = new LinkedList<>();
         }
-        node.setArraySizeList(new LinkedList<>(lst));
+        node.setArraySizeList(newArraySizeList);
         lst = new LinkedList<>();
     }
 
+    /**
+     * for a Unary node, we count how many times the unary operation
+     * occurs and reduce it accordingly by the count and type of the expression
+     * wrapped by the Unary
+     * @param node
+     */
     public void visit(Unary node) {
         Expression temp = node;
         int count = 1;
@@ -230,19 +381,33 @@ public class ConstantFoldingVisitor implements NodeVisitor {
             } else {
                 val = lst.get(0);
                 lst = new LinkedList<>();
-                lst.add(new Unary(UnaryOperator.NOT, val));
+                lst.add(new BooleanLiteral(false));
             }
         }
     }
 
+    /**
+     * nothing to do for underscore
+     * @param node
+     */
     public void visit(Underscore node) {
 
     }
 
+    /**
+     * nothing to do for use statement
+     * @param node
+     */
     public void visit(UseStatement node) {
 
     }
 
+    /**
+     * for while statements we visit its guard
+     * and then set the guard to the visited guard
+     * then we visit the block
+     * @param node
+     */
     public void visit(WhileStatement node) {
         node.getGuard().accept(this);
         assert lst.size() == 1;

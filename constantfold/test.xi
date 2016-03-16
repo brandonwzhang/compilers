@@ -1,4 +1,5 @@
 arrayLiteralIndexCombo(): int  {
+  q:int[1+3][2+3][8-5][9]
   return {1,2,3}[0+1]
 }
 
@@ -95,4 +96,18 @@ complicatedComboFunction() : int {
 arryLiteralIndexTest() {
   x:int[] = {1,2,3}
   x[1+1] = 20
+}
+
+dummyFunction(x:int, y:int, z:int) : int {
+  return 5; 
+}
+
+dummyProcedure(x:int, y:int, z:int) {
+  swag:int = 1 
+  nice:bool = false 
+}
+
+testFunctionArguments() {
+  dummyProcedure(5+3,3-1,5*30);
+  x:int = dummyFunction(5+3,3-1,5*30);
 }
