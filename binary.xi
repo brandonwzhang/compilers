@@ -5,6 +5,7 @@ returnOne():int{
 }
 
 main(){
-	x:int = returnOne() + 2
-    print({x});
+    y:int[] = "get fukd boi";
+	x:int = returnOne() + 35
+    println(y);
 }
