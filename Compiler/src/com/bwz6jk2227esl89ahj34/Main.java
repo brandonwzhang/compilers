@@ -52,7 +52,7 @@ public class Main {
         cli.addOption("--irrun",
                 "Generate and interpret intermediate code",
                 files -> Arrays.stream(files).forEach(file ->
-                        Core.irRun(sourcePath, libPath, file)),
+                        Core.irRun(sourcePath, diagnosticPath, libPath, file)),
                 0);
         cli.execute(args);
 
