@@ -68,8 +68,10 @@ public class Main {
                 e.printStackTrace();
             }
 
-            Tests.constantFoldTests();
             //Tests.typeCheckTests();
+            //Tests.constantFoldTests();
+            //Tests.irGenTests();
+            Tests.irRunTests();
         }
     }
 

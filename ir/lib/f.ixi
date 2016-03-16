@@ -1,0 +1,3 @@
+foo(bar:bool, arr:int[]):int
+fubar():bool[]
+wumpus(x:int)
