@@ -149,13 +149,13 @@ public class Core {
      * libPath is the path where the interface files (.ixi)
      * are found.
      */
-    public static void typeCheck(String sourcePath,
+    public static Optional<Program> typeCheck(String sourcePath,
                                  String diagnosticPath,
                                  String libPath,
                                  String file) {
         Optional<FileReader> reader = Util.getFileReader(sourcePath, file);
         if (!reader.isPresent()) {
-            return;
+            return Optional.empty();
         }
 
         Lexer lexer = new Lexer(reader.get());
@@ -168,7 +168,7 @@ public class Core {
             // TODO: syntactic error. what do we do?
             // printing to standard output is already taken care of
             Util.writeHelper(file, "typed", diagnosticPath, parseLines);
-            return;
+            return Optional.empty();
         }
 
         String typeCheckErrorMessage = typeCheckHelper((Program) result.get().value, libPath);
@@ -180,10 +180,13 @@ public class Core {
             // print to file
             List<String> lines = Collections.singletonList("Valid Xi Program");
             Util.writeHelper(file, "typed", diagnosticPath, lines);
+
+            return Optional.of((Program) result.get().value);
         } else {
             Util.printError("Semantic", typeCheckErrorMessage);
             List<String> lines = Collections.singletonList(typeCheckErrorMessage);
             Util.writeHelper(file, "typed", diagnosticPath, lines);
+            return Optional.empty();
         }
     }
 

@@ -11,7 +11,7 @@ arrayLiteralIndexNested() : int {
 }
 
 arrayLiterIndexNested2() : int {
-  return {{{1,2}}, {{3,4},{5,6}}}[1][2][1]
+  return {{{1,2}}, {{3,4},{5,6}}}[1][1][1]
 }
 
 unaryNegationBool() : bool {
@@ -52,7 +52,7 @@ binOpCombo() : int {
 
 complicatedCombo() {
   x:int = 2
-  andy = 5+3 + 2*x - 3+1 
+  andy:int = 5+3 + 2*x - 3+1 
   if(true) {
     x = 1+2+3
   } else {
@@ -77,7 +77,7 @@ simpleFunction() : int {
 
 complicatedComboFunction() : int {
   x:int = 2
-  andy = 5+3 + 2*x - 3+1 
+  andy:int = 5+3 + 2*x - 3+1 
   if(true) {
     x = 1+2+3
   } else {
