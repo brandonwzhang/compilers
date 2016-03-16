@@ -114,8 +114,22 @@ public class MIRGenerateVisitor implements NodeVisitor {
             assert variables.size() == 1;
             Assignable variable = variables.get(0);
             if (variable instanceof Underscore) {
-                generatedNodes.push(new IRExp(evaluatedExpression));
+                // Throw away if underscore
                 return;
+            } else if (variable instanceof TypedDeclaration) {
+                // Since TypedDeclarations are treated as statements, we must
+                // handle them separately
+                TypedDeclaration typedDeclaration = (TypedDeclaration) variable;
+                List<IRStmt> statements = new ArrayList<>();
+                if (typedDeclaration.getArraySizeList().size() > 0) {
+                    variable.accept(this);
+                    assert generatedNodes.peek() instanceof IRStmt;
+                    statements.add((IRStmt) generatedNodes.pop());
+                }
+                IRTemp temp = new IRTemp(typedDeclaration.getIdentifier().getName());
+                IRMove move = new IRMove(temp, evaluatedExpression);
+                statements.add(move);
+                generatedNodes.push(new IRSeq(statements));
             }
             variable.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
@@ -137,9 +151,23 @@ public class MIRGenerateVisitor implements NodeVisitor {
         for (int i = 0; i < variables.size(); i++) {
             Assignable variable = variables.get(i);
             if (variable instanceof Underscore) {
-                statements.add(new IRExp(new IRTemp("_RET" + i)));
+                // Throw away return value if underscore
+                continue;
+            } else if (variable instanceof TypedDeclaration) {
+                // Since TypedDeclarations are treated as statements, we must
+                // handle them separately
+                TypedDeclaration typedDeclaration = (TypedDeclaration) variable;
+                if (typedDeclaration.getArraySizeList().size() > 0) {
+                    variable.accept(this);
+                    assert generatedNodes.peek() instanceof IRStmt;
+                    statements.add((IRStmt) generatedNodes.pop());
+                }
+                IRTemp temp = new IRTemp(typedDeclaration.getIdentifier().getName());
+                IRMove move = new IRMove(temp, new IRTemp("_RET" + i));
+                statements.add(move);
                 continue;
             }
+            // We know LHS must be either identifier or array index at this point
             variable.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
             IRMove move = new IRMove((IRExpr) generatedNodes.pop(), new IRTemp("_RET" + i));
@@ -341,34 +369,31 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRStmt trueBlock = (IRStmt) generatedNodes.pop();
 
         // We need a label for the end of the if statement to ensure
-        // that the false block doesn't execute after the true block
+        // that both blocks don't execute
         String endLabelName = getFreshVariable();
         IRLabel endLabel = new IRLabel(endLabelName);
 
-        String falseLabelName;
-        IRLabel falseLabel;
-        if (!node.getFalseBlock().isPresent()) {
-            // Set the falseLabel to be the end label if there isn't a false block
-            falseLabelName = endLabelName;
-            falseLabel = endLabel;
-        } else {
-            falseLabelName = getFreshVariable();
-            falseLabel = new IRLabel(falseLabelName);
-        }
-
-        IRCJump cjump = new IRCJump(guard, trueLabelName, falseLabelName);
         List<IRStmt> statements = new ArrayList<>();
-        statements.add(cjump);
-        statements.add(trueLabel);
-        statements.add(trueBlock);
+
         if (node.getFalseBlock().isPresent()) {
+            String falseLabelName = getFreshVariable();
+            IRLabel falseLabel = new IRLabel(falseLabelName);
+            IRCJump cjump = new IRCJump(guard, trueLabelName, falseLabelName);
+            statements.add(cjump);
             statements.add(new IRJump(new IRName(endLabelName)));
             statements.add(falseLabel);
             node.getFalseBlock().get().accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
             IRStmt falseBlock = (IRStmt) generatedNodes.pop();
             statements.add(falseBlock);
+            statements.add(new IRJump(new IRName(endLabelName)));
+        } else {
+            IRCJump cjump = new IRCJump(guard, trueLabelName);
+            statements.add(cjump);
         }
+
+        statements.add(trueLabel);
+        statements.add(trueBlock);
         statements.add(endLabel);
     }
 
