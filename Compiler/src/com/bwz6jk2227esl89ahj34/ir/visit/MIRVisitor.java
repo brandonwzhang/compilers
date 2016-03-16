@@ -1,14 +1,10 @@
 package com.bwz6jk2227esl89ahj34.ir.visit;
 
-import com.bwz6jk2227esl89ahj34.MIRGenerateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.*;
 
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by jihunkim on 3/14/16.
- */
 public class MIRVisitor extends IRVisitor{
     // Counter to append to label strings.
     private long labelCounter = 0;
@@ -83,8 +79,6 @@ public class MIRVisitor extends IRVisitor{
             assert n_ instanceof IRExp;
             assert ((IRExp)(n_)).expr() instanceof IRESeq;
             return new IRSeq(((IRESeq)((IRExp)(n_)).expr()).stmt());
-//            assert n_ instanceof IRESeq; // L[[e]] = vector s; e'
-//            return new IRSeq(((IRESeq)n_).stmt()); //L[[EXP(e)]] = vector s
         } else if (n instanceof IRMove) {
             assert n_ instanceof IRMove;
             assert ((IRMove)(n_)).target() instanceof IRESeq;
