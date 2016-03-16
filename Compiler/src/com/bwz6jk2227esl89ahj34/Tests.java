@@ -9,6 +9,24 @@ import java.util.Optional;
 
 public class Tests {
 
+    public static void irRunTests() {
+        System.out.println("\n================IR RUN TESTs================");
+
+        Util.getDirectoryFiles("ir/irrun/").stream()
+                .filter(filename -> filename.contains(".xi"))
+                .forEach(filename -> Core.irGen("ir/irrun/",
+                        "ir/irrun/diagnostics/", "ir/lib/", filename));
+    }
+
+    public static void irGenTests() {
+        System.out.println("\n================IR GEN TESTs================");
+
+        Util.getDirectoryFiles("ir/irgen/").stream()
+                .filter(filename -> filename.contains(".xi"))
+                .forEach(filename -> Core.irGen("ir/irgen/",
+                        "ir/irgen/diagnostics/", "ir/lib/", filename));
+    }
+
     /**
      * Automated tests for ConstantFoldingVisitor.
      */

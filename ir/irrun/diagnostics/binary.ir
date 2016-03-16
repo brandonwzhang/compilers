@@ -1,0 +1,204 @@
+(
+  COMPUNIT
+  
+  (
+    FUNC _IreturnOne_i
+    (SEQ (MOVE (TEMP _RET0) (CONST 1)) (RETURN)))
+  (
+    FUNC
+    _Imain_p
+    (
+      SEQ
+      (
+        SEQ (MOVE (TEMP x) (ADD (CALL (NAME _IreturnOne_i)) (CONST 2))))
+      (
+        EXP
+        (
+          CALL
+          (NAME _Iprint_pai)
+          (ESEQ
+           (SEQ
+            (MOVE (TEMP 0) (CALL (NAME _I_alloc_i) (CONST 16)))
+            (MOVE (MEM (TEMP 0)) (CONST 1))
+            (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+            (MOVE (MEM (TEMP 0)) (TEMP x))
+            (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+            (MOVE (TEMP 0) (SUB (TEMP 0) (CONST 8))))
+           (TEMP 0))))
+      (
+        RETURN))))
+(
+  FUNC _IreturnOne_i (SEQ (MOVE (TEMP _RET0) (CONST 1)) (RETURN)))
+(
+  SEQ (MOVE (TEMP _RET0) (CONST 1)) (RETURN))
+(
+  MOVE (TEMP _RET0) (CONST 1))
+(
+  TEMP _RET0)
+(
+  CONST 1)
+(
+  RETURN)
+(
+  FUNC
+  _Imain_p
+  (
+    SEQ
+    (
+      SEQ (MOVE (TEMP x) (ADD (CALL (NAME _IreturnOne_i)) (CONST 2))))
+    (
+      EXP
+      (
+        CALL
+        (NAME _Iprint_pai)
+        (ESEQ
+         (SEQ
+          (MOVE (TEMP 0) (CALL (NAME _I_alloc_i) (CONST 16)))
+          (MOVE (MEM (TEMP 0)) (CONST 1))
+          (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+          (MOVE (MEM (TEMP 0)) (TEMP x))
+          (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+          (MOVE (TEMP 0) (SUB (TEMP 0) (CONST 8))))
+         (TEMP 0))))
+    (
+      RETURN)))
+(
+  SEQ
+  (
+    SEQ (MOVE (TEMP x) (ADD (CALL (NAME _IreturnOne_i)) (CONST 2))))
+  (
+    EXP
+    (
+      CALL
+      (NAME _Iprint_pai)
+      (ESEQ
+       (SEQ
+        (MOVE (TEMP 0) (CALL (NAME _I_alloc_i) (CONST 16)))
+        (MOVE (MEM (TEMP 0)) (CONST 1))
+        (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+        (MOVE (MEM (TEMP 0)) (TEMP x))
+        (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+        (MOVE (TEMP 0) (SUB (TEMP 0) (CONST 8))))
+       (TEMP 0))))
+  (
+    RETURN))
+(
+  SEQ (MOVE (TEMP x) (ADD (CALL (NAME _IreturnOne_i)) (CONST 2))))
+(
+  MOVE (TEMP x) (ADD (CALL (NAME _IreturnOne_i)) (CONST 2)))
+(
+  TEMP x)
+(
+  ADD (CALL (NAME _IreturnOne_i)) (CONST 2))
+(
+  CALL (NAME _IreturnOne_i))
+(
+  NAME _IreturnOne_i)
+(
+  CONST 2)
+(
+  EXP
+  (
+    CALL
+    (NAME _Iprint_pai)
+    (ESEQ
+     (SEQ
+      (MOVE (TEMP 0) (CALL (NAME _I_alloc_i) (CONST 16)))
+      (MOVE (MEM (TEMP 0)) (CONST 1))
+      (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+      (MOVE (MEM (TEMP 0)) (TEMP x))
+      (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+      (MOVE (TEMP 0) (SUB (TEMP 0) (CONST 8))))
+     (TEMP 0))))
+(
+  CALL
+  (NAME _Iprint_pai)
+  (ESEQ
+   (SEQ
+    (MOVE (TEMP 0) (CALL (NAME _I_alloc_i) (CONST 16)))
+    (MOVE (MEM (TEMP 0)) (CONST 1))
+    (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+    (MOVE (MEM (TEMP 0)) (TEMP x))
+    (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+    (MOVE (TEMP 0) (SUB (TEMP 0) (CONST 8))))
+   (TEMP 0)))
+(
+  NAME _Iprint_pai)
+(
+  ESEQ
+  (SEQ
+   (MOVE (TEMP 0) (CALL (NAME _I_alloc_i) (CONST 16)))
+   (MOVE (MEM (TEMP 0)) (CONST 1))
+   (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+   (MOVE (MEM (TEMP 0)) (TEMP x))
+   (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+   (MOVE (TEMP 0) (SUB (TEMP 0) (CONST 8))))
+  (TEMP 0))
+(
+  SEQ
+  (MOVE (TEMP 0) (CALL (NAME _I_alloc_i) (CONST 16)))
+  (MOVE (MEM (TEMP 0)) (CONST 1))
+  (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+  (MOVE (MEM (TEMP 0)) (TEMP x))
+  (MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+  (MOVE (TEMP 0) (SUB (TEMP 0) (CONST 8))))
+(
+  MOVE (TEMP 0) (CALL (NAME _I_alloc_i) (CONST 16)))
+(
+  TEMP 0)
+(
+  CALL (NAME _I_alloc_i) (CONST 16))
+(
+  NAME _I_alloc_i)
+(
+  CONST 16)
+(
+  MOVE (MEM (TEMP 0)) (CONST 1))
+(
+  MEM (TEMP 0))
+(
+  TEMP 0)
+(
+  CONST 1)
+(
+  MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+(
+  TEMP 0)
+(
+  ADD (TEMP 0) (CONST 8))
+(
+  TEMP 0)
+(
+  CONST 8)
+(
+  MOVE (MEM (TEMP 0)) (TEMP x))
+(
+  MEM (TEMP 0))
+(
+  TEMP 0)
+(
+  TEMP x)
+(
+  MOVE (TEMP 0) (ADD (TEMP 0) (CONST 8)))
+(
+  TEMP 0)
+(
+  ADD (TEMP 0) (CONST 8))
+(
+  TEMP 0)
+(
+  CONST 8)
+(
+  MOVE (TEMP 0) (SUB (TEMP 0) (CONST 8)))
+(
+  TEMP 0)
+(
+  SUB (TEMP 0) (CONST 8))
+(
+  TEMP 0)
+(
+  CONST 8)
+(
+  TEMP 0)
+(
+  RETURN)
