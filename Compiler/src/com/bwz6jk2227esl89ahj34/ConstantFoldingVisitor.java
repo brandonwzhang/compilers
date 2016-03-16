@@ -77,7 +77,6 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(BlockList node) {
-        System.out.println("hello");
         List<Block> blockList = new LinkedList<>();
         for(Block b : node.getBlockList()) {
             b.accept(this);
@@ -103,7 +102,6 @@ public class ConstantFoldingVisitor implements NodeVisitor {
                 blockList.add(b);
             }
         }
-        System.out.println(blockList);
         node.setBlockList(new LinkedList<>(blockList));
     }
 
