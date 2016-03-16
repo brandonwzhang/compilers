@@ -74,6 +74,12 @@ public class BinarySymbol {
                         }
                         break;
                     case DIVIDE:
+                        // for divide by 0, we believe constant folding over it
+                        // doesn't make any sense, so we just return the
+                        // Binary expression as is to avoid throwing an error
+                        if (rightValue == 0 ) {
+                            return b;
+                        }
                         BigInteger divideBigInt = leftValueBigInt.divide(rightValueBigInt);
                         long divide = leftValue / rightValue;
                         if (divideBigInt.compareTo(BigInteger.valueOf(divide)) == 0) {
@@ -87,11 +93,11 @@ public class BinarySymbol {
                             return new IntegerLiteral(moduloBigInt.toString());
                         }
                         break;
-                    case HIGH_MULT: //TOOD: look over
+                    case HIGH_MULT:
                         BigInteger highMultBigInt = leftValueBigInt.multiply(rightValueBigInt).shiftRight(64);
                         return new IntegerLiteral(highMultBigInt.toString());
                     default:
-                        throw new TypeException("Number too big after constant folding performed");
+                        return b; //shouldn't reach here
                 }
             } else if (BinarySymbol.INT_BINARY_OPERATOR_BOOL.contains(binop)) {
                 switch (binop) {
@@ -108,7 +114,7 @@ public class BinarySymbol {
                     case GEQ:
                         return new BooleanLiteral(leftValueBigInt.compareTo(rightValueBigInt) >= 0);
                     default:
-                        throw new TypeException("Should never reach here");
+                        return b; //should never reach here
                 }
             }
         }
@@ -132,7 +138,7 @@ public class BinarySymbol {
                     else
                         return new BooleanLiteral(rightValue);
                 default:
-                    throw new TypeException("Should never reach here");
+                    return b; //should never reach here
             }
 
         }
@@ -180,7 +186,7 @@ public class BinarySymbol {
                     result = new BooleanLiteral(!left.equals(right));
                     return result;
                 default:
-                    throw new TypeException("Should never reach here");
+                    return b; //should never reach here
             }
         } else {
                 return b;

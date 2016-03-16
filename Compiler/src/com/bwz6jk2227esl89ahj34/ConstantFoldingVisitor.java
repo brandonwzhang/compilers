@@ -2,6 +2,7 @@ package com.bwz6jk2227esl89ahj34;
 
 import com.bwz6jk2227esl89ahj34.AST.*;
 
+import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -367,17 +368,20 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         if(count % 2 == 0) {
             if(val instanceof IntegerLiteral &&
                     ((IntegerLiteral)val).getValue()
-                            .compareTo("9223372036854775808") > 0) {
-                throw new TypeException("Number too big after constant folding performed");
+                            .compareTo("9223372036854775808") >= 0) {
+                BigInteger bi = new BigInteger(((IntegerLiteral)val).getValue());
+                lst = new LinkedList<>();
+                lst.add(new IntegerLiteral(""+bi.longValue()));
+                //throw new TypeException("Number too big after constant folding performed");
             } else {
                 //lst.add(val); val is already added so we don't need it
             }
         } else {
             if(val instanceof IntegerLiteral) {
-                int intValue = Integer.parseInt(((IntegerLiteral)(lst.get(0))).getValue());
+                long longValue = Long.parseLong(((IntegerLiteral)(lst.get(0))).getValue());
                 lst = new LinkedList<>();
-                intValue = -1 * intValue;
-                lst.add(new IntegerLiteral(""+intValue));
+                longValue = -1 * longValue;
+                lst.add(new IntegerLiteral(""+longValue));
             } else {
                 val = lst.get(0);
                 lst = new LinkedList<>();
