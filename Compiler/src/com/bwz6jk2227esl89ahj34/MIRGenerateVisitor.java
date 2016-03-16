@@ -100,7 +100,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         }
 
         // move array pointer back to index 0
-        stmts.add(new IRMove(array, new IRBinOp(OpType.SUB, array, new IRConst(WORD_SIZE * length - 1))));
+        stmts.add(new IRMove(array, new IRBinOp(OpType.SUB, array, new IRConst(WORD_SIZE * length))));
 
         IRSeq seq = new IRSeq(stmts);
         IRESeq eseq = new IRESeq(seq, array);
@@ -334,10 +334,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             stmts.add(new IRMove(combinedArray,
                     new IRBinOp(OpType.SUB,
                             combinedArray,
-                            new IRBinOp(OpType.SUB,
-                                    new IRBinOp(OpType.MUL,
-                                            new IRConst(WORD_SIZE), combinedLength),
-                                    new IRConst(1))
+                            new IRBinOp(OpType.MUL, new IRConst(WORD_SIZE), combinedLength)
                     ))
             );
 
