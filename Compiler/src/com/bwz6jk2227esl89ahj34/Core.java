@@ -134,8 +134,7 @@ public class Core {
 
         // print the AST, update lines, and return the result
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CodeWriterSExpPrinter printer =
-                new CodeWriterSExpPrinter(baos);
+        CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(baos);
         NodeVisitor visitor = new PrintVisitor(printer);
 
         ((Program)(result.value)).accept(visitor);
@@ -252,13 +251,10 @@ public class Core {
                                    String diagnosticPath,
                                    String file,
                                    String extension) {
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CodeWriterSExpPrinter printer =
-                new CodeWriterSExpPrinter(baos);
-        IRVisitor printVisitor = new IRSexyPrintVisitor(printer);
-
-        printVisitor.visit(root);
-
+        CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(baos);
+        root.printSExp(printer);
         printer.flush();
         List<String> lines = Collections.singletonList(baos.toString());
         Util.writeHelper(file, extension, diagnosticPath, lines);
