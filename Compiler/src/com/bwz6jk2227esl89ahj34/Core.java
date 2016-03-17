@@ -4,6 +4,7 @@ import com.bwz6jk2227esl89ahj34.AST.Program;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.MIRVisitor;
 import com.bwz6jk2227esl89ahj34.util.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
 
@@ -214,28 +215,53 @@ public class Core {
         }
     }
 
-    public static void irGen(String sourcePath,
+    public static Optional<IRCompUnit> mirGen(String sourcePath,
                              String diagnosticPath,
                              String libPath,
                              String file) {
         Optional<Program> root = typeCheck(sourcePath, diagnosticPath, libPath, file);
         if (!root.isPresent()) {
-            return;
+            return Optional.empty();
         }
 
         MIRGenerateVisitor visitor = new MIRGenerateVisitor("");
         root.get().accept(visitor);
 
+        printIRTree(visitor.getIRRoot(), diagnosticPath, file, "mir");
+
+        return Optional.of(visitor.getIRRoot());
+    }
+
+    public static void irGen(String sourcePath,
+                             String diagnosticPath,
+                             String libPath,
+                             String file) {
+        Optional<IRCompUnit> mirRoot = mirGen(sourcePath, diagnosticPath, libPath, file);
+
+        if (!mirRoot.isPresent()) {
+            return;
+        }
+
+        MIRVisitor mirVisitor = new MIRVisitor();
+        IRCompUnit lirRoot = (IRCompUnit) mirVisitor.visit(mirRoot.get());
+
+        printIRTree(lirRoot, diagnosticPath, file, "ir");
+    }
+
+    public static void printIRTree(IRCompUnit root,
+                                   String diagnosticPath,
+                                   String file,
+                                   String extension) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CodeWriterSExpPrinter printer =
                 new CodeWriterSExpPrinter(baos);
-        IRVisitor irVisitor = new IRSexyPrintVisitor(printer);
+        IRVisitor printVisitor = new IRSexyPrintVisitor(printer);
 
-        irVisitor.visit(visitor.getIRRoot());
+        printVisitor.visit(root);
 
         printer.flush();
         List<String> lines = Collections.singletonList(baos.toString());
-        Util.writeHelper(file, "ir", diagnosticPath, lines);
+        Util.writeHelper(file, extension, diagnosticPath, lines);
     }
 
     public static void irRun(String sourcePath,
