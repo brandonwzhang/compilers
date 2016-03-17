@@ -610,6 +610,13 @@ public class MIRGenerateVisitor implements NodeVisitor {
             functions.put(getIRFunctionName(fd), (IRFuncDecl) generatedNodes.pop());
         }
 
+        // add length builtin function TODO
+        List<IRStmt> lengthBody = new LinkedList<>();
+        
+
+
+        // add ArrayOutofBounds function (throws OOB error) TODO
+
         IRRoot = new IRCompUnit(name, functions);
         generatedNodes.push(IRRoot);
     }
@@ -649,19 +656,21 @@ public class MIRGenerateVisitor implements NodeVisitor {
             // join all the expressions together with a multiply
             assert expressions.size() >= 1;
             IRExpr length = expressions.pollFirst();
+            IRExpr allocsize = new IRBinOp(OpType.ADD, length, new IRConst(1));
+            // multiply all lengths together to get length
+            // multiply all (length+1) together to get allocsize
             while (expressions.size() > 0) {
                 IRExpr e = expressions.pollFirst();
                 length = new IRBinOp(OpType.MUL, length, e);
+                allocsize = new IRBinOp(OpType.MUL,
+                        new IRBinOp(OpType.ADD, length, new IRConst(1)), allocsize);
             }
 
             // instantiate array space, insert length, shift pointer up
             IRTemp array = new IRTemp(getFreshVariable()); // temp to store array
 
             // call to malloc
-            IRCall malloc = new IRCall(new IRName("_I_alloc_i"),
-                    new IRBinOp(OpType.MUL,
-                            new IRBinOp(OpType.ADD, length, new IRConst(1)),
-                            new IRConst(WORD_SIZE)));
+            IRCall malloc = new IRCall(new IRName("_I_alloc_i"), allocsize);
 
             IRMove storeArrayPtr = new IRMove(array, malloc);
             // TODO make first index of malloc's return IMMUTABLE IRMem
