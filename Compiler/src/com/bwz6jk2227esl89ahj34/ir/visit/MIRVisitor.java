@@ -61,20 +61,29 @@ public class MIRVisitor extends IRVisitor{
 
     protected IRNode leave(IRNode parent, IRNode n, IRNode n_,
                            IRVisitor v_) {
-        if (n instanceof IRCompUnit || n instanceof IRFuncDecl) {
+        if (n instanceof IRCompUnit) {
           return n_;
         } else if (n instanceof IRSeq) {
             assert n_ instanceof IRSeq;
+           // System.out.println("The child result is "+n_);
+            System.out.println("Pre: "+((IRSeq)n_).stmts());
             List<IRStmt> flattenedResult = new LinkedList<>();
             for (IRStmt r : ((IRSeq)n_).stmts()) {
                 if (r instanceof IRSeq) { //we need to flatten
-                    for(IRStmt i: ((IRSeq)r).stmts()) {
-                        flattenedResult.add(i);
+                    if ( ((IRSeq)(r)).stmts() == null ||
+                            ((IRSeq)(r)).stmts().size() == 0) {}
+                    else {
+                        for (IRStmt i : ((IRSeq) r).stmts()) {
+                            System.out.println("Wrapped in stmt: " + i);
+                            flattenedResult.add(i);
+                        }
                     }
-                } else { //otherwise, unflatted
+                } else { //otherwise, unflattened
+                    System.out.println("hello");
                     flattenedResult.add(r);
                 }
             }
+            System.out.println("Post: "+flattenedResult);
             return new IRSeq(flattenedResult);
         } else if (n instanceof IRExp) {
             assert n_ instanceof IRExp;
@@ -94,7 +103,7 @@ public class MIRVisitor extends IRVisitor{
             lst.add(new IRMove(new IRTemp(t), casted_expr.expr()));
             lst.add(casted_dest.stmt());
             lst.add(new IRMove(casted_dest.expr(), new IRMem(new IRTemp(t))));
-            return new IRSeq(lst); //TODO
+            return new IRSeq(lst);
         } else if (n instanceof IRConst) {
             return new IRESeq(new IRSeq(new LinkedList<IRStmt>()), (IRConst)n);
         } else if (n instanceof IRName) {
@@ -147,11 +156,20 @@ public class MIRVisitor extends IRVisitor{
                             ((IRESeq)(irb.right())).expr()));
         } else if (n instanceof IRCall) {
             assert n_ instanceof IRCall;
-            IRCall call_n_ = (IRCall)(n);
+            IRCall call_n_ = (IRCall)(n_);
             List<IRStmt> stmtList = new LinkedList<>();
             List<IRExpr> tempList = new LinkedList<>();
+
             IRESeq eseq;
             IRTemp t;
+
+            assert call_n_.target() instanceof IRESeq;
+            eseq = (IRESeq)(call_n_.target());
+            stmtList.add(eseq.stmt());
+            t = new IRTemp(getFreshVariable());
+            stmtList.add(new IRMove(t, eseq.expr()));
+            tempList.add(t);
+
             for (IRExpr e : call_n_.args()) {
                 assert e instanceof IRESeq;
                 eseq = (IRESeq)(e);
@@ -160,6 +178,7 @@ public class MIRVisitor extends IRVisitor{
                 stmtList.add(new IRMove(t, eseq.expr()));
                 tempList.add(t);
             }
+
             t = new IRTemp(getFreshVariable());
             assert !tempList.isEmpty();
             IRExpr target = tempList.remove(0);

@@ -31,7 +31,7 @@ public class IRFuncDecl extends IRNode {
     @Override
     public IRNode visitChildren(IRVisitor v) {
         IRStmt stmt = (IRStmt) v.visit(this, body);
-
+        
         if (stmt != body) return new IRFuncDecl(name, stmt);
 
         return this;
