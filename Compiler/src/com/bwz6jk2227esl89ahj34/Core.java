@@ -293,7 +293,7 @@ public class Core {
 
         printIRTree(lirRoot, diagnosticPath, file, "ir");
     }
-
+    
     public static void irRun(String sourcePath,
                              String diagnosticPath,
                              String libPath,

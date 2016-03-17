@@ -30,7 +30,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     private String getFreshVariable() {
-        return "" + (labelCounter++);
+        return "temp" + (labelCounter++);
     }
 
   	/*
@@ -55,7 +55,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRExpr index = (IRExpr)generatedNodes.pop();
 
         IRMem location = new IRMem(new IRBinOp(IRBinOp.OpType.ADD, array, new IRBinOp(OpType.MUL, index, new IRConst(WORD_SIZE)))); // TODO double check
-        location.setType(array.getType());
+
+        assert !(array.getVarType() instanceof VariableTypeList);
+        location.setVarType(array.getVarType());
 
         generatedNodes.push(location);
     }
@@ -104,7 +106,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
         stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.SUB, new IRTemp(array), new IRConst(WORD_SIZE * length))));
 
         IRSeq seq = new IRSeq(stmts);
-        IRESeq eseq = new IRESeq(seq, new IRTemp(array));
+        IRTemp arraytemp = new IRTemp(array);
+        arraytemp.setVarType(node.getType());
+        IRESeq eseq = new IRESeq(seq, arraytemp);
+        eseq.setVarType(node.getType());
 
         generatedNodes.push(eseq);
     }
@@ -259,8 +264,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
         }
 
         // array addition case
-//        if (optype == OpType.ADD && ((VariableType)node.getLeft().getType()).getNumBrackets() > 0) {
-//            assert ((VariableType)node.getRight().getType()).getNumBrackets() > 0;
+//        if (optype == OpType.ADD && ((VariableType)left.getType()).getNumBrackets() > 0) {
+//            assert ((VariableType)right.getType()).getNumBrackets() > 0;
 //            assert left instanceof IRTemp;
 //            assert right instanceof IRTemp;
 //            // get length of operands
