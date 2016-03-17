@@ -10,22 +10,32 @@ import java.util.Optional;
 public class Tests {
 
     public static void irRunTests() {
-        System.out.println("\n================IR RUN TESTs================");
+        System.out.println("\n================IR RUN TESTS================");
 
         Util.getDirectoryFiles("ir/irrun/").stream()
                 .filter(filename -> filename.contains(".xi"))
-                .forEach(filename -> Core.irGen("ir/irrun/",
+                .forEach(filename -> Core.irRun("ir/irrun/",
                         "ir/irrun/diagnostics/", "ir/lib/", filename));
     }
 
+    public static void mirGenTests() {
+        System.out.println("\n================MIR GEN TESTS================");
+
+        Util.getDirectoryFiles("ir/irgen/").stream()
+                .filter(filename -> filename.contains(".xi"))
+                .forEach(filename -> Core.mirGen("ir/irgen/",
+                        "ir/irgen/diagnostics/", "ir/lib/", filename));
+    }
+
     public static void irGenTests() {
-        System.out.println("\n================IR GEN TESTs================");
+        System.out.println("\n================IR GEN TESTS================");
 
         Util.getDirectoryFiles("ir/irgen/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .forEach(filename -> Core.irGen("ir/irgen/",
                         "ir/irgen/diagnostics/", "ir/lib/", filename));
     }
+
 
     /**
      * Automated tests for ConstantFoldingVisitor.
