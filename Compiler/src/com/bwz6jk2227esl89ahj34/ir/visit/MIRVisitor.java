@@ -65,7 +65,6 @@ public class MIRVisitor extends IRVisitor{
           return n_;
         } else if (n instanceof IRSeq) {
             assert n_ instanceof IRSeq;
-           // System.out.println("The child result is "+n_);
             System.out.println("Pre: "+((IRSeq)n_).stmts());
             List<IRStmt> flattenedResult = new LinkedList<>();
             for (IRStmt r : ((IRSeq)n_).stmts()) {
