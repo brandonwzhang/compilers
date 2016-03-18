@@ -57,9 +57,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
         IRMem location = new IRMem(new IRBinOp(IRBinOp.OpType.ADD, array, new IRBinOp(OpType.MUL, index, new IRConst(WORD_SIZE)))); // TODO double check
 
-        assert !(array.getVarType() instanceof VariableTypeList);
-        location.setVarType(array.getVarType());
-
         generatedNodes.push(location);
     }
 
@@ -107,10 +104,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.SUB, new IRTemp(array), new IRConst(WORD_SIZE * length))));
 
         IRSeq seq = new IRSeq(stmts);
-        IRTemp arraytemp = new IRTemp(array);
-        arraytemp.setVarType(node.getType());
-        IRESeq eseq = new IRESeq(seq, arraytemp);
-        eseq.setVarType(node.getType());
+        IRESeq eseq = new IRESeq(seq, new IRTemp(array));
 
         generatedNodes.push(eseq);
     }
