@@ -38,7 +38,7 @@ public class Tests {
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
                 .forEach(filename -> Core.mirGen("ir/irgen/",
-                        "ir/irgen/diagnostics/", "ir/lib/", filename));
+                        "ir/irgen/diagnostics/mir/", "ir/lib/", filename));
     }
 
     public static void irGenTests() {
@@ -48,7 +48,7 @@ public class Tests {
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
                 .forEach(filename -> Core.irGen("ir/irgen/",
-                        "ir/irgen/diagnostics/", "ir/lib/", filename));
+                        "ir/irgen/diagnostics/ir/", "ir/lib/", filename));
     }
 
     /*
@@ -105,14 +105,14 @@ public class Tests {
                 .forEach(filename -> Core.typeCheck("typecheck/passtests/",
                         "typecheck/passtests/diagnostics/",
                         "typecheck/lib/", filename));
-        /*
+
         System.out.println("\n================Failed Tests================");
         Util.getDirectoryFiles("typecheck/failtests/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .forEach(filename -> Core.typeCheck("typecheck/failtests/",
                         "typecheck/failtests/diagnostics/",
                         "typecheck/lib/", filename));
-        */
+
     }
 
     /**

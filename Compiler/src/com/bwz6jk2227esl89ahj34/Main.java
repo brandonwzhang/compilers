@@ -69,7 +69,7 @@ public class Main {
 
         if(debug) { // put debug mode behaviors here
 
-            String[] exclude = {};
+            String[] exclude = {"block", "f", "interface_test1", "interface_test2", "unop"};
             Collections.addAll(Tests.exclude, exclude);
             System.out.println("\nDEBUG: Excluding: " + Tests.exclude.toString());
 
@@ -81,7 +81,7 @@ public class Main {
 
             //Tests.typeCheckTests();
             //Tests.constantFoldTests();
-            Tests.mirGenTests();
+            //Tests.mirGenTests();
             //Tests.irGenTests();
             //Tests.irRunTests();
         }
