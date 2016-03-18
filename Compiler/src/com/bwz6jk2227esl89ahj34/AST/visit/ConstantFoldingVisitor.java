@@ -383,10 +383,10 @@ public class ConstantFoldingVisitor implements NodeVisitor {
                 longValue = longValue.multiply(new BigInteger("-1"));
                 lst.add(new IntegerLiteral(""+longValue.longValue()));
             } else if (val instanceof BooleanLiteral){
-                val = lst.get(0);
                 lst = new LinkedList<>();
                 lst.add(new BooleanLiteral(false));
             } else {
+                lst = new LinkedList<>();
                 lst.add(new Unary(node.getOp(), val));
             }
 

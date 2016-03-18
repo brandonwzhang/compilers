@@ -1,3 +1,10 @@
+andyTest() {
+  x:int = -1 
+  y:int = -x
+  z:int = --x
+  a:int = ---x
+}
+
 divideByZero() {
   x:int = 10/0
 }
