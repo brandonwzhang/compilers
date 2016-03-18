@@ -1,6 +1,13 @@
-package com.bwz6jk2227esl89ahj34;
+package com.bwz6jk2227esl89ahj34.AST.visit;
 
 import com.bwz6jk2227esl89ahj34.AST.*;
+import com.bwz6jk2227esl89ahj34.AST.parse.InterfaceParser;
+import com.bwz6jk2227esl89ahj34.AST.type.PrimitiveType;
+import com.bwz6jk2227esl89ahj34.AST.type.Type;
+import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
+import com.bwz6jk2227esl89ahj34.AST.type.VariableTypeList;
+import com.bwz6jk2227esl89ahj34.AST.type.Context;
+import com.bwz6jk2227esl89ahj34.AST.type.TypeException;
 
 import java.util.*;
 
@@ -345,7 +352,12 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException("Argument types do not match with function definition", id.getRow(), id.getCol());
         }
 
-        node.setType(thisFuncType.getReturnTypeList());
+        if (thisFuncType.getReturnTypeList().getVariableTypeList().size() > 1) {
+            node.setType(thisFuncType.getReturnTypeList());
+        } else {
+            assert thisFuncType.getReturnTypeList().getVariableTypeList().size() == 1;
+            node.setType(thisFuncType.getReturnTypeList().getVariableTypeList().get(0));
+        }
     }
 
     /**

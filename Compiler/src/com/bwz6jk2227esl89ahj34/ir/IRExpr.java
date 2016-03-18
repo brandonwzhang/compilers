@@ -1,7 +1,7 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
+import com.bwz6jk2227esl89ahj34.AST.type.Type;
 import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
-import com.bwz6jk2227esl89ahj34.AST.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +10,7 @@ import lombok.Setter;
  */
 public abstract class IRExpr extends IRNode {
 
-    @Getter @Setter private Type type;
+    @Getter @Setter private Type varType;
 
     @Override
     public CheckCanonicalIRVisitor checkCanonicalEnter(

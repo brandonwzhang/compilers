@@ -1,4 +1,4 @@
-package com.bwz6jk2227esl89ahj34.AST;
+package com.bwz6jk2227esl89ahj34.AST.type;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,4 +1,7 @@
-package com.bwz6jk2227esl89ahj34;
+package com.bwz6jk2227esl89ahj34.util;
+
+import com.bwz6jk2227esl89ahj34.Main;
+import com.bwz6jk2227esl89ahj34.AST.parse.ParserSym;
 
 import java.io.*;
 import java.nio.charset.Charset;

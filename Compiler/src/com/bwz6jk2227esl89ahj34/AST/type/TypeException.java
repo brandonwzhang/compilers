@@ -1,4 +1,4 @@
-package com.bwz6jk2227esl89ahj34;
+package com.bwz6jk2227esl89ahj34.AST.type;
 
 public class TypeException extends RuntimeException {
     private int row;

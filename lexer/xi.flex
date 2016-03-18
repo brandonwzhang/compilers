@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 
 %%
+%public
 %class Lexer
 %unicode
 %cup

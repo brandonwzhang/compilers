@@ -1,5 +1,7 @@
-package com.bwz6jk2227esl89ahj34.AST;
+package com.bwz6jk2227esl89ahj34.AST.type;
 
+import com.bwz6jk2227esl89ahj34.AST.type.Type;
+import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

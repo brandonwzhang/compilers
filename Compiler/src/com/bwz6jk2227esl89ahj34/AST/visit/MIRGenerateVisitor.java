@@ -1,5 +1,7 @@
-package com.bwz6jk2227esl89ahj34;
+package com.bwz6jk2227esl89ahj34.AST.visit;
 import com.bwz6jk2227esl89ahj34.AST.*;
+import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
+import com.bwz6jk2227esl89ahj34.AST.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 
@@ -29,7 +31,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     private String getFreshVariable() {
-        return "" + (labelCounter++);
+        return "temp" + (labelCounter++);
     }
 
   	/*
@@ -54,7 +56,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRExpr index = (IRExpr)generatedNodes.pop();
 
         IRMem location = new IRMem(new IRBinOp(IRBinOp.OpType.ADD, array, new IRBinOp(OpType.MUL, index, new IRConst(WORD_SIZE)))); // TODO double check
-        location.setType(array.getType());
+
+        assert !(array.getVarType() instanceof VariableTypeList);
+        location.setVarType(array.getVarType());
 
         generatedNodes.push(location);
     }
@@ -103,7 +107,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
         stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.SUB, new IRTemp(array), new IRConst(WORD_SIZE * length))));
 
         IRSeq seq = new IRSeq(stmts);
-        IRESeq eseq = new IRESeq(seq, new IRTemp(array));
+        IRTemp arraytemp = new IRTemp(array);
+        arraytemp.setVarType(node.getType());
+        IRESeq eseq = new IRESeq(seq, arraytemp);
+        eseq.setVarType(node.getType());
 
         generatedNodes.push(eseq);
     }
@@ -245,8 +252,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
         right = (IRExpr)generatedNodes.pop();
 
         // array addition case
-//        if (optype == OpType.ADD && ((VariableType)node.getLeft().getType()).getNumBrackets() > 0) {
-//            assert ((VariableType)node.getRight().getType()).getNumBrackets() > 0;
+//        if (optype == OpType.ADD && ((VariableType)left.getType()).getNumBrackets() > 0) {
+//            assert ((VariableType)right.getType()).getNumBrackets() > 0;
 //            assert left instanceof IRTemp;
 //            assert right instanceof IRTemp;
 //            // get length of operands
@@ -449,12 +456,22 @@ public class MIRGenerateVisitor implements NodeVisitor {
             arguments.add(argument);
         }
 
-        assert node.getType() instanceof VariableTypeList;
-        FunctionType funcType = new FunctionType(argTypeList, (VariableTypeList) node.getType());
-        FunctionDeclaration tempFuncDec = new FunctionDeclaration(node.getIdentifier(), funcType, null, null);
+        String irFunctionName = "";
+        if (node.getType() instanceof VariableTypeList) {
+            FunctionType funcType = new FunctionType(argTypeList, (VariableTypeList) node.getType());
+            FunctionDeclaration tempFuncDec = new FunctionDeclaration(node.getIdentifier(), funcType, null, null);
+            irFunctionName = getIRFunctionName(tempFuncDec);
+        } else {
+            assert node.getType() instanceof VariableType;
+            List<VariableType> retTypes = new ArrayList<>(Arrays.asList((VariableType) node.getType()));
+            FunctionType funcType = new FunctionType(argTypeList, new VariableTypeList(retTypes));
+            FunctionDeclaration tempFuncDec = new FunctionDeclaration(node.getIdentifier(), funcType, null, null);
+            irFunctionName = getIRFunctionName(tempFuncDec);
+        }
+
 
         // Pass the function name and arguments to an IRCall
-        IRCall call = new IRCall(new IRName(getIRFunctionName(tempFuncDec)), arguments);
+        IRCall call = new IRCall(new IRName(irFunctionName), arguments);
         generatedNodes.push(call);
     }
 
@@ -609,6 +626,13 @@ public class MIRGenerateVisitor implements NodeVisitor {
             functions.put(getIRFunctionName(fd), (IRFuncDecl) generatedNodes.pop());
         }
 
+        // add length builtin function TODO
+        List<IRStmt> lengthBody = new LinkedList<>();
+        
+
+
+        // add ArrayOutofBounds function (throws OOB error) TODO
+
         IRRoot = new IRCompUnit(name, functions);
         generatedNodes.push(IRRoot);
     }
@@ -628,7 +652,59 @@ public class MIRGenerateVisitor implements NodeVisitor {
         arrayliteral.accept(this);
     }
     public void visit(TypedDeclaration node) {
+        // In the case where TypedDeclaration is part of an assignment, it will be handled separately
+        // We only concern with a standalone declaration here (x:int[], y:bool[4], z:int, etc)
+        // Overall, return an IREseq (temp) if array with size stated
+        // else do nothing
 
+        List<Expression> arraySizeList = node.getArraySizeList();
+        List<IRStmt> stmts = new LinkedList<>();
+
+        // if there are expressions inside array brackets
+        if (arraySizeList.size() > 0) {
+            // initialize space, multiply all the expression results together
+            LinkedList<IRExpr> expressions = new LinkedList<>();
+            for (Expression e : arraySizeList) {
+                e.accept(this);
+                assert generatedNodes.peek() instanceof IRExpr;
+                expressions.add((IRExpr)generatedNodes.pop());
+            }
+            // join all the expressions together with a multiply
+            assert expressions.size() >= 1;
+            IRExpr length = expressions.pollFirst();
+            IRExpr allocsize = new IRBinOp(OpType.ADD, length, new IRConst(1));
+            // multiply all lengths together to get length
+            // multiply all (length+1) together to get allocsize
+            while (expressions.size() > 0) {
+                IRExpr e = expressions.pollFirst();
+                length = new IRBinOp(OpType.MUL, length, e);
+                allocsize = new IRBinOp(OpType.MUL,
+                        new IRBinOp(OpType.ADD, length, new IRConst(1)), allocsize);
+            }
+
+            // instantiate array space, insert length, shift pointer up
+            IRTemp array = new IRTemp(getFreshVariable()); // temp to store array
+
+            // call to malloc
+            IRCall malloc = new IRCall(new IRName("_I_alloc_i"), allocsize);
+
+            IRMove storeArrayPtr = new IRMove(array, malloc);
+            // TODO make first index of malloc's return IMMUTABLE IRMem
+
+            // save length in MEM(array)
+            IRMove saveLength = new IRMove(new IRMem(array), length);
+            // shift array up to 0th index
+            IRMove shift = new IRMove(array, new IRBinOp(OpType.ADD, array, new IRConst(WORD_SIZE)));
+
+            stmts.add(storeArrayPtr);
+            stmts.add(saveLength);
+            stmts.add(shift);
+            IRSeq seq = new IRSeq(stmts);
+            IRESeq eseq = new IRESeq(seq, array);
+
+            generatedNodes.push(eseq);
+        }
+        // else if plain variable or uninitialized array
     }
     public void visit(Unary node) {
         // not --> XOR with 1
