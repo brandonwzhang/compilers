@@ -23,7 +23,7 @@ main(){
         println("Else seems to be working")
     }
     y:int[] = "get fukd boi";
-    y = y + "iiiiiiii"
+    y = y + "iiiiiiiiiiiiiiiiii"
 	x:int = returnOne() + 35
-    println(y);
+    println(identity(y));
 }

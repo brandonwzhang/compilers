@@ -1,0 +1,32 @@
+(
+  COMPUNIT
+  simple
+  (
+    FUNC
+    _Imain_p
+    (
+      SEQ
+      (
+        SEQ (MOVE (TEMP x) (ADD (CONST 1) (CONST 1))))
+      (
+        EXP
+        (
+          CALL
+          (NAME _Iprintln_pai)
+          (ESEQ
+           (SEQ
+            (MOVE (TEMP temp0) (CALL (NAME _I_alloc_i) (CONST 40)))
+            (MOVE (MEM (TEMP temp0)) (CONST 4))
+            (MOVE (TEMP temp0) (ADD (TEMP temp0) (CONST 8)))
+            (MOVE (MEM (TEMP temp0)) (CONST 1))
+            (MOVE (TEMP temp0) (ADD (TEMP temp0) (CONST 8)))
+            (MOVE (MEM (TEMP temp0)) (CONST 2))
+            (MOVE (TEMP temp0) (ADD (TEMP temp0) (CONST 8)))
+            (MOVE (MEM (TEMP temp0)) (CONST 3))
+            (MOVE (TEMP temp0) (ADD (TEMP temp0) (CONST 8)))
+            (MOVE (MEM (TEMP temp0)) (CONST 4))
+            (MOVE (TEMP temp0) (ADD (TEMP temp0) (CONST 8)))
+            (MOVE (TEMP temp0) (SUB (TEMP temp0) (CONST 32))))
+           (TEMP temp0))))
+      (
+        RETURN))))

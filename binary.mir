@@ -1,0 +1,521 @@
+(
+  COMPUNIT
+  binary
+  (
+    FUNC _IreturnOne_i (SEQ (MOVE (TEMP _RET0) (CONST 1)) (RETURN)))
+  (
+    FUNC
+    _Imain_p
+    (
+      SEQ
+      (
+        SEQ (MOVE (TEMP c) (CONST 0)))
+      (
+        SEQ
+        (
+          LABEL temp0)
+        (
+          CJUMP (LT (TEMP c) (CONST 3)) temp1 temp2)
+        (
+          LABEL temp1)
+        (
+          SEQ
+          (
+            EXP
+            (CALL
+             (NAME _Iprintln_pai)
+             (ESEQ
+              (SEQ
+               (MOVE (TEMP temp3) (CALL (NAME _I_alloc_i) (CONST 48)))
+               (MOVE (MEM (TEMP temp3)) (CONST 5))
+               (MOVE (TEMP temp3) (ADD (TEMP temp3) (CONST 8)))
+               (MOVE (MEM (TEMP temp3)) (CONST 104))
+               (MOVE (TEMP temp3) (ADD (TEMP temp3) (CONST 8)))
+               (MOVE (MEM (TEMP temp3)) (CONST 101))
+               (MOVE (TEMP temp3) (ADD (TEMP temp3) (CONST 8)))
+               (MOVE (MEM (TEMP temp3)) (CONST 108))
+               (MOVE (TEMP temp3) (ADD (TEMP temp3) (CONST 8)))
+               (MOVE (MEM (TEMP temp3)) (CONST 108))
+               (MOVE (TEMP temp3) (ADD (TEMP temp3) (CONST 8)))
+               (MOVE (MEM (TEMP temp3)) (CONST 111))
+               (MOVE (TEMP temp3) (ADD (TEMP temp3) (CONST 8)))
+               (MOVE (TEMP temp3) (SUB (TEMP temp3) (CONST 40))))
+              (TEMP temp3))))
+          (MOVE (TEMP c) (ADD (TEMP c) (CONST 1))))
+        (
+          JUMP (NAME temp0))
+        (
+          LABEL temp2))
+      (
+        SEQ
+        (
+          CJUMP (GT (TEMP c) (CONST 1)) temp4)
+        (
+          LABEL temp4)
+        (
+          SEQ
+          (
+            EXP
+            (
+              CALL
+              (NAME _Iprintln_pai)
+              (ESEQ
+               (SEQ
+                (MOVE (TEMP temp5) (CALL (NAME _I_alloc_i) (CONST 72)))
+                (MOVE (MEM (TEMP temp5)) (CONST 8))
+                (MOVE (TEMP temp5) (ADD (TEMP temp5) (CONST 8)))
+                (MOVE (MEM (TEMP temp5)) (CONST 103))
+                (MOVE (TEMP temp5) (ADD (TEMP temp5) (CONST 8)))
+                (MOVE (MEM (TEMP temp5)) (CONST 111))
+                (MOVE (TEMP temp5) (ADD (TEMP temp5) (CONST 8)))
+                (MOVE (MEM (TEMP temp5)) (CONST 116))
+                (MOVE (TEMP temp5) (ADD (TEMP temp5) (CONST 8)))
+                (MOVE (MEM (TEMP temp5)) (CONST 32))
+                (MOVE (TEMP temp5) (ADD (TEMP temp5) (CONST 8)))
+                (MOVE (MEM (TEMP temp5)) (CONST 104))
+                (MOVE (TEMP temp5) (ADD (TEMP temp5) (CONST 8)))
+                (MOVE (MEM (TEMP temp5)) (CONST 101))
+                (MOVE (TEMP temp5) (ADD (TEMP temp5) (CONST 8)))
+                (MOVE (MEM (TEMP temp5)) (CONST 114))
+                (MOVE (TEMP temp5) (ADD (TEMP temp5) (CONST 8)))
+                (MOVE (MEM (TEMP temp5)) (CONST 101))
+                (MOVE (TEMP temp5) (ADD (TEMP temp5) (CONST 8)))
+                (MOVE (TEMP temp5) (SUB (TEMP temp5) (CONST 64))))
+               (TEMP temp5)))))
+        (
+          LABEL temp6))
+      (
+        SEQ
+        (
+          CJUMP (LT (TEMP c) (CONST 0)) temp7 temp10)
+        (
+          LABEL temp10)
+        (
+          SEQ
+          (
+            EXP
+            (
+              CALL
+              (NAME _Iprintln_pai)
+              (ESEQ
+               (SEQ
+                (MOVE (TEMP temp11) (CALL (NAME _I_alloc_i) (CONST 200)))
+                (MOVE (MEM (TEMP temp11)) (CONST 24))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 69))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 108))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 115))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 101))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 32))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 115))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 101))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 101))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 109))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 115))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 32))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 116))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 111))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 32))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 98))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 101))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 32))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 119))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 111))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 114))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 107))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 105))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 110))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (MEM (TEMP temp11)) (CONST 103))
+                (MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 8)))
+                (MOVE (TEMP temp11) (SUB (TEMP temp11) (CONST 192))))
+               (TEMP temp11)))))
+        (
+          JUMP (NAME temp9))
+        (
+          LABEL temp7)
+        (
+          SEQ
+          (
+            EXP
+            (
+              CALL
+              (NAME _Iprintln_pai)
+              (ESEQ
+               (SEQ
+                (MOVE (TEMP temp8) (CALL (NAME _I_alloc_i) (CONST 112)))
+                (MOVE (MEM (TEMP temp8)) (CONST 13))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 69))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 82))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 82))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 79))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 82))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 32))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 79))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 67))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 67))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 85))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 82))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 69))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (MEM (TEMP temp8)) (CONST 68))
+                (MOVE (TEMP temp8) (ADD (TEMP temp8) (CONST 8)))
+                (MOVE (TEMP temp8) (SUB (TEMP temp8) (CONST 104))))
+               (TEMP temp8)))))
+        (
+          LABEL temp9))
+      (
+        SEQ
+        (
+          MOVE
+          (TEMP y)
+          (ESEQ
+           (SEQ
+            (MOVE (TEMP temp12) (CALL (NAME _I_alloc_i) (CONST 104)))
+            (MOVE (MEM (TEMP temp12)) (CONST 12))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (MEM (TEMP temp12)) (CONST 103))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (MEM (TEMP temp12)) (CONST 101))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (MEM (TEMP temp12)) (CONST 116))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (MEM (TEMP temp12)) (CONST 32))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (MEM (TEMP temp12)) (CONST 102))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (MEM (TEMP temp12)) (CONST 117))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (MEM (TEMP temp12)) (CONST 107))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (MEM (TEMP temp12)) (CONST 100))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (MEM (TEMP temp12)) (CONST 32))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (MEM (TEMP temp12)) (CONST 98))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (MEM (TEMP temp12)) (CONST 111))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (MEM (TEMP temp12)) (CONST 105))
+            (MOVE (TEMP temp12) (ADD (TEMP temp12) (CONST 8)))
+            (MOVE (TEMP temp12) (SUB (TEMP temp12) (CONST 96))))
+           (TEMP temp12))))
+      (
+        MOVE
+        (
+          TEMP y)
+        (
+          ESEQ
+          (
+            SEQ
+            (
+              MOVE (TEMP temp15) (TEMP temp14))
+            (
+              MOVE
+              (
+                TEMP temp14)
+              (
+                CALL
+                (
+                  NAME _I_alloc_i)
+                (
+                  MUL
+                  (
+                    ADD
+                    (
+                      ADD
+                      (
+                        MEM
+                        (
+                          SUB
+                          (TEMP y)
+                          (CONST 8)))
+                      (
+                        MEM
+                        (SUB
+                         (ESEQ
+                          (SEQ
+                           (MOVE (TEMP temp13)
+                            (CALL (NAME _I_alloc_i) (CONST 152)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 18))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (MEM (TEMP temp13)) (CONST 105))
+                           (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                           (MOVE (TEMP temp13) (SUB (TEMP temp13) (CONST 144))))
+                          (TEMP temp13))
+                         (CONST 8))))
+                    (
+                      CONST 1))
+                  (
+                    CONST 8))))
+            (
+              MOVE
+              (MEM (TEMP temp14))
+              (ADD
+               (MEM (SUB (TEMP y) (CONST 8)))
+               (MEM
+                (SUB
+                 (ESEQ
+                  (SEQ
+                   (MOVE (TEMP temp13) (CALL (NAME _I_alloc_i) (CONST 152)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 18))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (MEM (TEMP temp13)) (CONST 105))
+                   (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                   (MOVE (TEMP temp13) (SUB (TEMP temp13) (CONST 144))))
+                  (TEMP temp13))
+                 (CONST 8)))))
+            (
+              MOVE (TEMP temp14) (ADD (TEMP temp14) (CONST 8)))
+            (
+              MOVE (TEMP temp16) (CONST 0))
+            (
+              LABEL temp17)
+            (
+              CJUMP (LT (TEMP temp16) (MEM (SUB (TEMP y) (CONST 8)))) temp18
+              temp19)
+            (
+              LABEL temp18)
+            (
+              MOVE (MEM (TEMP temp14))
+              (MEM (ADD (MUL (TEMP temp16) (CONST 8)) (TEMP y))))
+            (
+              MOVE (TEMP temp14) (ADD (TEMP temp14) (CONST 8)))
+            (
+              MOVE (TEMP temp16) (ADD (TEMP temp16) (CONST 8)))
+            (
+              JUMP (NAME temp17))
+            (
+              LABEL temp19)
+            (
+              MOVE (TEMP temp16) (CONST 0))
+            (
+              LABEL temp20)
+            (
+              CJUMP
+              (
+                LT
+                (TEMP temp16)
+                (MEM
+                 (SUB
+                  (ESEQ
+                   (SEQ
+                    (MOVE (TEMP temp13) (CALL (NAME _I_alloc_i) (CONST 152)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 18))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (TEMP temp13) (SUB (TEMP temp13) (CONST 144))))
+                   (TEMP temp13))
+                  (CONST 8))))
+              temp21
+              temp22)
+            (
+              LABEL temp21)
+            (
+              MOVE
+              (
+                MEM (TEMP temp14))
+              (
+                MEM
+                (
+                  ADD
+                  (MUL (TEMP temp16) (CONST 8))
+                  (ESEQ
+                   (SEQ
+                    (MOVE (TEMP temp13) (CALL (NAME _I_alloc_i) (CONST 152)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 18))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (MEM (TEMP temp13)) (CONST 105))
+                    (MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                    (MOVE (TEMP temp13) (SUB (TEMP temp13) (CONST 144))))
+                   (TEMP temp13)))))
+            (
+              MOVE (TEMP temp14) (ADD (TEMP temp14) (CONST 8)))
+            (
+              MOVE (TEMP temp16) (ADD (TEMP temp16) (CONST 8)))
+            (
+              JUMP (NAME temp20))
+            (
+              LABEL temp22))
+          (
+            TEMP temp15)))
+      (
+        SEQ (MOVE (TEMP x) (ADD (CALL (NAME _IreturnOne_i)) (CONST 35))))
+      (
+        EXP (CALL (NAME _Iprintln_pai) (CALL (NAME _Iidentity_aiai) (TEMP y))))
+      (
+        RETURN)))
+  (
+    FUNC _Iidentity_aiai
+    (SEQ (MOVE (TEMP x) (TEMP _ARG0)) (MOVE (TEMP _RET0) (TEMP x)) (RETURN))))

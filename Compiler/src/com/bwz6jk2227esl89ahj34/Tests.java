@@ -9,15 +9,24 @@ import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 public class Tests {
+
+    public static Set<String> exclude = new HashSet<>();
+
+    public static boolean excluded(String file) {
+        return exclude.contains(file.substring(0, file.length() - 3));
+    }
 
     public static void irRunTests() {
         System.out.println("\n================IR RUN TESTS================");
 
         Util.getDirectoryFiles("ir/irrun/").stream()
                 .filter(filename -> filename.contains(".xi"))
+                .filter(filename -> !excluded(filename))
                 .forEach(filename -> Core.irRun("ir/irrun/",
                         "ir/irrun/diagnostics/", "ir/lib/", filename));
     }
@@ -27,8 +36,9 @@ public class Tests {
 
         Util.getDirectoryFiles("ir/irgen/").stream()
                 .filter(filename -> filename.contains(".xi"))
+                .filter(filename -> !excluded(filename))
                 .forEach(filename -> Core.mirGen("ir/irgen/",
-                        "ir/irgen/diagnostics/", "ir/lib/", filename));
+                        "ir/irgen/diagnostics/mir/", "ir/lib/", filename));
     }
 
     public static void irGenTests() {
@@ -36,10 +46,12 @@ public class Tests {
 
         Util.getDirectoryFiles("ir/irgen/").stream()
                 .filter(filename -> filename.contains(".xi"))
+                .filter(filename -> !excluded(filename))
                 .forEach(filename -> Core.irGen("ir/irgen/",
-                        "ir/irgen/diagnostics/", "ir/lib/", filename));
+                        "ir/irgen/diagnostics/ir/", "ir/lib/", filename));
     }
 
+    /*
     public static void constantFoldTests() {
         System.out.println("\n==CONSTANT FOLD TESTS==");
 
@@ -52,10 +64,11 @@ public class Tests {
      * Prints the result of constant folding (before IR translation)
      * on a single Xi program.
      */
+    /*
     public static void constantFoldHelper(String filename) {
 
         Optional<Program> program =
-                Core.typeCheck("constantfold/", "constantfold/", "", filename);
+                Core.typeCheckHelper("constantfold/", "constantfold/", "", filename);
 
         if (!program.isPresent()) {
             System.out.println("type checking failed");
@@ -77,6 +90,7 @@ public class Tests {
                 .replaceAll("\\s?\\)", ")")
                 .trim());
     }
+    */
 
     /**
      * Automated tests for typecheck.
@@ -98,6 +112,7 @@ public class Tests {
                 .forEach(filename -> Core.typeCheck("typecheck/failtests/",
                         "typecheck/failtests/diagnostics/",
                         "typecheck/lib/", filename));
+
     }
 
     /**
