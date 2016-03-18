@@ -98,7 +98,7 @@ public class MIRVisitor extends IRVisitor{
             String t = getFreshVariable();
             addStatements(lst, new IRMove(new IRTemp(t), casted_expr.expr()));
             addStatements(lst, casted_dest.stmt());
-            addStatements(lst, new IRMove(casted_dest.expr(), new IRMem(new IRTemp(t))));
+            addStatements(lst, new IRMove(casted_dest.expr(), new IRTemp(t)));
             return new IRSeq(lst);
         } else if (n instanceof IRConst) {
             return new IRESeq(new IRSeq(new LinkedList<>()), (IRConst)n);
@@ -126,8 +126,10 @@ public class MIRVisitor extends IRVisitor{
             IRESeq casted_eseq = (IRESeq)(((IRCJump)(n_)).expr());
             List<IRStmt> lst = new LinkedList<>();
             addStatements(lst, casted_eseq.stmt());
-            addStatements(lst, new IRLabel(((IRCJump)(n_)).trueLabel()));
-            addStatements(lst, new IRLabel(((IRCJump)(n_)).falseLabel()));
+            addStatements(lst, new IRCJump(casted_eseq.expr(),
+                    ((IRCJump)(n_)).trueLabel(),
+                    ((IRCJump)(n_)).falseLabel()));
+
             return new IRSeq(lst);
         } else if (n instanceof IRESeq) {
             assert n_ instanceof IRESeq;
