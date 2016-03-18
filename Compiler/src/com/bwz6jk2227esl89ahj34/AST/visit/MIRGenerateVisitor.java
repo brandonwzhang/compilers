@@ -4,6 +4,7 @@ import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
 import com.bwz6jk2227esl89ahj34.AST.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
+import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
 import java.util.*;
 
@@ -218,14 +219,14 @@ public class MIRGenerateVisitor implements NodeVisitor {
                     statements.add((IRStmt) generatedNodes.pop());
                 }
                 IRTemp temp = new IRTemp(typedDeclaration.getIdentifier().getName());
-                IRMove move = new IRMove(temp, new IRTemp("_RET" + i));
+                IRMove move = new IRMove(temp, new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i));
                 statements.add(move);
                 continue;
             }
             // We know LHS must be either identifier or array index at this point
             variable.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
-            IRMove move = new IRMove((IRExpr) generatedNodes.pop(), new IRTemp("_RET" + i));
+            IRMove move = new IRMove((IRExpr) generatedNodes.pop(), new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i));
             statements.add(move);
         }
         IRSeq seq = new IRSeq(statements);
@@ -471,7 +472,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             returnValues.get(i).accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
             IRExpr expr = (IRExpr) generatedNodes.pop();
-            IRExpr target = new IRTemp("_RET" + i);
+            IRExpr target = new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i);
             stmtList.add(new IRMove(target, expr));
         }
 
@@ -557,10 +558,16 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
     public void visit(FunctionDeclaration node) {
         node.getMethodBlock().accept(this);
-        assert generatedNodes.peek() instanceof IRStmt;
-        IRStmt body = (IRStmt) generatedNodes.pop();
+        assert generatedNodes.peek() instanceof IRSeq;
+        IRSeq body = (IRSeq) generatedNodes.pop();
+        List<IRStmt> fullBody = new ArrayList<>();
+        for (int i = 0; i < node.getArgList().size(); i++) {
+            IRTemp varTemp = new IRTemp(node.getArgList().get(i).getName());
+            fullBody.add(new IRMove(varTemp, new IRTemp(Configuration.ABSTRACT_ARG_PREFIX + i)));
+        }
+        fullBody.addAll(body.stmts());
 
-        IRFuncDecl irfd = new IRFuncDecl(getIRFunctionName(node), body);
+        IRFuncDecl irfd = new IRFuncDecl(getIRFunctionName(node), new IRSeq(fullBody));
         generatedNodes.push(irfd);
     }
 
