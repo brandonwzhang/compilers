@@ -236,14 +236,20 @@ public class MIRVisitor extends IRVisitor{
         } else if (n instanceof IRFuncDecl) {
             assert n_ instanceof IRFuncDecl;
             System.out.println("func decl");
+            // Result of lowering all the children
+            // All IRSeq's should be flattened by this point
             IRFuncDecl fd = (IRFuncDecl) n_;
             List<IRStmt> stmts = ((IRSeq)(fd.body())).stmts();
+            // Holds the basic blocks of the program
+            // Split up by "leader instructions" (jump target, after jump, first
+            // instruction in the program)
             List<List<IRStmt>> blocks = new LinkedList<>();
             List<IRStmt> temp = new LinkedList<>();
             for(IRStmt stmt : stmts) {
                 temp.add(stmt);
                 if(stmt instanceof IRCJump || stmt instanceof IRJump
                         || stmt instanceof IRReturn) {
+                    // If we encounter a new leader, we split off a new block
                     blocks.add(new LinkedList<>(temp));
                     temp = new LinkedList<>();
                 }
