@@ -242,6 +242,8 @@ public class Core {
             // constant folding on the AST
             NodeVisitor cfv = new ConstantFoldingVisitor();
             root.get().accept(cfv);
+            NodeVisitor tcv = new TypeCheckVisitor(libPath);
+            root.get().accept(tcv);
         }
 
         MIRGenerateVisitor mirgv =

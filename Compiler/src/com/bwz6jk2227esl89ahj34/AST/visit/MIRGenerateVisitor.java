@@ -433,9 +433,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
         List<IRStmt> stmtList = new ArrayList<>();
 
         for (Block block : blockList) {
-            if (block instanceof TypedDeclaration) {
-                continue;
-            }
             block.accept(this);
             assert generatedNodes.peek() instanceof IRStmt;
             stmtList.add((IRStmt) generatedNodes.pop());
@@ -461,9 +458,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
         List<IRStmt> stmtList = new ArrayList<>();
 
         for (Block block : blockList) {
-            if (block instanceof TypedDeclaration) {
-                continue;
-            }
             block.accept(this);
             assert generatedNodes.peek() instanceof IRStmt;
             stmtList.add((IRStmt) generatedNodes.pop());
@@ -621,9 +615,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
         List<IRStmt> stmtList = new ArrayList<>();
 
         for (Block block : blockList) {
-            if (block instanceof TypedDeclaration) {
-                continue;
-            }
             block.accept(this);
             assert generatedNodes.peek() instanceof IRStmt;
             stmtList.add((IRStmt) generatedNodes.pop());
@@ -697,7 +688,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRTemp length = new IRTemp(getFreshVariable());
         statements.add(new IRMove(length, lengths.get(index)));
         // Allocate memory for this array
-        IRCall malloc = new IRCall(new IRName("_Ialloc_i"), scaleByWordSize(new IRBinOp(OpType.ADD, length, new IRConst(1))));
+        IRCall malloc = new IRCall(new IRName("_I_alloc_i"), scaleByWordSize(new IRBinOp(OpType.ADD, length, new IRConst(1))));
         // Pointer for this array
         IRTemp arrayTemp = new IRTemp(getFreshVariable());
         statements.add(new IRMove(arrayTemp, malloc));
@@ -714,7 +705,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             statements.add(new IRMove(parentMem, arrayTemp));
         }
         // If we're at the last element, we don't need to add more subarrays
-        if (index == lengths.size()) {
+        if (index == lengths.size() - 1) {
             return new IRSeq(statements);
         }
         // Iterate through the array and recursively allocate memory for subarrays
@@ -749,6 +740,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
             arraySize.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
             lengths.add((IRExpr) generatedNodes.pop());
+        }
+        while (lengths.size() < node.getDeclarationType().getNumBrackets()) {
+            lengths.add(new IRConst(0));
         }
         String variableName = node.getIdentifier().getName();
         IRTemp array = new IRTemp(variableName);
