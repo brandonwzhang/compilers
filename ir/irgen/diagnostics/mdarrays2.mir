@@ -379,5 +379,9 @@
       (
         RETURN)))
   (
-    FUNC _IaddOne_ii
-    (SEQ (MOVE (TEMP _RET0) (ADD (TEMP x) (CONST 1))) (RETURN))))
+    FUNC
+    _IaddOne_ii
+    (SEQ
+     (MOVE (TEMP x) (TEMP _ARG0))
+     (MOVE (TEMP _RET0) (ADD (TEMP x) (CONST 1)))
+     (RETURN))))

@@ -162,64 +162,49 @@ public class Core {
      *
      * Returns the typechecked program if it types.
      */
-    public static Optional<Program> typeCheck(String sourcePath,
+    public static void typeCheck(String sourcePath,
                                  String diagnosticPath,
                                  String libPath,
                                  String file) {
         Optional<FileReader> reader = Util.getFileReader(sourcePath, file);
         if (!reader.isPresent()) {
-            return Optional.empty();
+            return;
         }
 
         Lexer lexer = new Lexer(reader.get());
         Parser parser = new Parser(lexer);
+        List<String> lines = new ArrayList<>();
+        Optional<Program> program = typeCheckHelper(parser, libPath, lines);
+        Util.writeHelper(file, "typed", diagnosticPath, lines);
 
-        // parse the file
-        List<String> parseLines = new ArrayList<>();
-        Optional<Symbol> result = parseHelper(parser, parseLines);
+        if (program.isPresent()) {
+            if (Main.debugOn()) {
+                System.out.println("DEBUG: typed");
+            }
+        } else {
+            Util.printError("Semantic", lines.get(0));
+        }
+    }
+
+    public static Optional<Program> typeCheckHelper(Parser parser,
+                                                    String libPath,
+                                                    List<String> lines) {
+        lines.clear();
+
+        Optional<Symbol> result = parseHelper(parser, lines);
         if (!result.isPresent()) {
-            // printing to standard output is already taken care of
-            Util.writeHelper(file, "typed", diagnosticPath, parseLines);
             return Optional.empty();
         }
 
         Program program = (Program) result.get().value;
-        Optional<String> typeCheckErrorMessage = typeCheckHelper(program, libPath);
-
-        if (!typeCheckErrorMessage.isPresent()) {
-            if (Main.debugOn()) {
-                System.out.println("DEBUG: typed");
-            }
-
-            List<String> lines = Collections.singletonList("Valid Xi Program");
-            Util.writeHelper(file, "typed", diagnosticPath, lines);
-
-            return Optional.of(program);
-        } else {
-            Util.printError("Semantic", typeCheckErrorMessage.get());
-            List<String> lines = Collections.singletonList(typeCheckErrorMessage.get());
-            Util.writeHelper(file, "typed", diagnosticPath, lines);
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * Typechecks the given program. Returns an error message if a type
-     * error occurs.
-     *
-     * @param node a program
-     * @param libPath the path that contains Xi interface files
-     * @return the error message wrapped in an Optional
-     */
-    public static Optional<String> typeCheckHelper(Program node, String libPath) {
-        NodeVisitor visitor =
-                new TypeCheckVisitor(libPath);
+        NodeVisitor visitor = new TypeCheckVisitor(libPath);
         try {
-            node.accept(visitor);
-            return Optional.empty();
+            program.accept(visitor);
+            lines.add("Valid Xi Program");
+            return Optional.of(program);
         } catch (TypeException e) {
-            String errorMessage = e.toString();
-            return Optional.of(errorMessage);
+            lines.add(e.toString());
+            return Optional.empty();
         }
     }
 
@@ -229,26 +214,34 @@ public class Core {
      */
     public static Optional<IRCompUnit> translateToMIR(
             String sourcePath,
-            String diagnosticPath,
             String libPath,
             String file) {
 
-        Optional<Program> root = typeCheck(sourcePath, diagnosticPath, libPath, file);
-        if (!root.isPresent()) {
+        Optional<FileReader> reader = Util.getFileReader(sourcePath, file);
+        if (!reader.isPresent()) {
+            return Optional.empty();
+        }
+
+        Lexer lexer = new Lexer(reader.get());
+        Parser parser = new Parser(lexer);
+        List<String> lines = new ArrayList<>();
+        Optional<Program> program = typeCheckHelper(parser, libPath, lines);
+        if (!program.isPresent()) {
             return Optional.empty();
         }
 
         if (Main.optimizationsOn()) {
             // constant folding on the AST
             NodeVisitor cfv = new ConstantFoldingVisitor();
-            root.get().accept(cfv);
+            program.get().accept(cfv);
+            // annotate the new nodes with types
             NodeVisitor tcv = new TypeCheckVisitor(libPath);
-            root.get().accept(tcv);
+            program.get().accept(tcv);
         }
 
         MIRGenerateVisitor mirgv =
                 new MIRGenerateVisitor(file.substring(0, file.length() - 3));
-        root.get().accept(mirgv);
+        program.get().accept(mirgv);
         IRCompUnit mirRoot = mirgv.getIRRoot();
 
         if (Main.optimizationsOn()) {
@@ -284,12 +277,14 @@ public class Core {
                              String libPath,
                              String file) {
         Optional<IRCompUnit> root =
-                translateToMIR(sourcePath, diagnosticPath, libPath, file);
+                translateToMIR(sourcePath, libPath, file);
         if (!root.isPresent()) {
             return Optional.empty();
         }
 
-        writeIRTree(root.get(), diagnosticPath, file, "mir");
+        if (Main.debugOn()) {
+            writeIRTree(root.get(), diagnosticPath, file, "mir");
+        }
 
         return Optional.of(root.get());
     }

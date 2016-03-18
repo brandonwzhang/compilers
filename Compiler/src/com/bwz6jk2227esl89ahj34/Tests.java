@@ -40,6 +40,7 @@ public class Tests {
                         "ir/irgen/diagnostics/", "ir/lib/", filename));
     }
 
+    /*
     public static void constantFoldTests() {
         System.out.println("\n==CONSTANT FOLD TESTS==");
 
@@ -52,10 +53,11 @@ public class Tests {
      * Prints the result of constant folding (before IR translation)
      * on a single Xi program.
      */
+    /*
     public static void constantFoldHelper(String filename) {
 
         Optional<Program> program =
-                Core.typeCheck("constantfold/", "constantfold/", "", filename);
+                Core.typeCheckHelper("constantfold/", "constantfold/", "", filename);
 
         if (!program.isPresent()) {
             System.out.println("type checking failed");
@@ -77,6 +79,7 @@ public class Tests {
                 .replaceAll("\\s?\\)", ")")
                 .trim());
     }
+    */
 
     /**
      * Automated tests for typecheck.
@@ -91,13 +94,14 @@ public class Tests {
                 .forEach(filename -> Core.typeCheck("typecheck/passtests/",
                         "typecheck/passtests/diagnostics/",
                         "typecheck/lib/", filename));
-
+        /*
         System.out.println("\n================Failed Tests================");
         Util.getDirectoryFiles("typecheck/failtests/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .forEach(filename -> Core.typeCheck("typecheck/failtests/",
                         "typecheck/failtests/diagnostics/",
                         "typecheck/lib/", filename));
+        */
     }
 
     /**
