@@ -10,8 +10,6 @@ import lombok.Setter;
  */
 public abstract class IRExpr extends IRNode {
 
-    @Getter @Setter private Type varType;
-
     @Override
     public CheckCanonicalIRVisitor checkCanonicalEnter(
             CheckCanonicalIRVisitor v) {
