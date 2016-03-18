@@ -329,7 +329,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRLabel trueLabel = new IRLabel(getFreshVariable());
             IRLabel falseLabel = new IRLabel(getFreshVariable());
 
-            IRBinOp guard = new IRBinOp(OpType.LT, new IRTemp(index), combinedLength);
+            IRBinOp guard = new IRBinOp(OpType.LT, new IRTemp(index), leftLength);
             IRCJump cjump = new IRCJump(guard, trueLabel.name(), falseLabel.name());
 
             IRBinOp leftElement = new IRBinOp(OpType.ADD,
@@ -339,6 +339,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRMove trueMove1 = new IRMove(new IRMem(new IRTemp(combinedArray)), new IRMem(leftElement));
             IRMove trueMove2 = new IRMove(new IRTemp(combinedArray),
                     new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(WORD_SIZE)));
+            IRMove trueMove3 = new IRMove(new IRTemp(index),
+                    new IRBinOp(OpType.ADD, new IRTemp(index), new IRConst(WORD_SIZE)));
             IRJump headJump = new IRJump(new IRName(headLabel.name()));
 
             stmts.add(headLabel);
@@ -346,6 +348,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             stmts.add(trueLabel);
             stmts.add(trueMove1);
             stmts.add(trueMove2);
+            stmts.add(trueMove3);
             stmts.add(headJump);
             stmts.add(falseLabel);
 
@@ -356,7 +359,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRLabel trueLabel2 = new IRLabel(getFreshVariable());
             IRLabel falseLabel2 = new IRLabel(getFreshVariable());
 
-            IRBinOp guard2 = new IRBinOp(OpType.LT, new IRTemp(index), combinedLength);
+            IRBinOp guard2 = new IRBinOp(OpType.LT, new IRTemp(index), rightLength);
             IRCJump cjump2 = new IRCJump(guard2, trueLabel2.name(), falseLabel2.name());
 
             IRBinOp rightElement = new IRBinOp(OpType.ADD,
@@ -366,6 +369,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRMove trueMove1_ = new IRMove(new IRMem(new IRTemp(combinedArray)), new IRMem(rightElement));
             IRMove trueMove2_ = new IRMove(new IRTemp(combinedArray),
                     new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(WORD_SIZE)));
+            IRMove trueMove3_ = new IRMove(new IRTemp(index),
+                    new IRBinOp(OpType.ADD, new IRTemp(index), new IRConst(WORD_SIZE)));
             IRJump headJump2 = new IRJump(new IRName(headLabel2.name()));
 
             stmts.add(headLabel2);
@@ -373,6 +378,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             stmts.add(trueLabel2);
             stmts.add(trueMove1_);
             stmts.add(trueMove2_);
+            stmts.add(trueMove3_);
             stmts.add(headJump2);
             stmts.add(falseLabel2);
 
@@ -380,12 +386,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
             stmts.add(new IRMove(new IRTemp(combinedArray),
                     new IRBinOp(OpType.SUB,
                             new IRTemp(combinedArray),
-                            new IRBinOp(OpType.SUB,
-                                    new IRBinOp(OpType.MUL,
-                                            new IRConst(WORD_SIZE), combinedLength),
-                                    new IRConst(1))
-                    ))
-            );
+                            new IRBinOp(OpType.MUL,
+                                    new IRConst(WORD_SIZE), combinedLength)
+                    )
+            ));
 
             IRSeq seq = new IRSeq(stmts);
             IRESeq eseq = new IRESeq(seq, new IRTemp(combinedArray));
@@ -587,7 +591,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRLabel falseLabel = new IRLabel(falseLabelName);
             IRCJump cjump = new IRCJump(guard, trueLabelName, falseLabelName);
             statements.add(cjump);
-            statements.add(new IRJump(new IRName(endLabelName)));
             statements.add(falseLabel);
             node.getFalseBlock().get().accept(this);
             assert generatedNodes.peek() instanceof IRStmt;
