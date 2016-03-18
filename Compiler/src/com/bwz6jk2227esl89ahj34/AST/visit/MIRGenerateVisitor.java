@@ -494,6 +494,17 @@ public class MIRGenerateVisitor implements NodeVisitor {
             arguments.add(argument);
         }
 
+        /* Special case for length(arr) */
+        if (node.getIdentifier().getName().equals("length")) {
+            assert arguments.size() == 1;
+            IRExpr arrayArg = arguments.get(0);
+
+            IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrayArg, new IRConst(WORD_SIZE)));
+            generatedNodes.push(length);
+
+            return;
+        }
+
         String irFunctionName = "";
         if (node.getType() instanceof VariableTypeList) {
             FunctionType funcType = new FunctionType(argTypeList, (VariableTypeList) node.getType());
@@ -666,10 +677,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
             functions.put(getIRFunctionName(fd), (IRFuncDecl) generatedNodes.pop());
         }
 
-        // add length builtin function TODO
-        List<IRStmt> lengthBody = new LinkedList<>();
 
-        // add ArrayOutofBounds function (throws OOB error) TODO
+        /* Add ArrayOutOfBounds function (to throw OOB error) */
+
+
 
         IRRoot = new IRCompUnit(name, functions);
         generatedNodes.push(IRRoot);
