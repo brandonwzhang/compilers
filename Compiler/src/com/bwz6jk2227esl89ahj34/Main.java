@@ -31,7 +31,7 @@ public class Main {
         cli.addOption("-O",
                 "Turn on optimizations",
                 Main::turnOptimizationsOn,
-                1);
+                0);
         cli.addOption("-libpath",
                 "Set the path for interface files. Takes one argument.",
                 Main::setLibPath,
@@ -75,8 +75,8 @@ public class Main {
 
             //Tests.typeCheckTests();
             //Tests.constantFoldTests();
-            Tests.irGenTests();
-            //Tests.mirGenTests();
+            Tests.mirGenTests();
+            //Tests.irGenTests();
             //Tests.irRunTests();
         }
     }

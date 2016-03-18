@@ -328,6 +328,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (!context.containsKey(id)) {
             throw new TypeException("Function not defined", id.getRow(), id.getCol());
         }
+        id.accept(this);
 
         List<VariableType> argumentTypes = new ArrayList<>();
         for (Expression argument : node.getArguments()) {
@@ -531,6 +532,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             }
             FunctionType funcType = funcDec.getFunctionType();
             contexts.peek().put(funcName, funcType);
+            funcName.accept(this);
         }
 
         // Add function declarations from interface files
@@ -604,6 +606,10 @@ public class TypeCheckVisitor implements NodeVisitor {
                     " already declared in scope", node.getRow(), node.getCol());
         }
         context.put(identifier, node.getDeclarationType());
+        identifier.accept(this);
+        for (Expression expression : node.getArraySizeList()) {
+            expression.accept(this);
+        }
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
 
