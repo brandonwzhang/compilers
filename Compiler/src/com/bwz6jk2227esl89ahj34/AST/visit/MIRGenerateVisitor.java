@@ -654,50 +654,85 @@ public class MIRGenerateVisitor implements NodeVisitor {
         List<Expression> arraySizeList = node.getArraySizeList();
         List<IRStmt> stmts = new LinkedList<>();
 
-        // if there are expressions inside array brackets
-        if (arraySizeList.size() > 0) {
-            // initialize space, multiply all the expression results together
-            LinkedList<IRExpr> expressions = new LinkedList<>();
-            for (Expression e : arraySizeList) {
-                e.accept(this);
-                assert generatedNodes.peek() instanceof IRExpr;
-                expressions.add((IRExpr)generatedNodes.pop());
-            }
-            // join all the expressions together with a multiply
-            assert expressions.size() >= 1;
-            IRExpr length = expressions.pollFirst();
-            IRExpr allocsize = new IRBinOp(OpType.ADD, length, new IRConst(1));
-            // multiply all lengths together to get length
-            // multiply all (length+1) together to get allocsize
-            while (expressions.size() > 0) {
-                IRExpr e = expressions.pollFirst();
-                length = new IRBinOp(OpType.MUL, length, e);
-                allocsize = new IRBinOp(OpType.MUL,
-                        new IRBinOp(OpType.ADD, length, new IRConst(1)), allocsize);
-            }
+        // recursion base case: one-dimensional array init
+        if (arraySizeList.size() == 1) {
+            // get length
+            arraySizeList.get(0).accept(this);
+            assert generatedNodes.peek() instanceof IRExpr;
+            IRExpr length = (IRExpr)generatedNodes.pop();
 
-            // instantiate array space, insert length, shift pointer up
-            IRTemp array = new IRTemp(getFreshVariable()); // temp to store array
+            String array = getFreshVariable();
 
-            // call to malloc
-            IRCall malloc = new IRCall(new IRName("_I_alloc_i"), allocsize);
-
-            IRMove storeArrayPtr = new IRMove(array, malloc);
-            // TODO make first index of malloc's return IMMUTABLE IRMem
+            IRCall malloc = new IRCall(new IRName("_Ialloc_i"), new IRBinOp(
+                    OpType.MUL, new IRBinOp(OpType.ADD, length, new IRConst(1)), new IRConst(WORD_SIZE)));
+            IRMove storeArrayPtr = new IRMove(new IRTemp(array), malloc);
+            // TODO make first index of mallo'cs return IMMUTABLE IRMem
 
             // save length in MEM(array)
-            IRMove saveLength = new IRMove(new IRMem(array), length);
+            IRMove saveLength = new IRMove(new IRMem(new IRTemp(array)), length);
             // shift array up to 0th index
-            IRMove shift = new IRMove(array, new IRBinOp(OpType.ADD, array, new IRConst(WORD_SIZE)));
+            IRMove shift = new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD, new IRTemp(array), new IRConst(WORD_SIZE)));
 
             stmts.add(storeArrayPtr);
             stmts.add(saveLength);
             stmts.add(shift);
+
             IRSeq seq = new IRSeq(stmts);
-            IRESeq eseq = new IRESeq(seq, array);
+            IRESeq eseq = new IRESeq(seq, new IRTemp(array));
 
             generatedNodes.push(eseq);
         }
+        // recursive case
+        else if (arraySizeList.size() > 1) {
+            /* Take the top level dimension size, called e1
+             * We need to make e1 recu */
+        }
+
+
+        // if there are expressions inside array brackets
+//        if (arraySizeList.size() > 0) {
+//            // initialize space, multiply all the expression results together
+//            LinkedList<IRExpr> expressions = new LinkedList<>();
+//            for (Expression e : arraySizeList) {
+//                e.accept(this);
+//                assert generatedNodes.peek() instanceof IRExpr;
+//                expressions.add((IRExpr)generatedNodes.pop());
+//            }
+//            // join all the expressions together with a multiply
+//            assert expressions.size() >= 1;
+//            IRExpr length = expressions.pollFirst();
+//            IRExpr allocsize = new IRBinOp(OpType.ADD, length, new IRConst(1));
+//            // multiply all lengths together to get length
+//            // multiply all (length+1) together to get allocsize
+//            while (expressions.size() > 0) {
+//                IRExpr e = expressions.pollFirst();
+//                length = new IRBinOp(OpType.MUL, length, e);
+//                allocsize = new IRBinOp(OpType.MUL,
+//                        new IRBinOp(OpType.ADD, length, new IRConst(1)), allocsize);
+//            }
+//
+//            // instantiate array space, insert length, shift pointer up
+//            IRTemp array = new IRTemp(getFreshVariable()); // temp to store array
+//
+//            // call to malloc
+//            IRCall malloc = new IRCall(new IRName("_I_alloc_i"), allocsize);
+//
+//            IRMove storeArrayPtr = new IRMove(array, malloc);
+//            // TODO make first index of malloc's return IMMUTABLE IRMem
+//
+//            // save length in MEM(array)
+//            IRMove saveLength = new IRMove(new IRMem(array), length);
+//            // shift array up to 0th index
+//            IRMove shift = new IRMove(array, new IRBinOp(OpType.ADD, array, new IRConst(WORD_SIZE)));
+//
+//            stmts.add(storeArrayPtr);
+//            stmts.add(saveLength);
+//            stmts.add(shift);
+//            IRSeq seq = new IRSeq(stmts);
+//            IRESeq eseq = new IRESeq(seq, array);
+//
+//            generatedNodes.push(eseq);
+//        }
         // else if plain variable or uninitialized array
     }
     public void visit(Unary node) {
