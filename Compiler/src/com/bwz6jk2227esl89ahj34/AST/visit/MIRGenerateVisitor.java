@@ -802,12 +802,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
     public void visit(WhileStatement node) {
         // create labels
-        String headLabelName = getFreshVariable();
-        IRLabel headLabel = new IRLabel(headLabelName);
-        String trueLabelName = getFreshVariable();
-        IRLabel trueLabel = new IRLabel(trueLabelName);
-        String exitLabelName = getFreshVariable();
-        IRLabel exitLabel = new IRLabel(exitLabelName);
+        IRLabel headLabel = new IRLabel(getFreshVariable());
+        IRLabel trueLabel = new IRLabel(getFreshVariable());
+        IRLabel exitLabel = new IRLabel(getFreshVariable());
 
         // perform translations
         node.getGuard().accept(this);
@@ -820,10 +817,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
         IRSeq seq = new IRSeq(
                 headLabel,
-                new IRCJump(guard, trueLabelName, exitLabelName),
+                new IRCJump(guard, trueLabel.name(), exitLabel.name()),
                 trueLabel,
                 body,
-                new IRJump(new IRName(headLabelName)),
+                new IRJump(new IRName(headLabel.name())),
                 exitLabel);
 
         generatedNodes.push(seq);
