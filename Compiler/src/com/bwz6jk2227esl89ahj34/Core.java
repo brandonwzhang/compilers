@@ -10,6 +10,8 @@ import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRLexer;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRParser;
+import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.MIRConstantFoldingVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRVisitor;
 import com.bwz6jk2227esl89ahj34.util.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.Util;
@@ -237,22 +239,32 @@ public class Core {
         }
 
         if (Main.optimizationsOn()) {
-            constantFoldAST(root.get());
+            // constant folding on the AST
+            NodeVisitor cfv = new ConstantFoldingVisitor();
+            root.get().accept(cfv);
         }
 
-        MIRGenerateVisitor visitor = new MIRGenerateVisitor(file.substring(0, file.length()-3));
-        root.get().accept(visitor);
-        return Optional.of(visitor.getIRRoot());
+        MIRGenerateVisitor mirgv =
+                new MIRGenerateVisitor(file.substring(0, file.length() - 3));
+        root.get().accept(mirgv);
+        IRCompUnit mirRoot = mirgv.getIRRoot();
+
+        if (Main.optimizationsOn()) {
+            // constant folding on the MIR tree
+            IRVisitor mircfv = new MIRConstantFoldingVisitor();
+            mirRoot = (IRCompUnit) mircfv.visit(mirRoot);
+        }
+
+        return Optional.of(mirRoot);
     }
 
     /**
      * Writes the given IR tree as an S-Expression to a file.
      */
-    public static void printIRTree(IRCompUnit root,
+    public static void writeIRTree(IRCompUnit root,
                                    String diagnosticPath,
                                    String file,
                                    String extension) {
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(baos);
         root.printSExp(printer);
@@ -269,12 +281,13 @@ public class Core {
                              String diagnosticPath,
                              String libPath,
                              String file) {
-        Optional<IRCompUnit> root = translateToMIR(sourcePath, diagnosticPath, libPath, file);
+        Optional<IRCompUnit> root =
+                translateToMIR(sourcePath, diagnosticPath, libPath, file);
         if (!root.isPresent()) {
             return Optional.empty();
         }
 
-        printIRTree(root.get(), diagnosticPath, file, "mir");
+        writeIRTree(root.get(), diagnosticPath, file, "mir");
 
         return Optional.of(root.get());
     }
@@ -286,37 +299,38 @@ public class Core {
                              String diagnosticPath,
                              String libPath,
                              String file) {
-        Optional<IRCompUnit> mirRoot = mirGen(sourcePath, diagnosticPath, libPath, file);
+        Optional<IRCompUnit> mirRoot =
+                mirGen(sourcePath, diagnosticPath, libPath, file);
         if (!mirRoot.isPresent()) {
             return;
         }
 
-        MIRVisitor mirVisitor = new MIRVisitor();
-        IRCompUnit lirRoot = (IRCompUnit) mirVisitor.visit(mirRoot.get());
+        MIRVisitor mirv = new MIRVisitor();
+        IRCompUnit lirRoot = (IRCompUnit) mirv.visit(mirRoot.get());
 
-        printIRTree(lirRoot, diagnosticPath, file, "ir");
+        writeIRTree(lirRoot, diagnosticPath, file, "ir");
     }
 
     public static void irRun(String sourcePath,
                              String diagnosticPath,
                              String libPath,
                              String file) {
+        // TODO: lower the IR (use irGen instead of mirGen)
 
-//        Optional<IRCompUnit> root = translateToMIR(sourcePath, diagnosticPath, libPath, file);
-//        if (!root.isPresent()) {
-//            return;
-//        }
-
-        // TODO: lower the IR
+        // reads Xi source file and writes an .mir file
         mirGen(sourcePath, diagnosticPath, libPath, file);
 
-        Optional<FileReader> reader = Util.getFileReader(diagnosticPath, file.substring(0, file.length()-2) + "mir");
+        Optional<FileReader> reader =
+                Util.getFileReader(
+                        diagnosticPath,
+                        file.substring(0, file.length() - 2) + "mir"
+                );
         if (!reader.isPresent()) {
             return;
         }
+
         IRLexer lexer = new IRLexer(reader.get());
         IRParser parser = new IRParser(lexer);
-
         Symbol result;
         try {
             result = parser.parse();
@@ -325,19 +339,9 @@ public class Core {
             throw new RuntimeException("IR parsing failed");
         }
 
-        IRCompUnit compunit = (IRCompUnit)result.value();
-
-        IRSimulator sim = new IRSimulator(compunit);
-
+        IRCompUnit root = result.value();
+        IRSimulator sim = new IRSimulator(root);
         long callResult = sim.call("_Imain_p", 0);
         System.out.println(callResult);
-    }
-
-    /**
-     * Performs constant folding on the given AST.
-     */
-    public static void constantFoldAST(Program root) {
-        NodeVisitor visitor = new ConstantFoldingVisitor();
-        root.accept(visitor);
     }
 }

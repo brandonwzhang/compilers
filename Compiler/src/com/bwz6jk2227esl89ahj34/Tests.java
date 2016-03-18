@@ -40,10 +40,6 @@ public class Tests {
                         "ir/irgen/diagnostics/", "ir/lib/", filename));
     }
 
-
-    /**
-     * Automated tests for ConstantFoldingVisitor.
-     */
     public static void constantFoldTests() {
         System.out.println("\n==CONSTANT FOLD TESTS==");
 
@@ -71,10 +67,10 @@ public class Tests {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CodeWriterSExpPrinter printer =
                 new CodeWriterSExpPrinter(baos);
-        NodeVisitor visitor = new PrintVisitor(printer);
+        NodeVisitor pv = new PrintVisitor(printer);
 
         program.get().accept(cfv);
-        program.get().accept(visitor);
+        program.get().accept(pv);
         printer.flush();
         System.out.println(baos.toString().replaceAll("\\s+", " ")
                 .replaceAll("\\(\\s?", "(")
