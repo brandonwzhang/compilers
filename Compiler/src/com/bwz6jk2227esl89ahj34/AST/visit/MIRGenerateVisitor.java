@@ -316,10 +316,13 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRMove saveLength = new IRMove(new IRMem(new IRTemp(combinedArray)), combinedLength);
             // shift array up to 0th index
             IRMove shift = new IRMove(new IRTemp(combinedArray), new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(WORD_SIZE)));
+            // Store the start of the array to return
+            IRTemp retArray = new IRTemp(getFreshVariable());
 
             stmts.add(storeArrayPtr);
             stmts.add(saveLength);
             stmts.add(shift);
+            stmts.add(new IRMove(retArray, new IRTemp(combinedArray)));
 
             /* Insert elements into new array */
             // insert elements from left array
@@ -341,7 +344,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRMove trueMove2 = new IRMove(new IRTemp(combinedArray),
                     new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(WORD_SIZE)));
             IRMove trueMove3 = new IRMove(new IRTemp(index),
-                    new IRBinOp(OpType.ADD, new IRTemp(index), new IRConst(WORD_SIZE)));
+                    new IRBinOp(OpType.ADD, new IRTemp(index), new IRConst(1)));
             IRJump headJump = new IRJump(new IRName(headLabel.name()));
 
             stmts.add(headLabel);
@@ -371,7 +374,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRMove trueMove2_ = new IRMove(new IRTemp(combinedArray),
                     new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(WORD_SIZE)));
             IRMove trueMove3_ = new IRMove(new IRTemp(index),
-                    new IRBinOp(OpType.ADD, new IRTemp(index), new IRConst(WORD_SIZE)));
+                    new IRBinOp(OpType.ADD, new IRTemp(index), new IRConst(1)));
             IRJump headJump2 = new IRJump(new IRName(headLabel2.name()));
 
             stmts.add(headLabel2);
@@ -383,17 +386,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
             stmts.add(headJump2);
             stmts.add(falseLabel2);
 
-            /* return new combinedArray to index 0 address */
-            stmts.add(new IRMove(new IRTemp(combinedArray),
-                    new IRBinOp(OpType.SUB,
-                            new IRTemp(combinedArray),
-                            new IRBinOp(OpType.MUL,
-                                    new IRConst(WORD_SIZE), combinedLength)
-                    )
-            ));
-
             IRSeq seq = new IRSeq(stmts);
-            IRESeq eseq = new IRESeq(seq, new IRTemp(combinedArray));
+            IRESeq eseq = new IRESeq(seq, retArray);
 
             generatedNodes.push(eseq);
             return;
