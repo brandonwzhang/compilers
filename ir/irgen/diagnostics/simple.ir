@@ -1,0 +1,11 @@
+(
+  COMPUNIT
+  
+  (
+    FUNC
+    _Imain_p
+    (SEQ
+     (MOVE (TEMP 1) (CONST 1))
+     (MOVE (TEMP 2) (ADD (TEMP 1) (CONST 1)))
+     (MOVE (TEMP 0) (MEM (TEMP 2)))
+     (RETURN))))
