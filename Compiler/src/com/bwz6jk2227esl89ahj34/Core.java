@@ -214,39 +214,33 @@ public class Core {
         }
     }
 
-    public static Optional<IRCompUnit> mirGen(String sourcePath,
-                             String diagnosticPath,
-                             String libPath,
-                             String file) {
+    /**
+     * Reads in a Xi source file, typechecks it, and translates it
+     * to an MIR (IR that has not been lowered).
+     */
+    public static Optional<IRCompUnit> translateToMIR(
+            String sourcePath,
+            String diagnosticPath,
+            String libPath,
+            String file) {
+
         Optional<Program> root = typeCheck(sourcePath, diagnosticPath, libPath, file);
         if (!root.isPresent()) {
             return Optional.empty();
         }
 
+        if (Main.optimizationsOn()) {
+            constantFoldAST(root.get());
+        }
+
         MIRGenerateVisitor visitor = new MIRGenerateVisitor("");
         root.get().accept(visitor);
-
-        printIRTree(visitor.getIRRoot(), diagnosticPath, file, "mir");
-
         return Optional.of(visitor.getIRRoot());
     }
 
-    public static void irGen(String sourcePath,
-                             String diagnosticPath,
-                             String libPath,
-                             String file) {
-        Optional<IRCompUnit> mirRoot = mirGen(sourcePath, diagnosticPath, libPath, file);
-
-        if (!mirRoot.isPresent()) {
-            return;
-        }
-
-        MIRVisitor mirVisitor = new MIRVisitor();
-        IRCompUnit lirRoot = (IRCompUnit) mirVisitor.visit(mirRoot.get());
-
-        printIRTree(lirRoot, diagnosticPath, file, "ir");
-    }
-
+    /**
+     * Writes the given IR tree as an S-Expression to a file.
+     */
     public static void printIRTree(IRCompUnit root,
                                    String diagnosticPath,
                                    String file,
@@ -260,20 +254,64 @@ public class Core {
         Util.writeHelper(file, extension, diagnosticPath, lines);
     }
 
+    /**
+     * Generates and prints the MIR of the given Xi source file.
+     * Intermediate method for testing.
+     */
+    public static Optional<IRCompUnit> mirGen(String sourcePath,
+                             String diagnosticPath,
+                             String libPath,
+                             String file) {
+        Optional<IRCompUnit> root = translateToMIR(sourcePath, diagnosticPath, libPath, file);
+        if (!root.isPresent()) {
+            return Optional.empty();
+        }
+
+        printIRTree(root.get(), diagnosticPath, file, "mir");
+
+        return Optional.of(root.get());
+    }
+
+    /**
+     * Generates and prints the IR of the given Xi source file.
+     */
+    public static void irGen(String sourcePath,
+                             String diagnosticPath,
+                             String libPath,
+                             String file) {
+        Optional<IRCompUnit> mirRoot = mirGen(sourcePath, diagnosticPath, libPath, file);
+        if (!mirRoot.isPresent()) {
+            return;
+        }
+
+        MIRVisitor mirVisitor = new MIRVisitor();
+        IRCompUnit lirRoot = (IRCompUnit) mirVisitor.visit(mirRoot.get());
+
+        printIRTree(lirRoot, diagnosticPath, file, "ir");
+    }
+
     public static void irRun(String sourcePath,
                              String diagnosticPath,
                              String libPath,
                              String file) {
 
-        Optional<Program> root = typeCheck(sourcePath, diagnosticPath, libPath, file);
+        Optional<IRCompUnit> root = translateToMIR(sourcePath, diagnosticPath, libPath, file);
         if (!root.isPresent()) {
             return;
         }
 
-        MIRGenerateVisitor visitor = new MIRGenerateVisitor("");
-        root.get().accept(visitor);
-        IRSimulator sim = new IRSimulator(visitor.getIRRoot());
+        // TODO: lower the IR
+
+        IRSimulator sim = new IRSimulator(root.get());
         long callResult = sim.call("_Imain_p", 0);
         System.out.println(callResult);
+    }
+
+    /**
+     * Performs constant folding on the given AST.
+     */
+    public static void constantFoldAST(Program root) {
+        NodeVisitor visitor = new ConstantFoldingVisitor();
+        root.accept(visitor);
     }
 }

@@ -7,6 +7,7 @@ public class Main {
     private static String diagnosticPath = "./";
     private static String libPath = "./";
     private static boolean debug;
+    private static boolean optimizations;
 
     public static void main(String[] args) {
         CLI cli = new CLI();
@@ -26,6 +27,10 @@ public class Main {
         cli.addOption("-D",
                 "Set the path for diagnostic files. Takes one argument.",
                 Main::setDiagnosticPath,
+                1);
+        cli.addOption("-O",
+                "Turn on optimizations",
+                Main::turnOptimizationsOn,
                 1);
         cli.addOption("-libpath",
                 "Set the path for interface files. Takes one argument.",
@@ -116,8 +121,19 @@ public class Main {
         debug = true;
     }
 
+    /**
+     * Turns on optimizations (constant folding).
+     */
+    public static void turnOptimizationsOn(String[] args) {
+        optimizations = true;
+    }
+
     public static boolean debugOn() {
         return debug;
+    }
+
+    public static boolean optimizationsOn() {
+        return optimizations;
     }
 
 }
