@@ -472,6 +472,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
         List<IRStmt> stmtList = new ArrayList<>();
 
         for (Block block : blockList) {
+            if (block instanceof TypedDeclaration) {
+                if (((TypedDeclaration) block).getArraySizeList().size() == 0) {
+                    continue;
+                }
+            }
             block.accept(this);
             assert generatedNodes.peek() instanceof IRStmt;
             stmtList.add((IRStmt) generatedNodes.pop());
@@ -497,6 +502,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
         List<IRStmt> stmtList = new ArrayList<>();
 
         for (Block block : blockList) {
+            if (block instanceof TypedDeclaration) {
+                if (((TypedDeclaration) block).getArraySizeList().size() == 0) {
+                    continue;
+                }
+            }
             block.accept(this);
             assert generatedNodes.peek() instanceof IRStmt;
             stmtList.add((IRStmt) generatedNodes.pop());
@@ -670,6 +680,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
         List<IRStmt> stmtList = new ArrayList<>();
 
         for (Block block : blockList) {
+            if (block instanceof TypedDeclaration) {
+                if (((TypedDeclaration) block).getArraySizeList().size() == 0) {
+                    continue;
+                }
+            }
             block.accept(this);
             assert generatedNodes.peek() instanceof IRStmt;
             stmtList.add((IRStmt) generatedNodes.pop());
