@@ -250,19 +250,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
         assert generatedNodes.peek() instanceof IRExpr;
         right = (IRExpr)generatedNodes.pop();
 
-        // array equality case
-        if (optype == OpType.EQ && ((VariableType)node.getLeft().getType()).getNumBrackets() > 0) {
-
-
-            return;
-        }
-
-        // array inequality case
-        if (optype == OpType.NEQ && ((VariableType)node.getLeft().getType()).getNumBrackets() > 0) {
-
-            return;
-        }
-
         // array addition case
 //        if (optype == OpType.ADD && ((VariableType)left.getType()).getNumBrackets() > 0) {
 //            assert ((VariableType)right.getType()).getNumBrackets() > 0;
