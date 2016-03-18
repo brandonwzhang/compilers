@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34.ir.visit;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -230,8 +231,10 @@ public class MIRVisitor extends IRVisitor{
             t = new IRTemp(getFreshVariable());
             assert !tempList.isEmpty();
             IRExpr target = tempList.remove(0);
-            addStatements(stmtList,
-                    new IRMove(t , new IRCall(target, tempList)));
+            addStatements(stmtList, new IRExp(new IRCall(target, tempList)));
+            addStatements(stmtList, new IRMove(t, new IRTemp(Configuration.ABSTRACT_RET_PREFIX + 0)));
+            //addStatements(stmtList,
+            //        new IRMove(t , new IRCall(target, tempList)));
             return new IRESeq(new IRSeq(stmtList), t);
         } else if (n instanceof IRFuncDecl) {
             assert n_ instanceof IRFuncDecl;
