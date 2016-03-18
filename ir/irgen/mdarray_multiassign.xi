@@ -1,7 +1,7 @@
 use io
 
 multipleArrays(x: int): int[], int[], int[] {
-	return {{x, x}, {x, x}, {x, x}}
+	return {x, x}, {x, x}, {x, x}
 }
 
 main() {
