@@ -52,47 +52,40 @@ public class MIRVisitor extends IRVisitor{
     /**
      *
      * TODO: fix
-     * 
-     * given a certain block, find the indices of other blocks
+     *
+     * given a certain block, return indices of other blocks
      * that are successors to it
      * @param graph
      * @param block
      * @return
      */
-    public List<Integer> successors (List<List<IRStmt>> graph, List<IRStmt> block) {
+    public List<IRStmt> successors (List<List<IRStmt>> graph, List<IRStmt> block) {
         IRStmt target = block.get(block.size()-1);
         if(target instanceof IRReturn) {
             return new LinkedList<>();
         } else if (target instanceof IRJump) {
             IRJump temp = (IRJump)(target);
-            String targetLabel = temp.label(); //TODO: fix
+            String targetLabel = temp.label(); //todo: look at
             List<Integer> successors = new LinkedList<>();
-            for(int i = 0; i < graph.size(); i++) {
-                List<IRStmt> stmt = graph.get(i);
+            for(List<IRStmt> stmt : graph) {
                 if(stmt.get(0) instanceof IRLabel &&
                         ((IRLabel)(stmt.get(0))).label().equals(targetLabel)) {
-                    successors.add(i);
+                    return stmt;
                 }
             }
-            return successors;
+            return new LinkedList<>();
         } else if (target instanceof IRCJump) {
             IRCJump temp = (IRCJump)(target);
-            String target1 =  temp.trueLabel();
-            String target2 = temp.falseLabel();
-            List<Integer> successors = new LinkedList<>();
-            for(int i = 0; i < graph.size(); i++) {
-                List<IRStmt> stmt = graph.get(i);
-
+            String falseLabel = temp.falseLabel();
+            for(List<IRStmt> stmt : graph) {
                 if(stmt.get(0) instanceof IRLabel){
-                    if(((IRLabel)(stmt.get(0))).name().equals(target1)
-                            || ((IRLabel)(stmt.get(0))).name().equals(target2))
+                    if(((IRLabel)(stmt.get(0))).name().equals(falseLabel))
                     {
-                        System.out.println("hello");
-                        successors.add(i);
+                        return stmt;
                     }
                 }
             }
-            return successors;
+            return  new LinkedList<>();
         } else { return new LinkedList<>(); }
     }
 
@@ -173,7 +166,7 @@ public class MIRVisitor extends IRVisitor{
             addStatements(lst, casted_eseq.stmt());
             addStatements(lst, new IRJump(casted_eseq.expr()));
             return new IRSeq(lst);
-        } else if (n instanceof IRCJump) { //TODO: block reordering
+        } else if (n instanceof IRCJump) {
             assert n_ instanceof IRCJump;
             assert ((IRCJump)(n_)).expr() instanceof IRESeq;
             System.out.println("cjump");
@@ -256,24 +249,26 @@ public class MIRVisitor extends IRVisitor{
                 }
             }
 
-            boolean[] mapped = new boolean[blocks.size()];
-
             List<IRStmt> trace;
             List<IRStmt> finalStatements = new LinkedList<>();
-            for(int i = 0; i < blocks.size(); i++) {
-                trace = new LinkedList<>();
-                if(!mapped[i]) { //if block has not been visited
-                    mapped[i] = true;
-                    trace.addAll(blocks.get(i));
-                    System.out.println(successors(blocks, blocks.get(i)));
 
+            while(!blocks.isEmpty()) {
+                trace = blocks.get(0);
+                temp = successors(blocks, trace);
+                while(temp != null && temp.size() > 0) {
+                    finalStatements.addAll(trace);
+                    blocks.remove(trace);
+                    trace = temp;
+                    temp = successors(blocks, trace);
                 }
                 finalStatements.addAll(trace);
+                blocks.remove(trace);
             }
 
-            System.out.println(blocks);
+            //System.out.println(finalStatements);
 
-            return n_;
+            return new IRFuncDecl(fd.name(), new IRSeq(finalStatements));
+
         } else {
             return n_;
         }
