@@ -36,6 +36,15 @@ public class IRCall extends IRExpr {
         this.args = args;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param call
+     */
+    public IRCall(IRCall call) {
+        this.target = call.target;
+        this.args = call.args;
+    }
+
     public IRExpr target() {
         return target;
     }

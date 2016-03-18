@@ -18,6 +18,14 @@ public class IRJump extends IRStmt {
         target = expr;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param jump
+     */
+    public IRJump(IRJump jump) {
+        this.target = jump.target;
+    }
+
     public IRExpr target() {
         return target;
     }

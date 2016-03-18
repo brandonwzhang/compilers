@@ -17,6 +17,14 @@ public class IRConst extends IRExpr {
         this.value = value;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param c
+     */
+    public IRConst(IRConst c) {
+        this.value = c.value;
+    }
+
     public long value() {
         return value;
     }

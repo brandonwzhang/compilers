@@ -20,6 +20,14 @@ public class IRExp extends IRStmt {
         this.expr = expr;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param exp
+     */
+    public IRExp(IRExp exp) {
+        this.expr = exp.expr;
+    }
+
     public IRExpr expr() {
         return expr;
     }

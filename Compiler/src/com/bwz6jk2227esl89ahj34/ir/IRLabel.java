@@ -17,6 +17,14 @@ public class IRLabel extends IRStmt {
         this.name = name;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param label
+     */
+    public IRLabel(IRLabel label) {
+        this.name = label.name;
+    }
+
     public String name() {
         return name;
     }

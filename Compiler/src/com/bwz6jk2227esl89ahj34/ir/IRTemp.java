@@ -17,6 +17,14 @@ public class IRTemp extends IRExpr {
         this.name = name;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param temp
+     */
+    public IRTemp(IRTemp temp) {
+        this.name = temp.name;
+    }
+
     public String name() {
         return name;
     }

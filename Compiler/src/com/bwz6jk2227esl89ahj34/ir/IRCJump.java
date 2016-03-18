@@ -37,6 +37,16 @@ public class IRCJump extends IRStmt {
         this.falseLabel = falseLabel;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param cjump
+     */
+    public IRCJump(IRCJump cjump) {
+        this.expr = cjump.expr;
+        this.trueLabel = cjump.trueLabel;
+        this.falseLabel = cjump.falseLabel;
+    }
+
     public IRExpr expr() {
         return expr;
     }

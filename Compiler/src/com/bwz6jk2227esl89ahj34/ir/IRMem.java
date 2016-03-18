@@ -41,6 +41,15 @@ public class IRMem extends IRExpr {
         this.memType = memType;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param mem
+     */
+    public IRMem(IRMem mem) {
+        this.expr = mem.expr;
+        this.memType = mem.memType;
+    }
+
     public IRExpr expr() {
         return expr;
     }

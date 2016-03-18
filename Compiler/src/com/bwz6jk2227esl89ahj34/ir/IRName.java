@@ -17,6 +17,14 @@ public class IRName extends IRExpr {
         this.name = name;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param name
+     */
+    public IRName(IRName name) {
+        this.name = name.name;
+    }
+
     public String name() {
         return name;
     }

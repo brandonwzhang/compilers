@@ -23,6 +23,15 @@ public class IRESeq extends IRExpr {
         this.expr = expr;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param eseq
+     */
+    public IRESeq(IRESeq eseq) {
+        this.stmt = eseq.stmt;
+        this.expr = eseq.expr;
+    }
+
     public IRStmt stmt() {
         return stmt;
     }

@@ -22,6 +22,15 @@ public class IRMove extends IRStmt {
         this.expr = expr;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param move
+     */
+    public IRMove(IRMove move) {
+        this.target = move.target;
+        this.expr = move.expr;
+    }
+
     public IRExpr target() {
         return target;
     }

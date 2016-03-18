@@ -24,6 +24,15 @@ public class IRCompUnit extends IRNode {
         this.functions = functions;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param compunit
+     */
+    public IRCompUnit(IRCompUnit compunit) {
+        this.name = compunit.name;
+        this.functions = compunit.functions;
+    }
+
     public void appendFunc(IRFuncDecl func) {
         functions.put(func.name(), func);
     }

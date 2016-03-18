@@ -71,6 +71,16 @@ public class IRBinOp extends IRExpr {
         this.right = right;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param binop
+     */
+    public IRBinOp(IRBinOp binop) {
+        this.type = binop.type;
+        this.left = binop.left;
+        this.right = binop.right;
+    }
+
     public OpType opType() {
         return type;
     }

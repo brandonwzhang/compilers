@@ -31,6 +31,14 @@ public class IRSeq extends IRStmt {
         this.stmts = stmts;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param seq
+     */
+    public IRSeq(IRSeq seq) {
+        this.stmts = seq.stmts;
+    }
+
     public List<IRStmt> stmts() {
         return stmts;
     }

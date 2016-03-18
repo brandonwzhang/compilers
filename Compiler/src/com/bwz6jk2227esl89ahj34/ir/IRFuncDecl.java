@@ -15,6 +15,15 @@ public class IRFuncDecl extends IRNode {
         body = stmt;
     }
 
+    /**
+     * Copy constructor (shallow).
+     * @param funcdecl
+     */
+    public IRFuncDecl(IRFuncDecl funcdecl) {
+        this.name = funcdecl.name;
+        this.body = funcdecl.body;
+    }
+
     public String name() {
         return name;
     }
