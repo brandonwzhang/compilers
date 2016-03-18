@@ -3,6 +3,12 @@ andyTest() {
   y:int = -x
   z:int = --x
   a:int = ---x
+  b:int = ----x 
+  c:bool = true
+  d:bool = !c
+  e:bool = !!c 
+  f:bool = !!!c
+  g:bool = !!!!c
 }
 
 divideByZero() {
