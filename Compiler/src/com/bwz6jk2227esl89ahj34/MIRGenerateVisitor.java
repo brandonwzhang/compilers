@@ -522,7 +522,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         String trueLabelName = getFreshVariable();
         IRLabel trueLabel = new IRLabel(trueLabelName);
         node.getTrueBlock().accept(this);
-        assert generatedNodes.peek() instanceof IRExpr;
+        assert generatedNodes.peek() instanceof IRStmt;
         IRStmt trueBlock = (IRStmt) generatedNodes.pop();
 
         // We need a label for the end of the if statement to ensure
@@ -540,7 +540,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             statements.add(new IRJump(new IRName(endLabelName)));
             statements.add(falseLabel);
             node.getFalseBlock().get().accept(this);
-            assert generatedNodes.peek() instanceof IRExpr;
+            assert generatedNodes.peek() instanceof IRStmt;
             IRStmt falseBlock = (IRStmt) generatedNodes.pop();
             statements.add(falseBlock);
             statements.add(new IRJump(new IRName(endLabelName)));
