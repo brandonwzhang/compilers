@@ -159,7 +159,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
     public void visit(Assignment node) {
         List<Assignable> variables = node.getVariables();
         Expression expression = node.getExpression();
-        // If RHS is VariableType, we know there was no function call
+        // If RHS is VariableType, we know there was no multiassign
         if (expression.getType() instanceof VariableType) {
             expression.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
@@ -192,7 +192,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             generatedNodes.push(move);
             return;
         }
-        // If RHS is VariableTypeList, we have to handle a function call
+        // If RHS is VariableTypeList, we have to handle a multiassign
         assert expression instanceof FunctionCall;
         assert expression.getType() instanceof VariableTypeList;
         assert variables.size() == ((VariableTypeList) expression.getType()).getVariableTypeList().size();
@@ -688,95 +688,71 @@ public class MIRGenerateVisitor implements NodeVisitor {
         ArrayLiteral arrayliteral = new ArrayLiteral(chars);
         arrayliteral.accept(this);
     }
+    public IRBinOp scaleByWordSize(IRExpr expr) {
+        return new IRBinOp(OpType.MUL, expr, new IRConst(WORD_SIZE));
+    }
+
+    public IRSeq initializeArray(IRTemp parentArrayPointer, IRExpr parentArrayIndex, List<IRExpr> lengths, int index) {
+        List<IRStmt> statements = new ArrayList<>();
+        IRTemp length = new IRTemp(getFreshVariable());
+        statements.add(new IRMove(length, lengths.get(index)));
+        // Allocate memory for this array
+        IRCall malloc = new IRCall(new IRName("_Ialloc_i"), scaleByWordSize(new IRBinOp(OpType.ADD, length, new IRConst(1))));
+        // Pointer for this array
+        IRTemp arrayTemp = new IRTemp(getFreshVariable());
+        statements.add(new IRMove(arrayTemp, malloc));
+        // Add the length to before the first element of the array
+        statements.add(new IRMove(new IRMem(arrayTemp), length));
+        // Move pointer to the first element of the array
+        statements.add(new IRMove(arrayTemp, new IRBinOp(OpType.ADD, arrayTemp, new IRConst(WORD_SIZE))));
+        if (index == 0) {
+            // If we're at the first index, we just need to put the pointer to the array in the given temp
+            statements.add(new IRMove(parentArrayPointer, arrayTemp));
+        } else {
+            // Store the pointer to this array in the parent array
+            IRMem parentMem = new IRMem(new IRBinOp(OpType.ADD, parentArrayPointer, scaleByWordSize(parentArrayIndex)));
+            statements.add(new IRMove(parentMem, arrayTemp));
+        }
+        // If we're at the last element, we don't need to add more subarrays
+        if (index == lengths.size()) {
+            return new IRSeq(statements);
+        }
+        // Iterate through the array and recursively allocate memory for subarrays
+        IRLabel headLabel = new IRLabel(getFreshVariable());
+        IRLabel trueLabel = new IRLabel(getFreshVariable());
+        IRLabel exitLabel = new IRLabel(getFreshVariable());
+        IRTemp counter = new IRTemp(getFreshVariable());
+        statements.add(new IRMove(counter, new IRConst(0)));
+        IRExpr guard = new IRBinOp(OpType.LT, counter, length);
+        IRSeq allocateSubarrays = initializeArray(arrayTemp, counter, lengths, index + 1);
+        List<IRStmt> loopStatements = new ArrayList<>();
+        loopStatements.add(headLabel);
+        loopStatements.add(new IRCJump(guard, trueLabel.name(), exitLabel.name()));
+        loopStatements.add(trueLabel);
+        loopStatements.add(allocateSubarrays);
+        loopStatements.add(new IRMove(counter, new IRBinOp(OpType.ADD, counter, new IRConst(1))));
+        loopStatements.add(new IRJump(new IRName(headLabel.name())));
+        loopStatements.add(exitLabel);
+        statements.add(new IRSeq(loopStatements));
+        return new IRSeq(statements);
+    }
+
     public void visit(TypedDeclaration node) {
         // In the case where TypedDeclaration is part of an assignment, it will be handled separately
         // We only concern with a standalone declaration here (x:int[], y:bool[4], z:int, etc)
-        // Overall, return an IREseq (temp) if array with size stated
+        // We'll store the pointer to the initialized array in the temp of the variable name
         // else do nothing
 
         List<Expression> arraySizeList = node.getArraySizeList();
-        List<IRStmt> stmts = new LinkedList<>();
-
-        // recursion base case: one-dimensional array init
-        if (arraySizeList.size() == 1) {
-            // get length
-            arraySizeList.get(0).accept(this);
+        List<IRExpr> lengths = new ArrayList<>();
+        for (Expression arraySize : arraySizeList) {
+            arraySize.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
-            IRExpr length = (IRExpr)generatedNodes.pop();
-
-            String array = getFreshVariable();
-
-            IRCall malloc = new IRCall(new IRName("_Ialloc_i"), new IRBinOp(
-                    OpType.MUL, new IRBinOp(OpType.ADD, length, new IRConst(1)), new IRConst(WORD_SIZE)));
-            IRMove storeArrayPtr = new IRMove(new IRTemp(array), malloc);
-            // TODO make first index of mallo'cs return IMMUTABLE IRMem
-
-            // save length in MEM(array)
-            IRMove saveLength = new IRMove(new IRMem(new IRTemp(array)), length);
-            // shift array up to 0th index
-            IRMove shift = new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD, new IRTemp(array), new IRConst(WORD_SIZE)));
-
-            stmts.add(storeArrayPtr);
-            stmts.add(saveLength);
-            stmts.add(shift);
-
-            IRSeq seq = new IRSeq(stmts);
-            IRESeq eseq = new IRESeq(seq, new IRTemp(array));
-
-            generatedNodes.push(eseq);
+            lengths.add((IRExpr) generatedNodes.pop());
         }
-        // recursive case
-        else if (arraySizeList.size() > 1) {
-            /* Take the top level dimension size, called e1
-             * We need to make e1 recu */
-        }
-
-
-        // if there are expressions inside array brackets
-//        if (arraySizeList.size() > 0) {
-//            // initialize space, multiply all the expression results together
-//            LinkedList<IRExpr> expressions = new LinkedList<>();
-//            for (Expression e : arraySizeList) {
-//                e.accept(this);
-//                assert generatedNodes.peek() instanceof IRExpr;
-//                expressions.add((IRExpr)generatedNodes.pop());
-//            }
-//            // join all the expressions together with a multiply
-//            assert expressions.size() >= 1;
-//            IRExpr length = expressions.pollFirst();
-//            IRExpr allocsize = new IRBinOp(OpType.ADD, length, new IRConst(1));
-//            // multiply all lengths together to get length
-//            // multiply all (length+1) together to get allocsize
-//            while (expressions.size() > 0) {
-//                IRExpr e = expressions.pollFirst();
-//                length = new IRBinOp(OpType.MUL, length, e);
-//                allocsize = new IRBinOp(OpType.MUL,
-//                        new IRBinOp(OpType.ADD, length, new IRConst(1)), allocsize);
-//            }
-//
-//            // instantiate array space, insert length, shift pointer up
-//            IRTemp array = new IRTemp(getFreshVariable()); // temp to store array
-//
-//            // call to malloc
-//            IRCall malloc = new IRCall(new IRName("_I_alloc_i"), allocsize);
-//
-//            IRMove storeArrayPtr = new IRMove(array, malloc);
-//            // TODO make first index of malloc's return IMMUTABLE IRMem
-//
-//            // save length in MEM(array)
-//            IRMove saveLength = new IRMove(new IRMem(array), length);
-//            // shift array up to 0th index
-//            IRMove shift = new IRMove(array, new IRBinOp(OpType.ADD, array, new IRConst(WORD_SIZE)));
-//
-//            stmts.add(storeArrayPtr);
-//            stmts.add(saveLength);
-//            stmts.add(shift);
-//            IRSeq seq = new IRSeq(stmts);
-//            IRESeq eseq = new IRESeq(seq, array);
-//
-//            generatedNodes.push(eseq);
-//        }
-        // else if plain variable or uninitialized array
+        String variableName = node.getIdentifier().getName();
+        IRTemp array = new IRTemp(variableName);
+        generatedNodes.push(new IRSeq(initializeArray(array, null, lengths, 0)));
     }
     public void visit(Unary node) {
         // not --> XOR with 1
