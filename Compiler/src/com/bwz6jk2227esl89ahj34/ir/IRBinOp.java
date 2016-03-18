@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
+import com.bwz6jk2227esl89ahj34.ir.visit.CheckConstFoldedIRVisitor;
 import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
 import com.bwz6jk2227esl89ahj34.util.SExpPrinter;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
@@ -107,6 +108,11 @@ public class IRBinOp extends IRExpr {
             return new IRBinOp(type, left, right);
 
         return this;
+    }
+
+    @Override
+    public boolean isConstFolded(CheckConstFoldedIRVisitor v) {
+        return !isConstant();
     }
 
     @Override

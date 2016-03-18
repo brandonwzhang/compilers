@@ -8,6 +8,8 @@ import com.bwz6jk2227esl89ahj34.AST.type.TypeException;
 import com.bwz6jk2227esl89ahj34.AST.visit.*;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
+import com.bwz6jk2227esl89ahj34.ir.parse.IRLexer;
+import com.bwz6jk2227esl89ahj34.ir.parse.IRParser;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRVisitor;
 import com.bwz6jk2227esl89ahj34.util.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.Util;
@@ -238,7 +240,7 @@ public class Core {
             constantFoldAST(root.get());
         }
 
-        MIRGenerateVisitor visitor = new MIRGenerateVisitor("");
+        MIRGenerateVisitor visitor = new MIRGenerateVisitor(file.substring(0, file.length()-3));
         root.get().accept(visitor);
         return Optional.of(visitor.getIRRoot());
     }
@@ -300,14 +302,33 @@ public class Core {
                              String libPath,
                              String file) {
 
-        Optional<IRCompUnit> root = translateToMIR(sourcePath, diagnosticPath, libPath, file);
-        if (!root.isPresent()) {
-            return;
-        }
+//        Optional<IRCompUnit> root = translateToMIR(sourcePath, diagnosticPath, libPath, file);
+//        if (!root.isPresent()) {
+//            return;
+//        }
 
         // TODO: lower the IR
+        mirGen(sourcePath, diagnosticPath, libPath, file);
 
-        IRSimulator sim = new IRSimulator(root.get());
+        Optional<FileReader> reader = Util.getFileReader(diagnosticPath, file.substring(0, file.length()-2) + "mir");
+        if (!reader.isPresent()) {
+            return;
+        }
+        IRLexer lexer = new IRLexer(reader.get());
+        IRParser parser = new IRParser(lexer);
+
+        Symbol result;
+        try {
+            result = parser.parse();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("IR parsing failed");
+        }
+
+        IRCompUnit compunit = (IRCompUnit)result.value();
+
+        IRSimulator sim = new IRSimulator(compunit);
+
         long callResult = sim.call("_Imain_p", 0);
         System.out.println(callResult);
     }

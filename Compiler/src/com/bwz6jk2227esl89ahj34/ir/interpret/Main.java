@@ -5,22 +5,14 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 import com.bwz6jk2227esl89ahj34.util.CodeWriterSExpPrinter;
-import com.bwz6jk2227esl89ahj34.util.SExpPrinter;
-import com.bwz6jk2227esl89ahj34.ir.IRBinOp;
-import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
-import com.bwz6jk2227esl89ahj34.ir.IRCall;
-import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
-import com.bwz6jk2227esl89ahj34.ir.IRConst;
-import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
-import com.bwz6jk2227esl89ahj34.ir.IRMove;
-import com.bwz6jk2227esl89ahj34.ir.IRName;
-import com.bwz6jk2227esl89ahj34.ir.IRReturn;
-import com.bwz6jk2227esl89ahj34.ir.IRSeq;
-import com.bwz6jk2227esl89ahj34.ir.IRStmt;
-import com.bwz6jk2227esl89ahj34.ir.IRTemp;
+import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRLexer;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRParser;
 import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.CheckConstFoldedIRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.IRBinOp.*;
+import com.bwz6jk2227esl89ahj34.util.SExpPrinter;
+
 
 public class Main {
 
@@ -45,7 +37,7 @@ public class Main {
                                  new IRMove(new IRTemp("j"), new IRTemp(arg1)),
                                  new IRMove(new IRTemp(ret0), new IRTemp("i")),
                                  new IRMove(new IRTemp(ret1),
-                                            new IRBinOp(OpType.MUL,
+                                            new IRBinOp(IRBinOp.OpType.MUL,
                                                         new IRConst(2),
                                                         new IRTemp("j"))),
                                  new IRReturn());
@@ -96,6 +88,13 @@ public class Main {
             System.out.println(cv.visit(compUnit));
         }
 
+        // IR constant-folding checker demo
+        {
+            CheckConstFoldedIRVisitor cv = new CheckConstFoldedIRVisitor();
+            System.out.print("Constant-folded?: ");
+            System.out.println(cv.visit(compUnit));
+        }
+
         // IR parser demo
         String prog = sw.toString();
         try (StringReader r = new StringReader(prog)) {
@@ -104,11 +103,13 @@ public class Main {
             try {
                 compUnit_ = parser.parse().<IRCompUnit> value();
             }
+            catch (RuntimeException e) {
+                throw e;
+            }
             catch (Exception e) {
+                // Used by CUP to indicate an unrecoverable error.
                 String msg = e.getMessage();
-                if (msg != null)
-                    System.err.println("Syntax error: " + e.getMessage());
-                e.printStackTrace();
+                if (msg != null) System.err.println("Syntax error: " + msg);
             }
 
             if (compUnit_ != null) {

@@ -3,12 +3,10 @@ package com.bwz6jk2227esl89ahj34.ir;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import com.bwz6jk2227esl89ahj34.ir.visit.*;
 import com.bwz6jk2227esl89ahj34.util.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.SExpPrinter;
-import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
-import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
-import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
-import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
+
 
 /**
  * A node in an intermediate-representation abstract syntax tree.
@@ -43,6 +41,10 @@ public abstract class IRNode {
     }
 
     public boolean isCanonical(CheckCanonicalIRVisitor v) {
+        return true;
+    }
+
+    public boolean isConstFolded(CheckConstFoldedIRVisitor v) {
         return true;
     }
 

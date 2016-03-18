@@ -34,6 +34,52 @@ public class MIRGenerateVisitor implements NodeVisitor {
         return "temp" + (labelCounter++);
     }
 
+    private IRExpr makeCopy(IRExpr e) {
+        if (e instanceof IRBinOp) {
+            return new IRBinOp((IRBinOp)e);
+        }
+        if (e instanceof IRCall) {
+            return new IRCall((IRCall)e);
+        }
+        if (e instanceof IRConst) {
+            return new IRConst((IRConst)e);
+        }
+        if (e instanceof IRESeq) {
+            return new IRESeq((IRESeq)e);
+        }
+        if (e instanceof IRMem) {
+            return new IRMem((IRMem)e);
+        }
+        if (e instanceof IRName) {
+            return new IRName((IRName)e);
+        }
+        if (e instanceof IRTemp) {
+            return new IRTemp((IRTemp)e);
+        }
+        return null; // should not be reached
+    }
+    private IRStmt makeCopy(IRStmt s) {
+        if (s instanceof IRCJump) {
+            return new IRCJump((IRCJump)s);
+        }
+        if (s instanceof IRExp) {
+            return new IRExp((IRExp)s);
+        }
+        if (s instanceof IRJump) {
+            return new IRJump((IRJump)s);
+        }
+        if (s instanceof IRLabel) {
+            return new IRLabel((IRLabel)s);
+        }
+        if (s instanceof IRMove) {
+            return new IRMove((IRMove)s);
+        }
+        if (s instanceof IRSeq) {
+            return new IRSeq((IRSeq)s);
+        }
+        return null; // should not be reached
+    }
+
   	/*
     	General paradigm:
       - We use a stack called generatedNodes that allows us to bypass our visit functions not returning anything.
@@ -55,13 +101,14 @@ public class MIRGenerateVisitor implements NodeVisitor {
         assert generatedNodes.peek() instanceof IRExpr;
         IRExpr index = (IRExpr)generatedNodes.pop();
 
-        IRMem location = new IRMem(new IRBinOp(IRBinOp.OpType.ADD, array, new IRBinOp(OpType.MUL, index, new IRConst(WORD_SIZE)))); // TODO double check
+        IRMem location = new IRMem(new IRBinOp(OpType.ADD, makeCopy(array),
+                new IRBinOp(OpType.MUL, index, new IRConst(WORD_SIZE)))); // TODO double check
 
         generatedNodes.push(location);
     }
 
     public void visit(ArrayLiteral node) {
-        // overall return type is IRMem
+        // overall return type is IRTemp t, of which IRMem(t) is index 0 of array
 
         // eseq
         // call malloc for 8(n+1), the size of the arrayliteral, move result into a
@@ -620,8 +667,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
         // add length builtin function TODO
         List<IRStmt> lengthBody = new LinkedList<>();
-        
-
 
         // add ArrayOutofBounds function (throws OOB error) TODO
 
