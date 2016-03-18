@@ -1,0 +1,37 @@
+(
+  COMPUNIT
+  binary
+  (
+    FUNC _IreturnOne_i
+    (SEQ (MOVE (TEMP 1) (CONST 1)) (MOVE (TEMP 0) (TEMP 1)) (RETURN)))
+  (
+    FUNC
+    _Imain_p
+    (SEQ
+     (MOVE (TEMP 3) (NAME _IreturnOne_i))
+     (MOVE (TEMP 4) (CALL (TEMP 3)))
+     (MOVE (TEMP 5) (TEMP 4))
+     (MOVE (TEMP 6) (ADD (TEMP 5) (CONST 2)))
+     (MOVE (TEMP 2) (TEMP 6))
+     (MOVE (TEMP 30) (NAME _Iprint_pai))
+     (MOVE (TEMP 8) (NAME _I_alloc_i))
+     (MOVE (TEMP 9) (CONST 16))
+     (MOVE (TEMP 10) (CALL (TEMP 8) (TEMP 9)))
+     (MOVE (TEMP 11) (TEMP 10))
+     (MOVE (TEMP 7) (TEMP 11))
+     (MOVE (TEMP 13) (CONST 1))
+     (MOVE (MEM (TEMP 12)) (TEMP 13))
+     (MOVE (TEMP 16) (TEMP 15))
+     (MOVE (TEMP 17) (ADD (TEMP 16) (CONST 8)))
+     (MOVE (TEMP 14) (TEMP 17))
+     (MOVE (TEMP 20) (TEMP 19))
+     (MOVE (MEM (TEMP 18)) (TEMP 20))
+     (MOVE (TEMP 23) (TEMP 22))
+     (MOVE (TEMP 24) (ADD (TEMP 23) (CONST 8)))
+     (MOVE (TEMP 21) (TEMP 24))
+     (MOVE (TEMP 27) (TEMP 26))
+     (MOVE (TEMP 28) (SUB (TEMP 27) (CONST 8)))
+     (MOVE (TEMP 25) (TEMP 28))
+     (MOVE (TEMP 31) (TEMP 29))
+     (MOVE (TEMP 32) (CALL (TEMP 30) (TEMP 31)))
+     (RETURN))))

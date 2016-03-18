@@ -1,0 +1,43 @@
+(
+  COMPUNIT
+  array_literal
+  (
+    FUNC _If_i
+    (SEQ (MOVE (TEMP 1) (CONST 2)) (MOVE (TEMP 0) (TEMP 1)) (RETURN)))
+  (
+    FUNC
+    _Imain_p
+    (SEQ
+     (MOVE (TEMP 4) (NAME _I_alloc_i))
+     (MOVE (TEMP 5) (CONST 32))
+     (MOVE (TEMP 6) (CALL (TEMP 4) (TEMP 5)))
+     (MOVE (TEMP 7) (TEMP 6))
+     (MOVE (TEMP 3) (TEMP 7))
+     (MOVE (TEMP 9) (CONST 3))
+     (MOVE (MEM (TEMP 8)) (TEMP 9))
+     (MOVE (TEMP 12) (TEMP 11))
+     (MOVE (TEMP 13) (ADD (TEMP 12) (CONST 8)))
+     (MOVE (TEMP 10) (TEMP 13))
+     (MOVE (TEMP 15) (CONST 5))
+     (MOVE (MEM (TEMP 14)) (TEMP 15))
+     (MOVE (TEMP 18) (TEMP 17))
+     (MOVE (TEMP 19) (ADD (TEMP 18) (CONST 8)))
+     (MOVE (TEMP 16) (TEMP 19))
+     (MOVE (TEMP 21) (NAME _If_i))
+     (MOVE (TEMP 22) (CALL (TEMP 21)))
+     (MOVE (TEMP 23) (TEMP 22))
+     (MOVE (MEM (TEMP 20)) (TEMP 23))
+     (MOVE (TEMP 26) (TEMP 25))
+     (MOVE (TEMP 27) (ADD (TEMP 26) (CONST 8)))
+     (MOVE (TEMP 24) (TEMP 27))
+     (MOVE (TEMP 29) (CONST 1))
+     (MOVE (MEM (TEMP 28)) (TEMP 29))
+     (MOVE (TEMP 32) (TEMP 31))
+     (MOVE (TEMP 33) (ADD (TEMP 32) (CONST 8)))
+     (MOVE (TEMP 30) (TEMP 33))
+     (MOVE (TEMP 36) (TEMP 35))
+     (MOVE (TEMP 37) (SUB (TEMP 36) (CONST 24)))
+     (MOVE (TEMP 34) (TEMP 37))
+     (MOVE (TEMP 39) (TEMP 38))
+     (MOVE (TEMP 2) (TEMP 39))
+     (RETURN))))

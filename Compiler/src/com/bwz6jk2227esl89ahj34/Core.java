@@ -181,8 +181,6 @@ public class Core {
             if (Main.debugOn()) {
                 System.out.println("DEBUG: typed");
             }
-        } else {
-            Util.printError("Semantic", lines.get(0));
         }
     }
 
@@ -195,6 +193,7 @@ public class Core {
         if (!result.isPresent()) {
             return Optional.empty();
         }
+        lines.clear();
 
         Program program = (Program) result.get().value;
         NodeVisitor visitor = new TypeCheckVisitor(libPath);
@@ -203,6 +202,7 @@ public class Core {
             lines.add("Valid Xi Program");
             return Optional.of(program);
         } catch (TypeException e) {
+            Util.printError("Semantic", e.toString());
             lines.add(e.toString());
             return Optional.empty();
         }
@@ -315,12 +315,12 @@ public class Core {
         // TODO: lower the IR (use irGen instead of mirGen)
 
         // reads Xi source file and writes an .mir file
-        mirGen(sourcePath, diagnosticPath, libPath, file);
+        irGen(sourcePath, diagnosticPath, libPath, file);
 
         Optional<FileReader> reader =
                 Util.getFileReader(
                         diagnosticPath,
-                        file.substring(0, file.length() - 2) + "mir"
+                        file.substring(0, file.length() - 2) + "ir"
                 );
         if (!reader.isPresent()) {
             return;

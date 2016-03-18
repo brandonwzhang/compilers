@@ -36,8 +36,12 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      */
     public void visit(ArrayIndex node) {
         node.getArrayRef().accept(this);
-        assert lst.size() == 1;
-        node.setArrayRef(lst.get(0));
+        //assert lst.size() == 1;
+        //System.out.println(node.getArrayRef().getType());
+        //lst.get(0).setType(node.getArrayRef().getType());
+        //System.out.println(lst);
+        node.setArrayRef(lst.get(lst.size()-1));
+        //System.out.println(node.getArrayRef().getType());
         lst = new LinkedList<>();
 
         node.getIndex().accept(this);

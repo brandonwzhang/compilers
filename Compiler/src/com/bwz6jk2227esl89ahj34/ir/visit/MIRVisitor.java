@@ -249,10 +249,15 @@ public class MIRVisitor extends IRVisitor{
             List<List<IRStmt>> blocks = new LinkedList<>();
             List<IRStmt> temp = new LinkedList<>();
             for(IRStmt stmt : stmts) {
+                if (stmt instanceof IRLabel) {
+                    // We encountered beginning of new block
+                    blocks.add(new LinkedList<>(temp));
+                    temp = new LinkedList<>();
+                }
                 temp.add(stmt);
                 if(stmt instanceof IRCJump || stmt instanceof IRJump
                         || stmt instanceof IRReturn) {
-                    // If we encounter a new leader, we split off a new block
+                    // We encountered end of block
                     blocks.add(new LinkedList<>(temp));
                     temp = new LinkedList<>();
                 }
