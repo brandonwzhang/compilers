@@ -1,1 +1,0 @@
-(COMPUNIT simple (FUNC _Imain_p (SEQ (SEQ (MOVE (TEMP x) (CONST 2))) (RETURN))))
