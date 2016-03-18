@@ -239,8 +239,9 @@ public class Core {
             program.get().accept(tcv);
         }
 
+
         MIRGenerateVisitor mirgv =
-                new MIRGenerateVisitor(file.substring(0, file.length() - 3));
+                new MIRGenerateVisitor(Util.extractFileName(file));
         program.get().accept(mirgv);
         IRCompUnit mirRoot = mirgv.getIRRoot();
 

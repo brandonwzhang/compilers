@@ -223,4 +223,22 @@ public class Util {
         }
         return files;
     }
+
+    /**
+     * Given a filename that could look like test1.xi, test2.mir, dir1/dir2/test3.parsed,
+     * return the name of the file with no extensions or directories.
+     * @param file
+     * @return
+     */
+    public static String extractFileName(String file) {
+        String filename = file;
+        int lastIndexSlash = filename.lastIndexOf('/');
+        if (lastIndexSlash != -1) {
+            filename = filename.substring(lastIndexSlash+1);
+        }
+        int extensionIndex = filename.lastIndexOf('.');
+
+        filename = filename.substring(0, extensionIndex);
+        return filename;
+    }
 }
