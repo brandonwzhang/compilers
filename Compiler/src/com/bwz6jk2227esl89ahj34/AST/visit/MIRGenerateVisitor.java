@@ -1,5 +1,6 @@
-package com.bwz6jk2227esl89ahj34;
+package com.bwz6jk2227esl89ahj34.AST.visit;
 import com.bwz6jk2227esl89ahj34.AST.*;
+import com.bwz6jk2227esl89ahj34.AST.visit.NodeVisitor;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 

@@ -1,6 +1,9 @@
-package com.bwz6jk2227esl89ahj34;
+package com.bwz6jk2227esl89ahj34.AST.visit;
 
 import com.bwz6jk2227esl89ahj34.AST.*;
+import com.bwz6jk2227esl89ahj34.AST.parse.InterfaceParser;
+import com.bwz6jk2227esl89ahj34.Context;
+import com.bwz6jk2227esl89ahj34.TypeException;
 
 import java.util.*;
 
