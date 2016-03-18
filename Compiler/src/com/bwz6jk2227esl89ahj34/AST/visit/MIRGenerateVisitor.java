@@ -93,6 +93,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
     public void visit(ArrayIndex node) {
         // a[e]
         // Return IRMem that contains the value of the array a at index e
+        // OR if out of bounds, a functioncall to out of bounds exception
 
         node.getArrayRef().accept(this);
         assert generatedNodes.peek() instanceof IRExpr;
@@ -102,10 +103,49 @@ public class MIRGenerateVisitor implements NodeVisitor {
         assert generatedNodes.peek() instanceof IRExpr;
         IRExpr index = (IRExpr)generatedNodes.pop();
 
-        IRMem location = new IRMem(new IRBinOp(OpType.ADD, makeCopy(array),
-                new IRBinOp(OpType.MUL, index, new IRConst(WORD_SIZE)))); // TODO double check
+        IRMem length = new IRMem(new IRBinOp(OpType.SUB, array, new IRConst(WORD_SIZE)));
 
-        generatedNodes.push(location);
+        // Check for out of bounds index
+        IRTemp result = new IRTemp(getFreshVariable());
+        List<IRStmt> stmts = new LinkedList<>();
+        IRLabel trueLabel = new IRLabel(getFreshVariable());
+        IRLabel falseLabel = new IRLabel(getFreshVariable());
+        IRLabel exitLabel = new IRLabel(getFreshVariable());
+
+        IRCJump cjump = new IRCJump( // index < length && index >= 0
+                new IRBinOp(OpType.AND,
+                        new IRBinOp(OpType.LT, index, length),
+                        new IRBinOp(OpType.GEQ, index, new IRConst(0))),
+                trueLabel.name(),
+                falseLabel.name()
+        );
+
+        // get mem location
+        IRSeq trueBody = new IRSeq(
+                // get actual element
+                new IRMove(result, new IRMem( new IRBinOp(
+                        OpType.ADD,
+                        new IRBinOp(OpType.MUL, index, new IRConst(WORD_SIZE)),
+                        array
+                ))),
+                // jump to exit
+                new IRJump(new IRName(exitLabel.name()))
+        );
+
+        IRMove outOfBoundsCall = new IRMove(result, new IRCall(new IRName("_I_outOfBounds_p")));
+
+        IRSeq seq = new IRSeq(
+                cjump,
+                trueLabel,
+                trueBody,
+                falseLabel,
+                outOfBoundsCall,
+                exitLabel
+        );
+
+        IRESeq eseq = new IRESeq(seq, result);
+
+        generatedNodes.push(eseq);
     }
 
     public void visit(ArrayLiteral node) {
@@ -670,11 +710,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
             assert generatedNodes.peek() instanceof IRFuncDecl;
             functions.put(getIRFunctionName(fd), (IRFuncDecl) generatedNodes.pop());
         }
-
-
-        /* Add ArrayOutOfBounds function (to throw OOB error) */
-
-
 
         IRRoot = new IRCompUnit(name, functions);
         generatedNodes.push(IRRoot);
