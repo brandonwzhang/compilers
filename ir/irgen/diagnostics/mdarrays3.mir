@@ -1,0 +1,125 @@
+(
+  COMPUNIT
+  mdarrays3
+  (
+    FUNC
+    _Imain_p
+    (
+      SEQ
+      (
+        SEQ
+        (
+          MOVE (TEMP temp0) (CONST 5))
+        (
+          MOVE
+          (
+            TEMP temp1)
+          (CALL
+           (NAME _I_alloc_i) (MUL (ADD (TEMP temp0) (CONST 1)) (CONST 8))))
+        (
+          MOVE
+          (
+            MEM (TEMP temp1)) (TEMP temp0))
+        (
+          MOVE
+          (
+            TEMP temp1) (ADD (TEMP temp1) (CONST 8)))
+        (
+          MOVE
+          (
+            TEMP a) (TEMP temp1))
+        (
+          MOVE
+          (
+            TEMP temp5) (CONST 0))
+        (
+          SEQ
+          (
+            LABEL temp2)
+          (
+            CJUMP (LT (TEMP temp5) (TEMP temp0)) temp3 temp4)
+          (
+            LABEL temp3)
+          (
+            SEQ
+            (
+              MOVE
+              (TEMP temp6)
+              (CONST 2))
+            (
+              MOVE
+              (TEMP temp7)
+              (CALL
+               (NAME _I_alloc_i)
+               (MUL (ADD (TEMP temp6) (CONST 1)) (CONST 8))))
+            (
+              MOVE (MEM (TEMP temp7)) (TEMP temp6))
+            (
+              MOVE
+              (TEMP temp7)
+              (ADD
+               (TEMP temp7)
+               (CONST 8)))
+            (
+              MOVE
+              (
+                MEM
+                (ADD (TEMP temp1) (MUL (TEMP temp5) (CONST 8))))
+              (TEMP temp7))
+            (
+              MOVE
+              (TEMP temp11)
+              (CONST 0))
+            (
+              SEQ
+              (
+                LABEL temp8)
+              (
+                CJUMP (LT (TEMP temp11) (TEMP temp6)) temp9 temp10)
+              (
+                LABEL temp9)
+              (
+                SEQ
+                (
+                  MOVE (TEMP temp12) (CONST 3))
+                (
+                  MOVE
+                  (
+                    TEMP temp13)
+                  (CALL
+                   (NAME _I_alloc_i)
+                   (MUL (ADD (TEMP temp12) (CONST 1)) (CONST 8))))
+                (
+                  MOVE (MEM (TEMP temp13)) (TEMP temp12))
+                (
+                  MOVE (TEMP temp13) (ADD (TEMP temp13) (CONST 8)))
+                (
+                  MOVE (MEM (ADD (TEMP temp7) (MUL (TEMP temp11) (CONST 8))))
+                  (TEMP temp13)))
+              (
+                MOVE (TEMP temp11) (ADD (TEMP temp11) (CONST 1)))
+              (
+                JUMP (NAME temp8))
+              (
+                LABEL temp10)))
+          (
+            MOVE (TEMP temp5) (ADD (TEMP temp5) (CONST 1)))
+          (
+            JUMP (NAME temp2))
+          (
+            LABEL temp4)))
+      (
+        SEQ
+        (MOVE (TEMP temp14) (CONST 2))
+        (MOVE (TEMP temp15)
+         (CALL (NAME _I_alloc_i) (MUL (ADD (TEMP temp14) (CONST 1)) (CONST 8))))
+        (MOVE (MEM (TEMP temp15)) (TEMP temp14))
+        (MOVE (TEMP temp15) (ADD (TEMP temp15) (CONST 8)))
+        (MOVE (TEMP b) (TEMP temp15)))
+      (
+        MOVE
+        (MEM
+         (ADD (MEM (ADD (MEM (ADD (TEMP a) (CONST 0))) (CONST 0))) (CONST 0)))
+        (CONST 1))
+      (
+        RETURN))))
