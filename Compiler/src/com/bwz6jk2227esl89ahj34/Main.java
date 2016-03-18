@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Main {
     private static String sourcePath = "./";
@@ -67,6 +68,11 @@ public class Main {
         cli.execute(args);
 
         if(debug) { // put debug mode behaviors here
+
+            String[] exclude = {};
+            Collections.addAll(Tests.exclude, exclude);
+            System.out.println("\nDEBUG: Excluding: " + Tests.exclude.toString());
+
             try {
                 //Tests.parseTests();
             } catch (Exception e) {
