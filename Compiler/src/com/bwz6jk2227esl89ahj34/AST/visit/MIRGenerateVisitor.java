@@ -455,12 +455,22 @@ public class MIRGenerateVisitor implements NodeVisitor {
             arguments.add(argument);
         }
 
-        assert node.getType() instanceof VariableTypeList;
-        FunctionType funcType = new FunctionType(argTypeList, (VariableTypeList) node.getType());
-        FunctionDeclaration tempFuncDec = new FunctionDeclaration(node.getIdentifier(), funcType, null, null);
+        String irFunctionName = "";
+        if (node.getType() instanceof VariableTypeList) {
+            FunctionType funcType = new FunctionType(argTypeList, (VariableTypeList) node.getType());
+            FunctionDeclaration tempFuncDec = new FunctionDeclaration(node.getIdentifier(), funcType, null, null);
+            irFunctionName = getIRFunctionName(tempFuncDec);
+        } else {
+            assert node.getType() instanceof VariableType;
+            List<VariableType> retTypes = new ArrayList<>(Arrays.asList((VariableType) node.getType()));
+            FunctionType funcType = new FunctionType(argTypeList, new VariableTypeList(retTypes));
+            FunctionDeclaration tempFuncDec = new FunctionDeclaration(node.getIdentifier(), funcType, null, null);
+            irFunctionName = getIRFunctionName(tempFuncDec);
+        }
+
 
         // Pass the function name and arguments to an IRCall
-        IRCall call = new IRCall(new IRName(getIRFunctionName(tempFuncDec)), arguments);
+        IRCall call = new IRCall(new IRName(irFunctionName), arguments);
         generatedNodes.push(call);
     }
 

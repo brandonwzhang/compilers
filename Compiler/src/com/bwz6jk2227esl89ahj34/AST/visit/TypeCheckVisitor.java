@@ -348,7 +348,12 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException("Argument types do not match with function definition", id.getRow(), id.getCol());
         }
 
-        node.setType(thisFuncType.getReturnTypeList());
+        if (thisFuncType.getReturnTypeList().getVariableTypeList().size() > 1) {
+            node.setType(thisFuncType.getReturnTypeList());
+        } else {
+            assert thisFuncType.getReturnTypeList().getVariableTypeList().size() == 1;
+            node.setType(thisFuncType.getReturnTypeList().getVariableTypeList().get(0));
+        }
     }
 
     /**

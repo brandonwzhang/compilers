@@ -4,6 +4,10 @@ returnOne():int{
 	return 1
 }
 
+identity(x:int[]):int[] {
+    return x;
+}
+
 main(){
     c:int = 0
     while (c < 3) {
@@ -13,7 +17,12 @@ main(){
     if (c > 1) {
         println("got here")
     }
+    if (c < 0) {
+        println("ERROR OCCURED")
+    } else {
+        println("Else seems to be working")
+    }
     y:int[] = "get fukd boi";
 	x:int = returnOne() + 35
-    println(y);
+    println(identity(y));
 }
