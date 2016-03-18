@@ -779,11 +779,13 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(TypedDeclaration node) {
+        if (node.getArraySizeList().size() == 0) {
+            return;
+        }
         // In the case where TypedDeclaration is part of an assignment, it will be handled separately
         // We only concern with a standalone declaration here (x:int[], y:bool[4], z:int, etc)
         // We'll store the pointer to the initialized array in the temp of the variable name
         // else do nothing
-
         List<Expression> arraySizeList = node.getArraySizeList();
         List<IRExpr> lengths = new ArrayList<>();
         for (Expression arraySize : arraySizeList) {
