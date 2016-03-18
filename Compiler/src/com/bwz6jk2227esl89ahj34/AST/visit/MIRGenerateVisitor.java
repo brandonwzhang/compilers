@@ -597,7 +597,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRLabel falseLabel = new IRLabel(falseLabelName);
             IRCJump cjump = new IRCJump(guard, trueLabelName, falseLabelName);
             statements.add(cjump);
-            statements.add(new IRJump(new IRName(endLabelName)));
             statements.add(falseLabel);
             node.getFalseBlock().get().accept(this);
             assert generatedNodes.peek() instanceof IRStmt;
