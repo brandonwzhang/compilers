@@ -1,0 +1,58 @@
+(
+  COMPUNIT
+  functions
+  (
+    FUNC
+    _Iwumpus_ii
+    (SEQ
+     (MOVE (TEMP 2) (TEMP 1))
+     (MOVE (TEMP 0) (TEMP 2))
+     (MOVE (TEMP 4) (CONST 1))
+     (MOVE (TEMP 3) (TEMP 4))
+     (RETURN)))
+  (
+    FUNC
+    _Imain_p
+    (SEQ
+     (MOVE (TEMP 5) (NAME _Ifoo_p))
+     (MOVE (TEMP 6) (CALL (TEMP 5)))
+     (RETURN)))
+  (
+    FUNC
+    _Ifoo_p
+    (SEQ
+     (MOVE (TEMP 7) (NAME _Imain_p))
+     (MOVE (TEMP 8) (CALL (TEMP 7)))
+     (RETURN)))
+  (
+    FUNC
+    _Ibar_p
+    (SEQ
+     (MOVE (TEMP 9) (NAME _Ifoo_p))
+     (MOVE (TEMP 10) (CALL (TEMP 9)))
+     (MOVE (TEMP 11) (NAME _Imain_p))
+     (MOVE (TEMP 12) (CALL (TEMP 11)))
+     (MOVE (TEMP 15) (NAME _I_alloc_i))
+     (MOVE (TEMP 16) (CONST 16))
+     (MOVE (TEMP 17) (CALL (TEMP 15) (TEMP 16)))
+     (MOVE (TEMP 18) (TEMP 17))
+     (MOVE (TEMP 14) (TEMP 18))
+     (MOVE (TEMP 20) (CONST 1))
+     (MOVE (MEM (TEMP 19)) (TEMP 20))
+     (MOVE (TEMP 23) (TEMP 22))
+     (MOVE (TEMP 24) (ADD (TEMP 23) (CONST 8)))
+     (MOVE (TEMP 21) (TEMP 24))
+     (MOVE (TEMP 26) (NAME _Iwumpus_ii))
+     (MOVE (TEMP 27) (CONST 2))
+     (MOVE (TEMP 28) (CALL (TEMP 26) (TEMP 27)))
+     (MOVE (TEMP 29) (TEMP 28))
+     (MOVE (MEM (TEMP 25)) (TEMP 29))
+     (MOVE (TEMP 32) (TEMP 31))
+     (MOVE (TEMP 33) (ADD (TEMP 32) (CONST 8)))
+     (MOVE (TEMP 30) (TEMP 33))
+     (MOVE (TEMP 36) (TEMP 35))
+     (MOVE (TEMP 37) (SUB (TEMP 36) (CONST 8)))
+     (MOVE (TEMP 34) (TEMP 37))
+     (MOVE (TEMP 39) (TEMP 38))
+     (MOVE (TEMP 13) (TEMP 39))
+     (RETURN))))

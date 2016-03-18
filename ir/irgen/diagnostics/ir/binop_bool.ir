@@ -1,0 +1,28 @@
+(
+  COMPUNIT
+  binop_bool
+  (
+    FUNC
+    _Imain_p
+    (SEQ
+     (MOVE (TEMP 1) (CONST 0))
+     (MOVE (TEMP 0) (TEMP 1))
+     (MOVE (TEMP 3) (CONST 1))
+     (MOVE (TEMP 2) (TEMP 3))
+     (MOVE (TEMP 5) (CONST 1))
+     (MOVE (TEMP 4) (TEMP 5))
+     (MOVE (TEMP 7) (CONST 1))
+     (MOVE (TEMP 6) (TEMP 7))
+     (MOVE (TEMP 9) (CONST 1))
+     (MOVE (TEMP 8) (TEMP 9))
+     (MOVE (TEMP 11) (CONST 0))
+     (MOVE (TEMP 10) (TEMP 11))
+     (MOVE (TEMP 13) (CONST 1))
+     (MOVE (TEMP 12) (TEMP 13))
+     (MOVE (TEMP 15) (CONST 1))
+     (MOVE (TEMP 14) (TEMP 15))
+     (MOVE (TEMP 17) (CONST 0))
+     (MOVE (TEMP 16) (TEMP 17))
+     (MOVE (TEMP 19) (CONST 0))
+     (MOVE (TEMP 18) (TEMP 19))
+     (RETURN))))
