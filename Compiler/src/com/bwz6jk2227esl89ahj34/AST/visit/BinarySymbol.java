@@ -1,6 +1,8 @@
 package com.bwz6jk2227esl89ahj34.AST.visit;
 
 import com.bwz6jk2227esl89ahj34.AST.*;
+import com.bwz6jk2227esl89ahj34.AST.type.PrimitiveType;
+import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
 
 import java.math.BigInteger;
 import java.util.*;

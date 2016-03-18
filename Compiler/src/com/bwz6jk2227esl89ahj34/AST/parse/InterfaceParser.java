@@ -6,6 +6,9 @@
 package com.bwz6jk2227esl89ahj34.AST.parse;
 
 import com.bwz6jk2227esl89ahj34.AST.*;
+import com.bwz6jk2227esl89ahj34.AST.type.PrimitiveType;
+import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
+import com.bwz6jk2227esl89ahj34.AST.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import java_cup.runtime.Symbol;
 
@@ -383,7 +386,7 @@ class CUP$InterfaceParser$actions {
                 int tleft = CUP$InterfaceParser$stack.peek().left;
                 int tright = CUP$InterfaceParser$stack.peek().right;
                 List<VariableType> t = CUP$InterfaceParser$stack.peek().<List<VariableType>> value();
-                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, null); 
+                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, null);
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",8, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-5), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;

@@ -2,8 +2,12 @@ package com.bwz6jk2227esl89ahj34.AST.visit;
 
 import com.bwz6jk2227esl89ahj34.AST.*;
 import com.bwz6jk2227esl89ahj34.AST.parse.InterfaceParser;
-import com.bwz6jk2227esl89ahj34.Context;
-import com.bwz6jk2227esl89ahj34.TypeException;
+import com.bwz6jk2227esl89ahj34.AST.type.PrimitiveType;
+import com.bwz6jk2227esl89ahj34.AST.type.Type;
+import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
+import com.bwz6jk2227esl89ahj34.AST.type.VariableTypeList;
+import com.bwz6jk2227esl89ahj34.AST.type.Context;
+import com.bwz6jk2227esl89ahj34.AST.type.TypeException;
 
 import java.util.*;
 

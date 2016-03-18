@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34.AST;
 
+import com.bwz6jk2227esl89ahj34.AST.type.Type;
 import com.bwz6jk2227esl89ahj34.AST.visit.NodeVisitor;
 import lombok.Data;
 

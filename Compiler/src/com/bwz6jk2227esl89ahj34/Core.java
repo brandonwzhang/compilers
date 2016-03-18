@@ -4,6 +4,7 @@ import com.bwz6jk2227esl89ahj34.AST.Program;
 import com.bwz6jk2227esl89ahj34.AST.parse.Lexer;
 import com.bwz6jk2227esl89ahj34.AST.parse.Parser;
 import com.bwz6jk2227esl89ahj34.AST.parse.ParserSym;
+import com.bwz6jk2227esl89ahj34.AST.type.TypeException;
 import com.bwz6jk2227esl89ahj34.AST.visit.*;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
