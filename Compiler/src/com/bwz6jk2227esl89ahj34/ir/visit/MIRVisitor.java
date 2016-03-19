@@ -68,15 +68,20 @@ public class MIRVisitor extends IRVisitor{
             IRCJump cjump = (IRCJump) lastStatement;
             // First add false block, then true block
             List<Integer> successors = new LinkedList<>();
-            successors.add(indexOfLabel(cjump.falseLabel(), blocks));
-            successors.add(indexOfLabel(cjump.trueLabel(), blocks));
+            if (cjump.falseLabel() != null) {
+                int falseIndex = indexOfLabel(cjump.falseLabel(), blocks);
+                successors.add(falseIndex);
+            }
+            int trueIndex = indexOfLabel(cjump.trueLabel(), blocks);
+            successors.add(trueIndex);
             return successors;
         } else if (lastStatement instanceof IRJump) {
             IRJump jump = (IRJump) lastStatement;
             List<Integer> successors = new LinkedList<>();
             assert jump.target() instanceof IRName;
             String labelName = ((IRName) jump.target()).name();
-            successors.add(indexOfLabel(labelName, blocks));
+            int index = indexOfLabel(labelName, blocks);
+            successors.add(index);
             return successors;
         }
         else {
@@ -117,11 +122,9 @@ public class MIRVisitor extends IRVisitor{
     protected IRNode leave(IRNode parent, IRNode n, IRNode n_,
                            IRVisitor v_) {
         if (n instanceof IRCompUnit) {
-            System.out.println("comp");
             return n_;
         } else if (n instanceof IRSeq) {
             assert n_ instanceof IRSeq;
-            System.out.println("seq");
             List<IRStmt> flattenedResult = new LinkedList<>();
             for (IRStmt r : ((IRSeq)n_).stmts()) {
                 addStatements(flattenedResult, r);
@@ -129,12 +132,10 @@ public class MIRVisitor extends IRVisitor{
             return new IRSeq(flattenedResult);
         } else if (n instanceof IRExp) {
             assert n_ instanceof IRExp;
-            System.out.println("exp");
             assert ((IRExp)(n_)).expr() instanceof IRESeq;
             return ((IRESeq)((IRExp)(n_)).expr()).stmt();
         } else if (n instanceof IRMove) {
             assert n_ instanceof IRMove;
-            System.out.println("move");
             assert ((IRMove)(n_)).target() instanceof IRESeq;
             assert ((IRMove)(n_)).expr() instanceof IRESeq;
 
@@ -157,14 +158,12 @@ public class MIRVisitor extends IRVisitor{
                     new IRTemp(((IRTemp)n).name()));
         } else if (n instanceof IRMem) {
             assert n_ instanceof IRMem;
-            System.out.println("mem");
             assert ((IRMem)n_).expr() instanceof IRESeq;
             IRESeq casted_eseq = (IRESeq)(((IRMem)n_).expr());
             return new IRESeq(casted_eseq.stmt(), new IRMem(casted_eseq.expr()));
         } else if (n instanceof IRJump) {
             assert n_ instanceof IRJump;
             assert ((IRJump)(n_)).target() instanceof IRESeq;
-            System.out.println("jump");
             IRESeq casted_eseq = (IRESeq)(((IRJump)(n_)).target());
             List<IRStmt> lst = new LinkedList<>();
             addStatements(lst, casted_eseq.stmt());
@@ -173,7 +172,6 @@ public class MIRVisitor extends IRVisitor{
         } else if (n instanceof IRCJump) {
             assert n_ instanceof IRCJump;
             assert ((IRCJump)(n_)).expr() instanceof IRESeq;
-            System.out.println("cjump");
             IRESeq casted_eseq = (IRESeq)(((IRCJump)(n_)).expr());
             List<IRStmt> lst = new LinkedList<>();
             addStatements(lst, casted_eseq.stmt());
@@ -186,7 +184,6 @@ public class MIRVisitor extends IRVisitor{
             assert n_ instanceof IRESeq;
             IRESeq cast_n_ = (IRESeq)(n_);
             assert cast_n_.expr() instanceof IRESeq;
-            System.out.println("eseq");
             IRESeq cast_eseq = (IRESeq)(cast_n_.expr());
             List<IRStmt> lst = new LinkedList<>();
             addStatements(lst, cast_n_.stmt());
@@ -197,7 +194,6 @@ public class MIRVisitor extends IRVisitor{
             IRBinOp irb = (IRBinOp)(n_);
             assert irb.left() instanceof IRESeq;
             assert irb.right() instanceof IRESeq;
-            System.out.println("binop");
             List<IRStmt> lst = new LinkedList<>();
             addStatements(lst, ((IRESeq)(irb.left())).stmt());
             String t = getFreshVariable();
@@ -214,7 +210,6 @@ public class MIRVisitor extends IRVisitor{
 
             IRESeq eseq;
             IRTemp t;
-            System.out.println("call");
 
             assert call_n_.target() instanceof IRESeq;
             eseq = (IRESeq)(call_n_.target());
@@ -252,7 +247,6 @@ public class MIRVisitor extends IRVisitor{
 
         } else if (n instanceof IRFuncDecl) {
             assert n_ instanceof IRFuncDecl;
-            System.out.println("func decl");
             // Result of lowering all the children
             // All IRSeq's should be flattened by this point
             IRFuncDecl fd = (IRFuncDecl) n_;
@@ -287,26 +281,43 @@ public class MIRVisitor extends IRVisitor{
                 }
             }
 
-            List<IRStmt> finalStatements = reorderBlocks(0, constructFlowGraph(blocks),
-                    blocks, new HashSet<>());
+            boolean[] visited = new boolean[blocks.size()];
+            List<IRStmt> finalStatements = new LinkedList<>();
+            int nextNode = 0;
+            while (nextNode >= 0) {
+                finalStatements.addAll(reorderBlocks(nextNode, constructFlowGraph(blocks),
+                        blocks, visited));
+                nextNode = firstUnvisited(visited);
+            }
+            if (!(finalStatements.get(finalStatements.size() - 1) instanceof IRReturn)) {
+                finalStatements.add(new IRReturn());
+            }
 
             return new IRFuncDecl(fd.name(), new IRSeq(finalStatements));
-
         } else {
             return n_;
         }
     }
 
+    private int firstUnvisited(boolean[] visited) {
+        for (int i = 0; i < visited.length; i++) {
+            if (!visited[i]) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private List<IRStmt> reorderBlocks(int curNode, Map<Integer, List<Integer>> graph,
-                                       List<List<IRStmt>> blocks, Set<Integer> visited) {
-        visited.add(curNode);
+                                       List<List<IRStmt>> blocks, boolean[] visited) {
+        visited[curNode] = true;
         List<IRStmt> block = blocks.get(curNode);
         List<Integer> successors = graph.get(curNode);
         if (successors.size() == 0) {
             return block;
         } else if (successors.size() == 1) {
             int successor = successors.get(0);
-            if (visited.contains(successor)) {
+            if (visited[successor]) {
                 return block;
             }
             List<IRStmt> retBlock = new LinkedList<>(block);
@@ -325,14 +336,14 @@ public class MIRVisitor extends IRVisitor{
             assert successors.size() == 2;
             int falseNode = successors.get(0);
             int trueNode = successors.get(1);
-            if (visited.contains(falseNode) && visited.contains(trueNode)) {
+            if (visited[falseNode] && visited[trueNode]) {
                 return block;
-            } else if (visited.contains(falseNode)) {
+            } else if (visited[falseNode]) {
                 // Only add true statements
                 List<IRStmt> retBlock = new LinkedList<>(block);
                 retBlock.addAll(reorderBlocks(trueNode, graph, blocks, visited));
                 return retBlock;
-            } else if (visited.contains(trueNode)) {
+            } else if (visited[trueNode]) {
                 // Only add false statements
                 List<IRStmt> retBlock = new LinkedList<>(block);
                 retBlock.addAll(reorderBlocks(falseNode, graph, blocks, visited));

@@ -1,7 +1,9 @@
 vm/*
 .DS_Store
+*.ir
 *.mir
 *.typed
 *.parsed
 *.lexed
+*.swp
 *~

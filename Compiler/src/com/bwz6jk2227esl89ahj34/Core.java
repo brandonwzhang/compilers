@@ -372,7 +372,8 @@ public class Core {
         //System.out.println(cv.visit(root));
         //System.out.println(root);
 
+        System.out.println("====================================");
         IRSimulator sim = new IRSimulator(root);
-        long callResult = sim.call("_Imain_p", 0);
+        sim.call("_Imain_p", 0);
     }
 }
