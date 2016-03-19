@@ -1,5 +1,0 @@
-(
-  COMPUNIT
-  simple
-  (FUNC _Imain_p
-   (SEQ (MOVE (TEMP 1) (CONST 2)) (MOVE (TEMP 0) (TEMP 1)) (RETURN))))
