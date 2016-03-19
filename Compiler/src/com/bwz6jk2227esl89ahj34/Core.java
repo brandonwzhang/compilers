@@ -317,12 +317,12 @@ public class Core {
         // TODO: lower the IR (use irGen instead of mirGen)
 
         // reads Xi source file and writes an .mir file
-        mirGen(sourcePath, diagnosticPath, libPath, file);
+        irGen(sourcePath, diagnosticPath, libPath, file);
 
         Optional<FileReader> reader =
                 Util.getFileReader(
                         diagnosticPath,
-                        file.substring(0, file.length() - 2) + "mir"
+                        file.substring(0, file.length() - 2) + "ir"
                 );
         if (!reader.isPresent()) {
             return;
