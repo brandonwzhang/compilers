@@ -766,6 +766,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         } else {
             IRCJump cjump = new IRCJump(guard, trueLabelName);
             statements.add(cjump);
+            statements.add(new IRJump(new IRName(endLabelName)));
         }
 
         statements.add(trueLabel);

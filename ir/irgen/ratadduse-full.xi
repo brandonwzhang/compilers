@@ -1,3 +1,5 @@
+use io
+
 // Return the greatest common divisor of two integers
 gcd(a:int, b:int):int {
   while (a != 0) {

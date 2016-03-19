@@ -1,3 +1,5 @@
+use io
+
 main(){
 	foo()
 }
