@@ -21,7 +21,6 @@ import java_cup.runtime.Symbol;
 import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -274,24 +273,6 @@ public class Core {
     }
 
     /**
-     * Writes the given IR tree as an S-Expression to a file.
-     *
-     * diagnosticPath is the destination directory. The .xi
-     * extension will be replaced by the given extension.
-     */
-    public static void writeIRTree(IRCompUnit root,
-                                   String diagnosticPath,
-                                   String file,
-                                   String extension) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(baos);
-        root.printSExp(printer);
-        printer.flush();
-        List<String> lines = Collections.singletonList(baos.toString());
-        Util.writeHelper(file, extension, diagnosticPath, lines);
-    }
-
-    /**
      * Intermediate method for ease of testing.
      *
      * Generates the MIR of the given Xi source file.
@@ -309,7 +290,7 @@ public class Core {
         }
 
         if (Main.debugOn()) {
-            writeIRTree(root.get(), diagnosticPath, file, "mir");
+            Util.writeIRTree(root.get(), diagnosticPath, file, "mir");
         }
 
         return Optional.of(root.get());
@@ -331,7 +312,7 @@ public class Core {
         MIRVisitor mirv = new MIRVisitor();
         IRCompUnit lirRoot = (IRCompUnit) mirv.visit(mirRoot.get());
 
-        writeIRTree(lirRoot, diagnosticPath, file, "ir");
+        Util.writeIRTree(lirRoot, diagnosticPath, file, "ir");
     }
 
     /**
