@@ -10,7 +10,7 @@ public class MIRVisitor extends IRVisitor{
     private long labelCounter = 0;
 
     private String getFreshVariable() {
-        return "" + (labelCounter++);
+        return "temp" + (labelCounter++);
     }
     /**
      * Recursively traverse the IR subtree rooted at {@code n}
