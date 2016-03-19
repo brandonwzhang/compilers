@@ -15,7 +15,8 @@ ratadd(p1:int, q1:int, p2:int, q2:int) : int, int {
     return p3, q1/g*q2
 }
 
-foo() {
+main() {
     p:int, q:int = ratadd(2, 5, 1, 3)
     _, q':int = ratadd(1, 2, 1, 3)
+    print({p, q, q'})
 }

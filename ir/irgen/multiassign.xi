@@ -5,6 +5,5 @@ f(x: int): bool, int {
 foo() {
     x:int = 2;
     z:int;
-    b: bool, i:int = f(x);
-    s: int[] = "Hello";
+    b: bool, i:int = f(x)
 }
