@@ -2,6 +2,7 @@ package com.bwz6jk2227esl89ahj34.util;
 
 import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.AST.parse.ParserSym;
+import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -240,5 +241,23 @@ public class Util {
 
         filename = filename.substring(0, extensionIndex);
         return filename;
+    }
+
+    /**
+     * Writes the given IR tree as an S-Expression to a file.
+     *
+     * diagnosticPath is the destination directory. The .xi
+     * extension will be replaced by the given extension.
+     */
+    public static void writeIRTree(IRCompUnit root,
+                                   String diagnosticPath,
+                                   String file,
+                                   String extension) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(baos);
+        root.printSExp(printer);
+        printer.flush();
+        List<String> lines = Collections.singletonList(baos.toString());
+        Util.writeHelper(file, extension, diagnosticPath, lines);
     }
 }
