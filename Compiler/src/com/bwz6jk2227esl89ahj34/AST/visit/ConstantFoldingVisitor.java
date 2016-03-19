@@ -6,16 +6,25 @@ import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Stack;
 
 //TODO: remove the exceptions for over/underflow
 public class ConstantFoldingVisitor implements NodeVisitor {
-    private List<Expression> lst; //while the visitor visits, it will add to
-                                 // or retrieve from the lst an appropriate
+    private Stack<Expression> stack; //while the visitor visits, it will push to
+                                 // or pop from the stack an appropriate
                                 // expression depending on where they are in the
                                // AST
+    private Stack<Assignable> assignableStack; // while the visitor visits, it
+                                              // will push or pop to this stack
+                                     // for constant folding LHS of assignments
+
+    boolean LHS = false; // for taking care of array indexing, which
+                               // can happen at the LHS or RHS of an assignment
+
 
     public ConstantFoldingVisitor() {
-        lst = new LinkedList<>();
+        stack = new Stack<>();
+        assignableStack = new Stack<>();
     }
 
     /**
@@ -30,30 +39,50 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * if the array ref is an array literal and the index is an integer literal
      * then we can constant fold by extracting the element of the array
      *
-     * we add this element to lst
+     * we add this element to the appropriate stack
      *
      * @param node
      */
     public void visit(ArrayIndex node) {
+        // we first see if the array reference can be constant folded ...
         node.getArrayRef().accept(this);
-        //assert lst.size() == 1;
-        //System.out.println(node.getArrayRef().getType());
-        //lst.get(0).setType(node.getArrayRef().getType());
-        //System.out.println(lst);
-        node.setArrayRef(lst.get(lst.size()-1));
-        //System.out.println(node.getArrayRef().getType());
-        lst = new LinkedList<>();
+        // and set the array ref to the potentially constant folded array ref
+        if(LHS) {
+            assert !assignableStack.isEmpty();
+            node.setArrayRef((Expression)(assignableStack.pop()));
+        } else {
+            assert !stack.isEmpty();
+            node.setArrayRef(stack.pop());
+        }
 
+
+        // then we perform constant folding on the index
         node.getIndex().accept(this);
-        assert lst.size() == 1;
-        node.setIndex(lst.get(0));
-        lst = new LinkedList<>();
+        // and set the array index to the potentially constant folded index
+        assert !stack.isEmpty();
+        node.setIndex(stack.pop());
+
+        // if the array ref is an array literal and the index is an
+        // integer literal then that means this node can be constant
+        // folded in a way that we extract the element in the index of
+        // interest in the array
         if (node.getArrayRef() instanceof ArrayLiteral &&
                 node.getIndex() instanceof IntegerLiteral) {
+            // because lists in java can only handle up to an int-bounded
+            // number of elements, we convert the index to an int
+            // rather than a long
             int index = Integer.parseInt(((IntegerLiteral)(node.getIndex())).getValue());
-            lst.add(((ArrayLiteral)(node.getArrayRef())).getValues().get(index));
+            stack.push(((ArrayLiteral)(node.getArrayRef())).getValues().get(index));
         } else {
-            lst.add(node);
+            // otherwise, we just push the constant folded node onto the stack
+
+            // however, if this came from the LHS of an assignment, we
+            // push the node onto the assingable stack
+            if(LHS) {
+             assignableStack.push(node);
+            } else { // otherwise we push it onto the regular stack
+                stack.push(node);
+            }
         }
     }
 
@@ -63,15 +92,19 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(ArrayLiteral node) {
+        // we visit every element of the array, applying the visitor paradigm
+        // to each element so that each element will be constant folded
+        // and add the constant folded value onto a temp list
         List<Expression> temp = new LinkedList<>();
         for(Expression e : node.getValues()) {
             e.accept(this);
-            temp.add(lst.get(lst.size()-1));
+            assert !stack.isEmpty(); // something is on the stack at this point
+            temp.add(stack.pop());
         }
+        // after setting the value of node to temp, we push it onto
+        // the stack so it's available on the stack
         node.setValues(temp);
-        lst = new LinkedList<>();
-        lst.add(node);
-
+        stack.push(node);
     }
 
     /**
@@ -82,22 +115,37 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Assignment node) {
+        // for each variable we are assigning (element of assingables)
+        // we perform constant folding over it and add it to newAssignables
+        // aka we are applying constant folding on the LHS of assignment
         List<Assignable> assignables = node.getVariables();
         List<Assignable> newAssignables = new LinkedList<>();
+
+        // to notify everyone that we are constant folding on the LHS
+        // of an assignment...
+        LHS = true;
+
         for (Assignable a : assignables) {
-            if (a instanceof ArrayIndex) {
-                a.accept(this);
-                newAssignables.add((Assignable)(lst.get(0)));
-                lst = new LinkedList<>();
-            } else {
-                newAssignables.add(a);
-            }
+            a.accept(this);
+            assert !assignableStack.isEmpty();
+            newAssignables.add(assignableStack.pop());
         }
+        // then we set the variables to to the list of constant folded
+        // variables in newAssignables
         node.setVariables(newAssignables);
+
+        // to notify everyone that we are no longer constant folding
+        // on the LHS of an assignment...
+        LHS = false;
+
+        // then we apply constant folding on the RHS of the assignment
         node.getExpression().accept(this);
-        assert lst.size() == 1;
-        node.setExpression(lst.get(0));
-        lst = new LinkedList<>();
+        // and set the constant folded RHS as the RHS of the assignment
+        assert !stack.isEmpty();
+        node.setExpression(stack.pop());
+
+        // an assignment itself cannot be constant folded so we do not
+        // add it to the stack
     }
 
     /**
@@ -107,17 +155,26 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * visit the right expression and do the same
      *
      * then, add the result of the computation of the binary expression
-     * into lst
+     * into a stack
      * @param node
      */
     public void visit(Binary node) {
-        node.getLeft().accept(this);
-        node.setLeft(lst.get(lst.size()-1));
 
+        // we accept the left expression of the binary node
+        node.getLeft().accept(this);
+        // and set its left to its constant-folded form that should be
+        // available on the stack
+        assert stack.size() > 0;
+        node.setLeft(stack.pop());
+
+        // then we apply the exact same on the right expression of the binary
+        // node
         node.getRight().accept(this);
-        node.setRight(lst.get(lst.size()-1));
-        lst = new LinkedList<>();
-        lst.add(BinarySymbol.compute(node));
+        node.setRight(stack.pop());
+
+        // now that node has been constant-folded we compute its value
+        // and push the result onto the stack
+        stack.push(BinarySymbol.compute(node));
     }
 
     /**
@@ -141,6 +198,8 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         List<Block> blockList = new LinkedList<>();
         for(Block b : node.getBlockList()) {
             b.accept(this);
+            // if an if statement can be reduced to not having the guard
+            // then we get rid of the guard
             if (b instanceof IfStatement &&
                     ((IfStatement)b).getGuard() instanceof BooleanLiteral) {
                 boolean bool = ((BooleanLiteral)(((IfStatement)b).getGuard())).getValue();
@@ -152,7 +211,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
                         blockList.add(fb.get());
                     }
                 }
-            } else if (b instanceof WhileStatement &&
+            } else if (b instanceof WhileStatement && //likewise for whiles
                     ((WhileStatement)b).getGuard() instanceof BooleanLiteral) {
                 boolean bool =  ((BooleanLiteral)((WhileStatement)b).getGuard()).getValue();
                 if (bool) {
@@ -171,7 +230,8 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(BooleanLiteral node) {
-        lst.add(node);
+        // we make the boolean literal available by pushing it onto the stack
+        stack.push(node);
     }
 
     /**
@@ -180,8 +240,11 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(CharacterLiteral node) {
+        // we convert the node into its int value
         Expression integerLiteral = new IntegerLiteral(""+(int)(node.getValue()));
-        lst.add(integerLiteral);
+        // and make the converted form readily available by pushing it onto
+        // the stack
+        stack.push(integerLiteral);
     }
 
     /**
@@ -190,7 +253,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      *
      * then we visit the return statement
      *
-     * afterwards we empty the lst
+     * afterwards we empty the stack
      * @param node
      */
     public void visit(FunctionBlock node) {
@@ -198,8 +261,10 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         ReturnStatement returnStatement = node.getReturnStatement();
         blockList.accept(this);
         returnStatement.accept(this);
-        lst = new LinkedList<>();
+        stack = new Stack<>();
+        assignableStack = new Stack<>();
     }
+
 
     /**
      * we simplify the arguments to the function call and add them to a
@@ -207,19 +272,27 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      *
      * then we set newArguments to the arguments of node
      *
-     * afterwards, we add the node to lst
+     * afterwards, we add the node to stack
      * @param node
      */
     public void visit(FunctionCall node) {
+        // we perform constant folding on the arguments of the function call
         List<Expression> newArguments = new LinkedList<>();
         for(Expression e : node.getArguments()) {
             e.accept(this);
-            newArguments.add(lst.get(lst.size()-1));
-            lst = new LinkedList<>();
+            assert !stack.isEmpty();
+            newArguments.add(stack.pop());
         }
+        // then we set the arguments of the function call to the list of
+        // constant folded arguments
         node.setArguments(new LinkedList<>(newArguments));
-        lst = new LinkedList<>();
-        lst.add(node);
+
+        // we make the function call available on the stack
+        if (LHS) {
+            assignableStack.push(node);
+        } else {
+            stack.push(node);
+        }
     }
 
     /**
@@ -232,11 +305,17 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     /**
-     * add the Identifier to lst
+     * add the Identifier to stack
      * @param node
      */
     public void visit(Identifier node) {
-        lst.add(node);
+        // if currently on LHS of assignment then we add it onto the
+        // stack of assignables
+        if (LHS) {
+            assignableStack.push(node);
+        } else { // otherwise we make the identifier available on the stack
+            stack.push(node);
+        }
     }
 
     /**
@@ -246,22 +325,29 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(IfStatement node) {
+        // we first perform constant folding on the guard of the
+        // if statement
         node.getGuard().accept(this);
-        assert lst.size() == 1;
-        node.setGuard(lst.get(0));
-        lst = new LinkedList<>();
+        // then we set its guard to the constant folded guard
+        assert !stack.isEmpty();
+        node.setGuard(stack.pop());
+
+        // then we constant fold over the true block
         node.getTrueBlock().accept(this);
+
+        // if a false block is present, we constant fold over that as well
         if (node.getFalseBlock().isPresent()) {
             node.getFalseBlock().get().accept(this);
         }
     }
 
     /**
-     * add integer literal to lst
+     * add integer literal to stack
      * @param node
      */
     public void visit(IntegerLiteral node) {
-        lst.add(node);
+        // we make the integer literal available on the stack
+        stack.push(node);
     }
 
     /**
@@ -280,14 +366,16 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(ProcedureCall node) {
+        // we perform constant folding on the arguments of a proc call
         List<Expression> newArguments = new LinkedList<>();
         for(Expression e : node.getArguments()) {
             e.accept(this);
-            newArguments.add(lst.get(0));
-            lst = new LinkedList<>();
+            assert !stack.isEmpty();
+            newArguments.add(stack.pop());
         }
         node.setArguments(new LinkedList<>(newArguments));
-        lst = new LinkedList<>();
+        // a proc call itself is a statement so we do not need to push it
+        // onto the stack
     }
 
     /**
@@ -310,31 +398,37 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(ReturnStatement node) {
+        // we constant fold over values of the return statement
         List<Expression> returnValues = node.getValues();
         List<Expression> temp = new LinkedList<>();
         for (int i = 0; i < returnValues.size(); i++) {
             Expression expression = returnValues.get(i);
             expression.accept(this);
-            temp.add(lst.get(0));
-            lst = new LinkedList<>();
+            assert !stack.isEmpty();
+            temp.add(stack.pop());
         }
         node.setValues(temp);
     }
 
     /**
      * we convert the string literal to an int array
-     * and add the array into lst
+     * and add the array into stack
      * @param node
      */
     public void visit(StringLiteral node) {
+
+        // we first get the char array representation of the string literal
         char[] str = node.getValue().toCharArray();
+        // then we convert each char into an integer literal
         List<Expression> expressions = new LinkedList<>();
         for (int i = 0; i < str.length; i++) {
             expressions.add(new IntegerLiteral(""+(int)(str[i])));
         }
+        // we now have converted the string literal into an array literal
         Expression arr = new ArrayLiteral(expressions);
 
-        lst.add(arr);
+        // we now push this arr into the stack so it will be readily availble
+        stack.push(arr);
     }
 
     /**
@@ -344,15 +438,25 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(TypedDeclaration node) {
+        // for a typed declaration, we can perform constant folding
+        // on expressions that represent the size of a particular
+        // array
         List<Expression> newArraySizeList = new LinkedList<>();
         for(Expression e : node.getArraySizeList()) {
             e.accept(this);
-            newArraySizeList.add(lst.get(0));
-            lst = new LinkedList<>();
+            assert !stack.isEmpty();
+            newArraySizeList.add(stack.pop());
         }
         node.setArraySizeList(newArraySizeList);
-        lst = new LinkedList<>();
+
+        //TODO test
+        // then we make the typed declaration available on the stack if it
+        // is on the LHS of an assignment
+        if (LHS) {
+            assignableStack.push(node);
+        }
     }
+
 
     /**
      * for a Unary node, we count how many times the unary operation
@@ -361,48 +465,79 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Unary node) {
+
         Expression temp = node;
+        // we start unlayering the unary node until the expression contained
+        // by the Unary is no longer a Unary
+
+        // because we start out with a unary node, we keep a variable
+        // count that keeps track of how many times the unary operator
+        // is layered. count is initialized at 1 since we start with a
+        // node that is known as a Unary
         int count = 1;
+
+        //we unlayer
         while(((Unary)temp).getExpression() instanceof Unary) {
             temp = ((Unary)temp).getExpression();
             count += 1;
         }
-        Expression val = ((Unary)temp).getExpression();
-        val.accept(this);
+        // now that we unlayered to some type of value that was wrapped
+        // in (possibly many) Unarys we "simplify" the value by applying
+        // the visiting paradigm
+        ((Unary)temp).getExpression().accept(this);
+
+        //now the value we want is on the stack so we pop it and
+        //use it as needed
+
+        assert stack.size() > 0;
+        Expression val = stack.pop();
+
+        // if the number of the unary operator is an even number then
+        // the unary operators can cancel out so we can just put the
+        // value without any wrapping of the unary symbols on the stack
         if(count % 2 == 0) {
+            // however, we have to be mindful of cases in which
+            // the layering converts MIN_INT into a positive number
+            // which would be out of bounds
             if(val instanceof IntegerLiteral &&
                     ((IntegerLiteral)val).getValue()
                             .compareTo("9223372036854775808") >= 0) {
+                // in order to handle it, we use BigIntger to wrap
+                // the expression and return its overflowed long value
                 BigInteger bi = new BigInteger(((IntegerLiteral)val).getValue());
-                lst = new LinkedList<>();
-                lst.add(new IntegerLiteral(""+bi.longValue()));
-                //throw new TypeException("Number too big after constant folding performed");
-            } else {
-                //lst.add(val); val is already added so we don't need it
+                stack.push(new IntegerLiteral(""+bi.longValue()));
+            } else { // otherwise, we just push the pure form of the expression
+                    // onto the stack
+                stack.push(val);
             }
-        } else {
-            if(val instanceof IntegerLiteral) {
-                BigInteger longValue = new BigInteger(((IntegerLiteral)(lst.get(0))).getValue());
-                lst = new LinkedList<>();
+        } else { // otherwise, the number of layered unary operator is
+                // odd so we push a Unary node with just ONE unary operator
+               // of interest, as well as the value wrapped inside
+            // if val is a boolean literal then we negate its value
+            // and push it onto the stack
+            if (val instanceof BooleanLiteral) {
+                stack.push(new BooleanLiteral(!((BooleanLiteral)val).getValue()));
+            } else if (val instanceof IntegerLiteral) {
+                // if val is an integer literal then we use BigInteger to
+                // multiply it by -1 and push onto the stack the negated value
+                BigInteger longValue = new BigInteger(((IntegerLiteral)(val)).getValue());
                 longValue = longValue.multiply(new BigInteger("-1"));
-                lst.add(new IntegerLiteral(""+longValue.longValue()));
-            } else if (val instanceof BooleanLiteral){
-                lst = new LinkedList<>();
-                lst.add(new BooleanLiteral(false));
+                stack.push(new IntegerLiteral(""+longValue.longValue()));
             } else {
-                lst = new LinkedList<>();
-                lst.add(new Unary(node.getOp(), val));
+                // otherwise we push a Unary object with just a single op
+                // and the val of interest
+                stack.push(new Unary(node.getOp(), val));
             }
 
         }
     }
 
     /**
-     * nothing to do for underscore
+     * add to stack of assignables
      * @param node
      */
     public void visit(Underscore node) {
-
+      assignableStack.push(node);
     }
 
     /**
@@ -420,10 +555,10 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(WhileStatement node) {
+        // we perform constant folding on the guard of the while loop
         node.getGuard().accept(this);
-        assert lst.size() == 1;
-        node.setGuard(lst.get(0));
-        lst = new LinkedList<>();
+        assert !stack.isEmpty();
+        node.setGuard(stack.pop());
         node.getBlock().accept(this);
     }
 }
