@@ -79,7 +79,8 @@ public class MIRVisitor extends IRVisitor{
             IRCJump temp = (IRCJump)(target);
             String falseLabel = temp.falseLabel();
             for(List<IRStmt> stmt : graph) {
-                if(stmt.get(0) instanceof IRLabel){
+                if(stmt != null && stmt.size() > 0
+                        && stmt.get(0) instanceof IRLabel){
                     if(((IRLabel)(stmt.get(0))).name().equals(falseLabel))
                     {
                         return stmt;
