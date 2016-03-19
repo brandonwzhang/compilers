@@ -23,7 +23,7 @@
  *
  * See README for contributors.
  ******************************************************************************/
-package polyglot.util;
+package com.bwz6jk2227esl89ahj34.util;
 
 import java.io.Externalizable;
 import java.io.ObjectInputStream;

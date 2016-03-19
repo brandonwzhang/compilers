@@ -2,7 +2,7 @@ package com.bwz6jk2227esl89ahj34.AST.visit;
 
 import com.bwz6jk2227esl89ahj34.AST.*;
 import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
-import com.bwz6jk2227esl89ahj34.util.CodeWriterSExpPrinter;
+import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 
 import java.util.List;
 

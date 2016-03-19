@@ -24,7 +24,7 @@
  * See README for contributors.
  ******************************************************************************/
 
-package polyglot.util;
+package com.bwz6jk2227esl89ahj34.util.prettyprint;
 
 import java.io.IOException;
 
@@ -103,7 +103,7 @@ public abstract class CodeWriter implements AutoCloseable {
      *            the alternative text
      * @param altlen
      *            the length in characters that 'alt' will be treated as taking up.
-     * @see polyglot.util.CodeWriter#allowBreak
+     * @see CodeWriter#allowBreak
      */
     public abstract void unifiedBreak(int n, int level, String alt, int altlen);
 

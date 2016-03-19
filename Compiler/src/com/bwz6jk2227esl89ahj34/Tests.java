@@ -6,7 +6,7 @@ import com.bwz6jk2227esl89ahj34.AST.parse.Parser;
 import com.bwz6jk2227esl89ahj34.AST.visit.ConstantFoldingVisitor;
 import com.bwz6jk2227esl89ahj34.AST.visit.NodeVisitor;
 import com.bwz6jk2227esl89ahj34.AST.visit.PrintVisitor;
-import com.bwz6jk2227esl89ahj34.util.CodeWriterSExpPrinter;
+import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.io.ByteArrayOutputStream;

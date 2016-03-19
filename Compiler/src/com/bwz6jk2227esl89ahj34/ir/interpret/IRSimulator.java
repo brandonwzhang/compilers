@@ -15,7 +15,7 @@ import java.util.Stack;
 import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
-import polyglot.util.SerialVersionUID;
+import com.bwz6jk2227esl89ahj34.util.SerialVersionUID;
 
 /**
  * A simple IR interpreter

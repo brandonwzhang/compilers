@@ -1,7 +1,5 @@
 package com.bwz6jk2227esl89ahj34.util;
 
-import polyglot.util.SerialVersionUID;
-
 /** Exception thrown when the compiler is confused. */
 public class InternalCompilerError extends RuntimeException {
     private static final long serialVersionUID = SerialVersionUID.generate();

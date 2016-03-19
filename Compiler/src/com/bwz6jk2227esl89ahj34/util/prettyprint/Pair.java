@@ -24,7 +24,7 @@
  * See README for contributors.
  ******************************************************************************/
 
-package polyglot.util;
+package com.bwz6jk2227esl89ahj34.util.prettyprint;
 
 /** A two-element tuple.
  */

@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
-import com.bwz6jk2227esl89ahj34.util.SExpPrinter;
+import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;

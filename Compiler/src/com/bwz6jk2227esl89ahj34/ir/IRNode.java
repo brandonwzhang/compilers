@@ -4,8 +4,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import com.bwz6jk2227esl89ahj34.ir.visit.*;
-import com.bwz6jk2227esl89ahj34.util.CodeWriterSExpPrinter;
-import com.bwz6jk2227esl89ahj34.util.SExpPrinter;
+import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
+import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 
 
 /**

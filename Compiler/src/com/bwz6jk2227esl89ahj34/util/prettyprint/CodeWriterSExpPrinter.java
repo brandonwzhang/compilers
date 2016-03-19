@@ -1,13 +1,10 @@
-package com.bwz6jk2227esl89ahj34.util;
+package com.bwz6jk2227esl89ahj34.util.prettyprint;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
-
-import polyglot.util.CodeWriter;
-import polyglot.util.OptimalCodeWriter;
 
 /**
  * An {@linkplain SExpPrinter} implementation designed to print ASTs through a

@@ -24,7 +24,9 @@
  * See README for contributors.
  ******************************************************************************/
 
-package polyglot.util;
+package com.bwz6jk2227esl89ahj34.util.prettyprint;
+
+import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -153,7 +155,7 @@ public class OptimalCodeWriter extends CodeWriter {
         current.add(new AllowBreak(n, level, alt, altlen, false));
     }
 
-    /** @see polyglot.util.CodeWriter#unifiedBreak */
+    /** @see CodeWriter#unifiedBreak */
     @Override
     public void unifiedBreak(int n, int level, String alt, int altlen) {
         if (OptimalCodeWriter.showInput) {
