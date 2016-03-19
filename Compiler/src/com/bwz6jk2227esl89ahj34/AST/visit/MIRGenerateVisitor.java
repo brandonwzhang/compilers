@@ -226,6 +226,58 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 statements.add(move);
                 generatedNodes.push(new IRSeq(statements));
                 return;
+            } else if (variable instanceof ArrayIndex) {
+                // if arrayindex on LHS, we need to handle out of bounds setting
+                ((ArrayIndex) variable).getArrayRef().accept(this);
+                assert generatedNodes.peek() instanceof IRExpr;
+                IRExpr array = (IRExpr)generatedNodes.pop();
+
+                ((ArrayIndex) variable).getIndex().accept(this);
+                assert generatedNodes.peek() instanceof IRExpr;
+                IRExpr index = (IRExpr)generatedNodes.pop();
+
+                IRMem length = new IRMem(new IRBinOp(OpType.SUB, array, new IRConst(WORD_SIZE)));
+
+                // check for out of bounds index
+                IRTemp result = new IRTemp(getFreshVariable());
+                List<IRStmt> stmts = new LinkedList<>();
+                IRLabel trueLabel = new IRLabel(getFreshVariable());
+                IRLabel falseLabel = new IRLabel(getFreshVariable());
+                IRLabel exitLabel = new IRLabel(getFreshVariable());
+
+                IRCJump cjump = new IRCJump( // index < length && index >= 0
+                        new IRBinOp(OpType.AND,
+                                new IRBinOp(OpType.LT, index, length),
+                                new IRBinOp(OpType.GEQ, index, new IRConst(0))),
+                        trueLabel.name(),
+                        falseLabel.name()
+                );
+
+                // move evaluatedExpression into location
+                IRMem location = new IRMem(new IRBinOp(OpType.ADD,
+                        array,
+                        new IRBinOp(OpType.MUL, index, new IRConst(WORD_SIZE))
+                ));
+                IRSeq trueBody = new IRSeq(
+                        // get actual element
+                        new IRMove(location, evaluatedExpression),
+                        // jump to exit
+                        new IRJump(new IRName(exitLabel.name()))
+                );
+
+                IRExp outOfBoundsCall = new IRExp(new IRCall(new IRName("_I_outOfBounds_p")));
+
+                IRSeq seq = new IRSeq(
+                        cjump,
+                        trueLabel,
+                        trueBody,
+                        falseLabel,
+                        outOfBoundsCall,
+                        exitLabel
+                );
+
+                generatedNodes.push(seq);
+                return;
             }
             variable.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
@@ -261,6 +313,58 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 IRTemp temp = new IRTemp(typedDeclaration.getIdentifier().getName());
                 IRMove move = new IRMove(temp, new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i));
                 statements.add(move);
+                continue;
+            } else if (variable instanceof ArrayIndex) {
+                // if arrayindex on LHS, we need to handle out of bounds setting
+                ((ArrayIndex) variable).getArrayRef().accept(this);
+                assert generatedNodes.peek() instanceof IRExpr;
+                IRExpr array = (IRExpr)generatedNodes.pop();
+
+                ((ArrayIndex) variable).getIndex().accept(this);
+                assert generatedNodes.peek() instanceof IRExpr;
+                IRExpr index = (IRExpr)generatedNodes.pop();
+
+                IRMem length = new IRMem(new IRBinOp(OpType.SUB, array, new IRConst(WORD_SIZE)));
+
+                // check for out of bounds index
+                IRTemp result = new IRTemp(getFreshVariable());
+                List<IRStmt> stmts = new LinkedList<>();
+                IRLabel trueLabel = new IRLabel(getFreshVariable());
+                IRLabel falseLabel = new IRLabel(getFreshVariable());
+                IRLabel exitLabel = new IRLabel(getFreshVariable());
+
+                IRCJump cjump = new IRCJump( // index < length && index >= 0
+                        new IRBinOp(OpType.AND,
+                                new IRBinOp(OpType.LT, index, length),
+                                new IRBinOp(OpType.GEQ, index, new IRConst(0))),
+                        trueLabel.name(),
+                        falseLabel.name()
+                );
+
+                // move evaluatedExpression into location
+                IRMem location = new IRMem(new IRBinOp(OpType.ADD,
+                        array,
+                        new IRBinOp(OpType.MUL, index, new IRConst(WORD_SIZE))
+                ));
+                IRSeq trueBody = new IRSeq(
+                        // get actual element
+                        new IRMove(location, new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i)),
+                        // jump to exit
+                        new IRJump(new IRName(exitLabel.name()))
+                );
+
+                IRExp outOfBoundsCall = new IRExp(new IRCall(new IRName("_I_outOfBounds_p")));
+
+                IRSeq seq = new IRSeq(
+                        cjump,
+                        trueLabel,
+                        trueBody,
+                        falseLabel,
+                        outOfBoundsCall,
+                        exitLabel
+                );
+
+                generatedNodes.push(seq);
                 continue;
             }
             // We know LHS must be either identifier or array index at this point
