@@ -25,6 +25,7 @@ If we run:
 This script will look for sp/file (file should end in .xi).
 This script will write any diagnostic files at dp/file , 
 where the extension of file is modified accordingly.
+Note that 'file' can include a directory path.
 
 
 #### Advanced
