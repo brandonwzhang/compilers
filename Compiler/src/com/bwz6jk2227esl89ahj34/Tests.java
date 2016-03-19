@@ -16,12 +16,23 @@ import java.util.*;
 
 public class Tests {
 
+    /**
+     * A set of files to exclude from testing. It is assumed that entries in this
+     * set do not contain a file extension.
+     */
     public static Set<String> exclude = new HashSet<>();
 
+    /**
+     * Returns true if the given file is excluded from testing. Assumes that
+     * the given string ends in .xi
+     */
     public static boolean excluded(String file) {
         return exclude.contains(file.substring(0, file.length() - 3));
     }
 
+    /**
+     * Automated tests for interpreted the generated IR.
+     */
     public static void irRunTests() {
         System.out.println("\n================IR RUN TESTS================");
 
@@ -32,6 +43,9 @@ public class Tests {
                         "ir/irrun/diagnostics/", "ir/lib/", filename));
     }
 
+    /**
+     * Automated tests for MIR generation.
+     */
     public static void mirGenTests() {
         System.out.println("\n================MIR GEN TESTS================");
 
@@ -42,6 +56,9 @@ public class Tests {
                         "ir/irgen/diagnostics/mir/", "ir/lib/", filename));
     }
 
+    /**
+     * Automated tests for IR generation.
+     */
     public static void irGenTests() {
         System.out.println("\n================IR GEN TESTS================");
 
@@ -65,7 +82,6 @@ public class Tests {
      * Prints the result of constant folding (before IR translation)
      * on a single Xi program.
      */
-
     public static void constantFoldHelper(String filename) {
 
         Optional<FileReader> reader = Util.getFileReader("constantfold/", filename);
@@ -96,7 +112,6 @@ public class Tests {
                 .replaceAll("\\s?\\)", ")")
                 .trim());
     }
-
 
     /**
      * Automated tests for typecheck.

@@ -158,10 +158,9 @@ public class Core {
     /**
      * Typechecks the Xi file located at sourcePath + file.
      * Writes the output to diagnosticPath + file.
+     *
      * libPath is the path where the interface files (.ixi)
      * are found.
-     *
-     * Returns the typechecked program if it types.
      */
     public static void typeCheck(String sourcePath,
                                  String diagnosticPath,
@@ -185,6 +184,21 @@ public class Core {
         }
     }
 
+    /**
+     * A helper function for typechecking.
+     *
+     * Parses with the given parser. If there is a syntax error,
+     * an error message will be stored in the given list.
+     *
+     * If the program types, then it will be returned inside an Optional.
+     * If there is a semantic error, an empty Optional will be returned
+     * and an error message will be stored in the given list.
+     *
+     * @param parser a Parser object
+     * @param lines a List<String> for storing the output. Any strings that
+     *              are in here before the method call will be lost.
+     * @return an Optional that might contain the result of the parsing
+     */
     public static Optional<Program> typeCheckHelper(Parser parser,
                                                     String libPath,
                                                     List<String> lines) {
@@ -212,6 +226,10 @@ public class Core {
     /**
      * Reads in a Xi source file, typechecks it, and translates it
      * to an MIR (IR that has not been lowered).
+     *
+     * If the translation succeeds, the root of the MIR tree will be
+     * returned inside an Optional. If an error occurs (e.g. semantic
+     * error, syntax error), then an empty Optional is returned.
      */
     public static Optional<IRCompUnit> translateToMIR(
             String sourcePath,
@@ -257,6 +275,9 @@ public class Core {
 
     /**
      * Writes the given IR tree as an S-Expression to a file.
+     *
+     * diagnosticPath is the destination directory. The .xi
+     * extension will be replaced by the given extension.
      */
     public static void writeIRTree(IRCompUnit root,
                                    String diagnosticPath,
@@ -271,8 +292,11 @@ public class Core {
     }
 
     /**
-     * Generates and prints the MIR of the given Xi source file.
-     * Intermediate method for testing.
+     * Intermediate method for ease of testing.
+     *
+     * Generates the MIR of the given Xi source file.
+     * If debug mode is one, the S-Expression representation will
+     * be written to a .mir file.
      */
     public static Optional<IRCompUnit> mirGen(String sourcePath,
                              String diagnosticPath,
@@ -292,7 +316,7 @@ public class Core {
     }
 
     /**
-     * Generates and prints the IR of the given Xi source file.
+     * Generates and writes the IR of the given Xi source file.
      */
     public static void irGen(String sourcePath,
                              String diagnosticPath,
@@ -310,6 +334,10 @@ public class Core {
         writeIRTree(lirRoot, diagnosticPath, file, "ir");
     }
 
+    /**
+     * Generates and writes the IR of the given Xi source file.
+     * Runs the Xi program by interpreting the IR.
+     */
     public static void irRun(String sourcePath,
                              String diagnosticPath,
                              String libPath,
@@ -341,11 +369,10 @@ public class Core {
         IRCompUnit root = result.value();
 
         CheckCanonicalIRVisitor cv = new CheckCanonicalIRVisitor();
-        System.out.println(cv.visit(root));
-        System.out.println(root);
+        //System.out.println(cv.visit(root));
+        //System.out.println(root);
 
         IRSimulator sim = new IRSimulator(root);
         long callResult = sim.call("_Imain_p", 0);
-        System.out.println(callResult);
     }
 }
