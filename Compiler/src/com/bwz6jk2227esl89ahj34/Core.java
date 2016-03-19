@@ -350,8 +350,8 @@ public class Core {
         IRCompUnit root = result.value();
 
         CheckCanonicalIRVisitor cv = new CheckCanonicalIRVisitor();
-        //System.out.println(cv.visit(root));
-        //System.out.println(root);
+        System.out.println(cv.visit(root));
+        System.out.println(root);
 
         System.out.println("====================================");
         IRSimulator sim = new IRSimulator(root);
