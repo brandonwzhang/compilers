@@ -81,7 +81,7 @@ public class Main {
 
             //Tests.typeCheckTests();
             //Tests.constantFoldTests();
-            Tests.mirGenTests();
+            //Tests.mirGenTests();
             //Tests.irGenTests();
             //Tests.irRunTests();
         }

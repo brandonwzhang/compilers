@@ -1,6 +1,8 @@
 package com.bwz6jk2227esl89ahj34;
 
 import com.bwz6jk2227esl89ahj34.AST.Program;
+import com.bwz6jk2227esl89ahj34.AST.parse.Lexer;
+import com.bwz6jk2227esl89ahj34.AST.parse.Parser;
 import com.bwz6jk2227esl89ahj34.AST.visit.ConstantFoldingVisitor;
 import com.bwz6jk2227esl89ahj34.AST.visit.NodeVisitor;
 import com.bwz6jk2227esl89ahj34.AST.visit.PrintVisitor;
@@ -8,10 +10,9 @@ import com.bwz6jk2227esl89ahj34.util.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class Tests {
 
@@ -51,7 +52,7 @@ public class Tests {
                         "ir/irgen/diagnostics/ir/", "ir/lib/", filename));
     }
 
-    /*
+
     public static void constantFoldTests() {
         System.out.println("\n==CONSTANT FOLD TESTS==");
 
@@ -64,14 +65,19 @@ public class Tests {
      * Prints the result of constant folding (before IR translation)
      * on a single Xi program.
      */
-    /*
+
     public static void constantFoldHelper(String filename) {
 
-        Optional<Program> program =
-                Core.typeCheckHelper("constantfold/", "constantfold/", "", filename);
+        Optional<FileReader> reader = Util.getFileReader("constantfold/", filename);
+        if (!reader.isPresent()) {
+            return;
+        }
 
+        Lexer lexer = new Lexer(reader.get());
+        Parser parser = new Parser(lexer);
+        List<String> lines = new ArrayList<>();
+        Optional<Program> program = Core.typeCheckHelper(parser, "constantfold/", lines);
         if (!program.isPresent()) {
-            System.out.println("type checking failed");
             return;
         }
 
@@ -90,7 +96,7 @@ public class Tests {
                 .replaceAll("\\s?\\)", ")")
                 .trim());
     }
-    */
+
 
     /**
      * Automated tests for typecheck.
