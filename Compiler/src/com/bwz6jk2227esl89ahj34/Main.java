@@ -9,6 +9,7 @@ public class Main {
     private static String libPath = "./";
     private static boolean debug;
     private static boolean optimizations;
+    private static boolean tests;
 
     public static void main(String[] args) {
         CLI cli = new CLI();
@@ -21,6 +22,10 @@ public class Main {
                       "Turns on debug mode.",
                       Main::turnDebugOn,
                       0);
+        cli.addOption("--tests",
+                "Runs the test suite.",
+                Main::turnTestsOn,
+                0);
         cli.addOption("-sourcepath",
                 "Set the path for source files. Takes one argument.",
                 Main::setSourcePath,
@@ -67,7 +72,7 @@ public class Main {
                 0);
         cli.execute(args);
 
-        if(debug) { // put debug mode behaviors here
+        if(tests) { // put debug mode behaviors here
 
             String[] exclude = {"arrayswag", "mdarrays3"};
             Collections.addAll(Tests.exclude, exclude);
@@ -83,7 +88,7 @@ public class Main {
             //Tests.constantFoldTests();
             //Tests.mirGenTests();
             //Tests.irGenTests();
-            Tests.irRunTests();
+            //Tests.irRunTests();
         }
     }
 
@@ -132,6 +137,10 @@ public class Main {
      */
     public static void turnOptimizationsOn(String[] args) {
         optimizations = true;
+    }
+
+    public static void turnTestsOn(String[] args) {
+        tests = true;
     }
 
     public static boolean debugOn() {
