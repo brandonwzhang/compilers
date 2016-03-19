@@ -355,8 +355,9 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         if (thisFuncType.getReturnTypeList().getVariableTypeList().size() > 1) {
             node.setType(thisFuncType.getReturnTypeList());
+        } else if (thisFuncType.getReturnTypeList().getVariableTypeList().size() == 0) {
+            throw new TypeException("Procedure calls cannot be used as an expression", id.getRow(), id.getCol());
         } else {
-            assert thisFuncType.getReturnTypeList().getVariableTypeList().size() == 1;
             node.setType(thisFuncType.getReturnTypeList().getVariableTypeList().get(0));
         }
     }
