@@ -214,7 +214,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         List<Expression> newArguments = new LinkedList<>();
         for(Expression e : node.getArguments()) {
             e.accept(this);
-            newArguments.add(lst.get(0));
+            newArguments.add(lst.get(lst.size()-1));
             lst = new LinkedList<>();
         }
         node.setArguments(new LinkedList<>(newArguments));
