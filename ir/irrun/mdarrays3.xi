@@ -1,6 +1,5 @@
 use io
 
-
 main() {
     a: int[5][2][3]
     b: int[2]
