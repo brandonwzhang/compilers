@@ -10,6 +10,7 @@ import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRLexer;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRParser;
+import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRConstantFoldingVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRVisitor;
@@ -338,6 +339,11 @@ public class Core {
         }
 
         IRCompUnit root = result.value();
+
+        CheckCanonicalIRVisitor cv = new CheckCanonicalIRVisitor();
+        System.out.println(cv.visit(root));
+        System.out.println(root);
+
         IRSimulator sim = new IRSimulator(root);
         long callResult = sim.call("_Imain_p", 0);
         System.out.println(callResult);

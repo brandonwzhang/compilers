@@ -10,7 +10,7 @@ public class MIRVisitor extends IRVisitor{
     private long labelCounter = 0;
 
     private String getFreshVariable() {
-        return "temp" + (labelCounter++);
+        return "temp_" + (labelCounter++);
     }
     /**
      * Recursively traverse the IR subtree rooted at {@code n}
@@ -154,7 +154,7 @@ public class MIRVisitor extends IRVisitor{
             return new IRESeq(new IRSeq(new LinkedList<>()), (IRName)n);
         } else if (n instanceof IRTemp) {
             return new IRESeq(new IRSeq(new LinkedList<>()),
-                    new IRTemp(getFreshVariable()));
+                    new IRTemp(((IRTemp)n).name()));
         } else if (n instanceof IRMem) {
             assert n_ instanceof IRMem;
             System.out.println("mem");
@@ -215,8 +215,10 @@ public class MIRVisitor extends IRVisitor{
             IRESeq eseq;
             IRTemp t;
             System.out.println("call");
+
             assert call_n_.target() instanceof IRESeq;
             eseq = (IRESeq)(call_n_.target());
+            IRESeq og =  (IRESeq)(call_n_.target());
             addStatements(stmtList, eseq.stmt());
             t = new IRTemp(getFreshVariable());
             addStatements(stmtList, new IRMove(t, eseq.expr()));
@@ -224,7 +226,7 @@ public class MIRVisitor extends IRVisitor{
 
             for (IRExpr e : call_n_.args()) {
                 assert e instanceof IRESeq;
-                eseq = (IRESeq)(e);
+                eseq = (IRESeq) (e);
                 addStatements(stmtList, eseq.stmt());
                 t = new IRTemp(getFreshVariable());
                 addStatements(stmtList, new IRMove(t, eseq.expr()));
@@ -234,11 +236,20 @@ public class MIRVisitor extends IRVisitor{
             t = new IRTemp(getFreshVariable());
             assert !tempList.isEmpty();
             IRExpr target = tempList.remove(0);
-            addStatements(stmtList, new IRExp(new IRCall(target, tempList)));
-            addStatements(stmtList, new IRMove(t, new IRTemp(Configuration.ABSTRACT_RET_PREFIX + 0)));
-            //addStatements(stmtList,
-            //        new IRMove(t , new IRCall(target, tempList)));
+            //addStatements(stmtList, new IRExp(new IRCall(target, tempList)));
+            //addStatements(stmtList, new IRMove(t, new IRTemp(Configuration.ABSTRACT_RET_PREFIX + 0)));
+            if(og.expr() instanceof IRName) {
+                addStatements(stmtList,
+                        new IRMove(t, new IRCall((IRName)(og.expr()), tempList)));
+            } else {
+                addStatements(stmtList,
+                        new IRMove(t, new IRCall(target, tempList)));
+            }
             return new IRESeq(new IRSeq(stmtList), t);
+
+
+
+
         } else if (n instanceof IRFuncDecl) {
             assert n_ instanceof IRFuncDecl;
             System.out.println("func decl");
