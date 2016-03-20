@@ -69,10 +69,7 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(FunctionBlock node) {
-        printer.startList();
-        node.getBlockList().accept(this);
-        node.getReturnStatement().accept(this);
-        printer.endList();
+        //we killed it
     }
 
     public void visit(FunctionCall node) {
@@ -104,7 +101,7 @@ public class PrintVisitor implements NodeVisitor {
             printType(t);
         }
         printer.endList();
-        node.getMethodBlock().accept(this);
+        node.getBlockList().accept(this);
         printer.endList();
     }
 

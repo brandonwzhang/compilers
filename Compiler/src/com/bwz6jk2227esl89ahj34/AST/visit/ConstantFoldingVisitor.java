@@ -267,21 +267,11 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     /**
-     * for the function block, we first visit the block list
-     * that is contained in the function block
-     *
-     * then we visit the return statement
-     *
-     * afterwards we empty the stack
+     * empty because we killed it
      * @param node
      */
     public void visit(FunctionBlock node) {
-        BlockList blockList = node.getBlockList();
-        ReturnStatement returnStatement = node.getReturnStatement();
-        blockList.accept(this);
-        returnStatement.accept(this);
-        stack = new Stack<>();
-        assignableStack = new Stack<>();
+
     }
 
 
@@ -319,7 +309,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(FunctionDeclaration node) {
-        MethodBlock methodBlock = node.getMethodBlock();
+        BlockList methodBlock = node.getBlockList();
         methodBlock.accept(this);
     }
 
