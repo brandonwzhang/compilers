@@ -19,5 +19,5 @@ main(args: int[][]) {
 		return
 	}
 
-	println(unpraserInt(fib(value)))
+	println(unparseInt(fib(value)))
 }
