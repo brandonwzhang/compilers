@@ -112,8 +112,12 @@ public class IRFuncDecl extends IRNode {
             successors.add(index);
             return successors;
         }
-        else {
+        else if (lastStatement instanceof IRReturn){
             return new LinkedList<>();
+        } else {
+            List<Integer> successors = new LinkedList<>();
+            successors.add(i + 1);
+            return successors;
         }
 
     }
@@ -228,14 +232,11 @@ public class IRFuncDecl extends IRNode {
             }
         }
 
-        boolean[] visited = new boolean[blocks.size()];
         List<IRStmt> finalStatements = new LinkedList<>();
-        int nextNode = 0;
-        while (nextNode >= 0) {
-            finalStatements.addAll(reorderBlocks(nextNode, constructFlowGraph(blocks),
-                    blocks, visited));
-            nextNode = firstUnvisited(visited);
-        }
+        finalStatements.addAll(reorderBlocks(0, constructFlowGraph(blocks),
+                blocks, new boolean[blocks.size()]));
+
+        // Last statement has to be return
         if (!(finalStatements.get(finalStatements.size() - 1) instanceof IRReturn)) {
             finalStatements.add(new IRReturn());
         }
