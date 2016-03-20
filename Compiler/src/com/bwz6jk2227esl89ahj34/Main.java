@@ -84,7 +84,7 @@ public class Main {
                 e.printStackTrace();
             }
 
-            //Tests.typeCheckTests();
+            Tests.typeCheckTests();
             //Tests.constantFoldTests();
             //Tests.mirGenTests();
             //Tests.irGenTests();

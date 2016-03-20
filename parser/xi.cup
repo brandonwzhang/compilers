@@ -85,6 +85,7 @@ nonterminal WhileStatement while_statement;
 nonterminal ReturnStatement return_statement;
 nonterminal Block block;
 nonterminal BlockList block_list;
+nonterminal BlockList block_scope;
 nonterminal Statement statement;
 nonterminal Statement statement_no_semicolon;
 
@@ -261,7 +262,7 @@ statement_no_semicolon ::= if_statement:s {: RESULT = s; RESULT.setLocation(s); 
                          | procedure_call:pc {: RESULT = pc; RESULT.setLocation(pc); :}
                          | typed_declaration:td {: RESULT = td; RESULT.setLocation(td); :}
                          | assignment:a {: RESULT = a; RESULT.setLocation(a); :}
-                         | return_statement:r {: RESULT = r; RESULT.setLocation(r); :} 
+                         | return_statement:r {: RESULT = r; RESULT.setLocation(r); :}
                          ;
 
 //this should be okay since semicolon doesn't actually matter
@@ -269,7 +270,7 @@ statement ::= statement_no_semicolon:s {: RESULT = s; RESULT.setLocation(s); :}
             | statement_no_semicolon:s SEMICOLON {: RESULT = s; RESULT.setLocation(s); :}
             ;
 
-block ::= OPEN_BRACE block_list:bl CLOSE_BRACE  {: RESULT = bl; RESULT.setLocation(bl); :}
+block ::= block_scope:bl {: RESULT = bl; RESULT.setLocation(bl); :}
         | statement:s {: RESULT = s; RESULT.setLocation(s); :}
         ;
 
@@ -277,6 +278,9 @@ block_list ::= block:b block_list:bl {: bl.getBlockList().add(0, b); RESULT = bl
              | RETURN {: List<Block> bl = new LinkedList<>(); bl.add(0,new ReturnStatement(new LinkedList<>())); RESULT = new BlockList(bl); :}
              | empty  {: List<Block> bl = new LinkedList<>(); RESULT = new BlockList(bl); :}
              ;
+
+block_scope ::= OPEN_BRACE block_list:bl CLOSE_BRACE {: RESULT = bl; RESULT.setLocation(bl); :}
+              ;
 
 function_declaration_return_types ::= var_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :}
        | var_type:t  {: List<VariableType> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; :}
