@@ -570,33 +570,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
     // not done
     public void visit(FunctionBlock node) {
-        List<Block> blockList = node.getBlockList().getBlockList();
-        ReturnStatement returnStatement = node.getReturnStatement();
-        List<Expression> returnValues = returnStatement.getValues();
-        List<IRStmt> stmtList = new ArrayList<>();
 
-        for (Block block : blockList) {
-            if (block instanceof TypedDeclaration) {
-                if (((TypedDeclaration) block).getArraySizeList().size() == 0) {
-                    continue;
-                }
-            }
-            block.accept(this);
-            assert generatedNodes.peek() instanceof IRStmt;
-            stmtList.add((IRStmt) generatedNodes.pop());
-        }
-
-        for (int i = 0; i < returnValues.size(); i++) {
-            returnValues.get(i).accept(this);
-            assert generatedNodes.peek() instanceof IRExpr;
-            IRExpr expr = (IRExpr) generatedNodes.pop();
-            IRExpr target = new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i);
-            stmtList.add(new IRMove(target, expr));
-        }
-
-        stmtList.add(new IRReturn());
-        IRStmt body = new IRSeq(stmtList);
-        generatedNodes.push(body);
     }
 
     public void visit(FunctionCall node) {
@@ -686,7 +660,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(FunctionDeclaration node) {
-        node.getMethodBlock().accept(this);
+        node.getBlockList().accept(this);
         assert generatedNodes.peek() instanceof IRSeq;
         IRSeq body = (IRSeq) generatedNodes.pop();
         List<IRStmt> fullBody = new ArrayList<>();
