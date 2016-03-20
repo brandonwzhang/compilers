@@ -2,6 +2,7 @@ package com.bwz6jk2227esl89ahj34.ir;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 
 import com.bwz6jk2227esl89ahj34.ir.visit.*;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
@@ -21,6 +22,8 @@ public abstract class IRNode {
     public IRNode visitChildren(IRVisitor v) {
         return this;
     }
+
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) { return n_; }
 
     public <T> T aggregateChildren(AggregateVisitor<T> v) {
         return v.unit();
@@ -64,5 +67,16 @@ public abstract class IRNode {
             printSExp(sp);
         }
         return sw.toString();
+    }
+
+    public void addStatements(List<IRStmt> lst, IRStmt stmt) {
+        if(stmt instanceof IRSeq) {
+            IRSeq seq = (IRSeq)(stmt);
+            for (IRStmt s : seq.stmts()) {
+                lst.add(s);
+            }
+        } else {
+            lst.add(stmt);
+        }
     }
 }

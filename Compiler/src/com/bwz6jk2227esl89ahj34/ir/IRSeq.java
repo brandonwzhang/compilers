@@ -2,6 +2,7 @@ package com.bwz6jk2227esl89ahj34.ir;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
@@ -90,5 +91,15 @@ public class IRSeq extends IRStmt {
         for (IRStmt stmt : stmts)
             stmt.printSExp(p);
         p.endList();
+    }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        assert n_ instanceof IRSeq;
+        List<IRStmt> flattenedResult = new LinkedList<>();
+        for (IRStmt r : ((IRSeq)n_).stmts()) {
+            addStatements(flattenedResult, r);
+        }
+        return new IRSeq(flattenedResult);
     }
 }

@@ -1,9 +1,12 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
+import com.bwz6jk2227esl89ahj34.ir.visit.MIRVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
+
+import java.util.*;
 
 /** An IR function declaration */
 public class IRFuncDecl extends IRNode {
@@ -72,5 +75,170 @@ public class IRFuncDecl extends IRNode {
         p.printAtom(name);
         body.printSExp(p);
         p.endList();
+    }
+
+    public int indexOfLabel(String labelName, List<List<IRStmt>> blocks) {
+        for (int i = 0; i < blocks.size(); i++) {
+            List<IRStmt> block = blocks.get(i);
+            if(block.get(0) instanceof IRLabel &&
+                    ((IRLabel)(block.get(0))).name().equals(labelName)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public List<Integer> getSuccessors(int i, List<List<IRStmt>> blocks) {
+        List<IRStmt> block = blocks.get(i);
+        assert block.size() > 0;
+        IRStmt lastStatement = block.get(block.size() - 1);
+        if (lastStatement instanceof IRCJump) {
+            IRCJump cjump = (IRCJump) lastStatement;
+            // First add false block, then true block
+            List<Integer> successors = new LinkedList<>();
+            if (cjump.falseLabel() != null) {
+                int falseIndex = indexOfLabel(cjump.falseLabel(), blocks);
+                successors.add(falseIndex);
+            }
+            int trueIndex = indexOfLabel(cjump.trueLabel(), blocks);
+            successors.add(trueIndex);
+            return successors;
+        } else if (lastStatement instanceof IRJump) {
+            IRJump jump = (IRJump) lastStatement;
+            List<Integer> successors = new LinkedList<>();
+            assert jump.target() instanceof IRName;
+            String labelName = ((IRName) jump.target()).name();
+            int index = indexOfLabel(labelName, blocks);
+            successors.add(index);
+            return successors;
+        }
+        else {
+            return new LinkedList<>();
+        }
+
+    }
+
+    public Map<Integer, List<Integer>> constructFlowGraph(List<List<IRStmt>> blocks) {
+        Map<Integer, List<Integer>> graph = new HashMap<>();
+        for (int i = 0; i < blocks.size(); i++) {
+            graph.put(i, getSuccessors(i, blocks));
+        }
+        return graph;
+    }
+
+    private int firstUnvisited(boolean[] visited) {
+        for (int i = 0; i < visited.length; i++) {
+            if (!visited[i]) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private List<IRStmt> reorderBlocks(int curNode, Map<Integer, List<Integer>> graph,
+                                       List<List<IRStmt>> blocks, boolean[] visited) {
+        visited[curNode] = true;
+        List<IRStmt> block = blocks.get(curNode);
+        List<Integer> successors = graph.get(curNode);
+        if (successors.size() == 0) {
+            return block;
+        } else if (successors.size() == 1) {
+            int successor = successors.get(0);
+            if (visited[successor]) {
+                return block;
+            }
+            List<IRStmt> retBlock = new LinkedList<>(block);
+            retBlock.addAll(reorderBlocks(successors.get(0), graph, blocks, visited));
+            return retBlock;
+        } else {
+            IRStmt lastStatement = block.get(block.size() - 1);
+            // We have a CJump to handle
+            assert lastStatement instanceof IRCJump;
+            // Lower the CJump
+            IRCJump mirCJump = (IRCJump) lastStatement;
+            IRCJump canonicalCJump = new IRCJump(mirCJump.expr(), mirCJump.trueLabel());
+            block.remove(block.size() - 1);
+            block.add(canonicalCJump);
+
+            assert successors.size() == 2;
+            int falseNode = successors.get(0);
+            int trueNode = successors.get(1);
+            if (visited[falseNode] && visited[trueNode]) {
+                return block;
+            } else if (visited[falseNode]) {
+                // Only add true statements
+                List<IRStmt> retBlock = new LinkedList<>(block);
+                retBlock.addAll(reorderBlocks(trueNode, graph, blocks, visited));
+                return retBlock;
+            } else if (visited[trueNode]) {
+                // Only add false statements
+                List<IRStmt> retBlock = new LinkedList<>(block);
+                retBlock.addAll(reorderBlocks(falseNode, graph, blocks, visited));
+                return retBlock;
+            }
+            List<IRStmt> falseBlock = reorderBlocks(falseNode, graph, blocks, visited);
+            List<IRStmt> trueBlock = reorderBlocks(trueNode, graph, blocks, visited);
+            IRStmt lastFalseStatement = falseBlock.get(falseBlock.size() - 1);
+            if (!(lastFalseStatement instanceof IRJump)) {
+                String exitLabelName = MIRVisitor.getFreshVariable();
+                falseBlock.add(new IRJump(new IRName(exitLabelName)));
+                trueBlock.add(new IRLabel(exitLabelName));
+            }
+            List<IRStmt> retBlock = new LinkedList<>(block);
+            retBlock.addAll(falseBlock);
+            retBlock.addAll(trueBlock);
+            return retBlock;
+        }
+    }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        assert n_ instanceof IRFuncDecl;
+        // Result of lowering all the children
+        // All IRSeq's should be flattened by this point
+        IRFuncDecl fd = (IRFuncDecl) n_;
+        List<IRStmt> stmts = ((IRSeq)(fd.body())).stmts();
+        // Holds the basic blocks of the program
+        // Split up by "leader instructions" (jump target, after jump, first
+        // instruction in the program)
+        List<List<IRStmt>> blocks = new LinkedList<>();
+        List<IRStmt> temp = new LinkedList<>();
+        for(IRStmt stmt : stmts) {
+            if (stmt instanceof IRLabel) {
+                // We encountered beginning of new block
+                blocks.add(new LinkedList<>(temp));
+                temp = new LinkedList<>();
+            }
+            temp.add(stmt);
+            if(stmt instanceof IRCJump || stmt instanceof IRJump ||
+                    stmt instanceof IRReturn) {
+                // We encountered end of block
+                blocks.add(new LinkedList<>(temp));
+                temp = new LinkedList<>();
+            }
+        }
+
+        // First, clear out all of the empty blocks (in case a label directly
+        // follows some sort of jump)
+        Iterator<List<IRStmt>> it = blocks.iterator();
+        while (it.hasNext()) {
+            List<IRStmt> block = it.next();
+            if (block.size() == 0) {
+                it.remove();
+            }
+        }
+
+        boolean[] visited = new boolean[blocks.size()];
+        List<IRStmt> finalStatements = new LinkedList<>();
+        int nextNode = 0;
+        while (nextNode >= 0) {
+            finalStatements.addAll(reorderBlocks(nextNode, constructFlowGraph(blocks),
+                    blocks, visited));
+            nextNode = firstUnvisited(visited);
+        }
+        if (!(finalStatements.get(finalStatements.size() - 1) instanceof IRReturn)) {
+            finalStatements.add(new IRReturn());
+        }
+        return new IRFuncDecl(fd.name(), new IRSeq(finalStatements));
     }
 }

@@ -1,6 +1,9 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
+import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
+
+import java.util.LinkedList;
 
 /**
  * An intermediate representation for a 64-bit integer constant.
@@ -45,5 +48,10 @@ public class IRConst extends IRExpr {
         p.printAtom("CONST");
         p.printAtom(String.valueOf(value));
         p.endList();
+    }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        return new IRESeq(new IRSeq(new LinkedList<>()), (IRConst)n);
     }
 }

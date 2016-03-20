@@ -5,6 +5,9 @@ import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * An intermediate representation for a conditional transfer of control
  * CJUMP(expr, trueLabel, falseLabel)
@@ -97,5 +100,18 @@ public class IRCJump extends IRStmt {
         p.printAtom(trueLabel);
         if (hasFalseLabel()) p.printAtom(falseLabel);
         p.endList();
+    }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        assert n_ instanceof IRCJump;
+        assert ((IRCJump)(n_)).expr() instanceof IRESeq;
+        IRESeq casted_eseq = (IRESeq)(((IRCJump)(n_)).expr());
+        List<IRStmt> lst = new LinkedList<>();
+        addStatements(lst, casted_eseq.stmt());
+        addStatements(lst, new IRCJump(casted_eseq.expr(),
+                ((IRCJump)(n_)).trueLabel(),
+                ((IRCJump)(n_)).falseLabel()));
+        return new IRSeq(lst);
     }
 }

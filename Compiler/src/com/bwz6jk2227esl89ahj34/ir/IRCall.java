@@ -2,8 +2,10 @@ package com.bwz6jk2227esl89ahj34.ir;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
+import com.bwz6jk2227esl89ahj34.ir.visit.MIRVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
@@ -99,5 +101,45 @@ public class IRCall extends IRExpr {
         for (IRExpr arg : args)
             arg.printSExp(p);
         p.endList();
+    }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        assert n_ instanceof IRCall;
+        IRCall call_n_ = (IRCall)(n_);
+        List<IRStmt> stmtList = new LinkedList<>();
+        List<IRExpr> tempList = new LinkedList<>();
+
+        IRESeq eseq;
+        IRTemp t;
+
+        assert call_n_.target() instanceof IRESeq;
+        eseq = (IRESeq)(call_n_.target());
+        IRESeq og =  (IRESeq)(call_n_.target());
+        addStatements(stmtList, eseq.stmt());
+        t = new IRTemp(MIRVisitor.getFreshVariable());
+        addStatements(stmtList, new IRMove(t, eseq.expr()));
+        tempList.add(t);
+
+        for (IRExpr e : call_n_.args()) {
+            assert e instanceof IRESeq;
+            eseq = (IRESeq) (e);
+            addStatements(stmtList, eseq.stmt());
+            t = new IRTemp(MIRVisitor.getFreshVariable());
+            addStatements(stmtList, new IRMove(t, eseq.expr()));
+            tempList.add(t);
+        }
+
+        t = new IRTemp(MIRVisitor.getFreshVariable());
+        assert !tempList.isEmpty();
+        IRExpr target = tempList.remove(0);
+        if(og.expr() instanceof IRName) {
+            addStatements(stmtList,
+                    new IRMove(t, new IRCall((IRName)(og.expr()), tempList)));
+        } else {
+            addStatements(stmtList,
+                    new IRMove(t, new IRCall(target, tempList)));
+        }
+        return new IRESeq(new IRSeq(stmtList), t);
     }
 }

@@ -1,6 +1,9 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
+import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
+
+import java.util.LinkedList;
 
 /**
  * An intermediate representation for a temporary register
@@ -40,5 +43,11 @@ public class IRTemp extends IRExpr {
         p.printAtom("TEMP");
         p.printAtom(name);
         p.endList();
+    }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        return new IRESeq(new IRSeq(new LinkedList<>()),
+                new IRTemp(((IRTemp)n).name()));
     }
 }

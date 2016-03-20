@@ -86,4 +86,12 @@ public class IRMem extends IRExpr {
         expr.printSExp(p);
         p.endList();
     }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        assert n_ instanceof IRMem;
+        assert ((IRMem)n_).expr() instanceof IRESeq;
+        IRESeq casted_eseq = (IRESeq)(((IRMem)n_).expr());
+        return new IRESeq(casted_eseq.stmt(), new IRMem(casted_eseq.expr()));
+    }
 }

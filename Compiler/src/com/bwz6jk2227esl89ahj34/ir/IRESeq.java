@@ -5,6 +5,9 @@ import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * An intermediate representation for an expression evaluated under side effects
  * ESEQ(stmt, expr)
@@ -76,5 +79,17 @@ public class IRESeq extends IRExpr {
         stmt.printSExp(p);
         expr.printSExp(p);
         p.endList();
+    }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        assert n_ instanceof IRESeq;
+        IRESeq cast_n_ = (IRESeq)(n_);
+        assert cast_n_.expr() instanceof IRESeq;
+        IRESeq cast_eseq = (IRESeq)(cast_n_.expr());
+        List<IRStmt> lst = new LinkedList<>();
+        addStatements(lst, cast_n_.stmt());
+        addStatements(lst, cast_eseq.stmt());
+        return new IRESeq(new IRSeq(lst), cast_eseq.expr());
     }
 }

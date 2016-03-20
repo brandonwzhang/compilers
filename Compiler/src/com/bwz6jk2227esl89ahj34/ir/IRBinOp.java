@@ -1,10 +1,14 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
 import com.bwz6jk2227esl89ahj34.ir.visit.CheckConstFoldedIRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.MIRVisitor;
 import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * An intermediate representation for a binary operation
@@ -130,6 +134,23 @@ public class IRBinOp extends IRExpr {
         left.printSExp(p);
         right.printSExp(p);
         p.endList();
+    }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        assert n_ instanceof IRBinOp;
+        IRBinOp irb = (IRBinOp)(n_);
+        assert irb.left() instanceof IRESeq;
+        assert irb.right() instanceof IRESeq;
+        List<IRStmt> lst = new LinkedList<>();
+        addStatements(lst, ((IRESeq)(irb.left())).stmt());
+        String t = MIRVisitor.getFreshVariable();
+        addStatements(lst,
+                new IRMove(new IRTemp(t), ((IRESeq)(irb.left())).expr()));
+        addStatements(lst, ((IRESeq)(irb.right())).stmt());
+        return new IRESeq(new IRSeq(lst),
+                new IRBinOp(irb.opType(), new IRTemp(t),
+                        ((IRESeq)(irb.right())).expr()));
     }
 
 }

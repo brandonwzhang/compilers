@@ -87,4 +87,9 @@ public class IRCompUnit extends IRNode {
             func.printSExp(p);
         p.endList();
     }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+      return n_;
+    }
 }

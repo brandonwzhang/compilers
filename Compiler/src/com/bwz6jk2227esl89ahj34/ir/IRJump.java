@@ -4,6 +4,9 @@ import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * An intermediate representation for a transfer of control
  */
@@ -57,5 +60,16 @@ public class IRJump extends IRStmt {
         p.printAtom("JUMP");
         target.printSExp(p);
         p.endList();
+    }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        assert n_ instanceof IRJump;
+        assert ((IRJump)(n_)).target() instanceof IRESeq;
+        IRESeq casted_eseq = (IRESeq)(((IRJump)(n_)).target());
+        List<IRStmt> lst = new LinkedList<>();
+        addStatements(lst, casted_eseq.stmt());
+        addStatements(lst, new IRJump(casted_eseq.expr()));
+        return new IRSeq(lst);
     }
 }

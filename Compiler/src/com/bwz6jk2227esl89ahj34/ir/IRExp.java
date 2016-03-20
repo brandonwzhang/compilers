@@ -60,4 +60,11 @@ public class IRExp extends IRStmt {
         expr.printSExp(p);
         p.endList();
     }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        assert n_ instanceof IRExp;
+        assert ((IRExp)(n_)).expr() instanceof IRESeq;
+        return ((IRESeq)((IRExp)(n_)).expr()).stmt();
+    }
 }

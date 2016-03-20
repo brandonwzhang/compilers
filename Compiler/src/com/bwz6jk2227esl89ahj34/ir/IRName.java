@@ -1,6 +1,9 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
+import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
+
+import java.util.LinkedList;
 
 /**
  * An intermediate representation for named memory address
@@ -40,5 +43,10 @@ public class IRName extends IRExpr {
         p.printAtom("NAME");
         p.printAtom(name);
         p.endList();
+    }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        return new IRESeq(new IRSeq(new LinkedList<>()), (IRName)n);
     }
 }
