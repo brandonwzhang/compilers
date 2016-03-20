@@ -59,8 +59,16 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         // then we perform constant folding on the index
         node.getIndex().accept(this);
         // and set the array index to the potentially constant folded index
-        assert !stack.isEmpty();
-        node.setIndex(stack.pop());
+
+        if(LHS && ! (node.getIndex() instanceof Binary)
+                && !(node.getIndex() instanceof IntegerLiteral)
+                && !(node.getIndex() instanceof CharacterLiteral)) {
+            assert !assignableStack.isEmpty();
+            node.setIndex((Expression)(assignableStack.pop()));
+        } else {
+            assert !stack.isEmpty();
+            node.setIndex(stack.pop());
+        }
 
         // if the array ref is an array literal and the index is an
         // integer literal then that means this node can be constant
@@ -164,17 +172,30 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         node.getLeft().accept(this);
         // and set its left to its constant-folded form that should be
         // available on the stack
-        assert stack.size() > 0;
-        node.setLeft(stack.pop());
+        if (node.getLeft() instanceof Identifier && LHS) {
+            assert !assignableStack.isEmpty();
+            node.setLeft((Expression)(assignableStack.pop()));
+        } else {
+            assert !stack.isEmpty();
+            node.setLeft(stack.pop());
+        }
 
         // then we apply the exact same on the right expression of the binary
         // node
         node.getRight().accept(this);
-        node.setRight(stack.pop());
+        if (node.getRight() instanceof Identifier && LHS) {
+            assert !assignableStack.isEmpty();
+            node.setRight((Expression)(assignableStack.pop()));
+        } else {
+            assert !stack.isEmpty();
+            node.setRight(stack.pop());
+        }
 
         // now that node has been constant-folded we compute its value
         // and push the result onto the stack
+
         stack.push(BinarySymbol.compute(node));
+
     }
 
     /**

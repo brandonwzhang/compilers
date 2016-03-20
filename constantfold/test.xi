@@ -1,3 +1,16 @@
+arryLiteralIndexTest() {
+  x:int[] = {1,2,3}
+  x[x[1]] = 1
+  x[1] = 10
+  x[1+1] = 20
+  y:int = 1
+  x[y] = 2;
+  x[y-1+1] = 3
+  x[complicatedComboFunction()] = 1
+  x[dummyFunction(1,2,3)] = 1
+  returnArrayLiteral(1,2+1,3)[1] = 1  
+}
+
 andyTest() {
   x:int = -1 
   y:int = -x
@@ -64,6 +77,22 @@ unaryNegationBool4() : bool {
   return !!!!true
 }
 
+unaryNegationBool5() : bool {
+  return !false
+}
+
+unaryNegationBool6() : bool {
+  return !!false
+}
+
+unaryNegationBool7() : bool {
+  return !!!false
+}
+
+unaryNegationBool8() : bool {
+  return !!!!false
+}
+
 unaryNegationInt() : int {
   return -1 
 }
@@ -126,9 +155,8 @@ complicatedComboFunction() : int {
   return 1 % 6 
 }
 
-arryLiteralIndexTest() {
-  x:int[] = {1,2,3}
-  x[1+1] = 20
+returnArrayLiteral(x:int, y:int, z:int) : int[] {
+  return {1,2,3}
 }
 
 dummyFunction(x:int, y:int, z:int) : int {
