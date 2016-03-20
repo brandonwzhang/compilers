@@ -4,7 +4,7 @@ returnOne():int{
 	return 1
 }
 
-main(){
+main(args:int[][]) {
 	x:int = returnOne() + 2
     print({x});
 }

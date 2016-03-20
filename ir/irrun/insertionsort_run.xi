@@ -17,7 +17,7 @@ sort(a: int[]) {
   }
 }
 
-main() {
+main(args:int[][]) {
   sortme: int[] = {101,100,104,103,102}  //edhgf
   metoo: int[] = "fadbgce"
   reverse: int[] = "ponmlkjih"

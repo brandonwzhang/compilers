@@ -1,7 +1,7 @@
 
 use io
 
-main() {
+main(args:int[][]) {
 	x: int = 0
 	if (1 == 1) {
 		if(2 == 2) {

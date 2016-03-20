@@ -17,7 +17,7 @@ sort(a: int[]) {
   }
 }
 
-main() {
+main(args:int[][]) {
   sortme: int[] = "hello"
   metoo: int[] = "dbcfaeg"
   sort(sortme)

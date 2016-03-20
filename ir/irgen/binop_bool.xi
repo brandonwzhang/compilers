@@ -1,4 +1,4 @@
-main(){
+main(args:int[][]) {
 	x1:bool = true == false
 	x2:bool = true != false
 	x30:bool = 3 == 3

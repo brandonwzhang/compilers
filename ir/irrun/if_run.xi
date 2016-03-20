@@ -1,6 +1,6 @@
 use io
 
-main() {
+main(args:int[][]) {
 	a:int[] = {100, 102, 101}
 	if (a[1] > a[2]) {
 		println("correct")

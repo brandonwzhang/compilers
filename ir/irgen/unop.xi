@@ -1,5 +1,5 @@
 use io;
-main(){
+main(args:int[][]) {
 	x:int = -3;
 	w:int = -x;
 	a:int = --x;

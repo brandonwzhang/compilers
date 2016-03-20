@@ -1,6 +1,6 @@
 use io
 
-main(){
+main(args:int[][]) {
 	foo()
 }
 

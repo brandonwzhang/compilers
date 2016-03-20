@@ -1,4 +1,4 @@
-main(){
+main(args:int[][]) {
 	x1:int = 3+4;
 	x2:int = 5-2;
 	x3:int = 4*4;
