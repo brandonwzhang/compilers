@@ -1,4 +1,4 @@
-main(arg1:int, arg2:bool[]) {
+main(args:int[][]) {
 	mang:bool[10][][][][][][][][];
 
 	x:int[] = {}

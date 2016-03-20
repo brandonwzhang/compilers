@@ -1,4 +1,4 @@
-main():int{
+foo():int {
 	
 	x:int = 4
 

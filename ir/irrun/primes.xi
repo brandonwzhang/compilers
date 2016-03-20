@@ -32,6 +32,6 @@ largestprime(max:int):int {
     return largest
 }
 
-main() {
+main(args:int[][]) {
     print("Largest prime less than 1000 is " + unparseInt(largestprime(1000)))
 }

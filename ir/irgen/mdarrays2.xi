@@ -2,7 +2,7 @@ addOne(x: int): int {
 	return x + 1
 }
 
-main() {
+main(args:int[][]) {
     a: int[3][2][2][3]
     b: int[addOne(3)][3]
     c: int[1][2][2]

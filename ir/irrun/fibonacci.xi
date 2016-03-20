@@ -11,6 +11,6 @@ fib(i: int): int {
 	return ret
 }
 
-main() {
+main(args:int[][]) {
 	println(unparseInt(fib(10)))
 }

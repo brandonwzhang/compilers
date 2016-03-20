@@ -2,7 +2,7 @@ use io
 
 // 100 is character d
 
-main() {
+main(args:int[][]) {
 	a:int[10] 
 	n:int = length(a)
 	i:int = 0
