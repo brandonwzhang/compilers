@@ -101,7 +101,9 @@ public class PrintVisitor implements NodeVisitor {
             printType(t);
         }
         printer.endList();
+        printer.startList();
         node.getBlockList().accept(this);
+        printer.endList();
         printer.endList();
     }
 

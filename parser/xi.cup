@@ -274,7 +274,8 @@ block ::= OPEN_BRACE block_list:bl CLOSE_BRACE  {: RESULT = bl; RESULT.setLocati
         ;
 
 block_list ::= block:b block_list:bl {: bl.getBlockList().add(0, b); RESULT = bl; RESULT.setLocation(b); :}
-             | block:b  {: List<Block> bl = new LinkedList<>(); bl.add(0,b); RESULT = new BlockList(bl); :}
+             | RETURN {: List<Block> bl = new LinkedList<>(); bl.add(0,new ReturnStatement(new LinkedList<>())); RESULT = new BlockList(bl); :}
+             | empty  {: List<Block> bl = new LinkedList<>(); RESULT = new BlockList(bl); :}
              ;
 
 function_declaration_return_types ::= var_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :}
