@@ -3,10 +3,7 @@ package com.bwz6jk2227esl89ahj34.AST.visit;
 import com.bwz6jk2227esl89ahj34.AST.*;
 
 import java.math.BigInteger;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Stack;
+import java.util.*;
 
 //TODO: remove the exceptions for over/underflow
 public class ConstantFoldingVisitor implements NodeVisitor {
@@ -439,11 +436,32 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     public void visit(StringLiteral node) {
 
         // we first get the char array representation of the string literal
-        char[] str = node.getValue().toCharArray();
+        String str = node.getValue();
+        List<Character> charList = new ArrayList<>();
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == '\\' && i != str.length() - 1) {
+                switch(str.charAt(i + 1)) {
+                    case 'r':
+                        charList.add('\r');
+                        i++;
+                        break;
+                    case 'n':
+                        charList.add('\n');
+                        i++;
+                        break;
+                    default:
+                        charList.add('\\');
+                        break;
+                }
+            } else {
+                charList.add(str.charAt(i));
+            }
+        }
+
         // then we convert each char into an integer literal
         List<Expression> expressions = new LinkedList<>();
-        for (int i = 0; i < str.length; i++) {
-            expressions.add(new IntegerLiteral(""+(int)(str[i])));
+        for (int i = 0; i < charList.size(); i++) {
+            expressions.add(new IntegerLiteral(""+(int)(charList.get(i))));
         }
         // we now have converted the string literal into an array literal
         Expression arr = new ArrayLiteral(expressions);
