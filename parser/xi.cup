@@ -261,6 +261,7 @@ statement_no_semicolon ::= if_statement:s {: RESULT = s; RESULT.setLocation(s); 
                          | procedure_call:pc {: RESULT = pc; RESULT.setLocation(pc); :}
                          | typed_declaration:td {: RESULT = td; RESULT.setLocation(td); :}
                          | assignment:a {: RESULT = a; RESULT.setLocation(a); :}
+                         | return_statement:r {: RESULT = r; RESULT.setLocation(r); :} 
                          ;
 
 //this should be okay since semicolon doesn't actually matter
@@ -268,19 +269,12 @@ statement ::= statement_no_semicolon:s {: RESULT = s; RESULT.setLocation(s); :}
             | statement_no_semicolon:s SEMICOLON {: RESULT = s; RESULT.setLocation(s); :}
             ;
 
-function_block ::= OPEN_BRACE block_list:bl return_statement:r CLOSE_BRACE {: RESULT = new FunctionBlock(bl, r); RESULT.setLocation(bl); :}
-                 | OPEN_BRACE block_list:bl return_statement:r SEMICOLON CLOSE_BRACE {: RESULT = new FunctionBlock(bl,r); RESULT.setLocation(bl); :}
-                 | OPEN_BRACE function_block:fb CLOSE_BRACE {: RESULT = fb; RESULT.setLocation(fb); :}
-                 | OPEN_BRACE function_block:fb CLOSE_BRACE SEMICOLON {: RESULT = fb; RESULT.setLocation(fb); :}
-                 ;
-
 block ::= OPEN_BRACE block_list:bl CLOSE_BRACE  {: RESULT = bl; RESULT.setLocation(bl); :}
-        | function_block:fb {: RESULT = fb; RESULT.setLocation(fb); :}
         | statement:s {: RESULT = s; RESULT.setLocation(s); :}
         ;
 
 block_list ::= block:b block_list:bl {: bl.getBlockList().add(0, b); RESULT = bl; RESULT.setLocation(b); :}
-             | empty  {: RESULT = new BlockList(new LinkedList<Block>()); :}
+             | block:b  {: List<Block> bl = new LinkedList<>(); bl.add(0,b); RESULT = new BlockList(bl); :}
              ;
 
 function_declaration_return_types ::= var_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :}
@@ -298,18 +292,13 @@ function_declaration_argument ::= function_declaration_argument_list:lst {: RESU
                                 | empty {: RESULT = new LinkedList<>(); :}
                                 ;
 
-function_declaration ::= identifier:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t function_block:fb {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(t)), args, fb); RESULT.setLocation(id); :}
-                       | identifier:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN procedure_block:fb {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, fb); RESULT.setLocation(id); :}
+function_declaration ::= identifier:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t OPEN_BRACE block_list:fb CLOSE_BRACE {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(t)), args, fb); RESULT.setLocation(id); :}
+                       | identifier:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN OPEN_BRACE block_list:fb CLOSE_BRACE {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, fb); RESULT.setLocation(id); :}
                        ;
 
 function_declaration_list ::= function_declaration:fd function_declaration_list:lst {: lst.add(0, fd); RESULT = lst; :}
                             | function_declaration:fd {: List<FunctionDeclaration> lst = new LinkedList<FunctionDeclaration>(); lst.add(0,fd); RESULT = lst; :}
                             ;
-
-procedure_block ::=  OPEN_BRACE block_list:b CLOSE_BRACE {: RESULT = new ProcedureBlock(b); RESULT.setLocation(b); :}
-                  | OPEN_BRACE block_list:b RETURN CLOSE_BRACE {: RESULT = new ProcedureBlock(b); RESULT.setLocation(b); :}
-                  | OPEN_BRACE block_list:b RETURN SEMICOLON CLOSE_BRACE {: RESULT = new ProcedureBlock(b); RESULT.setLocation(b); :}
-                  ;
 
 procedure_call ::= identifier:id OPEN_PAREN expression_list:elist CLOSE_PAREN {: RESULT = new ProcedureCall(id, elist); RESULT.setLocation(id); :} //f(x,y,z,...)
                  | identifier:id OPEN_PAREN CLOSE_PAREN {: RESULT = new ProcedureCall(id, new LinkedList<Expression>()); RESULT.setLocation(id); :}// f()
