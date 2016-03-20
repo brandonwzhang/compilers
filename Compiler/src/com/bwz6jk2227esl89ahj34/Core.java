@@ -355,6 +355,6 @@ public class Core {
 
         System.out.println("====================================");
         IRSimulator sim = new IRSimulator(root);
-        sim.call("_Imain_p", 0);
+        sim.call("_Imain_paai", 0);
     }
 }
