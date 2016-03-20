@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class ReturnStatement extends Block {
+public class ReturnStatement extends Statement {
     private List<Expression> values;
 
     public void accept(NodeVisitor v){

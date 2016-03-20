@@ -1,12 +1,10 @@
 package com.bwz6jk2227esl89ahj34.AST.visit;
 
 import com.bwz6jk2227esl89ahj34.AST.*;
+import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.math.BigInteger;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Stack;
+import java.util.*;
 
 //TODO: remove the exceptions for over/underflow
 public class ConstantFoldingVisitor implements NodeVisitor {
@@ -439,11 +437,12 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     public void visit(StringLiteral node) {
 
         // we first get the char array representation of the string literal
-        char[] str = node.getValue().toCharArray();
+        List<Character> charList = Util.backslashMergedCharList(node.getValue());
+
         // then we convert each char into an integer literal
         List<Expression> expressions = new LinkedList<>();
-        for (int i = 0; i < str.length; i++) {
-            expressions.add(new IntegerLiteral(""+(int)(str[i])));
+        for (int i = 0; i < charList.size(); i++) {
+            expressions.add(new IntegerLiteral(""+(int)(charList.get(i))));
         }
         // we now have converted the string literal into an array literal
         Expression arr = new ArrayLiteral(expressions);

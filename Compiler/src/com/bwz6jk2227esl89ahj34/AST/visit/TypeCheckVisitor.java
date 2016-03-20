@@ -292,6 +292,60 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     /**
+     * Checks that the given BlockList is guaranteed to return by the end
+     * @param blockList
+     * @return
+     */
+    public static boolean checkFunctionBlockList(BlockList blockList) {
+        Block lastBlock = blockList.getBlockList().get(blockList.getBlockList().size() - 1);
+
+        if (lastBlock instanceof ReturnStatement) {
+            // Guaranteed to return at the end
+            return true;
+        } else if (lastBlock instanceof IfStatement) {
+            // Allow for if {...return expr} else {...return expr}
+            IfStatement ifStatement = (IfStatement) lastBlock;
+            if (!ifStatement.getFalseBlock().isPresent()) {
+                // We need a false block to guarantee return
+                return false;
+            }
+            Block trueBlock = ifStatement.getTrueBlock();
+            if (!(trueBlock instanceof BlockList)) {
+                // We don't allow for single return statements not wrapped in
+                // braces, so it must be a BlockList for return to be there
+                return false;
+            }
+            BlockList trueBlockList = (BlockList) trueBlock;
+            Block falseBlock = ifStatement.getFalseBlock().get();
+            if (!(falseBlock instanceof BlockList)) {
+                // We don't allow for single return statements not wrapped in
+                // braces, so it must be a BlockList for return to be there
+                return false;
+            }
+            BlockList falseBlockList = (BlockList) falseBlock;
+            // Both branches must guarantee return
+            return checkFunctionBlockList(trueBlockList) &&
+                    checkFunctionBlockList(falseBlockList);
+        }
+        return false;
+    }
+
+    /**
+     * Checks that top level return statements only occur at the end of the BlockList
+     * @param blockList
+     * @return
+     */
+    public static boolean checkProcedureBlockList(BlockList blockList) {
+        List<Block> blocks = blockList.getBlockList();
+        // Iterate until last element to make sure none of them are return statements
+        for (int i = 0; i < blocks.size() - 1; i++) {
+            if (blocks.get(i) instanceof ReturnStatement) {
+                return false;
+            }
+        }
+        return true;
+    }
+    /**
      * FunctionBlock typechecks if its BlockList and ReturnStatement
      * typecheck. The ReturnStatement must be able to access the same
      * context that the BlockList had. The type of FunctionBlock is unit.
@@ -301,15 +355,11 @@ public class TypeCheckVisitor implements NodeVisitor {
         contexts.push(new Context(contexts.peek()));
 
         BlockList blockList = node.getBlockList();
-        ReturnStatement returnStatement = node.getReturnStatement();
-
         blockList.accept(this);
-        contexts.push(lastPoppedContext);
-        returnStatement.accept(this);
-        contexts.pop();
+        checkFunctionBlockList(blockList);
 
         // sanity check
-        assert blockList.getType().equals(UNIT_TYPE) || returnStatement.getType().equals(VOID_TYPE);
+        assert blockList.getType().equals(UNIT_TYPE);
 
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
 
@@ -379,13 +429,25 @@ public class TypeCheckVisitor implements NodeVisitor {
             newContext.put(argList.get(i), argTypeList.get(i));
         }
 
-        MethodBlock methodBlock = node.getMethodBlock();
+        BlockList blockList = node.getBlockList();
 
         contexts.push(newContext);
-        methodBlock.accept(this);
+        blockList.accept(this);
         contexts.pop();
 
-        assert methodBlock.getType().equals(UNIT_TYPE) || methodBlock.getType().equals(VOID_TYPE);
+        if (node.getFunctionType().getReturnTypeList().getVariableTypeList().size() > 0) {
+            // We have a function
+            if (!checkFunctionBlockList(blockList)) {
+                throw new TypeException("Function block does not guarantee return", node.getRow(), node.getCol());
+            }
+        } else {
+            // We have a procedure
+            if (!checkProcedureBlockList(blockList)) {
+                throw new TypeException("Procedure block has unreachable code", node.getRow(), node.getCol());
+            }
+        }
+
+        assert blockList.getType().equals(UNIT_TYPE) || blockList.getType().equals(VOID_TYPE);
         node.setType(UNIT_TYPE);
     }
 
@@ -422,6 +484,9 @@ public class TypeCheckVisitor implements NodeVisitor {
         boolean trueBlockIsStatement = trueBlock instanceof Statement;
         // We need create and pop a new context if the block is just a statement
         if (trueBlockIsStatement) {
+            if (trueBlock instanceof ReturnStatement) {
+                throw new TypeException("Single return statement encountered in true block", trueBlock.getRow(), trueBlock.getCol());
+            }
             contexts.push(new Context(contexts.peek()));
         }
         trueBlock.accept(this);
@@ -434,6 +499,9 @@ public class TypeCheckVisitor implements NodeVisitor {
             boolean falseBlockIsStatement = falseBlock.get() instanceof Statement;
             // We need create and pop a new context if the block is just a statement
             if (falseBlockIsStatement) {
+                if (falseBlock.get() instanceof ReturnStatement) {
+                    throw new TypeException("Single return statement encountered in false block", falseBlock.get().getRow(), falseBlock.get().getCol());
+                }
                 contexts.push(new Context(contexts.peek()));
             }
             falseBlock.get().accept(this);

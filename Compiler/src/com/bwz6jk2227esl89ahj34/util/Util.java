@@ -261,4 +261,29 @@ public class Util {
         List<String> lines = Collections.singletonList(baos.toString());
         Util.writeHelper(file, extension, diagnosticPath, lines);
     }
+
+    public static List<Character> backslashMergedCharList(String str) {
+        List<Character> charList = new ArrayList<>();
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == '\\' && i != str.length() - 1) {
+                switch(str.charAt(i + 1)) {
+                    case 'r':
+                        charList.add('\r');
+                        i++;
+                        break;
+                    case 'n':
+                        charList.add('\n');
+                        i++;
+                        break;
+                    default:
+                        charList.add('\\');
+                        break;
+                }
+            } else {
+                charList.add(str.charAt(i));
+            }
+        }
+
+        return charList;
+    }
 }

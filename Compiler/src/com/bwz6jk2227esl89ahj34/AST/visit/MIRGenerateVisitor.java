@@ -5,6 +5,7 @@ import com.bwz6jk2227esl89ahj34.AST.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
+import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.util.*;
 
@@ -816,9 +817,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
     public void visit(StringLiteral node) {
         // StringLiteral = int ArrayLiteral
-        char[] array = node.getValue().toCharArray();
+        List<Character> charList = Util.backslashMergedCharList(node.getValue());
         List<Expression> chars = new LinkedList<>();
-        for (char c : array) {
+        for (char c : charList) {
             chars.add(new CharacterLiteral(c));
         }
 

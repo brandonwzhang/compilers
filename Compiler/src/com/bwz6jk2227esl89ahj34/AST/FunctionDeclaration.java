@@ -14,7 +14,7 @@ public class FunctionDeclaration extends Node {
     private Identifier identifier;
     private FunctionType functionType;
     private List<Identifier> argList;
-    private MethodBlock methodBlock;
+    private BlockList blockList;
 
     public void accept(NodeVisitor v){
         v.visit(this);
