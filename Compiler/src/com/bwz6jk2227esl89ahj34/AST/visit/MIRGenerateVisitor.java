@@ -771,6 +771,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
         statements.add(trueLabel);
         statements.add(trueBlock);
+        statements.add(new IRJump(new IRName(endLabelName))); //added by jihun
+                                                          // to fix reordering
         statements.add(endLabel);
         generatedNodes.push(new IRSeq(statements));
     }
