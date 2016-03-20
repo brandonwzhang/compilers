@@ -1,0 +1,197 @@
+false
+(
+  COMPUNIT
+  ratadduse_full
+  (
+    FUNC
+    _Igcd_iii
+    (SEQ
+     (MOVE (TEMP temp_0) (TEMP _ARG0))
+     (MOVE (TEMP a) (TEMP temp_0))
+     (MOVE (TEMP temp_1) (TEMP _ARG1))
+     (MOVE (TEMP b) (TEMP temp_1))
+     (LABEL temp0)
+     (MOVE (TEMP temp_2) (TEMP a))
+     (CJUMP (NEQ (TEMP temp_2) (CONST 0)) temp1 temp2)
+     (LABEL temp1)
+     (MOVE (TEMP temp_3) (TEMP a))
+     (CJUMP (LT (TEMP temp_3) (TEMP b)) temp3 temp5)
+     (LABEL temp5)
+     (MOVE (TEMP temp_4) (TEMP a))
+     (MOVE (TEMP temp_5) (SUB (TEMP temp_4) (TEMP b)))
+     (MOVE (TEMP a) (TEMP temp_5))
+     (JUMP (NAME temp4))
+     (LABEL temp3)
+     (MOVE (TEMP temp_6) (TEMP b))
+     (MOVE (TEMP temp_7) (SUB (TEMP temp_6) (TEMP a)))
+     (MOVE (TEMP b) (TEMP temp_7))
+     (LABEL temp4)
+     (JUMP (NAME temp0))
+     (LABEL temp2)
+     (MOVE (TEMP temp_8) (TEMP b))
+     (MOVE (TEMP _RET0) (TEMP temp_8))
+     (RETURN)))
+  (
+    FUNC
+    _Iratadd_t2iiiiii
+    (SEQ
+     (MOVE (TEMP temp_10) (TEMP _ARG0))
+     (MOVE (TEMP p1) (TEMP temp_10))
+     (MOVE (TEMP temp_11) (TEMP _ARG1))
+     (MOVE (TEMP q1) (TEMP temp_11))
+     (MOVE (TEMP temp_12) (TEMP _ARG2))
+     (MOVE (TEMP p2) (TEMP temp_12))
+     (MOVE (TEMP temp_13) (TEMP _ARG3))
+     (MOVE (TEMP q2) (TEMP temp_13))
+     (MOVE (TEMP temp_14) (NAME _Igcd_iii))
+     (MOVE (TEMP temp_15) (TEMP q1))
+     (MOVE (TEMP temp_16) (TEMP q2))
+     (MOVE (TEMP temp_17) (CALL (NAME _Igcd_iii) (TEMP temp_15) (TEMP temp_16)))
+     (MOVE (TEMP temp_18) (TEMP temp_17))
+     (MOVE (TEMP g) (TEMP temp_18))
+     (MOVE (TEMP temp_20) (TEMP p1))
+     (MOVE (TEMP temp_19) (TEMP q2))
+     (MOVE (TEMP temp_23) (MUL (TEMP temp_20) (DIV (TEMP temp_19) (TEMP g))))
+     (MOVE (TEMP temp_22) (TEMP p2))
+     (MOVE (TEMP temp_21) (TEMP q1))
+     (MOVE (TEMP temp_24)
+      (ADD (TEMP temp_23) (MUL (TEMP temp_22) (DIV (TEMP temp_21) (TEMP g)))))
+     (MOVE (TEMP p3) (TEMP temp_24))
+     (MOVE (TEMP temp_25) (TEMP p3))
+     (MOVE (TEMP _RET0) (TEMP temp_25))
+     (MOVE (TEMP temp_26) (TEMP q1))
+     (MOVE (TEMP temp_27) (DIV (TEMP temp_26) (TEMP g)))
+     (MOVE (TEMP temp_28) (MUL (TEMP temp_27) (TEMP q2)))
+     (MOVE (TEMP _RET1) (TEMP temp_28))
+     (RETURN)))
+  (
+    FUNC
+    _Imain_p
+    (
+      SEQ
+      (
+        MOVE (TEMP temp_29) (NAME _Iratadd_t2iiiiii))
+      (
+        MOVE
+        (
+          TEMP temp_30) (CONST 2))
+      (
+        MOVE
+        (
+          TEMP temp_31) (CONST 5))
+      (
+        MOVE
+        (
+          TEMP temp_32) (CONST 1))
+      (
+        MOVE
+        (
+          TEMP temp_33) (CONST 3))
+      (
+        MOVE
+        (
+          TEMP temp_34)
+        (CALL
+         (NAME _Iratadd_t2iiiiii) (TEMP temp_30) (TEMP temp_31) (TEMP temp_32)
+         (TEMP temp_33)))
+      (
+        MOVE (TEMP temp_35) (TEMP _RET0))
+      (
+        MOVE (TEMP p) (TEMP temp_35))
+      (
+        MOVE (TEMP temp_36) (TEMP _RET1))
+      (
+        MOVE (TEMP q) (TEMP temp_36))
+      (
+        MOVE (TEMP temp_37) (NAME _Iratadd_t2iiiiii))
+      (
+        MOVE (TEMP temp_38) (CONST 1))
+      (
+        MOVE (TEMP temp_39) (CONST 2))
+      (
+        MOVE (TEMP temp_40) (CONST 1))
+      (
+        MOVE (TEMP temp_41) (CONST 3))
+      (
+        MOVE
+        (TEMP temp_42)
+        (CALL
+         (NAME _Iratadd_t2iiiiii) (TEMP temp_38) (TEMP temp_39) (TEMP temp_40)
+         (TEMP temp_41)))
+      (
+        MOVE (TEMP temp_43) (TEMP _RET1))
+      (
+        MOVE (TEMP r) (TEMP temp_43))
+      (
+        MOVE (TEMP temp_65) (NAME _Iprint_pai))
+      (
+        MOVE (TEMP temp_44) (NAME _I_alloc_i))
+      (
+        MOVE (TEMP temp_45) (CONST 32))
+      (
+        MOVE (TEMP temp_46) (CALL (NAME _I_alloc_i) (TEMP temp_45)))
+      (
+        MOVE (TEMP temp_47) (TEMP temp_46))
+      (
+        MOVE (TEMP temp6) (TEMP temp_47))
+      (
+        MOVE (TEMP temp_48) (CONST 3))
+      (
+        MOVE (MEM (TEMP temp6)) (TEMP temp_48))
+      (
+        MOVE (TEMP temp_49) (TEMP temp6))
+      (
+        MOVE (TEMP temp_50) (ADD (TEMP temp_49) (CONST 8)))
+      (
+        MOVE (TEMP temp6) (TEMP temp_50))
+      (
+        MOVE (TEMP temp_51) (TEMP p))
+      (
+        MOVE (TEMP temp_52) (ADD (TEMP temp_51) (CONST 100)))
+      (
+        MOVE (MEM (TEMP temp6)) (TEMP temp_52))
+      (
+        MOVE (TEMP temp_53) (TEMP temp6))
+      (
+        MOVE (TEMP temp_54) (ADD (TEMP temp_53) (CONST 8)))
+      (
+        MOVE (TEMP temp6) (TEMP temp_54))
+      (
+        MOVE (TEMP temp_55) (TEMP q))
+      (
+        MOVE (TEMP temp_56) (ADD (TEMP temp_55) (CONST 100)))
+      (
+        MOVE (MEM (TEMP temp6)) (TEMP temp_56))
+      (
+        MOVE (TEMP temp_57) (TEMP temp6))
+      (
+        MOVE (TEMP temp_58) (ADD (TEMP temp_57) (CONST 8)))
+      (
+        MOVE (TEMP temp6) (TEMP temp_58))
+      (
+        MOVE (TEMP temp_59) (TEMP r))
+      (
+        MOVE (TEMP temp_60) (ADD (TEMP temp_59) (CONST 100)))
+      (
+        MOVE (MEM (TEMP temp6)) (TEMP temp_60))
+      (
+        MOVE (TEMP temp_61) (TEMP temp6))
+      (
+        MOVE (TEMP temp_62) (ADD (TEMP temp_61) (CONST 8)))
+      (
+        MOVE (TEMP temp6) (TEMP temp_62))
+      (
+        MOVE (TEMP temp_63) (TEMP temp6))
+      (
+        MOVE (TEMP temp_64) (SUB (TEMP temp_63) (CONST 24)))
+      (
+        MOVE (TEMP temp6) (TEMP temp_64))
+      (
+        MOVE (TEMP temp_66) (TEMP temp6))
+      (
+        MOVE (TEMP temp_67) (CALL (NAME _Iprint_pai) (TEMP temp_66)))
+      (
+        RETURN))))
+
+====================================
+osj
