@@ -239,6 +239,7 @@ public class IRFuncDecl extends IRNode {
         if (!(finalStatements.get(finalStatements.size() - 1) instanceof IRReturn)) {
             finalStatements.add(new IRReturn());
         }
+        
         return new IRFuncDecl(fd.name(), new IRSeq(finalStatements));
     }
 }
