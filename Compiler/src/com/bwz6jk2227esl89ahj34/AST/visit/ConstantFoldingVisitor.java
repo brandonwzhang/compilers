@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34.AST.visit;
 
 import com.bwz6jk2227esl89ahj34.AST.*;
+import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -436,27 +437,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     public void visit(StringLiteral node) {
 
         // we first get the char array representation of the string literal
-        String str = node.getValue();
-        List<Character> charList = new ArrayList<>();
-        for (int i = 0; i < str.length(); i++) {
-            if (str.charAt(i) == '\\' && i != str.length() - 1) {
-                switch(str.charAt(i + 1)) {
-                    case 'r':
-                        charList.add('\r');
-                        i++;
-                        break;
-                    case 'n':
-                        charList.add('\n');
-                        i++;
-                        break;
-                    default:
-                        charList.add('\\');
-                        break;
-                }
-            } else {
-                charList.add(str.charAt(i));
-            }
-        }
+        List<Character> charList = Util.backslashMergedCharList(node.getValue());
 
         // then we convert each char into an integer literal
         List<Expression> expressions = new LinkedList<>();
