@@ -666,7 +666,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // If we have a procedure, we need to make sure the last statement is return
         if (node.getFunctionType().getReturnTypeList().getVariableTypeList().isEmpty()) {
             List<Block> blocks = node.getBlockList().getBlockList();
-            if (!(blocks.get(blocks.size() - 1) instanceof ReturnStatement)) {
+            if (blocks.isEmpty() || !(blocks.get(blocks.size() - 1) instanceof ReturnStatement)) {
                 blocks.add(new ReturnStatement(new LinkedList<>()));
             }
         }
