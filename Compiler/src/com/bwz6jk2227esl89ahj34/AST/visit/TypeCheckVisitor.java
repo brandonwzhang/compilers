@@ -318,7 +318,7 @@ public class TypeCheckVisitor implements NodeVisitor {
                 trueBlockList = (BlockList) trueBlock;
             } else {
                 // We don't allow for single return statements not wrapped in
-                // braces, so it must be a BlockList for return to be there
+                // braces, so there cannot be a return here
                 return false;
             }
             Block falseBlock = ifStatement.getFalseBlock().get();
@@ -330,7 +330,7 @@ public class TypeCheckVisitor implements NodeVisitor {
                 falseBlockList = (BlockList) falseBlock;
             } else {
                 // We don't allow for single return statements not wrapped in
-                // braces, so it must be a BlockList for return to be there
+                // braces, so there cannot be a return here
                 return false;
             }
             // Both branches must guarantee return
