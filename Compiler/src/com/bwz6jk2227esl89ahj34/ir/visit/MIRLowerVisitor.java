@@ -5,7 +5,7 @@ import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
 import java.util.*;
 
-public class MIRVisitor extends IRVisitor{
+public class MIRLowerVisitor extends IRVisitor{
     // Counter to append to label strings.
     private static long labelCounter = 0;
 

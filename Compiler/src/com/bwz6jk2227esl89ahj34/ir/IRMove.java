@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
-import com.bwz6jk2227esl89ahj34.ir.visit.MIRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
@@ -87,7 +87,7 @@ public class IRMove extends IRStmt {
 
         List<IRStmt> lst = new LinkedList<>();
         addStatements(lst, casted_expr.stmt());
-        String t = MIRVisitor.getFreshVariable();
+        String t = MIRLowerVisitor.getFreshVariable();
         addStatements(lst, new IRMove(new IRTemp(t), casted_expr.expr()));
         addStatements(lst, casted_dest.stmt());
         addStatements(lst, new IRMove(casted_dest.expr(), new IRTemp(t)));

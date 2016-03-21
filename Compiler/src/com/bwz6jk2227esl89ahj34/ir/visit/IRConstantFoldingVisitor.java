@@ -10,7 +10,7 @@ import com.bwz6jk2227esl89ahj34.ir.*;
 /**
  * Created by jihunkim on 3/17/16.
  */
-public class MIRConstantFoldingVisitor extends IRVisitor{
+public class IRConstantFoldingVisitor extends IRVisitor{
     /**
      * Recursively traverse the IR subtree rooted at {@code n}
      */

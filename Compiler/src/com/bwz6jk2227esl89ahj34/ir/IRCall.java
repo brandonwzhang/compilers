@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.bwz6jk2227esl89ahj34.ir.visit.MIRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
@@ -117,7 +117,7 @@ public class IRCall extends IRExpr {
         eseq = (IRESeq)(call_n_.target());
         IRESeq og =  (IRESeq)(call_n_.target());
         addStatements(stmtList, eseq.stmt());
-        t = new IRTemp(MIRVisitor.getFreshVariable());
+        t = new IRTemp(MIRLowerVisitor.getFreshVariable());
         addStatements(stmtList, new IRMove(t, eseq.expr()));
         tempList.add(t);
 
@@ -125,12 +125,12 @@ public class IRCall extends IRExpr {
             assert e instanceof IRESeq;
             eseq = (IRESeq) (e);
             addStatements(stmtList, eseq.stmt());
-            t = new IRTemp(MIRVisitor.getFreshVariable());
+            t = new IRTemp(MIRLowerVisitor.getFreshVariable());
             addStatements(stmtList, new IRMove(t, eseq.expr()));
             tempList.add(t);
         }
 
-        t = new IRTemp(MIRVisitor.getFreshVariable());
+        t = new IRTemp(MIRLowerVisitor.getFreshVariable());
         assert !tempList.isEmpty();
         IRExpr target = tempList.remove(0);
         if(og.expr() instanceof IRName) {

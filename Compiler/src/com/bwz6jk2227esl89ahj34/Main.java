@@ -74,7 +74,7 @@ public class Main {
 
         if(tests) { // put debug mode behaviors here
 
-            String[] exclude = {"arrayswag", "mdarrays3"};
+            String[] exclude = {};
             Collections.addAll(Tests.exclude, exclude);
             System.out.println("\nDEBUG: Excluding: " + Tests.exclude.toString());
 
@@ -84,7 +84,7 @@ public class Main {
                 e.printStackTrace();
             }
 
-            Tests.typeCheckTests();
+            //Tests.typeCheckTests();
             //Tests.constantFoldTests();
             //Tests.mirGenTests();
             //Tests.irGenTests();

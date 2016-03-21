@@ -1,7 +1,7 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
 import com.bwz6jk2227esl89ahj34.ir.visit.CheckConstFoldedIRVisitor;
-import com.bwz6jk2227esl89ahj34.ir.visit.MIRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
@@ -144,7 +144,7 @@ public class IRBinOp extends IRExpr {
         assert irb.right() instanceof IRESeq;
         List<IRStmt> lst = new LinkedList<>();
         addStatements(lst, ((IRESeq)(irb.left())).stmt());
-        String t = MIRVisitor.getFreshVariable();
+        String t = MIRLowerVisitor.getFreshVariable();
         addStatements(lst,
                 new IRMove(new IRTemp(t), ((IRESeq)(irb.left())).expr()));
         addStatements(lst, ((IRESeq)(irb.right())).stmt());

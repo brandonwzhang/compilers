@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
-import com.bwz6jk2227esl89ahj34.ir.visit.MIRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
@@ -186,7 +186,7 @@ public class IRFuncDecl extends IRNode {
             List<IRStmt> trueBlock = reorderBlocks(trueNode, graph, blocks, visited);
             IRStmt lastFalseStatement = falseBlock.get(falseBlock.size() - 1);
             if (!(lastFalseStatement instanceof IRJump)) {
-                String exitLabelName = MIRVisitor.getFreshVariable();
+                String exitLabelName = MIRLowerVisitor.getFreshVariable();
                 falseBlock.add(new IRJump(new IRName(exitLabelName)));
                 trueBlock.add(new IRLabel(exitLabelName));
             }

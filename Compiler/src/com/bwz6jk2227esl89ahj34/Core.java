@@ -12,8 +12,8 @@ import com.bwz6jk2227esl89ahj34.ir.parse.IRLexer;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRParser;
 import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
-import com.bwz6jk2227esl89ahj34.ir.visit.MIRConstantFoldingVisitor;
-import com.bwz6jk2227esl89ahj34.ir.visit.MIRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.IRConstantFoldingVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import java_cup.runtime.Symbol;
@@ -265,7 +265,7 @@ public class Core {
 
         if (Main.optimizationsOn()) {
             // constant folding on the MIR tree
-            IRVisitor mircfv = new MIRConstantFoldingVisitor();
+            IRVisitor mircfv = new IRConstantFoldingVisitor();
             mirRoot = (IRCompUnit) mircfv.visit(mirRoot);
         }
 
@@ -309,8 +309,13 @@ public class Core {
             return;
         }
 
-        MIRVisitor mirv = new MIRVisitor();
+        MIRLowerVisitor mirv = new MIRLowerVisitor();
         IRCompUnit lirRoot = (IRCompUnit) mirv.visit(mirRoot.get());
+
+        if (Main.optimizationsOn()) {
+            IRVisitor mircfv = new IRConstantFoldingVisitor();
+            lirRoot = (IRCompUnit) mircfv.visit(lirRoot);
+        }
 
         Util.writeIRTree(lirRoot, diagnosticPath, file, "ir");
     }
