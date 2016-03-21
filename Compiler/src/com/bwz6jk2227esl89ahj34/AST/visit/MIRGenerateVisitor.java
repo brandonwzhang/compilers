@@ -551,7 +551,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
                     continue;
                 }
             }
+            if (block instanceof ReturnStatement) {
+                continue;
+            }
             block.accept(this);
+
             assert generatedNodes.peek() instanceof IRStmt;
             stmtList.add((IRStmt) generatedNodes.pop());
         }
