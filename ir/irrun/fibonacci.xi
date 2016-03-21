@@ -1,16 +1,23 @@
 use io
 use conv
 
-fib(i: int): int {
-	ret:int = 0
+fib(i:int) : int {
 	if (i < 2) {
-		ret = i
+		return i
 	} else {
-		ret = fib(i - 1) + fib(i - 2)
+		return fib(i-1) + fib(i-2)
 	}
-	return ret
 }
 
 main(args:int[][]) {
-	println(unparseInt(fib(10)))
+	print("Please enter a positive number : ")
+	input: int[] = readln()
+
+	value:int, valid:bool = parseInt(input)
+	if (!valid) {
+		println("Invalid input!")
+		return
+	}
+
+	println(unparseInt(fib(value)))
 }

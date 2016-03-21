@@ -74,7 +74,7 @@ public class Main {
 
         if(tests) { // put debug mode behaviors here
 
-            String[] exclude = {};
+            String[] exclude = {"enigma"};
             Collections.addAll(Tests.exclude, exclude);
             System.out.println("\nDEBUG: Excluding: " + Tests.exclude.toString());
 
@@ -88,7 +88,7 @@ public class Main {
             //Tests.constantFoldTests();
             //Tests.mirGenTests();
             //Tests.irGenTests();
-            //Tests.irRunTests();
+            Tests.irRunTests();
         }
     }
 
