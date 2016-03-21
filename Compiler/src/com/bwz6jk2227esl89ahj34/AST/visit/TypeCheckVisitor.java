@@ -310,22 +310,28 @@ public class TypeCheckVisitor implements NodeVisitor {
                 return false;
             }
             Block trueBlock = ifStatement.getTrueBlock();
-            if (!(trueBlock instanceof BlockList)) {
+            BlockList trueBlockList;
+            if (trueBlock instanceof IfStatement) {
+                // It's possible that an if statement will also guarantee a return
+                trueBlockList = new BlockList(Collections.singletonList(trueBlock));
+            } else if (trueBlock instanceof BlockList) {
+                trueBlockList = (BlockList) trueBlock;
+            } else {
                 // We don't allow for single return statements not wrapped in
                 // braces, so it must be a BlockList for return to be there
                 return false;
             }
-            BlockList trueBlockList = (BlockList) trueBlock;
             Block falseBlock = ifStatement.getFalseBlock().get();
             BlockList falseBlockList;
             if (falseBlock instanceof IfStatement) {
+                // It's possible that an if statement will also guarantee a return
                 falseBlockList = new BlockList(Collections.singletonList(falseBlock));
-            } else if (!(falseBlock instanceof BlockList)) {
+            } else if (falseBlock instanceof BlockList) {
+                falseBlockList = (BlockList) falseBlock;
+            } else {
                 // We don't allow for single return statements not wrapped in
                 // braces, so it must be a BlockList for return to be there
                 return false;
-            } else {
-                falseBlockList = (BlockList) falseBlock;
             }
             // Both branches must guarantee return
             return checkFunctionBlockList(trueBlockList) &&
