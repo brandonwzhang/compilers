@@ -116,7 +116,9 @@ public class IRFuncDecl extends IRNode {
             return new LinkedList<>();
         } else {
             List<Integer> successors = new LinkedList<>();
-            successors.add(i + 1);
+            if (i < blocks.size() - 1) {
+                successors.add(i + 1);
+            }
             return successors;
         }
 
@@ -221,6 +223,7 @@ public class IRFuncDecl extends IRNode {
                 temp = new LinkedList<>();
             }
         }
+        blocks.add(new LinkedList<>(temp));
 
         // First, clear out all of the empty blocks (in case a label directly
         // follows some sort of jump)
@@ -231,6 +234,8 @@ public class IRFuncDecl extends IRNode {
                 it.remove();
             }
         }
+        //if the list of blocks is empty, we don't need to reorder it
+        if (blocks.size() == 0) { return n_; }
 
         List<IRStmt> finalStatements = new LinkedList<>();
         finalStatements.addAll(reorderBlocks(0, constructFlowGraph(blocks),
@@ -240,7 +245,7 @@ public class IRFuncDecl extends IRNode {
         if (!(finalStatements.get(finalStatements.size() - 1) instanceof IRReturn)) {
             finalStatements.add(new IRReturn());
         }
-        
+
         return new IRFuncDecl(fd.name(), new IRSeq(finalStatements));
     }
 }

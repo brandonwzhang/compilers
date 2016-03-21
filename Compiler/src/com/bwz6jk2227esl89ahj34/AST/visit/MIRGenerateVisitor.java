@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34.AST.visit;
 import com.bwz6jk2227esl89ahj34.AST.*;
+import com.bwz6jk2227esl89ahj34.AST.parse.Parser;
 import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
 import com.bwz6jk2227esl89ahj34.AST.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.ir.*;
@@ -551,9 +552,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
                     continue;
                 }
             }
-            if (block instanceof ReturnStatement) {
-                continue;
-            }
+
             block.accept(this);
 
             assert generatedNodes.peek() instanceof IRStmt;
@@ -791,7 +790,19 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(ReturnStatement node) {
+        List<Expression> returnValues = node.getValues();
+        List<IRStmt> statements = new LinkedList<>();
+        for (int i = 0; i < returnValues.size(); i++) {
+            Expression returnValue = returnValues.get(i);
+            returnValue.accept(this);
+            assert generatedNodes.peek() instanceof IRExpr;
+            IRExpr irReturnValue = (IRExpr) generatedNodes.pop();
+            statements.add(new IRMove(new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i),
+                    irReturnValue));
+        }
+        statements.add(new IRReturn());
 
+        generatedNodes.push(new IRSeq(statements));
     }
     public void visit(StringLiteral node) {
         // StringLiteral = int ArrayLiteral
