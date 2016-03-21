@@ -68,10 +68,15 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRLabel falseLabel = new IRLabel(getFreshVariable());
         IRLabel exitLabel = new IRLabel(getFreshVariable());
 
+        // Make a copy of these so we don't end up with duplicate labels
+        node.getIndex().accept(this);
+        assert generatedNodes.peek() instanceof IRExpr;
+        IRExpr indexCopy = (IRExpr)generatedNodes.pop();
+
         IRCJump cjump = new IRCJump( // index < length && index >= 0
                 new IRBinOp(OpType.AND,
                         new IRBinOp(OpType.LT, index, length),
-                        new IRBinOp(OpType.GEQ, index, new IRConst(0))),
+                        new IRBinOp(OpType.GEQ, indexCopy, new IRConst(0))),
                 trueLabel.name(),
                 falseLabel.name()
         );
@@ -82,14 +87,14 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRExpr arrayCopy = (IRExpr)generatedNodes.pop();
         node.getIndex().accept(this);
         assert generatedNodes.peek() instanceof IRExpr;
-        IRExpr indexCopy = (IRExpr)generatedNodes.pop();
+        IRExpr indexCopyCopy = (IRExpr)generatedNodes.pop();
 
         // get mem location
         IRSeq trueBody = new IRSeq(
                 // get actual element
                 new IRMove(result, new IRMem( new IRBinOp(
                         OpType.ADD,
-                        new IRBinOp(OpType.MUL, indexCopy, new IRConst(WORD_SIZE)),
+                        new IRBinOp(OpType.MUL, indexCopyCopy, new IRConst(WORD_SIZE)),
                         arrayCopy
                 ))),
                 // jump to exit
@@ -209,10 +214,15 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 IRLabel falseLabel = new IRLabel(getFreshVariable());
                 IRLabel exitLabel = new IRLabel(getFreshVariable());
 
+                // Make a copy of these so we don't end up with duplicate labels
+                ((ArrayIndex) variable).getIndex().accept(this);
+                assert generatedNodes.peek() instanceof IRExpr;
+                IRExpr indexCopy = (IRExpr)generatedNodes.pop();
+
                 IRCJump cjump = new IRCJump( // index < length && index >= 0
                         new IRBinOp(OpType.AND,
                                 new IRBinOp(OpType.LT, index, length),
-                                new IRBinOp(OpType.GEQ, index, new IRConst(0))),
+                                new IRBinOp(OpType.GEQ, indexCopy, new IRConst(0))),
                         trueLabel.name(),
                         falseLabel.name()
                 );
@@ -223,12 +233,12 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 IRExpr arrayCopy = (IRExpr)generatedNodes.pop();
                 ((ArrayIndex) variable).getIndex().accept(this);
                 assert generatedNodes.peek() instanceof IRExpr;
-                IRExpr indexCopy = (IRExpr)generatedNodes.pop();
+                IRExpr indexCopyCopy = (IRExpr)generatedNodes.pop();
 
                 // move evaluatedExpression into location
                 IRMem location = new IRMem(new IRBinOp(OpType.ADD,
                         arrayCopy,
-                        new IRBinOp(OpType.MUL, indexCopy, new IRConst(WORD_SIZE))
+                        new IRBinOp(OpType.MUL, indexCopyCopy, new IRConst(WORD_SIZE))
                 ));
                 IRSeq trueBody = new IRSeq(
                         // get actual element
@@ -305,10 +315,15 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 IRLabel falseLabel = new IRLabel(getFreshVariable());
                 IRLabel exitLabel = new IRLabel(getFreshVariable());
 
+                // Make a copy of these so we don't end up with duplicate labels
+                ((ArrayIndex) variable).getIndex().accept(this);
+                assert generatedNodes.peek() instanceof IRExpr;
+                IRExpr indexCopy = (IRExpr)generatedNodes.pop();
+
                 IRCJump cjump = new IRCJump( // index < length && index >= 0
                         new IRBinOp(OpType.AND,
                                 new IRBinOp(OpType.LT, index, length),
-                                new IRBinOp(OpType.GEQ, index, new IRConst(0))),
+                                new IRBinOp(OpType.GEQ, indexCopy, new IRConst(0))),
                         trueLabel.name(),
                         falseLabel.name()
                 );
@@ -319,12 +334,12 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 IRExpr arrayCopy = (IRExpr)generatedNodes.pop();
                 ((ArrayIndex) variable).getIndex().accept(this);
                 assert generatedNodes.peek() instanceof IRExpr;
-                IRExpr indexCopy = (IRExpr)generatedNodes.pop();
+                IRExpr indexCopyCopy = (IRExpr)generatedNodes.pop();
 
                 // move evaluatedExpression into location
                 IRMem location = new IRMem(new IRBinOp(OpType.ADD,
                         arrayCopy,
-                        new IRBinOp(OpType.MUL, indexCopy, new IRConst(WORD_SIZE))
+                        new IRBinOp(OpType.MUL, indexCopyCopy, new IRConst(WORD_SIZE))
                 ));
                 IRSeq trueBody = new IRSeq(
                         // get actual element
