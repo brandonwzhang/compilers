@@ -10,13 +10,11 @@ public interface NodeVisitor {
     void visit(BlockList node);
     void visit(BooleanLiteral node);
     void visit(CharacterLiteral node);
-    void visit(FunctionBlock node);
     void visit(FunctionCall node);
     void visit(FunctionDeclaration node);
     void visit(Identifier node);
     void visit(IfStatement node);
     void visit(IntegerLiteral node);
-    void visit(ProcedureBlock node);
     void visit(ProcedureCall node);
     void visit(Program node);
     void visit(ReturnStatement node);
@@ -26,5 +24,4 @@ public interface NodeVisitor {
     void visit(Underscore node);
     void visit(UseStatement node);
     void visit(WhileStatement node);
-
 }

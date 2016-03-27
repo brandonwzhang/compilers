@@ -355,26 +355,6 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
         return true;
     }
-    /**
-     * FunctionBlock typechecks if its BlockList and ReturnStatement
-     * typecheck. The ReturnStatement must be able to access the same
-     * context that the BlockList had. The type of FunctionBlock is unit.
-     * @param node
-     */
-    public void visit(FunctionBlock node) {
-        contexts.push(new Context(contexts.peek()));
-
-        BlockList blockList = node.getBlockList();
-        blockList.accept(this);
-        checkFunctionBlockList(blockList);
-
-        // sanity check
-        assert blockList.getType().equals(UNIT_TYPE);
-
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
-
-        contexts.pop();
-    }
 
     /**
      * The method called must exist in the context and the types of the
@@ -533,19 +513,6 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public void visit(IntegerLiteral node) {
         node.setType(new VariableType(PrimitiveType.INT, 0));
-    }
-
-    /**
-     * ProcedureBlock typechecks if its BlockList typechecks.
-     * The type of ProcedureBlock is unit.
-     * @param node
-     */
-    public void visit(ProcedureBlock node) {
-        Context newContext = new Context(contexts.peek());
-        contexts.push(newContext);
-        node.getBlockList().accept(this);
-        contexts.pop();
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
     }
 
     /**

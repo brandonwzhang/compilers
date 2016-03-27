@@ -267,15 +267,6 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     /**
-     * empty because we killed it
-     * @param node
-     */
-    public void visit(FunctionBlock node) {
-
-    }
-
-
-    /**
      * we simplify the arguments to the function call and add them to a
      * newArguments list
      *
@@ -357,14 +348,6 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     public void visit(IntegerLiteral node) {
         // we make the integer literal available on the stack
         stack.push(node);
-    }
-
-    /**
-     * visit the blocklist of procedure block
-     * @param node
-     */
-    public void visit(ProcedureBlock node) {
-        node.getBlockList().accept(this);
     }
 
     /**

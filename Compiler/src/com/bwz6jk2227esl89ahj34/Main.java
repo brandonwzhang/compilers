@@ -79,7 +79,7 @@ public class Main {
             System.out.println("\nDEBUG: Excluding: " + Tests.exclude.toString());
 
             try {
-                //Tests.parseTests();
+                Tests.parseTests();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -88,7 +88,7 @@ public class Main {
             //Tests.constantFoldTests();
             //Tests.mirGenTests();
             //Tests.irGenTests();
-            Tests.irRunTests();
+            //Tests.irRunTests();
         }
     }
 

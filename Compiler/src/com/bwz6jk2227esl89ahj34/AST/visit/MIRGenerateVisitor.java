@@ -595,11 +595,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
         generatedNodes.push(new IRConst((long) node.getValue()));
     }
 
-    // not done
-    public void visit(FunctionBlock node) {
-
-    }
-
     public void visit(FunctionCall node) {
         List<IRExpr> arguments = new ArrayList<>();
         List<VariableType> argTypeList = new ArrayList<>();
@@ -764,26 +759,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
     public void visit(IntegerLiteral node) {
         long value = Long.parseLong(node.getValue());
         generatedNodes.push(new IRConst(value));
-    }
-
-    public void visit(ProcedureBlock node) {
-        List<Block> blockList = node.getBlockList().getBlockList();
-        List<IRStmt> stmtList = new ArrayList<>();
-
-        for (Block block : blockList) {
-            if (block instanceof TypedDeclaration) {
-                if (((TypedDeclaration) block).getArraySizeList().size() == 0) {
-                    continue;
-                }
-            }
-            block.accept(this);
-            assert generatedNodes.peek() instanceof IRStmt;
-            stmtList.add((IRStmt) generatedNodes.pop());
-        }
-
-        stmtList.add(new IRReturn());
-        IRStmt body = new IRSeq(stmtList);
-        generatedNodes.push(body);
     }
 
     public void visit(ProcedureCall node) {

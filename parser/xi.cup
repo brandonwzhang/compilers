@@ -96,8 +96,6 @@ nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_arg
 
 nonterminal FunctionDeclaration function_declaration;
 nonterminal List<FunctionDeclaration> function_declaration_list;
-nonterminal FunctionBlock function_block;
-nonterminal ProcedureBlock procedure_block;
 
 nonterminal ProcedureCall procedure_call;
 
