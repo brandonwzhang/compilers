@@ -29,6 +29,7 @@ import java.util.Map;
 public class CLI {
     private Map<String, Option> options;
     private ArrayList<String> files;
+    public static String GENERATE_ASSEMBLY = "420blaze";
 
     public CLI() {
         // we use a LinkedHashMap because we want to preserve the order
@@ -100,7 +101,11 @@ public class CLI {
      * Print all of the options and their descriptions
      */
     public void printOptions() {
+        String skip = "--" + GENERATE_ASSEMBLY;
         for (String option : options.keySet()) {
+            if (option.equals(skip)) {
+                continue;
+            }
             System.out.println(option + "\t\t" +
                     options.get(option).description);
         }

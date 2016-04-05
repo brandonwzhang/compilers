@@ -7,6 +7,7 @@ public class Main {
     private static String sourcePath = "./";
     private static String diagnosticPath = "./";
     private static String libPath = "./";
+    private static String assemblyPath = "./";
     private static boolean debug;
     private static boolean optimizations;
     private static boolean tests;
@@ -33,6 +34,10 @@ public class Main {
         cli.addOption("-D",
                 "Set the path for diagnostic files. Takes one argument.",
                 Main::setDiagnosticPath,
+                1);
+        cli.addOption("-d",
+                "Specifies where to place the generated assembly files.",
+                Main::setAssemblyPath,
                 1);
         cli.addOption("-O",
                 "Turn on optimizations",
@@ -63,14 +68,23 @@ public class Main {
         cli.addOption("--irgen",
                 "Generate intermediate code and write its S-expression representation.",
                 files -> Arrays.stream(files).forEach(file ->
-                        Core.irGen(sourcePath, diagnosticPath, libPath, file)),
+                        Core.irGen(sourcePath, diagnosticPath, libPath, file, true)),
                 0);
         cli.addOption("--irrun",
                 "Generate and interpret intermediate code",
                 files -> Arrays.stream(files).forEach(file ->
                         Core.irRun(sourcePath, diagnosticPath, libPath, file)),
                 0);
-        cli.execute(args);
+        cli.addOption("--" + CLI.GENERATE_ASSEMBLY,
+                "This should not appear in help.",
+                files -> Arrays.stream(files).forEach(file ->
+                        Core.four20blaze(sourcePath, diagnosticPath, libPath, assemblyPath, file)),
+                0);
+
+        String[] extendedArgs = new String[args.length + 1];
+        System.arraycopy(args, 0, extendedArgs, 0, args.length);
+        extendedArgs[extendedArgs.length - 1] = "--" + CLI.GENERATE_ASSEMBLY;
+        cli.execute(extendedArgs);
 
         if(tests) { // put debug mode behaviors here
 
@@ -114,6 +128,18 @@ public class Main {
             return;
         }
         diagnosticPath = args[0] + "/";
+    }
+
+    /**
+     * Specifies where to place the generated assembly files.
+     * @param args single element String array containing the path
+     */
+    public static void setAssemblyPath(String[] args) {
+        if (args.length == 0 || args[0] == null) {
+            System.out.println("Please provide diagnostic path");
+            return;
+        }
+        assemblyPath = args[0] + "/";
     }
 
     public static void setLibPath(String[] args) {

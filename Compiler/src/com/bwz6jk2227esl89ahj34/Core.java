@@ -299,14 +299,16 @@ public class Core {
     /**
      * Generates and writes the IR of the given Xi source file.
      */
-    public static void irGen(String sourcePath,
-                             String diagnosticPath,
-                             String libPath,
-                             String file) {
+    public static Optional<IRCompUnit> irGen(
+            String sourcePath,
+            String diagnosticPath,
+            String libPath,
+            String file,
+            boolean write) {
         Optional<IRCompUnit> mirRoot =
                 mirGen(sourcePath, diagnosticPath, libPath, file);
         if (!mirRoot.isPresent()) {
-            return;
+            return Optional.empty();
         }
 
         MIRLowerVisitor mirv = new MIRLowerVisitor();
@@ -317,7 +319,11 @@ public class Core {
             lirRoot = (IRCompUnit) mircfv.visit(lirRoot);
         }
 
-        Util.writeIRTree(lirRoot, diagnosticPath, file, "ir");
+        if (write) {
+            Util.writeIRTree(lirRoot, diagnosticPath, file, "ir");
+        }
+
+        return Optional.of(lirRoot);
     }
 
     /**
@@ -331,7 +337,7 @@ public class Core {
         // TODO: lower the IR (use irGen instead of mirGen)
 
         // reads Xi source file and writes an .mir file
-        irGen(sourcePath, diagnosticPath, libPath, file);
+        irGen(sourcePath, diagnosticPath, libPath, file, true);
 
         Optional<FileReader> reader =
                 Util.getFileReader(
@@ -361,5 +367,19 @@ public class Core {
         System.out.println("====================================");
         IRSimulator sim = new IRSimulator(root);
         sim.call("_Imain_paai", 0);
+    }
+
+    public static void four20blaze(String sourcePath,
+                                   String diagnosticPath,
+                                   String libPath,
+                                   String assemblyPath,
+                                   String file) {
+        Optional<IRCompUnit> irRoot = irGen(sourcePath, diagnosticPath, libPath, file, false);
+        if (!irRoot.isPresent()) {
+            return;
+        }
+
+        // TODO: PA5
+        System.out.println("Assembly code generation has not been implemented yet.");
     }
 }
