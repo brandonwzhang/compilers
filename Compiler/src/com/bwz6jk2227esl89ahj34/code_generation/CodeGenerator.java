@@ -12,7 +12,7 @@ public class CodeGenerator {
     /**
      * Add all instruction tiles to tileContainer
      */
-    private void intialize() {
+    private void initialize() {
 
     }
 

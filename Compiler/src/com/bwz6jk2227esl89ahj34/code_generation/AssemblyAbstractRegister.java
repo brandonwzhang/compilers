@@ -7,7 +7,7 @@ import java.util.HashMap;
 public class AssemblyAbstractRegister extends AssemblyExpression {
     // Maintains the next id to be assigned to a new register
     private static int curId = 0;
-    // Keeps track of id's that were assigned to given names
+    // Keeps track of id's that were assigned to given temp names
     private static HashMap<String, Integer> nameIdMap = new HashMap<>();
 
     // The id for this instance
