@@ -1,19 +1,25 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
-import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
-import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
-import com.bwz6jk2227esl89ahj34.ir.IRSeq;
+import com.bwz6jk2227esl89ahj34.ir.*;
 
 import java.util.List;
 
-public class CodeGenerator {
+public class AbstractAssemblyGenerator {
     private TileContainer tileContainer = new TileContainer();
 
     /**
      * Add all instruction tiles to tileContainer
      */
     private void initialize() {
+        ExpressionTile.CodeGenerator constGenerator = (root, instructions) -> {
+            IRConst castedRoot = (IRConst) root;
+            return new AssemblyImmediate(castedRoot.value());
+        };
 
+        ExpressionTile.CodeGenerator tempGenerator = (root, instructions) -> {
+            IRTemp castedRoot = (IRTemp) root;
+            return new AssemblyAbstractRegister(castedRoot);
+        };
     }
 
     /**
@@ -21,7 +27,7 @@ public class CodeGenerator {
      * @param root IRCompUnit of program
      * @return
      */
-    public List<AssemblyInstruction> generateAbstract(IRCompUnit root) {
+    public List<AssemblyInstruction> generate(IRCompUnit root) {
 
         return null;
     }
