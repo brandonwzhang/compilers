@@ -4,7 +4,7 @@ import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 
 import java.util.HashMap;
 
-public class AssemblyAbstractRegister extends AssemblyExpression {
+public class AssemblyAbstractRegister extends AssemblyRegister {
     // Maintains the next id to be assigned to a new register
     private static int curId = 0;
     // Keeps track of id's that were assigned to given temp names
