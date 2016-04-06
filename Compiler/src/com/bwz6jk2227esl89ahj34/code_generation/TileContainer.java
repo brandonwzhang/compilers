@@ -36,7 +36,7 @@ class TileContainer {
         throw new RuntimeException("No code_generation matched! Please email jk2227@cornell.edu");
     }
 
-    private AssemblyExpression matchExpression(IRNode root, List<AssemblyInstruction> assemblyCode) {
+    public AssemblyExpression matchExpression(IRNode root, List<AssemblyInstruction> assemblyCode) {
         assert root instanceof IRExpr;
 
         for (ExpressionTile tile : exprTiles) {
