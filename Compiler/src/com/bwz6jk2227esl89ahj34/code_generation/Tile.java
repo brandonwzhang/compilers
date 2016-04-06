@@ -98,7 +98,6 @@ public abstract class Tile {
             IRBinOp castedRoot = (IRBinOp) curRoot;
             return 1 + getPatternSize(castedRoot.left()) + getPatternSize(castedRoot.right());
         } else if (curRoot instanceof IRCall) { // need to check if content wrapped as target are same type
-            IRCall castedRoot = (IRCall) curRoot;
             return 1;
         } else if (curRoot instanceof IRCJump) {
             return 1;
