@@ -31,4 +31,9 @@ public class AssemblyAbstractRegister extends AssemblyExpression {
         id = curId++;
         nameIdMap.put(name, id);
     }
+
+    @Override
+    public String toString() {
+        return "%a" + id;
+    }
 }
