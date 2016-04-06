@@ -28,11 +28,11 @@ public abstract class Tile {
      */
     public boolean matchHelper(IRNode curRoot, IRNode curPattern) {
         assert curRoot != null;
-        // if curPattern is null, we have reached the end of the pattern
+        // If curPattern is null, we have reached the end of the pattern
         // without returning false, so we can safely return true
         if (curPattern == null) { return true; }
 
-        // if pattern does not match, we return false
+        // If pattern does not match, we return false
         if (!curRoot.getClass().equals(curPattern.getClass())) {
             return false;
         }
@@ -48,18 +48,12 @@ public abstract class Tile {
             return matchHelper(castedRoot.target(), castedPattern.target());
         } else if (curRoot instanceof IRCJump) {
             return true;
-        } else if (curRoot instanceof IRCompUnit) {
-            assert false : "shouldn't reach IRCompUnit";
-            return false;
         } else if (curRoot instanceof IRConst) {
             return true;
         } else if (curRoot instanceof IRExp) { // need to check if content wrapped by IRExp is same
             IRExp castedRoot = (IRExp) curRoot;
             IRExp castedPattern = (IRExp) curPattern;
             return matchHelper(castedRoot.expr(), castedPattern.expr());
-        } else if (curRoot instanceof IRFuncDecl) {
-            assert false : "shouldn't reach IRFuncDecl";
-            return false;
         } else if (curRoot instanceof IRJump) {
             IRJump castedRoot = (IRJump) curRoot;
             IRJump castedPattern = (IRJump) curPattern;
