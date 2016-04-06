@@ -1,4 +1,4 @@
-package com.bwz6jk2227esl89ahj34.AST.code_generation;
+package com.bwz6jk2227esl89ahj34.code_generation;
 
 public class AssemblyMemoryLocation extends AssemblyExpression {
     private long displacement;
