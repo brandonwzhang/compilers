@@ -16,7 +16,7 @@ public abstract class Tile {
 
 
     /**
-     * if root matches the pattern, return true
+     * If root matches the pattern, return true
      * otherwise return false
      */
     public boolean match(IRNode root) {
@@ -24,7 +24,7 @@ public abstract class Tile {
     }
 
     /**
-     * recursive helper method for match
+     * Recursive helper method for match
      */
     public boolean matchHelper(IRNode curRoot, IRNode curPattern) {
         assert curRoot != null;
