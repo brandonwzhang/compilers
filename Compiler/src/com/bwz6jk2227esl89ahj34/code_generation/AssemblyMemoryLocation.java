@@ -1,8 +1,8 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
 public class AssemblyMemoryLocation extends AssemblyExpression {
-    private long displacement;
-    private long scale;
+    private Long displacement;
+    private Long scale;
     private AssemblyRegister offsetRegister;
     private AssemblyRegister baseRegister;
 
@@ -36,7 +36,26 @@ public class AssemblyMemoryLocation extends AssemblyExpression {
 
     @Override
     public String toString() {
-        //TODO: Somebody who know this syntax should do this
-        return null;
+        // syntax is displacement(base register, offset register, scalar multiplier)
+        String s = "";
+        if (displacement != null) {
+            s += displacement;
+        }
+        s += "(";
+
+        if (baseRegister != null) {
+            s += baseRegister;
+        }
+        s += ",";
+        if (offsetRegister != null) {
+            s += offsetRegister;
+        }
+        s += ",";
+        if (scale != null) {
+            s += scale;
+        }
+        s += ")";
+
+        return s;
     }
 }
