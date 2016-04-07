@@ -26,4 +26,18 @@ public class StatementCodeGenerators {
 
         return instructions;
     };
+
+    StatementTile.CodeGenerator jumpGenerator = (root) -> {
+            /*
+                JUMP(label)
+             */
+        LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+        IRJump castedRoot = (IRJump) root;
+        AssemblyExpression label = tileContainer.matchExpression(castedRoot.target(), instructions);
+
+        assert label instanceof AssemblyLabel;
+        instructions.add(new AssemblyInstruction(OpCode.JMP, label));
+
+        return instructions;
+    };
 }
