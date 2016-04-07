@@ -44,7 +44,9 @@ public abstract class Tile {
             IRCall castedPattern = (IRCall) curPattern;
             return matchHelper(castedRoot.target(), castedPattern.target());
         } else if (curRoot instanceof IRCJump) {
-            return true;
+            IRCJump castedRoot = (IRCJump) curRoot;
+            IRCJump castedPattern = (IRCJump) curPattern;
+            return matchHelper(castedRoot.expr(), castedPattern.expr());
         } else if (curRoot instanceof IRConst) {
             return true;
         } else if (curRoot instanceof IRExp) { // need to check if content wrapped by IRExp is same
