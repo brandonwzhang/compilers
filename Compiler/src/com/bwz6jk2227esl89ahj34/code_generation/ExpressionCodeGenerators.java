@@ -9,9 +9,9 @@ import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import java.util.List;
 
 public class ExpressionCodeGenerators {
-    TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
+    private static TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
 
-    ExpressionTile.CodeGenerator const1 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator const1 = (root, instructions) -> {
             /*
                 CONST(i)
              */
@@ -19,7 +19,7 @@ public class ExpressionCodeGenerators {
         return new AssemblyImmediate(castedRoot.value());
     };
 
-    ExpressionTile.CodeGenerator temp1 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator temp1 = (root, instructions) -> {
             /*
                 TEMP(t)
              */
@@ -27,7 +27,7 @@ public class ExpressionCodeGenerators {
         return new AssemblyAbstractRegister(castedRoot);
     };
 
-    ExpressionTile.CodeGenerator mem1 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator mem1 = (root, instructions) -> {
             /*
                 MEM(e)
              */
@@ -38,7 +38,7 @@ public class ExpressionCodeGenerators {
         return new AssemblyMemoryLocation((AssemblyAbstractRegister)e);
     };
 
-    ExpressionTile.CodeGenerator call1 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator call1 = (root, instructions) -> {
     		/*
         		CALL(...)
         */
@@ -47,14 +47,14 @@ public class ExpressionCodeGenerators {
         return null;
     };
 
-    ExpressionTile.CodeGenerator name1 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator name1 = (root, instructions) -> {
     		/*
         		NAME("name")
         */
         return null;
     };
 
-    ExpressionTile.CodeGenerator binop1 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator binop1 = (root, instructions) -> {
       	/*
         		Handles all BinOp(e1, e2), for all e1,e2 NOT IRMem
         */
@@ -68,7 +68,7 @@ public class ExpressionCodeGenerators {
         return binopHelper(castedRoot.opType(), e1, e2, instructions);
     };
 
-    ExpressionTile.CodeGenerator binop2 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator binop2 = (root, instructions) -> {
     		/*
         		Handles all BinOp(e, IRMem)
         */
@@ -80,7 +80,7 @@ public class ExpressionCodeGenerators {
         return binopHelper(castedRoot.opType(), e, reg, instructions);
     };
 
-    ExpressionTile.CodeGenerator binop3 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator binop3 = (root, instructions) -> {
     		/*
         		Handles all BinOp(IRMem, e)
         */
@@ -92,7 +92,7 @@ public class ExpressionCodeGenerators {
         return binopHelper(castedRoot.opType(), reg, e, instructions);
     };
 
-    ExpressionTile.CodeGenerator binop4 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator binop4 = (root, instructions) -> {
     		/*
         		Handles all BinOp(IRMem, IRMem)
         */
@@ -106,7 +106,7 @@ public class ExpressionCodeGenerators {
         return binopHelper(castedRoot.opType(), reg1, reg2, instructions);
     };
 
-    private AssemblyExpression binopHelper(OpType opType,
+    private static AssemblyExpression binopHelper(OpType opType,
                                            AssemblyExpression left,
                                            AssemblyExpression right,
                                            List<AssemblyInstruction> instructions) {

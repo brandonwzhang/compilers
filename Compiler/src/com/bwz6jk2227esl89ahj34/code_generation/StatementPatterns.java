@@ -8,9 +8,14 @@ public class StatementPatterns {
         All StatementPatterns have roots that are IRStmts.
         null represents a generic pattern, for lack of better solution. Problems? email ahj34@cornell.edu.
     */
-    IRStmt move1 = new IRMove(null, null);
-    IRStmt jump1 = new IRJump((IRExpr)null);
-    IRStmt label1 = new IRLabel("");
+    public static IRStmt move1 = new IRMove(null, null);
+    public static IRStmt jump1 = new IRJump((IRExpr)null); // fuck Java
+    public static IRStmt label1 = new IRLabel("");
+    public static IRStmt exp = new IRExp(new IRCall(new IRName("")));
+    public static IRStmt move2 = new IRMove(new IRTemp(""), new IRCall(new IRName("")));
 
+    public static IRStmt return1 = new IRReturn();
+
+    public static IRStmt cjump1 = new IRCJump(null, "");
 
 }

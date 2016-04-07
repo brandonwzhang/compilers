@@ -6,13 +6,13 @@ import java.util.LinkedList;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
 
 public class StatementCodeGenerators {
-    private TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
+    private static TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
 
     public StatementCodeGenerators(TileContainer tileContainer) {
         this.tileContainer = tileContainer;
     }
 
-    StatementTile.CodeGenerator moveGenerator = (root) -> {
+    public static StatementTile.CodeGenerator move1 = (root) -> {
         /*
             MOVE(dst, src)
         */
@@ -22,12 +22,12 @@ public class StatementCodeGenerators {
         AssemblyExpression dst = tileContainer.matchExpression(castedRoot.target(), instructions);
 
         assert !(dst instanceof AssemblyImmediate);
-        instructions.add(new AssemblyInstruction(OpCode.MOVEQ, src, dst));
+        instructions.add(new AssemblyInstruction(OpCode.MOVQ, src, dst));
 
         return instructions;
     };
 
-    StatementTile.CodeGenerator jumpGenerator = (root) -> {
+    public static StatementTile.CodeGenerator jump1 = (root) -> {
         /*
             JUMP(label)
         */
@@ -41,7 +41,7 @@ public class StatementCodeGenerators {
         return instructions;
     };
 
-    StatementTile.CodeGenerator labelGenerator = (root) -> {
+    public static StatementTile.CodeGenerator label1 = (root) -> {
         /*
             LABEL(name)
          */
@@ -52,5 +52,32 @@ public class StatementCodeGenerators {
         instructions.add(label);
         return instructions;
     };
-    
+
+    public static StatementTile.CodeGenerator exp = (root) -> {
+      	/*
+        		EXP(Call(Label))
+        */
+        LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+        IRExp castedRoot = (IRExp) root;
+        // TODO
+        return instructions;
+    };
+
+    public static StatementTile.CodeGenerator move2 = (root) -> {
+    		/*
+        		MOVE(TEMP, CALL(LABEL)
+        */
+        return null;
+    };
+
+    public static StatementTile.CodeGenerator return1 = (root) -> {
+        /*
+        		RETURN()
+        */
+        return null;
+    };
+
+    public static StatementTile.CodeGenerator cjump1 = (root) -> {
+        return null;
+    };
 }

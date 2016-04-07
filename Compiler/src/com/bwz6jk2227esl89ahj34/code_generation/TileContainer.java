@@ -16,7 +16,7 @@ class TileContainer {
         exprTiles = new TreeSet<>(new TileComparator());
     }
 
-    public boolean addTile(Tile tile) {
+    public boolean add(Tile tile) {
         if (tile instanceof StatementTile) {
             return stmtTiles.add((StatementTile)tile);
         }
