@@ -12,6 +12,10 @@ public class AssemblyInstruction {
     private OpCode opCode;
     private List<AssemblyExpression> args;
 
+    public AssemblyInstruction() {
+
+    }
+
     public AssemblyInstruction(OpCode opCode, AssemblyExpression... args) {
         this.opCode = opCode;
         this.args = Arrays.asList(args);

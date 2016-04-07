@@ -13,9 +13,9 @@ public class StatementCodeGenerators {
     }
 
     StatementTile.CodeGenerator moveGenerator = (root) -> {
-            /*
-                MOVE(dst, src)
-             */
+        /*
+            MOVE(dst, src)
+        */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
         IRMove castedRoot = (IRMove) root;
         AssemblyExpression src = tileContainer.matchExpression(castedRoot.expr(), instructions);
@@ -28,16 +28,29 @@ public class StatementCodeGenerators {
     };
 
     StatementTile.CodeGenerator jumpGenerator = (root) -> {
-            /*
-                JUMP(label)
-             */
+        /*
+            JUMP(label)
+        */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
         IRJump castedRoot = (IRJump) root;
         AssemblyExpression label = tileContainer.matchExpression(castedRoot.target(), instructions);
 
-        assert label instanceof AssemblyLabel;
+        assert label instanceof AssemblyName;
         instructions.add(new AssemblyInstruction(OpCode.JMP, label));
 
         return instructions;
     };
+
+    StatementTile.CodeGenerator labelGenerator = (root) -> {
+        /*
+            LABEL(name)
+         */
+        LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+        IRLabel castedRoot = (IRLabel) root;
+        AssemblyLabel label = new AssemblyLabel(new AssemblyName(castedRoot.name()));
+
+        instructions.add(label);
+        return instructions;
+    };
+    
 }

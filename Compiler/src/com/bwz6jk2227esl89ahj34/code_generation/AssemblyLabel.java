@@ -5,13 +5,13 @@ import java.util.HashSet;
 
 public class AssemblyLabel extends AssemblyInstruction {
     private static HashSet<String> allLabels = new HashSet<String>();
-    private String name;
+    private AssemblyName name;
 
-    public AssemblyLabel(String s) {
-        assert !(allLabels.contains(s)): "Duplicate labels detected. Please email esl89@cornell.edu";
+    public AssemblyLabel(AssemblyName name) {
+        assert !(allLabels.contains(name.getName())): "Duplicate labels detected. Please email esl89@cornell.edu";
 
-        allLabels.add(s);
-        this.name = s;
+        allLabels.add(name.getName());
+        this.name = name;
     }
 
     @Override
