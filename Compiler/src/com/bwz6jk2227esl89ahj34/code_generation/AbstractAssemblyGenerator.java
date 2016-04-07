@@ -9,16 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 public class AbstractAssemblyGenerator {
-    private TileContainer tileContainer = new TileContainer();
+    public static final TileContainer tileContainer = initialize();
 
     /**
      * Add all instruction tiles to tileContainer
      */
-    private void initialize() {
-        ExpressionCodeGenerators expressionCodeGenerators =
-                new ExpressionCodeGenerators(tileContainer);
-        StatementCodeGenerators statementCodeGenerators =
-                new StatementCodeGenerators(tileContainer);
+    private static TileContainer initialize() {
+        return null;
     }
 
     /**
@@ -26,7 +23,7 @@ public class AbstractAssemblyGenerator {
      * @param root IRCompUnit of program
      * @return
      */
-    public Map<String, List<AssemblyInstruction>> generate(IRCompUnit root) {
+    public static Map<String, List<AssemblyInstruction>> generate(IRCompUnit root) {
         Map<String, List<AssemblyInstruction>> functions = new LinkedHashMap<>();
         for (String functionName: root.functions().keySet()) {
             functions.put(functionName, generateFunction(root.functions().get(functionName)));
@@ -39,7 +36,7 @@ public class AbstractAssemblyGenerator {
      * @param func the IRFuncDecl to be translated to abstract assembly
      * @return
      */
-    private List<AssemblyInstruction> generateFunction(IRFuncDecl func) {
+    private static List<AssemblyInstruction> generateFunction(IRFuncDecl func) {
         IRSeq seq = (IRSeq) func.body();
         List<AssemblyInstruction> instructions = new LinkedList<>();
         for (IRStmt statement : seq.stmts()) {

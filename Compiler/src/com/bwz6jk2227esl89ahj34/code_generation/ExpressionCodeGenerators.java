@@ -4,11 +4,7 @@ import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
 
 public class ExpressionCodeGenerators {
-    TileContainer tileContainer;
-
-    public ExpressionCodeGenerators(TileContainer tileContainer) {
-        this.tileContainer = tileContainer;
-    }
+    TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
 
     ExpressionTile.CodeGenerator constGenerator = (root, instructions) -> {
             /*
