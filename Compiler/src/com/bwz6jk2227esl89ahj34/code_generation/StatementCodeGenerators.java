@@ -53,7 +53,7 @@ public class StatementCodeGenerators {
         return instructions;
     };
 
-    public static StatementTile.CodeGenerator exp = (root) -> {
+    public static StatementTile.CodeGenerator exp1 = (root) -> {
       	/*
         		EXP(Call(Label))
         */

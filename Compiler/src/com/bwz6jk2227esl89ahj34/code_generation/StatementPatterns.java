@@ -11,7 +11,7 @@ public class StatementPatterns {
     public static IRStmt move1 = new IRMove(null, null);
     public static IRStmt jump1 = new IRJump((IRExpr)null); // fuck Java
     public static IRStmt label1 = new IRLabel("");
-    public static IRStmt exp = new IRExp(new IRCall(new IRName("")));
+    public static IRStmt exp1 = new IRExp(new IRCall(new IRName("")));
     public static IRStmt move2 = new IRMove(new IRTemp(""), new IRCall(new IRName("")));
 
     public static IRStmt return1 = new IRReturn();

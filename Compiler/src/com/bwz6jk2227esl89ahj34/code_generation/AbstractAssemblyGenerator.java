@@ -30,7 +30,7 @@ public class AbstractAssemblyGenerator {
         tileContainer.add(new StatementTile(StatementPatterns.move2, StatementCodeGenerators.move2));
         tileContainer.add(new StatementTile(StatementPatterns.jump1, StatementCodeGenerators.jump1));
         tileContainer.add(new StatementTile(StatementPatterns.label1, StatementCodeGenerators.label1));
-        tileContainer.add(new StatementTile(StatementPatterns.exp, StatementCodeGenerators.exp));
+        tileContainer.add(new StatementTile(StatementPatterns.exp1, StatementCodeGenerators.exp1));
         tileContainer.add(new StatementTile(StatementPatterns.return1, StatementCodeGenerators.return1));
         tileContainer.add(new StatementTile(StatementPatterns.cjump1, StatementCodeGenerators.cjump1));
         return tileContainer;
