@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
 
 public class StatementCodeGenerators {
-    TileContainer tileContainer;
+    private TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
 
     public StatementCodeGenerators(TileContainer tileContainer) {
         this.tileContainer = tileContainer;
