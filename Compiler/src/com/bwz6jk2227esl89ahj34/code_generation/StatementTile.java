@@ -7,8 +7,8 @@ import java.util.List;
 public class StatementTile extends Tile {
     CodeGenerator codeGenerator;
 
-    public StatementTile(IRNode pattern, TileContainer tileContainer, CodeGenerator codeGenerator) {
-        super(pattern, tileContainer);
+    public StatementTile(IRNode pattern, CodeGenerator codeGenerator) {
+        super(pattern);
         this.codeGenerator = codeGenerator;
     }
     public interface CodeGenerator {

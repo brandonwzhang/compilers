@@ -7,8 +7,8 @@ import java.util.List;
 public class ExpressionTile extends Tile {
     CodeGenerator codeGenerator;
 
-    public ExpressionTile(IRNode pattern, TileContainer tileContainer, CodeGenerator codeGenerator) {
-        super(pattern, tileContainer);
+    public ExpressionTile(IRNode pattern, CodeGenerator codeGenerator) {
+        super(pattern);
         this.codeGenerator = codeGenerator;
     }
     public interface CodeGenerator {

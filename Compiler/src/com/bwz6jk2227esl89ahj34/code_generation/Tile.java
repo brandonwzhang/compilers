@@ -5,13 +5,10 @@ import com.bwz6jk2227esl89ahj34.ir.*;
 public abstract class Tile {
     public IRNode pattern;
     public int size;
-    public TileContainer tileContainer;
 
-    public Tile(IRNode pattern, TileContainer tileContainer) {
+    public Tile(IRNode pattern) {
         this.pattern = pattern;
         this.size = getPatternSize(pattern);
-        this.tileContainer = tileContainer;
-        tileContainer.addTile(this);
     }
 
 

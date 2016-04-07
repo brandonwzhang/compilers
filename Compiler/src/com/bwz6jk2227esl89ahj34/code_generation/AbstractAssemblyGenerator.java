@@ -2,8 +2,11 @@ package com.bwz6jk2227esl89ahj34.code_generation;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
+
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class AbstractAssemblyGenerator {
     private TileContainer tileContainer = new TileContainer();
@@ -23,9 +26,12 @@ public class AbstractAssemblyGenerator {
      * @param root IRCompUnit of program
      * @return
      */
-    public List<AssemblyInstruction> generate(IRCompUnit root) {
-
-        return null;
+    public Map<String, List<AssemblyInstruction>> generate(IRCompUnit root) {
+        Map<String, List<AssemblyInstruction>> functions = new LinkedHashMap<>();
+        for (String functionName: root.functions().keySet()) {
+            functions.put(functionName, generateFunction(root.functions().get(functionName)));
+        }
+        return functions;
     }
 
     /**
@@ -34,7 +40,11 @@ public class AbstractAssemblyGenerator {
      * @return
      */
     private List<AssemblyInstruction> generateFunction(IRFuncDecl func) {
-
-        return null;
+        IRSeq seq = (IRSeq) func.body();
+        List<AssemblyInstruction> instructions = new LinkedList<>();
+        for (IRStmt statement : seq.stmts()) {
+            instructions.addAll(tileContainer.matchStatement(statement));
+        }
+        return instructions;
     }
 }
