@@ -152,6 +152,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             // Compare each LHS type with RHS type
             for (int i = 0; i < variables.size(); i++) {
                 Assignable leftExpression = variables.get(i);
+
                 Type leftType = leftExpression.getType();
                 // If leftExpression is a TypedDeclaration, we need to get the
                 // type of the variable that was declared, not unit.
@@ -171,7 +172,8 @@ public class TypeCheckVisitor implements NodeVisitor {
         } else if (variables.size() > 1) {
             throw new TypeException("Expression only evaluates to single value", expression.getRow(), expression.getCol());
 
-        } else if (variables.size() == 1) {
+        } else if (variables.size() == 1 &&
+                !(variables.get(0) instanceof Underscore)) {
             Assignable leftExpression = variables.get(0);
             Type leftType = leftExpression.getType();
             // If leftExpression is a TypedDeclaration, we need to get the
