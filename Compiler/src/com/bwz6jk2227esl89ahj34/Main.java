@@ -9,7 +9,7 @@ public class Main {
     private static String libPath = "./";
     private static String assemblyPath = "./";
     private static boolean debug;
-    private static boolean optimizations;
+    private static boolean optimizations = true;
     private static boolean tests;
 
     public static void main(String[] args) {
@@ -40,8 +40,8 @@ public class Main {
                 Main::setAssemblyPath,
                 1);
         cli.addOption("-O",
-                "Turn on optimizations",
-                Main::turnOptimizationsOn,
+                "Turn off optimizations",
+                Main::turnOptimizationsOff,
                 0);
         cli.addOption("-libpath",
                 "Set the path for interface files. Takes one argument.",
@@ -161,8 +161,8 @@ public class Main {
     /**
      * Turns on optimizations (constant folding).
      */
-    public static void turnOptimizationsOn(String[] args) {
-        optimizations = true;
+    public static void turnOptimizationsOff(String[] args) {
+        optimizations = false;
     }
 
     public static void turnTestsOn(String[] args) {
