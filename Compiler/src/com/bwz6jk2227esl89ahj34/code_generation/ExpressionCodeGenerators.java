@@ -107,9 +107,9 @@ public class ExpressionCodeGenerators {
     };
 
     private static AssemblyExpression binopHelper(OpType opType,
-                                           AssemblyExpression left,
-                                           AssemblyExpression right,
-                                           List<AssemblyInstruction> instructions) {
+                                                  AssemblyExpression left,
+                                                  AssemblyExpression right,
+                                                  List<AssemblyInstruction> instructions) {
         AssemblyAbstractRegister t = new AssemblyAbstractRegister();
         switch(opType) {
             case ADD:
