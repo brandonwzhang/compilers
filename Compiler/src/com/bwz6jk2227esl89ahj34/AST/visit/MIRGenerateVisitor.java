@@ -394,7 +394,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(Binary node) {
-        System.out.println(node);
         OpType optype;
         IRExpr left, right;
         VariableType nodeType = null;
@@ -597,19 +596,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
                     move,
                     endLabel
             ));
-//            IRTemp result = new IRTemp(getFreshVariable());
-//            IRLabel continuelabel = new IRLabel(getFreshVariable());
-//            IRLabel skiplabel = new IRLabel(getFreshVariable());
-//            IRCJump cjump = new IRCJump(left, skiplabel.name(), continuelabel.name());
-//            IRMove initmove = new IRMove(result, new IRConst(1));
-//            IRMove truemove = new IRMove(result, right);
-//
-//            IRSeq seq = new IRSeq(Arrays.asList(
-//                    initmove,
-//                    cjump,
-//                    continuelabel,
-//                    truemove,
-//                    skiplabel));
             IRESeq eseq = new IRESeq(seq, result);
             generatedNodes.push(eseq);
             return;
