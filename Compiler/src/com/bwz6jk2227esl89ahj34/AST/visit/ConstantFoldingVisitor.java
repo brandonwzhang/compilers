@@ -165,7 +165,6 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Binary node) {
-
         // we accept the left expression of the binary node
         node.getLeft().accept(this);
         // and set its left to its constant-folded form that should be
@@ -174,8 +173,9 @@ public class ConstantFoldingVisitor implements NodeVisitor {
             assert !assignableStack.isEmpty();
             node.setLeft((Expression)(assignableStack.pop()));
         } else {
-            assert !stack.isEmpty();
-            node.setLeft(stack.pop());
+            assert !stack.isEmpty() || !assignableStack.isEmpty();
+            Expression newLeft = !stack.isEmpty() ? stack.pop() : (Expression) assignableStack.pop();
+            node.setLeft(newLeft);
         }
 
         // then we apply the exact same on the right expression of the binary
@@ -185,8 +185,9 @@ public class ConstantFoldingVisitor implements NodeVisitor {
             assert !assignableStack.isEmpty();
             node.setRight((Expression)(assignableStack.pop()));
         } else {
-            assert !stack.isEmpty();
-            node.setRight(stack.pop());
+            assert !stack.isEmpty() || !assignableStack.isEmpty();
+            Expression newRight = !stack.isEmpty() ? stack.pop() : (Expression) assignableStack.pop();
+            node.setRight(newRight);
         }
 
         // now that node has been constant-folded we compute its value
@@ -280,8 +281,10 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         List<Expression> newArguments = new LinkedList<>();
         for(Expression e : node.getArguments()) {
             e.accept(this);
-            assert !stack.isEmpty();
-            newArguments.add(stack.pop());
+            assert !stack.isEmpty() || !assignableStack.isEmpty();
+            Expression arg = !stack.isEmpty() ? stack.pop() :
+                    (Expression) assignableStack.pop();
+            newArguments.add(arg);
         }
         // then we set the arguments of the function call to the list of
         // constant folded arguments
