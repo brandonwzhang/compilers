@@ -213,6 +213,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 assert generatedNodes.peek() instanceof IRExpr;
                 IRExpr array = (IRExpr)generatedNodes.pop();
 
+                IRTemp arrTemp = new IRTemp(getFreshVariable());
+                IRMove moveArrToTemp = new IRMove(arrTemp, array);
+
                 ((ArrayIndex) variable).getIndex().accept(this);
                 assert generatedNodes.peek() instanceof IRExpr;
                 IRExpr index = (IRExpr)generatedNodes.pop();
@@ -220,7 +223,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 IRTemp indexTemp = new IRTemp(getFreshVariable());
                 IRMove moveIndexToTemp = new IRMove(indexTemp, index);
 
-                IRMem length = new IRMem(new IRBinOp(OpType.SUB, array, new IRConst(WORD_SIZE)));
+                IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrTemp, new IRConst(WORD_SIZE)));
 
                 // check for out of bounds index
                 IRTemp result = new IRTemp(getFreshVariable());
@@ -242,16 +245,15 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 );
 
                 // Make a copy of these so we don't end up with duplicate labels
-                ((ArrayIndex) variable).getArrayRef().accept(this);
-                assert generatedNodes.peek() instanceof IRExpr;
-                IRExpr arrayCopy = (IRExpr)generatedNodes.pop();
+                IRTemp arrCopyTemp = new IRTemp(getFreshVariable());
+                IRMove moveArrCopyToTemp = new IRMove(arrCopyTemp, arrTemp);
 
                 IRTemp indexCopyCopyTemp = new IRTemp(getFreshVariable());
                 IRMove moveIndexCopyCopyToTemp = new IRMove(indexCopyCopyTemp, indexCopyTemp);
 
                 // move evaluatedExpression into location
                 IRMem location = new IRMem(new IRBinOp(OpType.ADD,
-                        arrayCopy,
+                        arrCopyTemp,
                         new IRBinOp(OpType.MUL, indexCopyCopyTemp, new IRConst(WORD_SIZE))
                 ));
                 IRSeq trueBody = new IRSeq(
@@ -264,6 +266,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 IRExp outOfBoundsCall = new IRExp(new IRCall(new IRName("_I_outOfBounds_p")));
 
                 IRSeq seq = new IRSeq(
+                        moveArrToTemp,
+                        moveArrCopyToTemp,
                         moveIndexToTemp,
                         moveIndexCopyToTemp,
                         moveIndexCopyCopyToTemp,
