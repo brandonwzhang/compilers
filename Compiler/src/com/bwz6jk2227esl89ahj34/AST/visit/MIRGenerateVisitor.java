@@ -581,18 +581,35 @@ public class MIRGenerateVisitor implements NodeVisitor {
         if (optype == OpType.OR) {
             // same as above, but with left evaluating to true (and a default result of 1 (true)
             IRTemp result = new IRTemp(getFreshVariable());
-            IRLabel continuelabel = new IRLabel(getFreshVariable());
-            IRLabel skiplabel = new IRLabel(getFreshVariable());
-            IRCJump cjump = new IRCJump(left, skiplabel.name(), continuelabel.name());
             IRMove initmove = new IRMove(result, new IRConst(1));
-            IRMove truemove = new IRMove(result, right);
-
+            IRLabel label1 = new IRLabel(getFreshVariable());
+            IRLabel label2 = new IRLabel(getFreshVariable());
+            IRLabel endLabel = new IRLabel(getFreshVariable());
+            IRCJump cjump = new IRCJump(left, label1.name(), label2.name());
+            IRJump jumpToEnd = new IRJump(new IRName(endLabel.name()));
+            IRMove move = new IRMove(result, right);
             IRSeq seq = new IRSeq(Arrays.asList(
                     initmove,
                     cjump,
-                    continuelabel,
-                    truemove,
-                    skiplabel));
+                    label1,
+                    jumpToEnd,
+                    label2,
+                    move,
+                    endLabel
+            ));
+//            IRTemp result = new IRTemp(getFreshVariable());
+//            IRLabel continuelabel = new IRLabel(getFreshVariable());
+//            IRLabel skiplabel = new IRLabel(getFreshVariable());
+//            IRCJump cjump = new IRCJump(left, skiplabel.name(), continuelabel.name());
+//            IRMove initmove = new IRMove(result, new IRConst(1));
+//            IRMove truemove = new IRMove(result, right);
+//
+//            IRSeq seq = new IRSeq(Arrays.asList(
+//                    initmove,
+//                    cjump,
+//                    continuelabel,
+//                    truemove,
+//                    skiplabel));
             IRESeq eseq = new IRESeq(seq, result);
             generatedNodes.push(eseq);
             return;
