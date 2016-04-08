@@ -66,7 +66,7 @@ public class Tests {
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
                 .forEach(filename -> Core.irGen("ir/irgen/",
-                        "ir/irgen/diagnostics/ir/", "ir/lib/", filename));
+                        "ir/irgen/diagnostics/ir/", "ir/lib/", filename, true));
     }
 
 
