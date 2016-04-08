@@ -872,7 +872,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         return new IRBinOp(OpType.MUL, expr, new IRConst(WORD_SIZE));
     }
 
-    public IRSeq initializeArray(IRTemp parentArrayPointer, IRExpr parentArrayIndex, List<IRExpr> lengths, int index) {
+    public List<IRStmt> initializeArray(IRTemp parentArrayPointer, IRExpr parentArrayIndex, List<IRExpr> lengths, int index) {
         List<IRStmt> statements = new ArrayList<>();
         IRTemp length = new IRTemp(getFreshVariable());
         statements.add(new IRMove(length, lengths.get(index)));
@@ -895,7 +895,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         }
         // If we're at the last element, we don't need to add more subarrays
         if (index == lengths.size() - 1) {
-            return new IRSeq(statements);
+            return statements;
         }
         // Iterate through the array and recursively allocate memory for subarrays
         IRLabel headLabel = new IRLabel(getFreshVariable());
@@ -904,17 +904,17 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRTemp counter = new IRTemp(getFreshVariable());
         statements.add(new IRMove(counter, new IRConst(0)));
         IRExpr guard = new IRBinOp(OpType.LT, counter, length);
-        IRSeq allocateSubarrays = initializeArray(arrayTemp, counter, lengths, index + 1);
+        List<IRStmt> allocateSubarrays = initializeArray(arrayTemp, counter, lengths, index + 1);
         List<IRStmt> loopStatements = new ArrayList<>();
         loopStatements.add(headLabel);
         loopStatements.add(new IRCJump(guard, trueLabel.name(), exitLabel.name()));
         loopStatements.add(trueLabel);
-        loopStatements.add(allocateSubarrays);
+        loopStatements.add(new IRSeq(allocateSubarrays));
         loopStatements.add(new IRMove(counter, new IRBinOp(OpType.ADD, counter, new IRConst(1))));
         loopStatements.add(new IRJump(new IRName(headLabel.name())));
         loopStatements.add(exitLabel);
         statements.add(new IRSeq(loopStatements));
-        return new IRSeq(statements);
+        return statements;
     }
 
     public void visit(TypedDeclaration node) {
@@ -927,17 +927,19 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // else do nothing
         List<Expression> arraySizeList = node.getArraySizeList();
         List<IRExpr> lengths = new ArrayList<>();
+        List<IRStmt> statements = new ArrayList<>();
         for (Expression arraySize : arraySizeList) {
             arraySize.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
-            lengths.add((IRExpr) generatedNodes.pop());
-        }
-        while (lengths.size() < node.getDeclarationType().getNumBrackets()) {
-            lengths.add(new IRConst(0));
+            IRExpr lengthExpr = (IRExpr) generatedNodes.pop();
+            IRTemp lengthTemp = new IRTemp(getFreshVariable());
+            statements.add(new IRMove(lengthTemp, lengthExpr));
+            lengths.add(lengthTemp);
         }
         String variableName = node.getIdentifier().getName();
         IRTemp array = new IRTemp(variableName);
-        generatedNodes.push(new IRSeq(initializeArray(array, null, lengths, 0)));
+        statements.addAll(initializeArray(array, null, lengths, 0));
+        generatedNodes.push(new IRSeq(statements));
     }
     public void visit(Unary node) {
         // not --> XOR with 1
