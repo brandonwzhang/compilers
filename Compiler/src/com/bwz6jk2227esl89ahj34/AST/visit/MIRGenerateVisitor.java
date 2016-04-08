@@ -448,22 +448,28 @@ public class MIRGenerateVisitor implements NodeVisitor {
         node.getLeft().accept(this);
         assert generatedNodes.peek() instanceof IRExpr;
         left = (IRExpr)generatedNodes.pop();
+        IRTemp leftTemp = new IRTemp(getFreshVariable());
+        IRMove moveLeftToTemp = new IRMove(leftTemp, left);
 
         node.getRight().accept(this);
         assert generatedNodes.peek() instanceof IRExpr;
         right = (IRExpr)generatedNodes.pop();
+        IRTemp rightTemp = new IRTemp(getFreshVariable());
+        IRMove moveRightToTemp = new IRMove(rightTemp, right);
 
         // array addition case
         if (optype == OpType.ADD && ((VariableType)node.getLeft().getType()).getNumBrackets() > 0) {
             assert ((VariableType)node.getRight().getType()).getNumBrackets() > 0;
             // get length of operands
-            IRMem leftLength = new IRMem(new IRBinOp(OpType.SUB, left, new IRConst(WORD_SIZE)));
-            IRMem rightLength = new IRMem(new IRBinOp(OpType.SUB, right, new IRConst(WORD_SIZE)));
+            IRMem leftLength = new IRMem(new IRBinOp(OpType.SUB, leftTemp, new IRConst(WORD_SIZE)));
+            IRMem rightLength = new IRMem(new IRBinOp(OpType.SUB, rightTemp, new IRConst(WORD_SIZE)));
             IRBinOp combinedLength = new IRBinOp(OpType.ADD, leftLength, rightLength);
 
             /* Allocate space for new array */
             String combinedArray = getFreshVariable();
             List<IRStmt> stmts = new LinkedList<>();
+            stmts.add(moveLeftToTemp);
+            stmts.add(moveRightToTemp);
             // call malloc
             IRCall malloc = new IRCall(new IRName("_I_alloc_i"),
                     new IRBinOp(OpType.MUL,
@@ -499,7 +505,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRBinOp leftElement = new IRBinOp(OpType.ADD,
                     new IRBinOp(OpType.MUL,
                             new IRTemp(index), new IRConst(WORD_SIZE)),
-                    left);
+                    leftTemp);
             IRMove trueMove1 = new IRMove(new IRMem(new IRTemp(combinedArray)), new IRMem(leftElement));
             IRMove trueMove2 = new IRMove(new IRTemp(combinedArray),
                     new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(WORD_SIZE)));
@@ -529,7 +535,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRBinOp rightElement = new IRBinOp(OpType.ADD,
                     new IRBinOp(OpType.MUL,
                             new IRTemp(index), new IRConst(WORD_SIZE)),
-                    right);
+                    rightTemp);
             IRMove trueMove1_ = new IRMove(new IRMem(new IRTemp(combinedArray)), new IRMem(rightElement));
             IRMove trueMove2_ = new IRMove(new IRTemp(combinedArray),
                     new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(WORD_SIZE)));
