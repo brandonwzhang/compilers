@@ -21,7 +21,6 @@ public class AbstractAssemblyGenerator {
         tileContainer.add(new ExpressionTile(ExpressionPatterns.const1, ExpressionCodeGenerators.const1));
         tileContainer.add(new ExpressionTile(ExpressionPatterns.temp1, ExpressionCodeGenerators.temp1));
         tileContainer.add(new ExpressionTile(ExpressionPatterns.mem1, ExpressionCodeGenerators.mem1));
-        tileContainer.add(new ExpressionTile(ExpressionPatterns.call1, ExpressionCodeGenerators.call1));
         tileContainer.add(new ExpressionTile(ExpressionPatterns.name1, ExpressionCodeGenerators.name1));
         tileContainer.add(new ExpressionTile(ExpressionPatterns.binop1, ExpressionCodeGenerators.binop1));
         tileContainer.add(new ExpressionTile(ExpressionPatterns.binop2, ExpressionCodeGenerators.binop2));
@@ -81,12 +80,18 @@ public class AbstractAssemblyGenerator {
                 new AssemblyImmediate(WORD_SIZE*AssemblyAbstractRegister.getCurId()),
                 rsp));
 
-        // Save callee-save registers
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.RBX)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.RBP)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.R12)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.R13)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.R14)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.R15)));
+        // Save callee-save registers rbx rbp r12-r15
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.RBX)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.RBP)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.R12)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.R13)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.R14)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.R15)));
     }
 }
