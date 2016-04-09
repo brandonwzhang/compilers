@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class AbstractAssemblyGenerator {
     public static final TileContainer tileContainer = initialize();
+    private static final int WORD_SIZE = 8;
 
     /**
      * Add all instruction tiles to tileContainer
@@ -74,7 +75,12 @@ public class AbstractAssemblyGenerator {
         AssemblyPhysicalRegister rsp = new AssemblyPhysicalRegister(Register.RSP);
         instructions.add(new AssemblyInstruction(OpCode.PUSHQ, rbp));
         instructions.add(new AssemblyInstruction(OpCode.MOVQ, rsp, rbp));
-        // TODO: Decrement %RSP to make space for temps
+
+        // Decrement RSP to make space for temps   sub $8*l, rsp
+        instructions.add(new AssemblyInstruction(OpCode.SUBQ,
+                new AssemblyImmediate(WORD_SIZE*AssemblyAbstractRegister.getCurId()),
+                rsp));
+
         // Save callee-save registers
         instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.RBX)));
         instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.RBP)));

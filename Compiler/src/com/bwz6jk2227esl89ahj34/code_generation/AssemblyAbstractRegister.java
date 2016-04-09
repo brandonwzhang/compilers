@@ -21,6 +21,8 @@ public class AssemblyAbstractRegister extends AssemblyRegister {
         nameIdMap = new HashMap<>();
     }
 
+    public static int getCurId() { return curId; }
+
     public AssemblyAbstractRegister() {
         id = curId++;
     }
