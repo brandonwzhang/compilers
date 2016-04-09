@@ -191,6 +191,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             Assignable variable = variables.get(0);
             if (variable instanceof Underscore) {
                 // Throw away if underscore
+                generatedNodes.push(new IRExp(evaluatedExpression));
                 return;
             } else if (variable instanceof TypedDeclaration) {
                 // Since TypedDeclarations are treated as statements, we must

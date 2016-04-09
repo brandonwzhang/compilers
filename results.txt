@@ -1,0 +1,844 @@
+
+DEBUG: Excluding: [fibonacci, enigma]
+
+================IR RUN TESTS================
+
+DEBUG: Reading ir/irrun/ack.xi
+DEBUG: Writing ir/irrun/diagnostics/ack.mir
+DEBUG: Writing ir/irrun/diagnostics/ack.ir
+
+DEBUG: Reading ir/irrun/diagnostics/ack.ir
+true
+====================================
+Ack(3,5): 253
+
+DEBUG: Reading ir/irrun/arracc02.xi
+DEBUG: Writing ir/irrun/diagnostics/arracc02.mir
+DEBUG: Writing ir/irrun/diagnostics/arracc02.ir
+
+DEBUG: Reading ir/irrun/diagnostics/arracc02.ir
+true
+====================================
+Index: 0
+0
+Index: 1
+1
+Index: 2
+2
+Index: 3
+3
+Index: 4
+4
+
+DEBUG: Reading ir/irrun/arracc04.xi
+DEBUG: Writing ir/irrun/diagnostics/arracc04.mir
+DEBUG: Writing ir/irrun/diagnostics/arracc04.ir
+
+DEBUG: Reading ir/irrun/diagnostics/arracc04.ir
+true
+====================================
+Index: 0
+Index: 0
+0
+Index: 0
+Index: 1
+1
+Index: 0
+Index: 2
+2
+Index: 0
+Index: 3
+3
+Index: 1
+Index: 0
+1
+Index: 1
+Index: 1
+2
+Index: 1
+Index: 2
+3
+Index: 1
+Index: 3
+4
+Index: 2
+Index: 0
+2
+Index: 2
+Index: 1
+3
+Index: 2
+Index: 2
+4
+Index: 2
+Index: 3
+5
+Index: 3
+Index: 0
+3
+Index: 3
+Index: 1
+4
+Index: 3
+Index: 2
+5
+Index: 3
+Index: 3
+6
+Index: 4
+Index: 0
+4
+Index: 4
+Index: 1
+5
+Index: 4
+Index: 2
+6
+Index: 4
+Index: 3
+7
+
+DEBUG: Reading ir/irrun/arracc07.xi
+DEBUG: Writing ir/irrun/diagnostics/arracc07.mir
+DEBUG: Writing ir/irrun/diagnostics/arracc07.ir
+
+DEBUG: Reading ir/irrun/diagnostics/arracc07.ir
+true
+====================================
+Index: 0
+Index: 0
+1
+1
+0
+1
+2
+3
+Index: 1
+Index: 1
+1
+1
+2
+1
+2
+3
+Index: 2
+Index: 2
+3
+1
+2
+3
+2
+3
+Index: 3
+Index: 3
+3
+1
+2
+3
+4
+3
+Index: 4
+Index: 4
+3
+1
+2
+3
+4
+5
+
+DEBUG: Reading ir/irrun/arracc08.xi
+DEBUG: Writing ir/irrun/diagnostics/arracc08.mir
+DEBUG: Writing ir/irrun/diagnostics/arracc08.ir
+
+DEBUG: Reading ir/irrun/diagnostics/arracc08.ir
+true
+====================================
+Index: 4 2
+Index: 4 2
+8
+
+DEBUG: Reading ir/irrun/array_access_arg.xi
+DEBUG: Writing ir/irrun/diagnostics/array_access_arg.mir
+DEBUG: Writing ir/irrun/diagnostics/array_access_arg.ir
+
+DEBUG: Reading ir/irrun/diagnostics/array_access_arg.ir
+true
+====================================
+
+DEBUG: Reading ir/irrun/array_run.xi
+DEBUG: Writing ir/irrun/diagnostics/array_run.mir
+DEBUG: Writing ir/irrun/diagnostics/array_run.ir
+
+DEBUG: Reading ir/irrun/diagnostics/array_run.ir
+true
+====================================
+g
+def
+e
+
+DEBUG: Reading ir/irrun/arrayIndexIssue.xi
+DEBUG: Writing ir/irrun/diagnostics/arrayIndexIssue.mir
+DEBUG: Writing ir/irrun/diagnostics/arrayIndexIssue.ir
+
+DEBUG: Reading ir/irrun/diagnostics/arrayIndexIssue.ir
+true
+====================================
+a
+b
+DEBUG: Reading ir/irrun/arrayswag.xi
+DEBUG: Writing ir/irrun/diagnostics/arrayswag.mir
+DEBUG: Writing ir/irrun/diagnostics/arrayswag.ir
+
+DEBUG: Reading ir/irrun/diagnostics/arrayswag.ir
+true
+====================================
+brandon op
+DEBUG: Reading ir/irrun/assign05.xi
+DEBUG: Writing ir/irrun/diagnostics/assign05.mir
+DEBUG: Writing ir/irrun/diagnostics/assign05.ir
+
+DEBUG: Reading ir/irrun/diagnostics/assign05.ir
+true
+====================================
+f() called: 0
+f() called: 1
+f() called: 2
+3
+2
+
+DEBUG: Reading ir/irrun/assign06.xi
+DEBUG: Writing ir/irrun/diagnostics/assign06.mir
+DEBUG: Writing ir/irrun/diagnostics/assign06.ir
+
+DEBUG: Reading ir/irrun/diagnostics/assign06.ir
+true
+====================================
+f() called: 0
+f() called: 3
+f() called: 1
+f() called: 4
+f() called: 2
+f() called: 5
+3
+4
+
+DEBUG: Reading ir/irrun/assign07.xi
+DEBUG: Writing ir/irrun/diagnostics/assign07.mir
+DEBUG: Writing ir/irrun/diagnostics/assign07.ir
+
+DEBUG: Reading ir/irrun/diagnostics/assign07.ir
+true
+====================================
+f() called: 1
+g() called: 2
+1
+2
+47
+
+DEBUG: Reading ir/irrun/assign08.xi
+DEBUG: Writing ir/irrun/diagnostics/assign08.mir
+DEBUG: Writing ir/irrun/diagnostics/assign08.ir
+
+DEBUG: Reading ir/irrun/diagnostics/assign08.ir
+true
+====================================
+f() called: 1
+g() called: 2
+
+DEBUG: Reading ir/irrun/assign09.xi
+DEBUG: Writing ir/irrun/diagnostics/assign09.mir
+DEBUG: Writing ir/irrun/diagnostics/assign09.ir
+
+DEBUG: Reading ir/irrun/diagnostics/assign09.ir
+true
+====================================
+Index: 3
+Index: 2
+Index: 2
+Index: 1
+0
+1
+2
+3
+1
+2
+47
+4
+2
+3
+4
+5
+3
+4
+5
+6
+4
+5
+6
+7
+
+DEBUG: Reading ir/irrun/assign10.xi
+DEBUG: Writing ir/irrun/diagnostics/assign10.mir
+DEBUG: Writing ir/irrun/diagnostics/assign10.ir
+
+DEBUG: Reading ir/irrun/diagnostics/assign10.ir
+true
+====================================
+Index: 4 2
+Index: 4 2
+0
+1
+2
+3
+1
+2
+3
+4
+2
+3
+4
+5
+3
+4
+5
+6
+4
+5
+47
+7
+
+DEBUG: Reading ir/irrun/assignArrayIndexLHSIssue.xi
+DEBUG: Writing ir/irrun/diagnostics/assignArrayIndexLHSIssue.mir
+DEBUG: Writing ir/irrun/diagnostics/assignArrayIndexLHSIssue.ir
+
+DEBUG: Reading ir/irrun/diagnostics/assignArrayIndexLHSIssue.ir
+true
+====================================
+f() called 
+DEBUG: Reading ir/irrun/binary.xi
+DEBUG: Writing ir/irrun/diagnostics/binary.mir
+DEBUG: Writing ir/irrun/diagnostics/binary.ir
+
+DEBUG: Reading ir/irrun/diagnostics/binary.ir
+true
+====================================
+
+DEBUG: Reading ir/irrun/binary05.xi
+DEBUG: Writing ir/irrun/diagnostics/binary05.mir
+DEBUG: Writing ir/irrun/diagnostics/binary05.ir
+
+DEBUG: Reading ir/irrun/diagnostics/binary05.ir
+true
+====================================
+1
+0
+0
+1
+0
+1
+1
+0
+1
+0
+0
+0
+1
+1
+1
+0
+
+DEBUG: Reading ir/irrun/binary06.xi
+DEBUG: Writing ir/irrun/diagnostics/binary06.mir
+DEBUG: Writing ir/irrun/diagnostics/binary06.ir
+
+DEBUG: Reading ir/irrun/diagnostics/binary06.ir
+true
+====================================
+f() called: 1
+f() called: 1
+1
+f() called: 1
+f() called: 0
+0
+f() called: 0
+f() called: 1
+0
+f() called: 0
+f() called: 0
+1
+f() called: 1
+f() called: 1
+0
+f() called: 1
+f() called: 0
+1
+f() called: 0
+f() called: 1
+1
+f() called: 0
+f() called: 0
+0
+f() called: 1
+f() called: 1
+1
+f() called: 1
+f() called: 0
+0
+f() called: 0
+0
+f() called: 0
+0
+f() called: 1
+1
+f() called: 1
+1
+f() called: 0
+f() called: 1
+1
+f() called: 0
+f() called: 0
+0
+
+DEBUG: Reading ir/irrun/binary10.xi
+DEBUG: Writing ir/irrun/diagnostics/binary10.mir
+DEBUG: Writing ir/irrun/diagnostics/binary10.ir
+
+DEBUG: Reading ir/irrun/diagnostics/binary10.ir
+true
+====================================
+f() called: {1, 2, 3, 4}
+f() called: {5, 6, 7}
+{1, 2, 3, 4, 5, 6, 7}
+f() called: {1, 2, 3, 4}
+f() called: {}
+{1, 2, 3, 4}
+f() called: {5, 6, 7}
+f() called: {}
+{5, 6, 7}
+
+DEBUG: Reading ir/irrun/binary12.xi
+DEBUG: Writing ir/irrun/diagnostics/binary12.mir
+DEBUG: Writing ir/irrun/diagnostics/binary12.ir
+
+DEBUG: Reading ir/irrun/diagnostics/binary12.ir
+true
+====================================
+f() called: 1
+1
+f() called: 0
+1
+0
+f() called: 1
+1
+f() called: 0
+0
+0
+f() called: 1
+0
+f() called: 0
+1
+0
+f() called: 1
+0
+f() called: 0
+0
+0
+f() called: 1
+1
+f() called: 0
+1
+1
+f() called: 1
+1
+f() called: 0
+0
+1
+f() called: 1
+0
+f() called: 0
+1
+1
+f() called: 1
+0
+f() called: 0
+0
+1
+f() called: 1
+1
+0
+f() called: 0
+1
+f() called: 1
+0
+0
+f() called: 0
+0
+f() called: 1
+1
+0
+f() called: 0
+0
+f() called: 1
+0
+0
+f() called: 0
+1
+1
+f() called: 1
+1
+f() called: 0
+0
+1
+f() called: 1
+0
+f() called: 0
+1
+1
+f() called: 1
+0
+f() called: 0
+0
+1
+
+DEBUG: Reading ir/irrun/empty_main.xi
+DEBUG: Writing ir/irrun/diagnostics/empty_main.mir
+DEBUG: Writing ir/irrun/diagnostics/empty_main.ir
+
+DEBUG: Reading ir/irrun/diagnostics/empty_main.ir
+true
+====================================
+
+DEBUG: Reading ir/irrun/if07.xi
+DEBUG: Writing ir/irrun/diagnostics/if07.mir
+DEBUG: Writing ir/irrun/diagnostics/if07.ir
+
+DEBUG: Reading ir/irrun/diagnostics/if07.ir
+true
+====================================
+lt() called: 0 < 0
+lt() called: 0 < 0
+lt() called: 0 < 0
+lt() called: 0 < -1
+lt() called: 0 < -1
+lt() called: 0 < -1
+lt() called: 0 < 1
+lt() called: 0 < 0
+lt() called: 0 < 1
+lt() called: 0 < -1
+lt() called: 0 < 1
+lt() called: 0 < 1
+true
+printed
+
+DEBUG: Reading ir/irrun/if08.xi
+DEBUG: Writing ir/irrun/diagnostics/if08.mir
+DEBUG: Writing ir/irrun/diagnostics/if08.ir
+
+DEBUG: Reading ir/irrun/diagnostics/if08.ir
+true
+====================================
+lt() called: 0 < 0
+false
+lt() called: 0 < 0
+false
+lt() called: 0 < 0
+false
+lt() called: 0 < -1
+false
+lt() called: 0 < -1
+false
+lt() called: 0 < -1
+false
+lt() called: 0 < 1
+lt() called: 0 < 0
+false
+lt() called: 0 < 1
+lt() called: 0 < -1
+false
+lt() called: 0 < 1
+lt() called: 0 < 1
+true
+printed
+
+DEBUG: Reading ir/irrun/if09.xi
+DEBUG: Writing ir/irrun/diagnostics/if09.mir
+DEBUG: Writing ir/irrun/diagnostics/if09.ir
+
+DEBUG: Reading ir/irrun/diagnostics/if09.ir
+true
+====================================
+lt() called: 0 < 0
+lt() called: 0 < 0
+lt() called: 0 < 0
+lt() called: 0 < -1
+lt() called: 0 < 0
+lt() called: 0 < 1
+true
+lt() called: 0 < -1
+lt() called: 0 < 0
+lt() called: 0 < -1
+lt() called: 0 < -1
+lt() called: 0 < -1
+lt() called: 0 < 1
+true
+lt() called: 0 < 1
+true
+lt() called: 0 < 1
+true
+lt() called: 0 < 1
+true
+printed
+
+DEBUG: Reading ir/irrun/if10.xi
+DEBUG: Writing ir/irrun/diagnostics/if10.mir
+DEBUG: Writing ir/irrun/diagnostics/if10.ir
+
+DEBUG: Reading ir/irrun/diagnostics/if10.ir
+true
+====================================
+lt() called: 0 < 0
+lt() called: 0 < 0
+false
+lt() called: 0 < 0
+lt() called: 0 < -1
+false
+lt() called: 0 < 0
+lt() called: 0 < 1
+true
+lt() called: 0 < -1
+lt() called: 0 < 0
+false
+lt() called: 0 < -1
+lt() called: 0 < -1
+false
+lt() called: 0 < -1
+lt() called: 0 < 1
+true
+lt() called: 0 < 1
+true
+lt() called: 0 < 1
+true
+lt() called: 0 < 1
+true
+printed
+
+DEBUG: Reading ir/irrun/if_run.xi
+DEBUG: Writing ir/irrun/diagnostics/if_run.mir
+DEBUG: Writing ir/irrun/diagnostics/if_run.ir
+
+DEBUG: Reading ir/irrun/diagnostics/if_run.ir
+true
+====================================
+correct
+
+DEBUG: Reading ir/irrun/ifelsePrecedence.xi
+DEBUG: Writing ir/irrun/diagnostics/ifelsePrecedence.mir
+DEBUG: Writing ir/irrun/diagnostics/ifelsePrecedence.ir
+
+DEBUG: Reading ir/irrun/diagnostics/ifelsePrecedence.ir
+true
+====================================
+e
+
+DEBUG: Reading ir/irrun/insertionsort_run.xi
+DEBUG: Writing ir/irrun/diagnostics/insertionsort_run.mir
+DEBUG: Writing ir/irrun/diagnostics/insertionsort_run.ir
+
+DEBUG: Reading ir/irrun/diagnostics/insertionsort_run.ir
+true
+====================================
+unsorted: edhgf
+sorted:   defgh
+unsorted: fadbgce
+sorted:   abcdefg
+unsorted: ponmlkjih
+sorted:   hijklmnop
+
+DEBUG: Reading ir/irrun/localdecl13.xi
+DEBUG: Writing ir/irrun/diagnostics/localdecl13.mir
+DEBUG: Writing ir/irrun/diagnostics/localdecl13.ir
+
+DEBUG: Reading ir/irrun/diagnostics/localdecl13.ir
+true
+====================================
+Index: 0
+Index: 1
+
+DEBUG: Reading ir/irrun/localdecl14.xi
+DEBUG: Writing ir/irrun/diagnostics/localdecl14.mir
+DEBUG: Writing ir/irrun/diagnostics/localdecl14.ir
+
+DEBUG: Reading ir/irrun/diagnostics/localdecl14.ir
+true
+====================================
+Index: 3
+Index: 2
+Index: 2
+Index: 1
+Index: 1
+Index: 0
+1
+2
+2
+2
+4
+5
+5
+
+DEBUG: Reading ir/irrun/mdarray_multiassign.xi
+DEBUG: Writing ir/irrun/diagnostics/mdarray_multiassign.mir
+DEBUG: Writing ir/irrun/diagnostics/mdarray_multiassign.ir
+
+DEBUG: Reading ir/irrun/diagnostics/mdarray_multiassign.ir
+true
+====================================
+dd뻁톃ࢮ좮鱼ﾦ壕ೣ◄朞聅ꈿ膌䫺♅鿒ᵌ⋨ñ䍟㋮륈杸✭験廕⥫뙉舊癩柷⢄絰씾য়編㝝精㨶覇▤䇄뭿龣?罖㑨次ꚫꅍ⪬գ큾炖䖗ᖀ솟沋勃釪渒㕿휫?냣ꍻ䇪轀㔝ꧧ᳅ꏙ䌗怼왛닓꺮芸㇑幝ེ컂ᖰꇣ⩽凄ĉ怴
+dd
+
+DEBUG: Reading ir/irrun/mdarrays3.xi
+DEBUG: Writing ir/irrun/diagnostics/mdarrays3.mir
+DEBUG: Writing ir/irrun/diagnostics/mdarrays3.ir
+
+DEBUG: Reading ir/irrun/diagnostics/mdarrays3.ir
+true
+====================================
+d躞⇐
+
+DEBUG: Reading ir/irrun/primes.xi
+DEBUG: Writing ir/irrun/diagnostics/primes.mir
+DEBUG: Writing ir/irrun/diagnostics/primes.ir
+
+DEBUG: Reading ir/irrun/diagnostics/primes.ir
+true
+====================================
+Largest prime less than 1000 is 997
+DEBUG: Reading ir/irrun/ratadduse_full.xi
+DEBUG: Writing ir/irrun/diagnostics/ratadduse_full.mir
+DEBUG: Writing ir/irrun/diagnostics/ratadduse_full.ir
+
+DEBUG: Reading ir/irrun/diagnostics/ratadduse_full.ir
+true
+====================================
+osj
+DEBUG: Reading ir/irrun/simple.xi
+DEBUG: Writing ir/irrun/diagnostics/simple.mir
+DEBUG: Writing ir/irrun/diagnostics/simple.ir
+
+DEBUG: Reading ir/irrun/diagnostics/simple.ir
+true
+====================================
+
+DEBUG: Reading ir/irrun/swap.xi
+DEBUG: Writing ir/irrun/diagnostics/swap.mir
+DEBUG: Writing ir/irrun/diagnostics/swap.ir
+
+DEBUG: Reading ir/irrun/diagnostics/swap.ir
+true
+====================================
+def
+
+DEBUG: Reading ir/irrun/while02.xi
+DEBUG: Writing ir/irrun/diagnostics/while02.mir
+DEBUG: Writing ir/irrun/diagnostics/while02.ir
+
+DEBUG: Reading ir/irrun/diagnostics/while02.ir
+true
+====================================
+lt() called: 0 < 7
+0
+lt() called: 1 < 7
+1
+lt() called: 2 < 7
+2
+lt() called: 3 < 7
+3
+lt() called: 4 < 7
+4
+lt() called: 5 < 7
+5
+lt() called: 6 < 7
+6
+lt() called: 7 < 7
+done
+
+DEBUG: Reading ir/irrun/while03.xi
+DEBUG: Writing ir/irrun/diagnostics/while03.mir
+DEBUG: Writing ir/irrun/diagnostics/while03.ir
+
+DEBUG: Reading ir/irrun/diagnostics/while03.ir
+true
+====================================
+f() called
+lt() called: 0 < 7
+g() called
+0
+f() called
+lt() called: 1 < 7
+g() called
+1
+f() called
+lt() called: 2 < 7
+g() called
+2
+f() called
+lt() called: 3 < 7
+g() called
+3
+f() called
+lt() called: 4 < 7
+g() called
+4
+f() called
+lt() called: 5 < 7
+g() called
+5
+f() called
+lt() called: 6 < 7
+g() called
+6
+f() called
+lt() called: 7 < 7
+done
+
+DEBUG: Reading ir/irrun/while04.xi
+DEBUG: Writing ir/irrun/diagnostics/while04.mir
+DEBUG: Writing ir/irrun/diagnostics/while04.ir
+
+DEBUG: Reading ir/irrun/diagnostics/while04.ir
+true
+====================================
+f() called
+lt() called: 0 < 7
+0
+f() called
+lt() called: 1 < 7
+1
+f() called
+lt() called: 2 < 7
+2
+f() called
+lt() called: 3 < 7
+3
+f() called
+lt() called: 4 < 7
+4
+f() called
+lt() called: 5 < 7
+5
+f() called
+lt() called: 6 < 7
+6
+f() called
+lt() called: 7 < 7
+g() called
+done
+
+DEBUG: Reading ir/irrun/while_run.xi
+DEBUG: Writing ir/irrun/diagnostics/while_run.mir
+DEBUG: Writing ir/irrun/diagnostics/while_run.ir
+
+DEBUG: Reading ir/irrun/diagnostics/while_run.ir
+true
+====================================
+defghijklm
+efghijklmnopqrstuvwx
