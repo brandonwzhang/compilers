@@ -10,11 +10,8 @@ import com.bwz6jk2227esl89ahj34.util.Util;
 import java.util.*;
 
 public class MIRGenerateVisitor implements NodeVisitor {
-    // Word is 8 bytes
-    public static final int WORD_SIZE = 8;
-
     // The root of the MIR Tree
-    private IRCompUnit IRRoot;
+    private IRCompUnit root;
     // A stack of nodes, the top of which represents the current node.
     // Visit functions will modify the top of the current node
     private Stack<IRNode> generatedNodes;
@@ -28,8 +25,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
         generatedNodes = new Stack<>();
     }
 
-    public IRCompUnit getIRRoot() {
-        return IRRoot;
+    public IRCompUnit getRoot() {
+        return root;
     }
 
     private String getFreshVariable() {
@@ -58,21 +55,20 @@ public class MIRGenerateVisitor implements NodeVisitor {
         assert generatedNodes.peek() instanceof IRExpr;
         IRExpr index = (IRExpr)generatedNodes.pop();
 
-        //move array ref into a temp
+        // Move array ref into a temp
         IRTemp arrTemp = new IRTemp(getFreshVariable());
         IRMove moveArrToTemp = new IRMove(arrTemp, array);
 
-        //move index into a temp
+        // Move index into a temp
         IRTemp indexTemp = new IRTemp(getFreshVariable());
         IRMove moveIndexToTemp = new IRMove(indexTemp, index);
 
 
         IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrTemp,
-                new IRConst(WORD_SIZE)));
+                new IRConst(Configuration.WORD_SIZE)));
 
         // Check for out of bounds index
         IRTemp result = new IRTemp(getFreshVariable());
-        List<IRStmt> stmts = new LinkedList<>();
         IRLabel trueLabel = new IRLabel(getFreshVariable());
         IRLabel falseLabel = new IRLabel(getFreshVariable());
         IRLabel exitLabel = new IRLabel(getFreshVariable());
@@ -96,15 +92,15 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRTemp indexCopyCopyTemp = new IRTemp(getFreshVariable());
         IRMove moveIndexCopyCopyToTemp = new IRMove(indexCopyCopyTemp, indexTemp);
 
-        // get mem location
+        // Get mem location
         IRSeq trueBody = new IRSeq(
                 // get actual element
                 new IRMove(result, new IRMem( new IRBinOp(
                         OpType.ADD,
-                        new IRBinOp(OpType.MUL, indexCopyCopyTemp, new IRConst(WORD_SIZE)),
+                        new IRBinOp(OpType.MUL, indexCopyCopyTemp, new IRConst(Configuration.WORD_SIZE)),
                         arrayCopyTemp//arrayCopy
                 ))),
-                // jump to exit
+                // Jump to exit
                 new IRJump(new IRName(exitLabel.name()))
         );
 
@@ -130,15 +126,15 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(ArrayLiteral node) {
-        // overall return type is IRTemp t, of which IRMem(t) is index 0 of array
+        // Overall return type is IRTemp t, of which IRMem(t) is index 0 of array
 
         // eseq
-        // call malloc for 8(n+1), the size of the arrayliteral, move result into a
-        // move n (length of arrayliteral) into a
-        // move a+8 into a
-        // return a
+        // Call malloc for 8(n+1), the size of the arrayliteral, move result into a
+        // Move n (length of arrayliteral) into a
+        // Move a+8 into a
+        // Return a
 
-        List<IRExpr> arrayElements = new LinkedList<IRExpr>();
+        List<IRExpr> arrayElements = new LinkedList<>();
         int length = node.getValues().size();
         for (Expression e : node.getValues()) {
             e.accept(this);
@@ -149,28 +145,28 @@ public class MIRGenerateVisitor implements NodeVisitor {
         String array = getFreshVariable(); // temp to store array
 
         List<IRStmt> stmts = new LinkedList<>();
-        // call to malloc
-        IRCall malloc = new IRCall(new IRName("_I_alloc_i"), new IRConst(WORD_SIZE * (length + 1)));
+        // Call to malloc
+        IRCall malloc = new IRCall(new IRName("_I_alloc_i"), new IRConst(Configuration.WORD_SIZE * (length + 1)));
         IRMove storeArrayPtr = new IRMove(new IRTemp(array), malloc);
         // TODO make first index of malloc's return IMMUTABLE IRMem
 
-        // save length in MEM(array)
+        // Save length in MEM(array)
         IRMove saveLength = new IRMove(new IRMem(new IRTemp(array)), new IRConst(length));
-        // shift array up to 0th index
-        IRMove shift = new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD, new IRTemp(array), new IRConst(WORD_SIZE)));
+        // Shift array up to 0th index
+        IRMove shift = new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD, new IRTemp(array), new IRConst(Configuration.WORD_SIZE)));
 
         stmts.add(storeArrayPtr);
         stmts.add(saveLength);
         stmts.add(shift);
 
-        // put elements into array spaces
+        // Put elements into array spaces
         for (IRExpr e : arrayElements) {
             stmts.add(new IRMove(new IRMem(new IRTemp(array)), e)); // put array element in
-            stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD, new IRTemp(array), new IRConst(WORD_SIZE)))); // add 8 to array pointer
+            stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD, new IRTemp(array), new IRConst(Configuration.WORD_SIZE)))); // add 8 to array pointer
         }
 
-        // move array pointer back to index 0
-        stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.SUB, new IRTemp(array), new IRConst(WORD_SIZE * length))));
+        // Move array pointer back to index 0
+        stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.SUB, new IRTemp(array), new IRConst(Configuration.WORD_SIZE * length))));
 
         IRSeq seq = new IRSeq(stmts);
         IRESeq eseq = new IRESeq(seq, new IRTemp(array));
@@ -209,7 +205,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 generatedNodes.push(new IRSeq(statements));
                 return;
             } else if (variable instanceof ArrayIndex) {
-                // if arrayindex on LHS, we need to handle out of bounds setting
+                // If arrayindex on LHS, we need to handle out of bounds setting
                 ((ArrayIndex) variable).getArrayRef().accept(this);
                 assert generatedNodes.peek() instanceof IRExpr;
                 IRExpr array = (IRExpr)generatedNodes.pop();
@@ -224,11 +220,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 IRTemp indexTemp = new IRTemp(getFreshVariable());
                 IRMove moveIndexToTemp = new IRMove(indexTemp, index);
 
-                IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrTemp, new IRConst(WORD_SIZE)));
+                IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrTemp, new IRConst(Configuration.WORD_SIZE)));
 
-                // check for out of bounds index
-                IRTemp result = new IRTemp(getFreshVariable());
-                List<IRStmt> stmts = new LinkedList<>();
+                // Check for out of bounds index
                 IRLabel trueLabel = new IRLabel(getFreshVariable());
                 IRLabel falseLabel = new IRLabel(getFreshVariable());
                 IRLabel exitLabel = new IRLabel(getFreshVariable());
@@ -255,7 +249,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 // move evaluatedExpression into location
                 IRMem location = new IRMem(new IRBinOp(OpType.ADD,
                         arrCopyTemp,
-                        new IRBinOp(OpType.MUL, indexCopyCopyTemp, new IRConst(WORD_SIZE))
+                        new IRBinOp(OpType.MUL, indexCopyCopyTemp, new IRConst(Configuration.WORD_SIZE))
                 ));
                 IRSeq trueBody = new IRSeq(
                         // get actual element
@@ -328,7 +322,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 assert generatedNodes.peek() instanceof IRExpr;
                 IRExpr index = (IRExpr)generatedNodes.pop();
 
-                IRMem length = new IRMem(new IRBinOp(OpType.SUB, array, new IRConst(WORD_SIZE)));
+                IRMem length = new IRMem(new IRBinOp(OpType.SUB, array, new IRConst(Configuration.WORD_SIZE)));
 
                 // check for out of bounds index
                 IRTemp result = new IRTemp(getFreshVariable());
@@ -361,7 +355,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 // move evaluatedExpression into location
                 IRMem location = new IRMem(new IRBinOp(OpType.ADD,
                         arrayCopy,
-                        new IRBinOp(OpType.MUL, indexCopyCopy, new IRConst(WORD_SIZE))
+                        new IRBinOp(OpType.MUL, indexCopyCopy, new IRConst(Configuration.WORD_SIZE))
                 ));
                 IRSeq trueBody = new IRSeq(
                         // get actual element
@@ -462,8 +456,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
         if (optype == OpType.ADD && ((VariableType)node.getLeft().getType()).getNumBrackets() > 0) {
             assert ((VariableType)node.getRight().getType()).getNumBrackets() > 0;
             // get length of operands
-            IRMem leftLength = new IRMem(new IRBinOp(OpType.SUB, leftTemp, new IRConst(WORD_SIZE)));
-            IRMem rightLength = new IRMem(new IRBinOp(OpType.SUB, rightTemp, new IRConst(WORD_SIZE)));
+            IRMem leftLength = new IRMem(new IRBinOp(OpType.SUB, leftTemp, new IRConst(Configuration.WORD_SIZE)));
+            IRMem rightLength = new IRMem(new IRBinOp(OpType.SUB, rightTemp, new IRConst(Configuration.WORD_SIZE)));
             IRBinOp combinedLength = new IRBinOp(OpType.ADD, leftLength, rightLength);
 
             /* Allocate space for new array */
@@ -475,14 +469,14 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRCall malloc = new IRCall(new IRName("_I_alloc_i"),
                     new IRBinOp(OpType.MUL,
                             new IRBinOp(OpType.ADD, combinedLength, new IRConst(1)),
-                            new IRConst(WORD_SIZE)));
+                            new IRConst(Configuration.WORD_SIZE)));
             IRMove storeArrayPtr = new IRMove(new IRTemp(combinedArray), malloc);
             // TODO make first index of malloc's return IMMUTABLE IRMem
 
             // save length in MEM(combinedArray)
             IRMove saveLength = new IRMove(new IRMem(new IRTemp(combinedArray)), combinedLength);
             // shift array up to 0th index
-            IRMove shift = new IRMove(new IRTemp(combinedArray), new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(WORD_SIZE)));
+            IRMove shift = new IRMove(new IRTemp(combinedArray), new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(Configuration.WORD_SIZE)));
             // Store the start of the array to return
             IRTemp retArray = new IRTemp(getFreshVariable());
 
@@ -505,11 +499,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
             IRBinOp leftElement = new IRBinOp(OpType.ADD,
                     new IRBinOp(OpType.MUL,
-                            new IRTemp(index), new IRConst(WORD_SIZE)),
+                            new IRTemp(index), new IRConst(Configuration.WORD_SIZE)),
                     leftTemp);
             IRMove trueMove1 = new IRMove(new IRMem(new IRTemp(combinedArray)), new IRMem(leftElement));
             IRMove trueMove2 = new IRMove(new IRTemp(combinedArray),
-                    new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(WORD_SIZE)));
+                    new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(Configuration.WORD_SIZE)));
             IRMove trueMove3 = new IRMove(new IRTemp(index),
                     new IRBinOp(OpType.ADD, new IRTemp(index), new IRConst(1)));
             IRJump headJump = new IRJump(new IRName(headLabel.name()));
@@ -535,11 +529,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
             IRBinOp rightElement = new IRBinOp(OpType.ADD,
                     new IRBinOp(OpType.MUL,
-                            new IRTemp(index), new IRConst(WORD_SIZE)),
+                            new IRTemp(index), new IRConst(Configuration.WORD_SIZE)),
                     rightTemp);
             IRMove trueMove1_ = new IRMove(new IRMem(new IRTemp(combinedArray)), new IRMem(rightElement));
             IRMove trueMove2_ = new IRMove(new IRTemp(combinedArray),
-                    new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(WORD_SIZE)));
+                    new IRBinOp(OpType.ADD, new IRTemp(combinedArray), new IRConst(Configuration.WORD_SIZE)));
             IRMove trueMove3_ = new IRMove(new IRTemp(index),
                     new IRBinOp(OpType.ADD, new IRTemp(index), new IRConst(1)));
             IRJump headJump2 = new IRJump(new IRName(headLabel2.name()));
@@ -660,7 +654,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             assert arguments.size() == 1;
             IRExpr arrayArg = arguments.get(0);
 
-            IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrayArg, new IRConst(WORD_SIZE)));
+            IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrayArg, new IRConst(Configuration.WORD_SIZE)));
             generatedNodes.push(length);
 
             return;
@@ -832,15 +826,15 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
     public void visit(Program node) {
         Map<String, IRFuncDecl> functions = new HashMap<>();
-        // go through all function declarations
+        // Go through all function declarations
         for (FunctionDeclaration fd : node.getFunctionDeclarationList()) {
             fd.accept(this);
             assert generatedNodes.peek() instanceof IRFuncDecl;
             functions.put(getIRFunctionName(fd), (IRFuncDecl) generatedNodes.pop());
         }
 
-        IRRoot = new IRCompUnit(name, functions);
-        generatedNodes.push(IRRoot);
+        root = new IRCompUnit(name, functions);
+        generatedNodes.push(root);
     }
 
     public void visit(ReturnStatement node) {
@@ -870,7 +864,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         arrayliteral.accept(this);
     }
     public IRBinOp scaleByWordSize(IRExpr expr) {
-        return new IRBinOp(OpType.MUL, expr, new IRConst(WORD_SIZE));
+        return new IRBinOp(OpType.MUL, expr, new IRConst(Configuration.WORD_SIZE));
     }
 
     public List<IRStmt> initializeArray(IRTemp parentArrayPointer, IRExpr parentArrayIndex, List<IRExpr> lengths, int index) {
@@ -885,7 +879,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // Add the length to before the first element of the array
         statements.add(new IRMove(new IRMem(arrayTemp), length));
         // Move pointer to the first element of the array
-        statements.add(new IRMove(arrayTemp, new IRBinOp(OpType.ADD, arrayTemp, new IRConst(WORD_SIZE))));
+        statements.add(new IRMove(arrayTemp, new IRBinOp(OpType.ADD, arrayTemp, new IRConst(Configuration.WORD_SIZE))));
         if (index == 0) {
             // If we're at the first index, we just need to put the pointer to the array in the given temp
             statements.add(new IRMove(parentArrayPointer, arrayTemp));
@@ -985,12 +979,12 @@ public class MIRGenerateVisitor implements NodeVisitor {
         return;
     }
     public void visit(WhileStatement node) {
-        // create labels
+        // Create labels
         IRLabel headLabel = new IRLabel(getFreshVariable());
         IRLabel trueLabel = new IRLabel(getFreshVariable());
         IRLabel exitLabel = new IRLabel(getFreshVariable());
 
-        // perform translations
+        // Perform translations
         node.getGuard().accept(this);
         assert generatedNodes.peek() instanceof IRExpr;
         IRExpr guard = (IRExpr)generatedNodes.pop();

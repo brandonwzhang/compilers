@@ -261,7 +261,7 @@ public class Core {
         MIRGenerateVisitor mirgv =
                 new MIRGenerateVisitor(Util.extractFileName(file));
         program.get().accept(mirgv);
-        IRCompUnit mirRoot = mirgv.getIRRoot();
+        IRCompUnit mirRoot = mirgv.getRoot();
 
         if (Main.optimizationsOn()) {
             // constant folding on the MIR tree
