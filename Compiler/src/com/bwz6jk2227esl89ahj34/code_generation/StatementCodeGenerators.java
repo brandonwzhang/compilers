@@ -117,12 +117,50 @@ public class StatementCodeGenerators {
     };
 
     private static void functionCall(IRNode node, List<AssemblyInstruction> instructions) {
-
-
+        
         assert node instanceof IRCall;
         IRCall castedNode = (IRCall) node;
 
         // TODO: allocate space for returned arguments, pass a pointer to that
+        AssemblyExpression name = tileContainer.matchExpression(castedNode.target(), instructions);
+        assert name instanceof AssemblyName;
+        String functionName = ((AssemblyName) name).getName();
+
+        int numReturnValues;
+        int lastUnderscore = functionName.lastIndexOf('_');
+        String returnTypes = functionName.substring(lastUnderscore + 1);
+        if (returnTypes.contains("p")) {
+            // example: main(args: int[][]) -> _Imain_paai
+            numReturnValues = 0;
+        } else if (!returnTypes.contains("t")) {
+            // example: unparseInt(n: int): int[] -> _IunparseInt_aii
+            numReturnValues = 1;
+        } else {
+            // example: parseInt(str: int[]): int, bool -> _IparseInt_t2ibai
+            int i = 1;
+            while (Character.isDigit(returnTypes.charAt(i))) {
+                i++;
+            }
+            numReturnValues = Integer.parseInt(returnTypes.substring(1, i));
+        }
+
+        AssemblyAbstractRegister returnValuePointer = new AssemblyAbstractRegister();
+        instructions.add(new AssemblyInstruction(
+                OpCode.MOVQ,
+                new AssemblyPhysicalRegister(Register.RSP),
+                returnValuePointer
+        ));
+        for (int i = 0; i < numReturnValues; i++) {
+            instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                    new AssemblyImmediate(0)));
+        }
+
+        // TODO: where do we add the pointer to the return value space?
+        instructions.add(new AssemblyInstruction(
+                OpCode.PUSHQ,
+                returnValuePointer
+        ));
+
         // TODO: space to the callee function
 
         // save all caller-save registers
