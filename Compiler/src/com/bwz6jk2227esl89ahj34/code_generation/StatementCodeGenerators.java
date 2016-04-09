@@ -3,8 +3,10 @@ package com.bwz6jk2227esl89ahj34.code_generation;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyPhysicalRegister.Register;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
 
@@ -75,7 +77,7 @@ public class StatementCodeGenerators {
 
     /**
      * for convenience, we take care of the "function epilogue"
-     * along with the return statement 
+     * along with the return statement
      */
     public static StatementTile.CodeGenerator return1 = (root) -> {
         /*
@@ -114,8 +116,77 @@ public class StatementCodeGenerators {
         return instructions;
     };
 
-    private static AssemblyExpression functionCall(IRNode node, List<AssemblyInstruction> instructions) {
+    private static void functionCall(IRNode node, List<AssemblyInstruction> instructions) {
 
-        return null;
+
+        assert node instanceof IRCall;
+        IRCall castedNode = (IRCall) node;
+
+        // TODO: allocate space for returned arguments, pass a pointer to that
+        // TODO: space to the callee function
+
+        // save all caller-save registers
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.RAX)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.RCX)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.RDX)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.RSI)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.RDI)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.RSP)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.R8)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.R9)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.R10)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                new AssemblyPhysicalRegister(Register.R11)));
+
+        // put arguments in order rdi rsi rdx rcx r8 r9
+
+        List<IRExpr> arguments = castedNode.args();
+        List<Register> argumentRegisters = Arrays.asList(
+                Register.RDI,
+                Register.RSI,
+                Register.RDX,
+                Register.RCX,
+                Register.R8,
+                Register.R9
+        );
+        int numArguments = arguments.size();
+        Stack<AssemblyExpression> reversedArguments = new Stack<>();
+        for(int i = 0; i < numArguments; i++) {
+            if(i < 6) {
+                instructions.add(new AssemblyInstruction(OpCode.MOVQ,
+                        tileContainer.matchExpression(arguments.get(i), instructions),
+                        new AssemblyPhysicalRegister(argumentRegisters.get(i))));
+            } else { // push onto stack
+                reversedArguments.push(
+                        tileContainer.matchExpression(arguments.get(i), instructions)
+                );
+            }
+        }
+        // further arguments go in stack in reverse order
+        while (!reversedArguments.isEmpty()) {
+            instructions.add(
+                    new AssemblyInstruction(
+                            OpCode.PUSHQ,
+                            reversedArguments.pop()
+                    )
+            );
+        }
+
+        // add the call instruction to instructions
+        instructions.add(new AssemblyInstruction(
+                OpCode.JMP,
+                tileContainer.matchExpression(castedNode.target(), instructions)
+        ));
+
+        //TODO: save caller saved registers, but maybe put it in a separate function
     }
 }
