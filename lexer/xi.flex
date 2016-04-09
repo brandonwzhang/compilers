@@ -70,7 +70,7 @@ HexChar = \\x[2-7][0-9A-E]
 
  /* literals */
  {DecIntegerLiteralNegativeBound}   { return symbol(ParserSym.NEGATIVE_INT_BOUND); }
- {DecIntegerLiteral}                { if(yytext().length() > "9223372036854775807".length() || yytext().compareTo("9223372036854775807") > 0) { return symbol(ParserSym.error, "Integer literal is too big to process"); } else {return symbol(ParserSym.INTEGER_LITERAL, yytext()); } }
+ {DecIntegerLiteral}                { if(yytext().length() > "9223372036854775807".length() || (yytext().length() == "9223372036854775807".length() && yytext().compareTo("9223372036854775807") > 0)) { return symbol(ParserSym.error, "Integer literal is too big to process"); } else {return symbol(ParserSym.INTEGER_LITERAL, yytext()); } }
  \"                                 { string.setLength(0); stringStartRow = yyline + 1; stringStartCol = yycolumn + 1; yybegin(STRING); }
 
  /* char literals */

@@ -297,7 +297,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         for (int i = 0; i < variables.size(); i++) {
             Assignable variable = variables.get(i);
             if (variable instanceof Underscore) {
-                // Throw away return value if underscore
+                generatedNodes.push(new IRExp(new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i)));
                 continue;
             } else if (variable instanceof TypedDeclaration) {
                 // Since TypedDeclarations are treated as statements, we must

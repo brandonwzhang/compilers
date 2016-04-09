@@ -62,6 +62,7 @@ public class Util {
         put(ParserSym.USE, "use");
         put(ParserSym.UNDERSCORE, "_");
         put(ParserSym.error, "error:");
+                put(ParserSym.NEGATIVE_INT_BOUND, "negative_int_bound");
     }};
 
     /**
