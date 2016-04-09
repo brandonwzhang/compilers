@@ -16,6 +16,8 @@ public class ExpressionCodeGenerators {
 
     private static final AssemblyPhysicalRegister RAX = new AssemblyPhysicalRegister(Register.RAX);
     private static final AssemblyPhysicalRegister RDX = new AssemblyPhysicalRegister(Register.RDX);
+
+    // bottom 8 bits of RAX
     private static final AssemblyPhysicalRegister AL = new AssemblyPhysicalRegister(Register.AL);
 
     public static ExpressionTile.CodeGenerator const1 = (root, instructions) -> {
