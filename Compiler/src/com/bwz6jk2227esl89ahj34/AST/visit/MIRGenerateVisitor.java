@@ -840,13 +840,19 @@ public class MIRGenerateVisitor implements NodeVisitor {
     public void visit(ReturnStatement node) {
         List<Expression> returnValues = node.getValues();
         List<IRStmt> statements = new LinkedList<>();
+        List<IRTemp> temps = new LinkedList<>();
         for (int i = 0; i < returnValues.size(); i++) {
             Expression returnValue = returnValues.get(i);
             returnValue.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
             IRExpr irReturnValue = (IRExpr) generatedNodes.pop();
+            IRTemp temp = new IRTemp(getFreshVariable());
+            statements.add(new IRMove(temp, irReturnValue));
+            temps.add(temp);
+        }
+        for (int i = 0; i < temps.size(); i++) {
             statements.add(new IRMove(new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i),
-                    irReturnValue));
+                    temps.get(i)));
         }
         statements.add(new IRReturn());
 
