@@ -9,7 +9,6 @@ public class ExpressionPatterns {
     public static IRExpr const1 = new IRConst(0);
     public static IRExpr temp1 = new IRTemp("");
     public static IRExpr mem1 = new IRMem(null);
-    public static IRExpr call1 = new IRCall(null);
     public static IRExpr name1 = new IRName("");
 
     public static IRExpr binop1 = new IRBinOp(null, null, null);
