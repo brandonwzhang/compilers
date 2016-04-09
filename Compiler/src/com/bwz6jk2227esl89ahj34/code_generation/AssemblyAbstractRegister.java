@@ -13,6 +13,14 @@ public class AssemblyAbstractRegister extends AssemblyRegister {
     // The id for this instance
     public int id;
 
+    /**
+     * Resets the curId to 0 and nameIdMap to a new HashMap
+     */
+    public static void reset() {
+        curId = 0;
+        nameIdMap = new HashMap<>();
+    }
+
     public AssemblyAbstractRegister() {
         id = curId++;
     }

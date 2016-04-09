@@ -1,7 +1,8 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
+import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.OpCode;
+import com.bwz6jk2227esl89ahj34.code_generation.AssemblyPhysicalRegister.Register;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -55,11 +56,31 @@ public class AbstractAssemblyGenerator {
      * @return
      */
     private static List<AssemblyInstruction> generateFunction(IRFuncDecl func) {
+        // Reset the space for abstract registers
+        AssemblyAbstractRegister.reset();
+
+        // Generate assembly instructions for this function
         IRSeq seq = (IRSeq) func.body();
         List<AssemblyInstruction> instructions = new LinkedList<>();
         for (IRStmt statement : seq.stmts()) {
             instructions.addAll(tileContainer.matchStatement(statement));
         }
         return instructions;
+    }
+
+    private static void generateFunctionPrologue(List<AssemblyInstruction> instructions) {
+        // Save old RBP and update RBP
+        AssemblyPhysicalRegister rbp = new AssemblyPhysicalRegister(Register.RBP);
+        AssemblyPhysicalRegister rsp = new AssemblyPhysicalRegister(Register.RSP);
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, rbp));
+        instructions.add(new AssemblyInstruction(OpCode.MOVQ, rsp, rbp));
+        // TODO: Decrement %RSP to make space for temps
+        // Save callee-save registers
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.RBX)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.RBP)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.R12)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.R13)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.R14)));
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, new AssemblyPhysicalRegister(Register.R15)));
     }
 }

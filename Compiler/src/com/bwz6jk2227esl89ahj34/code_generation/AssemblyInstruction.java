@@ -6,7 +6,7 @@ import java.util.List;
 public class AssemblyInstruction {
     public enum OpCode {
         ADDQ, SUBQ, ANDQ, CMP, DIVQ ,ORQ, MOVQ, MULQ, SETZQ, SETNZQ, SETLQ, SETGQ, SETLEQ,
-        SETGEQ, PUSH, POP, JMP, XORQ, JE, JNE;
+        SETGEQ, PUSHQ, POPQ, JMP, XORQ, RETQ, JE, JNE;
     }
 
     private OpCode opCode;

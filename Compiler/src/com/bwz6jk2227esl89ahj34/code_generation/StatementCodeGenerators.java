@@ -1,8 +1,11 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.code_generation.AssemblyPhysicalRegister.Register;
 
 import java.util.LinkedList;
+import java.util.List;
+
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
 
 public class StatementCodeGenerators {
@@ -74,7 +77,21 @@ public class StatementCodeGenerators {
         /*
         		RETURN()
         */
-        return null;
+        List<AssemblyInstruction> instructions = new LinkedList<>();
+        // Restore callee-save registers
+        instructions.add(new AssemblyInstruction(OpCode.POPQ, new AssemblyPhysicalRegister(Register.R15)));
+        instructions.add(new AssemblyInstruction(OpCode.POPQ, new AssemblyPhysicalRegister(Register.R14)));
+        instructions.add(new AssemblyInstruction(OpCode.POPQ, new AssemblyPhysicalRegister(Register.R13)));
+        instructions.add(new AssemblyInstruction(OpCode.POPQ, new AssemblyPhysicalRegister(Register.R12)));
+        instructions.add(new AssemblyInstruction(OpCode.POPQ, new AssemblyPhysicalRegister(Register.RBP)));
+        instructions.add(new AssemblyInstruction(OpCode.POPQ, new AssemblyPhysicalRegister(Register.RBX)));
+        // Restore old RBP and RSP
+        AssemblyPhysicalRegister rbp = new AssemblyPhysicalRegister(Register.RBP);
+        AssemblyPhysicalRegister rsp = new AssemblyPhysicalRegister(Register.RSP);
+        instructions.add(new AssemblyInstruction(OpCode.MOVQ, rbp, rsp));
+        instructions.add(new AssemblyInstruction(OpCode.POPQ, rbp));
+        instructions.add(new AssemblyInstruction(OpCode.RETQ));
+        return instructions;
     };
 
     public static StatementTile.CodeGenerator cjump1 = (root) -> {
@@ -92,4 +109,9 @@ public class StatementCodeGenerators {
 
         return instructions;
     };
+
+    private static AssemblyExpression functionCall(IRNode node, List<AssemblyInstruction> instructions) {
+
+        return null;
+    }
 }

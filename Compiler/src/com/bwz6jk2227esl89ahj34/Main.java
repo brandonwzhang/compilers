@@ -88,7 +88,7 @@ public class Main {
 
         if(tests) { // put debug mode behaviors here
 
-            String[] exclude = {"enigma"};
+            String[] exclude = {"enigma", "medley01"};
             Collections.addAll(Tests.exclude, exclude);
             System.out.println("\nDEBUG: Excluding: " + Tests.exclude.toString());
 

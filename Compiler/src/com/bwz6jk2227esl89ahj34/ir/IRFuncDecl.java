@@ -234,16 +234,28 @@ public class IRFuncDecl extends IRNode {
                 it.remove();
             }
         }
-        //if the list of blocks is empty, we don't need to reorder it
+        // If the list of blocks is empty, we don't need to reorder it
         if (blocks.size() == 0) { return n_; }
 
         List<IRStmt> finalStatements = new LinkedList<>();
         finalStatements.addAll(reorderBlocks(0, constructFlowGraph(blocks),
                 blocks, new boolean[blocks.size()]));
 
-        // Last statement has to be return
+        // Remove last return statement before we add epilogue block
         if (!(finalStatements.get(finalStatements.size() - 1) instanceof IRReturn)) {
-            finalStatements.add(new IRReturn());
+            finalStatements.remove(finalStatements.size() - 1);
+        }
+
+        // Add epilogue block
+        String epilogueLabelName = MIRLowerVisitor.getFreshVariable();
+        finalStatements.add(new IRLabel(epilogueLabelName));
+        finalStatements.add(new IRReturn());
+
+        // Replace all instances of return with jump to this label
+        for (int i = 0; i < finalStatements.size() - 1; i++) {
+            if (finalStatements.get(i) instanceof IRReturn) {
+                finalStatements.set(i, new IRJump(new IRName(epilogueLabelName)));
+            }
         }
 
         return new IRFuncDecl(fd.name(), new IRSeq(finalStatements));
