@@ -65,7 +65,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
 
         IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrTemp,
-                new IRConst(Configuration.WORD_SIZE)));
+                new IRConst(Configuration.WORD_SIZE)), IRMem.MemType.IMMUTABLE);
 
         // Check for out of bounds index
         IRTemp result = new IRTemp(getFreshVariable());
