@@ -78,6 +78,18 @@ public class StatementCodeGenerators {
     };
 
     public static StatementTile.CodeGenerator cjump1 = (root) -> {
-        return null;
+        /*
+            CJUMP(e, trueLabel)
+         */
+        LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+        IRCJump castedRoot = (IRCJump) root;
+        assert castedRoot.falseLabel() == null; // assert lowered CJump
+        AssemblyExpression guard = tileContainer.matchExpression(castedRoot.expr(), instructions);
+
+        // compare guard to 0, jump to trueLabel if not equal
+        instructions.add(new AssemblyInstruction(OpCode.CMP, guard, new AssemblyImmediate(0)));
+        instructions.add(new AssemblyInstruction(OpCode.JNE, new AssemblyName(castedRoot.trueLabel())));
+
+        return instructions;
     };
 }
