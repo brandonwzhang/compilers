@@ -38,20 +38,14 @@ public class ExpressionCodeGenerators {
         return new AssemblyMemoryLocation((AssemblyAbstractRegister)e);
     };
 
-    public static ExpressionTile.CodeGenerator call1 = (root, instructions) -> {
-    		/*
-        		CALL(...)
-        */
-
-        // TODO
-        return null;
-    };
 
     public static ExpressionTile.CodeGenerator name1 = (root, instructions) -> {
-    		/*
-        		NAME("name")
+        /*
+        	NAME("name")
         */
-        return null;
+        IRName castedRoot = (IRName) root;
+
+        return new AssemblyName(castedRoot.label());
     };
 
     public static ExpressionTile.CodeGenerator binop1 = (root, instructions) -> {
