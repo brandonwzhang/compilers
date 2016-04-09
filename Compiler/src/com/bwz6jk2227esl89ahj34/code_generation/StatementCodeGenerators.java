@@ -73,6 +73,10 @@ public class StatementCodeGenerators {
         return null;
     };
 
+    /**
+     * for convenience, we take care of the "function epilogue"
+     * along with the return statement 
+     */
     public static StatementTile.CodeGenerator return1 = (root) -> {
         /*
         		RETURN()
