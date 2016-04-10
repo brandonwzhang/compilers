@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Stack;
 
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
+import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
 public class StatementCodeGenerators {
     private static TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
@@ -60,7 +61,7 @@ public class StatementCodeGenerators {
 
     public static StatementTile.CodeGenerator exp1 = (root) -> {
       	/*
-        		EXP(Call(Label))
+        		EXP(CALL(NAME))
         */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
         IRExp castedRoot = (IRExp) root;
@@ -70,14 +71,14 @@ public class StatementCodeGenerators {
 
     public static StatementTile.CodeGenerator move2 = (root) -> {
     		/*
-        		MOVE(TEMP, CALL(LABEL)
+        		MOVE(TEMP, CALL(NAME))
         */
         return null;
     };
 
     /**
-     * for convenience, we take care of the "function epilogue"
-     * along with the return statement
+     * For convenience, we take care of the "function epilogue"
+     * along with the return statement 
      */
     public static StatementTile.CodeGenerator return1 = (root) -> {
         /*
