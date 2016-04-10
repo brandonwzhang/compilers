@@ -117,7 +117,7 @@ public class StatementCodeGenerators {
     };
 
     private static void functionCall(IRNode node, List<AssemblyInstruction> instructions) {
-        
+
         assert node instanceof IRCall;
         IRCall castedNode = (IRCall) node;
 
@@ -144,22 +144,17 @@ public class StatementCodeGenerators {
             numReturnValues = Integer.parseInt(returnTypes.substring(1, i));
         }
 
-        AssemblyAbstractRegister returnValuePointer = new AssemblyAbstractRegister();
+        // put the stack pointer in rdi
+        // we are about to allocate space for the return values
         instructions.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 new AssemblyPhysicalRegister(Register.RSP),
-                returnValuePointer
+                new AssemblyPhysicalRegister(Register.RDI)
         ));
-        for (int i = 0; i < numReturnValues; i++) {
+        for (int i = 0; i < numReturnValues - 2; i++) {
             instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
                     new AssemblyImmediate(0)));
         }
-
-        // TODO: where do we add the pointer to the return value space?
-        instructions.add(new AssemblyInstruction(
-                OpCode.PUSHQ,
-                returnValuePointer
-        ));
 
         // TODO: space to the callee function
 
