@@ -12,9 +12,22 @@ import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
 
 public class StatementCodeGenerators {
     private static TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
+    private static List<Register> callerSavedRegisters;
 
     public StatementCodeGenerators(TileContainer tileContainer) {
         this.tileContainer = tileContainer;
+        this.callerSavedRegisters = Arrays.asList(
+                Register.RAX,
+                Register.RCX,
+                //Register.RDX,
+                Register.RSI,
+                Register.RDI,
+                Register.RSP,
+                Register.R8,
+                Register.R9,
+                Register.R10,
+                Register.R11
+        );
     }
 
     public static StatementTile.CodeGenerator move1 = (root) -> {
@@ -220,6 +233,34 @@ public class StatementCodeGenerators {
                 name
         ));
 
-        //TODO: save caller saved registers, but maybe put it in a separate function
+        //TODO: restore caller saved registers, but maybe put it in a separate function
+    }
+
+    private static void functionCallEpilogue(IRNode node, List<AssemblyInstruction> instructions) {
+        assert node instanceof IRCall;
+        IRCall castedNode = (IRCall) node;
+        List<IRExpr> arguments = castedNode.args();
+        int numArguments = arguments.size();
+
+        // if number of args was greater than 5, then we computed
+        // rdi as well as the first 5 into rdi...r9
+        // and the rest of the args are in the stack
+        // ... to ignore these args, we increment rsp
+        if (numArguments > 5) {
+            instructions.add(new AssemblyInstruction(
+                    OpCode.ADDQ,
+                    new AssemblyImmediate(8*(numArguments-5)),
+                    new AssemblyPhysicalRegister(Register.RSP)
+            );
+        }
+
+        // now we restore all of the caller saved registers
+
+        for(int i = callerSavedRegisters.size()-1; i >= 0; i--) {
+            instructions.add(new AssemblyInstruction(
+                    OpCode.PUSHQ,
+                    new AssemblyPhysicalRegister(callerSavedRegisters.get(i))
+                    ));
+        }
     }
 }
