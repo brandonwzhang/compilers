@@ -222,7 +222,7 @@ public class StatementCodeGenerators {
         // add the call instruction to instructions
         instructions.add(new AssemblyInstruction(
                 OpCode.JMP,
-                tileContainer.matchExpression(castedNode.target(), instructions)
+                name
         ));
 
         //TODO: save caller saved registers, but maybe put it in a separate function
