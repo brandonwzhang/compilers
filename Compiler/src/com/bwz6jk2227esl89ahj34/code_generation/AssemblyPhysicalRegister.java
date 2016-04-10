@@ -18,8 +18,20 @@ public class AssemblyPhysicalRegister extends AssemblyRegister {
     public static final AssemblyPhysicalRegister R10 = new AssemblyPhysicalRegister(Register.R10);
     public static final AssemblyPhysicalRegister R11 = new AssemblyPhysicalRegister(Register.R11);
 
+    // callee saved
+    public static final AssemblyPhysicalRegister RBP = new AssemblyPhysicalRegister(Register.RBP);
+    public static final AssemblyPhysicalRegister RBX = new AssemblyPhysicalRegister(Register.RBX);
+    public static final AssemblyPhysicalRegister R12 = new AssemblyPhysicalRegister(Register.R12);
+    public static final AssemblyPhysicalRegister R13 = new AssemblyPhysicalRegister(Register.R13);
+    public static final AssemblyPhysicalRegister R14 = new AssemblyPhysicalRegister(Register.R14);
+    public static final AssemblyPhysicalRegister R15 = new AssemblyPhysicalRegister(Register.R15);
+
     public static final AssemblyPhysicalRegister[] callerSavedRegisters = {
             RAX, RCX, RSI, RDI, RSP, R8, R9, R10, R11
+    };
+
+    public static final AssemblyPhysicalRegister[] calleeSavedRegisters = {
+            RBX, RBP, R12, R13, R14, R15
     };
 
     public enum Register {

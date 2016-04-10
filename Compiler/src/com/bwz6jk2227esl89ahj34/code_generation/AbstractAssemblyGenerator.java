@@ -4,14 +4,17 @@ import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.OpCode;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyPhysicalRegister.Register;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+
+import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
+
+import java.util.*;
 
 public class AbstractAssemblyGenerator {
     public static final TileContainer tileContainer = initialize();
-    private static final int WORD_SIZE = 8;
+    public static Map<String, Integer> numReturnValues = new HashMap<>();
+    public static Map<String, Integer> numArguments = new HashMap<>();
+    public static int maxNumReturnValues;
+    public static int maxNumArguments;
 
     /**
      * Add all instruction tiles to tileContainer
@@ -43,11 +46,89 @@ public class AbstractAssemblyGenerator {
      * @return
      */
     public static Map<String, List<AssemblyInstruction>> generate(IRCompUnit root) {
+        // Get the maximum number of return values and arguments in all functions
+        for (String functionName : root.functions().keySet()) {
+            maxNumReturnValues = Math.max(maxNumReturnValues, numReturnValues(functionName));
+            maxNumArguments = Math.max(maxNumArguments, numArguments(functionName));
+        }
+
         Map<String, List<AssemblyInstruction>> functions = new LinkedHashMap<>();
-        for (String functionName: root.functions().keySet()) {
+        for (String functionName : root.functions().keySet()) {
             functions.put(functionName, generateFunction(root.functions().get(functionName)));
         }
         return functions;
+    }
+
+    /**
+     * Returns the number of return values for a given function
+     */
+    private static int numArguments(String functionName) {
+        int numArguments = 0;
+        int lastUnderscore = functionName.lastIndexOf('_');
+        String types = functionName.substring(lastUnderscore + 1);
+        int i = 0;
+
+        if (types.charAt(0) == 'p') {
+            // example: main(args: int[][]) -> _Imain_paai
+            i = 1;
+
+        } else if (types.charAt(0) == 't') {
+            // example: parseInt(str: int[]): int, bool -> _IparseInt_t2ibai
+            i = 1;
+            int numReturnValues = 0;
+            while (Character.isDigit(types.charAt(i))) {
+                // think carefully
+                numReturnValues *= 10;
+                numReturnValues += Integer.parseInt("" + types.charAt(i));
+            }
+
+            // preemptively compensate for the # of return values
+            numArguments -= numReturnValues;
+
+        } else {
+            // example: unparseInt(n: int): int[] -> _IunparseInt_aii
+
+            // see above
+            numArguments--;
+        }
+
+        // adds up number of arguments and number of return values
+        while (i < types.length()) {
+            while (i < types.length() && types.charAt(i) == 'a') {
+                i++;
+            }
+            numArguments++;
+            i++;
+        }
+
+        return numArguments;
+    }
+
+    /**
+     * Returns the number of return values for a given function
+     */
+    private static int numReturnValues(String functionName) {
+        int numReturnValues;
+        int lastUnderscore = functionName.lastIndexOf('_');
+        String returnTypes = functionName.substring(lastUnderscore + 1);
+
+        if (returnTypes.contains("p")) {
+            // example: main(args: int[][]) -> _Imain_paai
+            numReturnValues = 0;
+
+        } else if (!returnTypes.contains("t")) {
+            // example: unparseInt(n: int): int[] -> _IunparseInt_aii
+            numReturnValues = 1;
+
+        } else {
+            // example: parseInt(str: int[]): int, bool -> _IparseInt_t2ibai
+            int i = 1;
+            while (Character.isDigit(returnTypes.charAt(i))) {
+                i++;
+            }
+            numReturnValues = Integer.parseInt(returnTypes.substring(1, i));
+        }
+        return numReturnValues;
     }
 
     /**
@@ -68,30 +149,61 @@ public class AbstractAssemblyGenerator {
         return instructions;
     }
 
-    private static void generateFunctionPrologue(List<AssemblyInstruction> instructions) {
-        // Save old RBP and update RBP
-        AssemblyPhysicalRegister rbp = new AssemblyPhysicalRegister(Register.RBP);
-        AssemblyPhysicalRegister rsp = new AssemblyPhysicalRegister(Register.RSP);
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, rbp));
-        instructions.add(new AssemblyInstruction(OpCode.MOVQ, rsp, rbp));
+    private static List<AssemblyInstruction> generateFunctionPrologue() {
+        List<AssemblyInstruction> instructions = new LinkedList<>();
 
-        // Decrement RSP to make space for temps   sub $8*l, rsp
-        instructions.add(new AssemblyInstruction(OpCode.SUBQ,
-                new AssemblyImmediate(WORD_SIZE*AssemblyAbstractRegister.getCurId()),
-                rsp));
+        // Save old RBP and update RBP
+        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, AssemblyPhysicalRegister.RBP));
+        instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RSP, AssemblyPhysicalRegister.RBP));
+
+        int currentStackOffset = Configuration.WORD_SIZE;
 
         // Save callee-save registers rbx rbp r12-r15
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RBX)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RBP)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.R12)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.R13)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.R14)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.R15)));
+        for (int i = 0; i < AssemblyPhysicalRegister.calleeSavedRegisters.length; i++) {
+            instructions.add(
+                    new AssemblyInstruction(
+                            OpCode.MOVQ,
+                            AssemblyPhysicalRegister.calleeSavedRegisters[i],
+                            AssemblyMemoryLocation.stackOffset(currentStackOffset)
+                    )
+            );
+            currentStackOffset += Configuration.WORD_SIZE;
+        }
+
+        // Make space for return values
+        currentStackOffset += Configuration.WORD_SIZE * maxNumReturnValues;
+
+        // Make space for arguments
+        currentStackOffset += Configuration.WORD_SIZE * maxNumArguments;
+
+        // Make space for temps
+        currentStackOffset += Configuration.WORD_SIZE * AssemblyAbstractRegister.getCurId();
+
+        // Make sure stack frame is 16 byte aligned
+        if (currentStackOffset % 16 != 0) {
+            currentStackOffset += Configuration.WORD_SIZE;
+        }
+
+        // Decrement RSP at the beginning of the instructions to make space for everything
+        instructions.add(0,
+                new AssemblyInstruction(
+                        OpCode.SUBQ,
+                        new AssemblyImmediate(currentStackOffset - Configuration.WORD_SIZE),
+                        AssemblyPhysicalRegister.RSP
+                )
+        );
+        return instructions;
+    }
+
+    public static int getReturnValuesOffset() {
+        return Configuration.WORD_SIZE * (2 + AssemblyPhysicalRegister.calleeSavedRegisters.length);
+    }
+
+    public static int getArgumentsOffset() {
+        return getReturnValuesOffset() + Configuration.WORD_SIZE * maxNumReturnValues;
+    }
+
+    public static int getScratchSpaceOffset() {
+        return getArgumentsOffset() + Configuration.WORD_SIZE * maxNumArguments;
     }
 }

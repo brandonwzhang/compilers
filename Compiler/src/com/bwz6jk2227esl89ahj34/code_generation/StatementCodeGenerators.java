@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
+import com.bwz6jk2227esl89ahj34.AST.WhileStatement;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyPhysicalRegister.Register;
 
@@ -13,6 +14,7 @@ import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
 public class StatementCodeGenerators {
     private static TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
+
     private static List<AssemblyPhysicalRegister> callerSavedRegisters =
             Arrays.asList(AssemblyPhysicalRegister.callerSavedRegisters);
 
@@ -128,27 +130,7 @@ public class StatementCodeGenerators {
         AssemblyExpression name = tileContainer.matchExpression(castedNode.target(), instructions);
         assert name instanceof AssemblyName;
         String functionName = ((AssemblyName) name).getName();
-
-        int numReturnValues;
-        int lastUnderscore = functionName.lastIndexOf('_');
-        String returnTypes = functionName.substring(lastUnderscore + 1);
-
-        if (returnTypes.contains("p")) {
-            // example: main(args: int[][]) -> _Imain_paai
-            numReturnValues = 0;
-
-        } else if (!returnTypes.contains("t")) {
-            // example: unparseInt(n: int): int[] -> _IunparseInt_aii
-            numReturnValues = 1;
-
-        } else {
-            // example: parseInt(str: int[]): int, bool -> _IparseInt_t2ibai
-            int i = 1;
-            while (Character.isDigit(returnTypes.charAt(i))) {
-                i++;
-            }
-            numReturnValues = Integer.parseInt(returnTypes.substring(1, i));
-        }
+        int numReturnValues = AbstractAssemblyGenerator.numReturnValues.get(functionName);
 
         // put the stack pointer in rdi (first 'argument')
         // we are about to allocate space for the return values

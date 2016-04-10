@@ -34,6 +34,10 @@ public class AssemblyMemoryLocation extends AssemblyExpression {
         this.scale = scale;
     }
 
+    public static AssemblyMemoryLocation stackOffset(int offset) {
+        return new AssemblyMemoryLocation(AssemblyPhysicalRegister.RBP, null, offset);
+    }
+
     @Override
     public String toString() {
         // syntax is displacement(base register, offset register, scalar multiplier)
