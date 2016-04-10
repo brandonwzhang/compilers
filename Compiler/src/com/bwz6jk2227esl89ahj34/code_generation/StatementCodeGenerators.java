@@ -182,26 +182,10 @@ public class StatementCodeGenerators {
         // TODO: space to the callee function
 
         // save all caller-save registers
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RAX)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RCX)));
-//        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-//                new AssemblyPhysicalRegister(Register.RDX)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RSI)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RDI)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RSP)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.R8)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.R9)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.R10)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.R11)));
+        for (int i = 0; i < callerSavedRegisters.size(); i++) {
+            instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                    new AssemblyPhysicalRegister(callerSavedRegisters.get(i))));
+        }
 
         // put arguments in order rsi rdx rcx r8 r9
 
@@ -271,7 +255,7 @@ public class StatementCodeGenerators {
 
         for(int i = callerSavedRegisters.size()-1; i >= 0; i--) {
             instructions.add(new AssemblyInstruction(
-                    OpCode.PUSHQ,
+                    OpCode.POPQ,
                     new AssemblyPhysicalRegister(callerSavedRegisters.get(i))
                     ));
         }
