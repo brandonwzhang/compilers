@@ -10,14 +10,5 @@ fib(i:int) : int {
 }
 
 main(args:int[][]) {
-	print("Please enter a positive number : ")
-	input: int[] = readln()
-
-	value:int, valid:bool = parseInt(input)
-	if (!valid) {
-		println("Invalid input!")
-		return
-	}
-
-	println(unparseInt(fib(value)))
+	println(unparseInt(fib(13)))
 }
