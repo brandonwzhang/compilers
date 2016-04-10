@@ -174,215 +174,126 @@ public class MIRGenerateVisitor implements NodeVisitor {
         generatedNodes.push(eseq);
     }
 
+    private IRStmt singleAssignment(Assignable variable, IRExpr expr) {
+        if (variable instanceof Underscore) {
+            // Throw away if underscore
+            return new IRExp(expr);
+        } else if (variable instanceof TypedDeclaration) {
+            // Since TypedDeclarations are treated as statements, we must
+            // handle them separately
+            TypedDeclaration typedDeclaration = (TypedDeclaration) variable;
+            List<IRStmt> statements = new ArrayList<>();
+            if (typedDeclaration.getArraySizeList().size() > 0) {
+                variable.accept(this);
+                assert generatedNodes.peek() instanceof IRStmt;
+                statements.add((IRStmt) generatedNodes.pop());
+            }
+            IRTemp temp = new IRTemp(typedDeclaration.getIdentifier().getName());
+            IRMove move = new IRMove(temp, expr);
+            statements.add(move);
+            return new IRSeq(statements);
+        } else if (variable instanceof ArrayIndex) {
+            // If arrayindex on LHS, we need to handle out of bounds setting
+            ((ArrayIndex) variable).getArrayRef().accept(this);
+            assert generatedNodes.peek() instanceof IRExpr;
+            IRExpr array = (IRExpr)generatedNodes.pop();
+
+            IRTemp arrTemp = new IRTemp(getFreshVariable());
+            IRMove moveArrToTemp = new IRMove(arrTemp, array);
+
+            ((ArrayIndex) variable).getIndex().accept(this);
+            assert generatedNodes.peek() instanceof IRExpr;
+            IRExpr index = (IRExpr)generatedNodes.pop();
+
+            IRTemp indexTemp = new IRTemp(getFreshVariable());
+            IRMove moveIndexToTemp = new IRMove(indexTemp, index);
+
+            IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrTemp, new IRConst(Configuration.WORD_SIZE)));
+
+            // Check for out of bounds index
+            IRLabel trueLabel = new IRLabel(getFreshVariable());
+            IRLabel falseLabel = new IRLabel(getFreshVariable());
+            IRLabel exitLabel = new IRLabel(getFreshVariable());
+
+            // Make a copy of these so we don't end up with duplicate labels
+            IRTemp indexCopyTemp = new IRTemp(getFreshVariable());
+            IRMove moveIndexCopyToTemp = new IRMove(indexCopyTemp, indexTemp);
+
+            IRCJump cjump = new IRCJump( // index < length && index >= 0
+                    new IRBinOp(OpType.AND,
+                            new IRBinOp(OpType.LT, indexTemp, length),
+                            new IRBinOp(OpType.GEQ, indexCopyTemp, new IRConst(0))),
+                    trueLabel.name(),
+                    falseLabel.name()
+            );
+
+            // Make a copy of these so we don't end up with duplicate labels
+            IRTemp arrCopyTemp = new IRTemp(getFreshVariable());
+            IRMove moveArrCopyToTemp = new IRMove(arrCopyTemp, arrTemp);
+
+            IRTemp indexCopyCopyTemp = new IRTemp(getFreshVariable());
+            IRMove moveIndexCopyCopyToTemp = new IRMove(indexCopyCopyTemp, indexCopyTemp);
+
+            // move expr into location
+            IRMem location = new IRMem(new IRBinOp(OpType.ADD,
+                    arrCopyTemp,
+                    new IRBinOp(OpType.MUL, indexCopyCopyTemp, new IRConst(Configuration.WORD_SIZE))
+            ));
+            IRSeq trueBody = new IRSeq(
+                    // get actual element
+                    new IRMove(location, expr),
+                    // jump to exit
+                    new IRJump(new IRName(exitLabel.name()))
+            );
+
+            IRExp outOfBoundsCall = new IRExp(new IRCall(new IRName("_I_outOfBounds_p")));
+
+            IRSeq seq = new IRSeq(
+                    moveArrToTemp,
+                    moveArrCopyToTemp,
+                    moveIndexToTemp,
+                    moveIndexCopyToTemp,
+                    moveIndexCopyCopyToTemp,
+                    cjump,
+                    trueLabel,
+                    trueBody,
+                    falseLabel,
+                    outOfBoundsCall,
+                    exitLabel
+            );
+
+            return seq;
+        }
+        variable.accept(this);
+        assert generatedNodes.peek() instanceof IRExpr;
+        IRMove move = new IRMove((IRExpr) generatedNodes.pop(), expr);
+        return move;
+    }
+
     public void visit(Assignment node) {
         List<Assignable> variables = node.getVariables();
         Expression expression = node.getExpression();
+
         // If RHS is VariableType, we know there was no multiassign
         if (expression.getType() instanceof VariableType) {
             expression.accept(this);
             assert generatedNodes.peek() instanceof IRExpr;
-            IRExpr evaluatedExpression = (IRExpr) generatedNodes.pop();
-
-            assert variables.size() == 1;
-            Assignable variable = variables.get(0);
-            if (variable instanceof Underscore) {
-                // Throw away if underscore
-                generatedNodes.push(new IRExp(evaluatedExpression));
-                return;
-            } else if (variable instanceof TypedDeclaration) {
-                // Since TypedDeclarations are treated as statements, we must
-                // handle them separately
-                TypedDeclaration typedDeclaration = (TypedDeclaration) variable;
-                List<IRStmt> statements = new ArrayList<>();
-                if (typedDeclaration.getArraySizeList().size() > 0) {
-                    variable.accept(this);
-                    assert generatedNodes.peek() instanceof IRStmt;
-                    statements.add((IRStmt) generatedNodes.pop());
-                }
-                IRTemp temp = new IRTemp(typedDeclaration.getIdentifier().getName());
-                IRMove move = new IRMove(temp, evaluatedExpression);
-                statements.add(move);
-                generatedNodes.push(new IRSeq(statements));
-                return;
-            } else if (variable instanceof ArrayIndex) {
-                // If arrayindex on LHS, we need to handle out of bounds setting
-                ((ArrayIndex) variable).getArrayRef().accept(this);
-                assert generatedNodes.peek() instanceof IRExpr;
-                IRExpr array = (IRExpr)generatedNodes.pop();
-
-                IRTemp arrTemp = new IRTemp(getFreshVariable());
-                IRMove moveArrToTemp = new IRMove(arrTemp, array);
-
-                ((ArrayIndex) variable).getIndex().accept(this);
-                assert generatedNodes.peek() instanceof IRExpr;
-                IRExpr index = (IRExpr)generatedNodes.pop();
-
-                IRTemp indexTemp = new IRTemp(getFreshVariable());
-                IRMove moveIndexToTemp = new IRMove(indexTemp, index);
-
-                IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrTemp, new IRConst(Configuration.WORD_SIZE)));
-
-                // Check for out of bounds index
-                IRLabel trueLabel = new IRLabel(getFreshVariable());
-                IRLabel falseLabel = new IRLabel(getFreshVariable());
-                IRLabel exitLabel = new IRLabel(getFreshVariable());
-
-                // Make a copy of these so we don't end up with duplicate labels
-                IRTemp indexCopyTemp = new IRTemp(getFreshVariable());
-                IRMove moveIndexCopyToTemp = new IRMove(indexCopyTemp, indexTemp);
-
-                IRCJump cjump = new IRCJump( // index < length && index >= 0
-                        new IRBinOp(OpType.AND,
-                                new IRBinOp(OpType.LT, indexTemp, length),
-                                new IRBinOp(OpType.GEQ, indexCopyTemp, new IRConst(0))),
-                        trueLabel.name(),
-                        falseLabel.name()
-                );
-
-                // Make a copy of these so we don't end up with duplicate labels
-                IRTemp arrCopyTemp = new IRTemp(getFreshVariable());
-                IRMove moveArrCopyToTemp = new IRMove(arrCopyTemp, arrTemp);
-
-                IRTemp indexCopyCopyTemp = new IRTemp(getFreshVariable());
-                IRMove moveIndexCopyCopyToTemp = new IRMove(indexCopyCopyTemp, indexCopyTemp);
-
-                // move evaluatedExpression into location
-                IRMem location = new IRMem(new IRBinOp(OpType.ADD,
-                        arrCopyTemp,
-                        new IRBinOp(OpType.MUL, indexCopyCopyTemp, new IRConst(Configuration.WORD_SIZE))
-                ));
-                IRSeq trueBody = new IRSeq(
-                        // get actual element
-                        new IRMove(location, evaluatedExpression),
-                        // jump to exit
-                        new IRJump(new IRName(exitLabel.name()))
-                );
-
-                IRExp outOfBoundsCall = new IRExp(new IRCall(new IRName("_I_outOfBounds_p")));
-
-                IRSeq seq = new IRSeq(
-                        moveArrToTemp,
-                        moveArrCopyToTemp,
-                        moveIndexToTemp,
-                        moveIndexCopyToTemp,
-                        moveIndexCopyCopyToTemp,
-                        cjump,
-                        trueLabel,
-                        trueBody,
-                        falseLabel,
-                        outOfBoundsCall,
-                        exitLabel
-                );
-
-                generatedNodes.push(seq);
-                return;
-            }
-            variable.accept(this);
-            assert generatedNodes.peek() instanceof IRExpr;
-            IRMove move = new IRMove((IRExpr) generatedNodes.pop(), evaluatedExpression);
-            generatedNodes.push(move);
+            generatedNodes.push(singleAssignment(variables.get(0), (IRExpr) generatedNodes.pop()));
             return;
         }
         // If RHS is VariableTypeList, we have to handle a multiassign
         assert expression instanceof FunctionCall;
         assert expression.getType() instanceof VariableTypeList;
         assert variables.size() == ((VariableTypeList) expression.getType()).getVariableTypeList().size();
+
         List<IRStmt> statements = new ArrayList<>();
         expression.accept(this);
         assert generatedNodes.peek() instanceof IRExpr;
-        // Add the function call to the IRSeq
-        // Throw away the evaluated expression since we'll be getting it from the return registers
-        statements.add(new IRExp((IRExpr) generatedNodes.pop()));
 
-        for (int i = 0; i < variables.size(); i++) {
-            Assignable variable = variables.get(i);
-            if (variable instanceof Underscore) {
-                generatedNodes.push(new IRExp(new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i)));
-                continue;
-            } else if (variable instanceof TypedDeclaration) {
-                // Since TypedDeclarations are treated as statements, we must
-                // handle them separately
-                TypedDeclaration typedDeclaration = (TypedDeclaration) variable;
-                if (typedDeclaration.getArraySizeList().size() > 0) {
-                    variable.accept(this);
-                    assert generatedNodes.peek() instanceof IRStmt;
-                    statements.add((IRStmt) generatedNodes.pop());
-                }
-                IRTemp temp = new IRTemp(typedDeclaration.getIdentifier().getName());
-                IRMove move = new IRMove(temp, new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i));
-                statements.add(move);
-                continue;
-            } else if (variable instanceof ArrayIndex) {
-                // if arrayindex on LHS, we need to handle out of bounds setting
-                ((ArrayIndex) variable).getArrayRef().accept(this);
-                assert generatedNodes.peek() instanceof IRExpr;
-                IRExpr array = (IRExpr)generatedNodes.pop();
-
-                ((ArrayIndex) variable).getIndex().accept(this);
-                assert generatedNodes.peek() instanceof IRExpr;
-                IRExpr index = (IRExpr)generatedNodes.pop();
-
-                IRMem length = new IRMem(new IRBinOp(OpType.SUB, array, new IRConst(Configuration.WORD_SIZE)));
-
-                // check for out of bounds index
-                IRTemp result = new IRTemp(getFreshVariable());
-                List<IRStmt> stmts = new LinkedList<>();
-                IRLabel trueLabel = new IRLabel(getFreshVariable());
-                IRLabel falseLabel = new IRLabel(getFreshVariable());
-                IRLabel exitLabel = new IRLabel(getFreshVariable());
-
-                // Make a copy of these so we don't end up with duplicate labels
-                ((ArrayIndex) variable).getIndex().accept(this);
-                assert generatedNodes.peek() instanceof IRExpr;
-                IRExpr indexCopy = (IRExpr)generatedNodes.pop();
-
-                IRCJump cjump = new IRCJump( // index < length && index >= 0
-                        new IRBinOp(OpType.AND,
-                                new IRBinOp(OpType.LT, index, length),
-                                new IRBinOp(OpType.GEQ, indexCopy, new IRConst(0))),
-                        trueLabel.name(),
-                        falseLabel.name()
-                );
-
-                // Make a copy of these so we don't end up with duplicate labels
-                ((ArrayIndex) variable).getArrayRef().accept(this);
-                assert generatedNodes.peek() instanceof IRExpr;
-                IRExpr arrayCopy = (IRExpr)generatedNodes.pop();
-                ((ArrayIndex) variable).getIndex().accept(this);
-                assert generatedNodes.peek() instanceof IRExpr;
-                IRExpr indexCopyCopy = (IRExpr)generatedNodes.pop();
-
-                // move evaluatedExpression into location
-                IRMem location = new IRMem(new IRBinOp(OpType.ADD,
-                        arrayCopy,
-                        new IRBinOp(OpType.MUL, indexCopyCopy, new IRConst(Configuration.WORD_SIZE))
-                ));
-                IRSeq trueBody = new IRSeq(
-                        // get actual element
-                        new IRMove(location, new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i)),
-                        // jump to exit
-                        new IRJump(new IRName(exitLabel.name()))
-                );
-
-                IRExp outOfBoundsCall = new IRExp(new IRCall(new IRName("_I_outOfBounds_p")));
-
-                IRSeq seq = new IRSeq(
-                        cjump,
-                        trueLabel,
-                        trueBody,
-                        falseLabel,
-                        outOfBoundsCall,
-                        exitLabel
-                );
-
-                generatedNodes.push(seq);
-                continue;
-            }
-            // We know LHS must be either identifier or array index at this point
-            variable.accept(this);
-            assert generatedNodes.peek() instanceof IRExpr;
-            IRMove move = new IRMove((IRExpr) generatedNodes.pop(), new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i));
-            statements.add(move);
+        // First set the first variable to the value of the call (_RET0)
+        statements.add(singleAssignment(variables.get(0), (IRExpr) generatedNodes.pop()));
+        for (int i = 1; i < variables.size(); i++) {
+            statements.add(singleAssignment(variables.get(i), new IRTemp(Configuration.ABSTRACT_RET_PREFIX + i)));
         }
         IRSeq seq = new IRSeq(statements);
         generatedNodes.push(seq);
@@ -612,14 +523,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         List<IRStmt> stmtList = new ArrayList<>();
 
         for (Block block : blockList) {
-            if (block instanceof TypedDeclaration) {
-                if (((TypedDeclaration) block).getArraySizeList().size() == 0) {
-                    continue;
-                }
-            }
-
             block.accept(this);
-
             assert generatedNodes.peek() instanceof IRStmt;
             stmtList.add((IRStmt) generatedNodes.pop());
         }
@@ -920,6 +824,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
     public void visit(TypedDeclaration node) {
         if (node.getArraySizeList().size() == 0) {
+            // If we don't need to initialize an array, do nothing
+            generatedNodes.push(new IRExp(new IRConst(0)));
             return;
         }
         // In the case where TypedDeclaration is part of an assignment, it will be handled separately
