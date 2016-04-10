@@ -9,12 +9,26 @@ import java.util.List;
 import java.util.Stack;
 
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
+import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
 public class StatementCodeGenerators {
     private static TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
+    private static List<Register> callerSavedRegisters;
 
     public StatementCodeGenerators(TileContainer tileContainer) {
         this.tileContainer = tileContainer;
+        this.callerSavedRegisters = Arrays.asList(
+                Register.RAX,
+                Register.RCX,
+                //Register.RDX,
+                Register.RSI,
+                Register.RDI,
+                Register.RSP,
+                Register.R8,
+                Register.R9,
+                Register.R10,
+                Register.R11
+        );
     }
 
     public static StatementTile.CodeGenerator move1 = (root) -> {
@@ -60,7 +74,7 @@ public class StatementCodeGenerators {
 
     public static StatementTile.CodeGenerator exp1 = (root) -> {
       	/*
-        		EXP(Call(Label))
+        		EXP(CALL(NAME))
         */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
         IRExp castedRoot = (IRExp) root;
@@ -70,14 +84,14 @@ public class StatementCodeGenerators {
 
     public static StatementTile.CodeGenerator move2 = (root) -> {
     		/*
-        		MOVE(TEMP, CALL(LABEL)
+        		MOVE(TEMP, CALL(NAME))
         */
         return null;
     };
 
     /**
-     * for convenience, we take care of the "function epilogue"
-     * along with the return statement
+     * For convenience, we take care of the "function epilogue"
+     * along with the return statement 
      */
     public static StatementTile.CodeGenerator return1 = (root) -> {
         /*
@@ -129,12 +143,15 @@ public class StatementCodeGenerators {
         int numReturnValues;
         int lastUnderscore = functionName.lastIndexOf('_');
         String returnTypes = functionName.substring(lastUnderscore + 1);
+
         if (returnTypes.contains("p")) {
             // example: main(args: int[][]) -> _Imain_paai
             numReturnValues = 0;
+
         } else if (!returnTypes.contains("t")) {
             // example: unparseInt(n: int): int[] -> _IunparseInt_aii
             numReturnValues = 1;
+
         } else {
             // example: parseInt(str: int[]): int, bool -> _IparseInt_t2ibai
             int i = 1;
@@ -144,47 +161,36 @@ public class StatementCodeGenerators {
             numReturnValues = Integer.parseInt(returnTypes.substring(1, i));
         }
 
-        // put the stack pointer in rdi
+        // put the stack pointer in rdi (first 'argument')
         // we are about to allocate space for the return values
-        instructions.add(new AssemblyInstruction(
-                OpCode.MOVQ,
-                new AssemblyPhysicalRegister(Register.RSP),
-                new AssemblyPhysicalRegister(Register.RDI)
-        ));
+        instructions.add(
+                new AssemblyInstruction(
+                        OpCode.MOVQ,
+                        new AssemblyPhysicalRegister(Register.RSP),
+                        new AssemblyPhysicalRegister(Register.RDI)
+                )
+        );
         for (int i = 0; i < numReturnValues - 2; i++) {
-            instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                    new AssemblyImmediate(0)));
+            instructions.add(
+                    new AssemblyInstruction(
+                            OpCode.PUSHQ,
+                            new AssemblyImmediate(0)
+                    )
+            );
         }
 
         // TODO: space to the callee function
 
         // save all caller-save registers
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RAX)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RCX)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RDX)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RSI)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RDI)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RSP)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.R8)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.R9)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.R10)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.R11)));
+        for (int i = 0; i < callerSavedRegisters.size(); i++) {
+            instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+                    new AssemblyPhysicalRegister(callerSavedRegisters.get(i))));
+        }
 
-        // put arguments in order rdi rsi rdx rcx r8 r9
+        // put arguments in order rsi rdx rcx r8 r9
 
         List<IRExpr> arguments = castedNode.args();
         List<Register> argumentRegisters = Arrays.asList(
-                Register.RDI,
                 Register.RSI,
                 Register.RDX,
                 Register.RCX,
@@ -194,10 +200,14 @@ public class StatementCodeGenerators {
         int numArguments = arguments.size();
         Stack<AssemblyExpression> reversedArguments = new Stack<>();
         for(int i = 0; i < numArguments; i++) {
-            if(i < 6) {
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ,
-                        tileContainer.matchExpression(arguments.get(i), instructions),
-                        new AssemblyPhysicalRegister(argumentRegisters.get(i))));
+            if (i < 5) {
+                instructions.add(
+                        new AssemblyInstruction(
+                                OpCode.MOVQ,
+                                tileContainer.matchExpression(arguments.get(i), instructions),
+                                new AssemblyPhysicalRegister(argumentRegisters.get(i))
+                        )
+                );
             } else { // push onto stack
                 reversedArguments.push(
                         tileContainer.matchExpression(arguments.get(i), instructions)
@@ -217,9 +227,38 @@ public class StatementCodeGenerators {
         // add the call instruction to instructions
         instructions.add(new AssemblyInstruction(
                 OpCode.JMP,
-                tileContainer.matchExpression(castedNode.target(), instructions)
+                name
         ));
 
-        //TODO: save caller saved registers, but maybe put it in a separate function
+        //TODO: restore caller saved registers, but maybe put it in a separate function
+    }
+
+    private static void functionCallEpilogue(IRNode node, List<AssemblyInstruction> instructions) {
+        assert node instanceof IRCall;
+        IRCall castedNode = (IRCall) node;
+        List<IRExpr> arguments = castedNode.args();
+        int numArguments = arguments.size();
+
+        // if number of args was greater than 5, then we computed
+        // rdi as well as the first 5 into rdi...r9
+        // and the rest of the args are in the stack
+        // ... to ignore these args, we increment rsp
+        if (numArguments > 5) {
+            instructions.add(new AssemblyInstruction(
+                    OpCode.ADDQ,
+                    new AssemblyImmediate(8*(numArguments-5)),
+                    new AssemblyPhysicalRegister(Register.RSP)
+            ));
+        }
+
+        // now we restore all of the caller saved registers
+
+        for(int i = callerSavedRegisters.size()-1; i >= 0; i--) {
+            instructions.add(new AssemblyInstruction(
+                    OpCode.POPQ,
+                    new AssemblyPhysicalRegister(callerSavedRegisters.get(i))
+                    ));
+        }
+
     }
 }
