@@ -130,12 +130,15 @@ public class StatementCodeGenerators {
         int numReturnValues;
         int lastUnderscore = functionName.lastIndexOf('_');
         String returnTypes = functionName.substring(lastUnderscore + 1);
+
         if (returnTypes.contains("p")) {
             // example: main(args: int[][]) -> _Imain_paai
             numReturnValues = 0;
+
         } else if (!returnTypes.contains("t")) {
             // example: unparseInt(n: int): int[] -> _IunparseInt_aii
             numReturnValues = 1;
+
         } else {
             // example: parseInt(str: int[]): int, bool -> _IparseInt_t2ibai
             int i = 1;
@@ -145,16 +148,22 @@ public class StatementCodeGenerators {
             numReturnValues = Integer.parseInt(returnTypes.substring(1, i));
         }
 
-        // put the stack pointer in rdi
+        // put the stack pointer in rdi (first 'argument')
         // we are about to allocate space for the return values
-        instructions.add(new AssemblyInstruction(
-                OpCode.MOVQ,
-                new AssemblyPhysicalRegister(Register.RSP),
-                new AssemblyPhysicalRegister(Register.RDI)
-        ));
+        instructions.add(
+                new AssemblyInstruction(
+                        OpCode.MOVQ,
+                        new AssemblyPhysicalRegister(Register.RSP),
+                        new AssemblyPhysicalRegister(Register.RDI)
+                )
+        );
         for (int i = 0; i < numReturnValues - 2; i++) {
-            instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                    new AssemblyImmediate(0)));
+            instructions.add(
+                    new AssemblyInstruction(
+                            OpCode.PUSHQ,
+                            new AssemblyImmediate(0)
+                    )
+            );
         }
 
         // TODO: space to the callee function
@@ -164,8 +173,8 @@ public class StatementCodeGenerators {
                 new AssemblyPhysicalRegister(Register.RAX)));
         instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
                 new AssemblyPhysicalRegister(Register.RCX)));
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
-                new AssemblyPhysicalRegister(Register.RDX)));
+//        instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
+//                new AssemblyPhysicalRegister(Register.RDX)));
         instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
                 new AssemblyPhysicalRegister(Register.RSI)));
         instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
@@ -181,11 +190,10 @@ public class StatementCodeGenerators {
         instructions.add(new AssemblyInstruction(OpCode.PUSHQ,
                 new AssemblyPhysicalRegister(Register.R11)));
 
-        // put arguments in order rdi rsi rdx rcx r8 r9
+        // put arguments in order rsi rdx rcx r8 r9
 
         List<IRExpr> arguments = castedNode.args();
         List<Register> argumentRegisters = Arrays.asList(
-                Register.RDI,
                 Register.RSI,
                 Register.RDX,
                 Register.RCX,
@@ -195,10 +203,14 @@ public class StatementCodeGenerators {
         int numArguments = arguments.size();
         Stack<AssemblyExpression> reversedArguments = new Stack<>();
         for(int i = 0; i < numArguments; i++) {
-            if(i < 6) {
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ,
-                        tileContainer.matchExpression(arguments.get(i), instructions),
-                        new AssemblyPhysicalRegister(argumentRegisters.get(i))));
+            if (i < 5) {
+                instructions.add(
+                        new AssemblyInstruction(
+                                OpCode.MOVQ,
+                                tileContainer.matchExpression(arguments.get(i), instructions),
+                                new AssemblyPhysicalRegister(argumentRegisters.get(i))
+                        )
+                );
             } else { // push onto stack
                 reversedArguments.push(
                         tileContainer.matchExpression(arguments.get(i), instructions)
@@ -216,11 +228,13 @@ public class StatementCodeGenerators {
         }
 
         // add the call instruction to instructions
-        instructions.add(new AssemblyInstruction(
-                OpCode.JMP,
-                tileContainer.matchExpression(castedNode.target(), instructions)
-        ));
+        instructions.add(
+                new AssemblyInstruction(
+                        OpCode.JMP,
+                        tileContainer.matchExpression(castedNode.target(), instructions)
+                )
+        );
 
-        //TODO: save caller saved registers, but maybe put it in a separate function
+        //TODO: restore caller-saved registers
     }
 }
