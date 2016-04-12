@@ -103,8 +103,8 @@ public class StatementCodeGenerators {
             AssemblyPhysicalRegister register = AssemblyPhysicalRegister.calleeSavedRegisters[i];
             instructions.add(new AssemblyInstruction(
                     OpCode.MOVQ,
-                    register,
-                    AssemblyMemoryLocation.stackOffset(Configuration.WORD_SIZE * (1 + i))
+                    AssemblyMemoryLocation.stackOffset(Configuration.WORD_SIZE * (1 + i)),
+                    register
                     ));
         }
         // Restore old RBP and RSP
