@@ -185,7 +185,7 @@ public class StatementCodeGenerators {
         // add the call instruction to instructions
         instructions.add(
                 new AssemblyInstruction(
-                        OpCode.CALL,
+                        OpCode.CALLQ,
                         name
                 )
         );
