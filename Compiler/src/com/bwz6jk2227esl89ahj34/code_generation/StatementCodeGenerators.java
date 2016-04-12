@@ -149,7 +149,7 @@ public class StatementCodeGenerators {
                 instructions.add(
                         new AssemblyInstruction(
                                 OpCode.MOVQ,
-                                AbstractAssemblyGenerator.tileContainer.matchExpression(arguments.get(i), instructions),
+                                TileContainer.matchExpression(arguments.get(i), instructions),
                                 AssemblyPhysicalRegister.returnRegisters[i]
                         )
                 );
@@ -157,7 +157,7 @@ public class StatementCodeGenerators {
                  instructions.add(
                     new AssemblyInstruction(
                             OpCode.MOVQ,
-                            AbstractAssemblyGenerator.tileContainer.matchExpression(arguments.get(i), instructions),
+                            TileContainer.matchExpression(arguments.get(i), instructions),
                             AssemblyMemoryLocation.stackOffset(AbstractAssemblyGenerator.getArgumentsOffset()
                                     + Configuration.WORD_SIZE * i))
                 );
