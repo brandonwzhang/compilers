@@ -14,6 +14,7 @@ public class AssemblyFunction {
     public static final int numScratchRegisters = 2;
 
     private String name;
+    private List<String> global;
     private List<AssemblyInstruction> instructions = new LinkedList<>();
 
     /**
@@ -21,9 +22,13 @@ public class AssemblyFunction {
      * @param func the IRFuncDecl to be translated to abstract assembly
      * @return
      */
-    public AssemblyFunction(IRFuncDecl func) {
+    public AssemblyFunction(IRFuncDecl func, List<String> global) {
         // Save the function name
         name = func.name();
+
+        // the name of functions introduced by the use statement is set as global
+        this.global = global;
+
 
         // Reset the space for abstract registers
         AssemblyAbstractRegister.reset();
@@ -136,6 +141,9 @@ public class AssemblyFunction {
     public String toString() {
         String s = "";
         s += "\t\t.globl\tFUNC(" + name + ")\n";
+        for(String globalName : global) {
+            s+= "\t\t.globl\tFUNC(" + globalName + ")\n";
+        }
         s += "\t\t.align\t4\n";
         s += "FUNC(" + name + "):\n";
         for (AssemblyInstruction instruction : instructions) {

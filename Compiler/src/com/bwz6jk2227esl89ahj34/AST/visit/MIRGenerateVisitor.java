@@ -568,62 +568,19 @@ public class MIRGenerateVisitor implements NodeVisitor {
         if (node.getType() instanceof VariableTypeList) {
             FunctionType funcType = new FunctionType(argTypeList, (VariableTypeList) node.getType());
             FunctionDeclaration tempFuncDec = new FunctionDeclaration(node.getIdentifier(), funcType, null, null);
-            irFunctionName = getIRFunctionName(tempFuncDec);
+            irFunctionName = Util.getIRFunctionName(tempFuncDec);
         } else {
             assert node.getType() instanceof VariableType;
             List<VariableType> retTypes = new ArrayList<>(Arrays.asList((VariableType) node.getType()));
             FunctionType funcType = new FunctionType(argTypeList, new VariableTypeList(retTypes));
             FunctionDeclaration tempFuncDec = new FunctionDeclaration(node.getIdentifier(), funcType, null, null);
-            irFunctionName = getIRFunctionName(tempFuncDec);
+            irFunctionName = Util.getIRFunctionName(tempFuncDec);
         }
 
 
         // Pass the function name and arguments to an IRCall
         IRCall call = new IRCall(new IRName(irFunctionName), arguments);
         generatedNodes.push(call);
-    }
-
-    public static String getTypeString(VariableType type) {
-        String typeString = "";
-        switch (type.getPrimitiveType()) {
-            case BOOL:
-                typeString = "b";
-                break;
-            case INT:
-                typeString = "i";
-                break;
-            default:
-                throw new RuntimeException("Invalid type");
-        }
-        for (int i = 0; i < type.getNumBrackets(); i++) {
-            typeString = "a" + typeString;
-        }
-        return typeString;
-    }
-
-    public String getIRFunctionName(FunctionDeclaration node) {
-        String funcName = node.getIdentifier().getName();
-        FunctionType funcType = node.getFunctionType();
-        String irName = "_I" + funcName + "_";
-
-        String ret = "";
-        List<VariableType> retList = funcType.getReturnTypeList().getVariableTypeList();
-        if (retList.size() > 1) {
-            ret = "t" + retList.size();
-        } else if (retList.size() == 0) {
-            ret = "p";
-        }
-        for (VariableType type : retList) {
-            ret += getTypeString(type);
-        }
-
-        String arg = "";
-        List<VariableType> argList = funcType.getArgTypeList();
-        for (VariableType type : argList) {
-            arg += getTypeString(type);
-        }
-        irName += ret + arg;
-        return irName;
     }
 
     public void visit(FunctionDeclaration node) {
@@ -645,7 +602,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         }
         fullBody.addAll(body.stmts());
 
-        IRFuncDecl irfd = new IRFuncDecl(getIRFunctionName(node), new IRSeq(fullBody));
+        IRFuncDecl irfd = new IRFuncDecl(Util.getIRFunctionName(node), new IRSeq(fullBody));
         generatedNodes.push(irfd);
     }
 
@@ -723,7 +680,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         FunctionDeclaration tempFuncDec = new FunctionDeclaration(node.getIdentifier(), funcType, null, null);
 
         // Pass the function name and arguments to an IRCall
-        IRCall call = new IRCall(new IRName(getIRFunctionName(tempFuncDec)), arguments);
+        IRCall call = new IRCall(new IRName(Util.getIRFunctionName(tempFuncDec)), arguments);
         // We need to throw out the return value;
         generatedNodes.push(new IRExp(call));
     }
@@ -734,7 +691,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         for (FunctionDeclaration fd : node.getFunctionDeclarationList()) {
             fd.accept(this);
             assert generatedNodes.peek() instanceof IRFuncDecl;
-            functions.put(getIRFunctionName(fd), (IRFuncDecl) generatedNodes.pop());
+            functions.put(Util.getIRFunctionName(fd), (IRFuncDecl) generatedNodes.pop());
         }
 
         root = new IRCompUnit(name, functions);

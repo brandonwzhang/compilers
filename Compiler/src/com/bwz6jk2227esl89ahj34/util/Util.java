@@ -1,5 +1,8 @@
 package com.bwz6jk2227esl89ahj34.util;
 
+import com.bwz6jk2227esl89ahj34.AST.FunctionDeclaration;
+import com.bwz6jk2227esl89ahj34.AST.FunctionType;
+import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
 import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.AST.parse.ParserSym;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction;
@@ -296,5 +299,48 @@ public class Util {
         for (AssemblyInstruction instruction : instructions) {
           System.out.println(instruction);
         }
+    }
+
+    public static String getTypeString(VariableType type) {
+        String typeString = "";
+        switch (type.getPrimitiveType()) {
+            case BOOL:
+                typeString = "b";
+                break;
+            case INT:
+                typeString = "i";
+                break;
+            default:
+                throw new RuntimeException("Invalid type");
+        }
+        for (int i = 0; i < type.getNumBrackets(); i++) {
+            typeString = "a" + typeString;
+        }
+        return typeString;
+    }
+
+    public static String getIRFunctionName(FunctionDeclaration node) {
+        String funcName = node.getIdentifier().getName();
+        FunctionType funcType = node.getFunctionType();
+        String irName = "_I" + funcName + "_";
+
+        String ret = "";
+        List<VariableType> retList = funcType.getReturnTypeList().getVariableTypeList();
+        if (retList.size() > 1) {
+            ret = "t" + retList.size();
+        } else if (retList.size() == 0) {
+            ret = "p";
+        }
+        for (VariableType type : retList) {
+            ret += getTypeString(type);
+        }
+
+        String arg = "";
+        List<VariableType> argList = funcType.getArgTypeList();
+        for (VariableType type : argList) {
+            arg += getTypeString(type);
+        }
+        irName += ret + arg;
+        return irName;
     }
 }

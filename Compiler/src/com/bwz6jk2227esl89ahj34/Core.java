@@ -1,6 +1,8 @@
 package com.bwz6jk2227esl89ahj34;
 
+import com.bwz6jk2227esl89ahj34.AST.FunctionDeclaration;
 import com.bwz6jk2227esl89ahj34.AST.Program;
+import com.bwz6jk2227esl89ahj34.AST.UseStatement;
 import com.bwz6jk2227esl89ahj34.AST.parse.Lexer;
 import com.bwz6jk2227esl89ahj34.AST.parse.Parser;
 import com.bwz6jk2227esl89ahj34.AST.parse.ParserSym;
@@ -21,10 +23,7 @@ import java_cup.runtime.Symbol;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * A class containing the methods that make up the core functionality
@@ -376,12 +375,35 @@ public class Core {
                                         String libPath,
                                         String assemblyPath,
                                         String file) {
+        Optional<FileReader> reader = Util.getFileReader(sourcePath, file);
+        if (!reader.isPresent()) {
+            return;
+        }
+
+        Lexer lexer = new Lexer(reader.get());
+        Parser parser = new Parser(lexer);
+        List<String> lines = new LinkedList<>();
+        Optional<Program> programASTOptional = typeCheckHelper(parser, libPath, lines);
+
+        List<String> IRfunctionNamesFromUseStatements = new LinkedList<>();
+        if (programASTOptional.isPresent()) {
+            Program programAST = programASTOptional.get();
+            List<FunctionDeclaration> useFunctionDeclarations =
+                    programAST.getFunctionsFromUseStatement(libPath);
+            for(FunctionDeclaration useFunctionDeclaration :
+                    useFunctionDeclarations) {
+                IRfunctionNamesFromUseStatements.add(Util.getIRFunctionName(useFunctionDeclaration));
+            }
+        }
+
         Optional<IRCompUnit> irRoot = irGen(sourcePath, diagnosticPath, libPath, file, true);
         if (!irRoot.isPresent()) {
             return;
         }
 
-        AssemblyProgram program = new AssemblyProgram(irRoot.get());
+
+        AssemblyProgram program = new AssemblyProgram(irRoot.get(),
+                IRfunctionNamesFromUseStatements);
         Util.writeHelper(file, "S", assemblyPath, Collections.singletonList(program.toString()));
 
         // System.out.println("Assembly code generation has not been implemented yet.");

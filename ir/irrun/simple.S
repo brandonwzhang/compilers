@@ -1,5 +1,10 @@
 		.text
-		.globl	FUNC(_Imain_paai)
+		.global	FUNC(_Imain_paai)
+		.global	FUNC(_Iprint_pai)
+		.global	FUNC(_Iprintln_pai)
+		.global	FUNC(_Ireadln_ai)
+		.global	FUNC(_Igetchar_i)
+		.global	FUNC(_Ieof_b)
 		.align	4
 FUNC(_Imain_paai):
 		subq	$216,%rsp

@@ -8,13 +8,18 @@ import java.util.List;
 
 public class AssemblyProgram {
     private List<AssemblyFunction> functions = new ArrayList<>();
+    private List<String> global; // has IR function names of functions from
+                                // the ixi files in the program's use statements
 
     /**
      * Generate abstract assembly code for a program
      * @param root IRCompUnit of program
      * @return
      */
-    public AssemblyProgram(IRCompUnit root) {
+    public AssemblyProgram(IRCompUnit root, List<String> global) {
+
+        this.global = global;
+
         // Get the maximum number of return values and arguments in all functions
         for (String functionName : root.functions().keySet()) {
             AssemblyFunction.maxNumReturnValues =
@@ -25,7 +30,7 @@ public class AssemblyProgram {
 
         // Store all the functions
         for (IRFuncDecl funcDecl : root.functions().values()) {
-            functions.add(new AssemblyFunction(funcDecl));
+            functions.add(new AssemblyFunction(funcDecl, global));
         }
     }
 
