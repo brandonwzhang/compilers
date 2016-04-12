@@ -150,20 +150,26 @@ public class ExpressionTileTests {
                         new IRConst(1)
                 )), assemblyInstructions);
         Assert.assertEquals(assemblyInstructions.size() , 2);
+
         AssemblyInstruction moveInstruction = assemblyInstructions.get(0);
         Assert.assertEquals(moveInstruction.getOpCode(), OpCode.MOVQ);
         List<AssemblyExpression> moveInstructionArgs = moveInstruction.getArgs();
         Assert.assertEquals(moveInstructionArgs.size(), 2);
+
         Assert.assertTrue(moveInstructionArgs.get(0) instanceof AssemblyAbstractRegister);
-        Assert.assertEquals(((AssemblyAbstractRegister) (moveInstructionArgs.get(0)) ).id, 0);
         Assert.assertTrue(moveInstructionArgs.get(1) instanceof AssemblyAbstractRegister);
-        Assert.assertEquals(((AssemblyAbstractRegister) (moveInstructionArgs.get(1))).id, 1);
+
+        AssemblyInstruction addInstruction = assemblyInstructions.get(1);
+        Assert.assertEquals(addInstruction.getOpCode(), OpCode.ADDQ);
+        List<AssemblyExpression> addInstructionArgs = addInstruction.getArgs();
+        Assert.assertEquals(addInstructionArgs.size(), 2);
+        Assert.assertTrue(addInstructionArgs.get(0) instanceof AssemblyImmediate);
+        Assert.assertTrue(addInstructionArgs.get(1) instanceof AssemblyAbstractRegister);
+
         Assert.assertTrue(result instanceof AssemblyMemoryLocation);
+
         Assert.assertTrue(((AssemblyMemoryLocation) result).getBaseRegister()
                 instanceof AssemblyAbstractRegister);
-        Assert.assertEquals(
-                ((AssemblyAbstractRegister)((AssemblyMemoryLocation) result)
-                        .getBaseRegister()).id, 1);
     }
 
     @Test // BINOP(+,1,1)
@@ -186,17 +192,13 @@ public class ExpressionTileTests {
         Assert.assertEquals(
                 ((AssemblyAbstractRegister)
                         (assemblyInstructions.get(0).getArgs().get(1))).id,
-                0
+                ((AssemblyAbstractRegister)
+                        (assemblyInstructions.get(1).getArgs().get(1))).id
         );
         Assert.assertEquals(
                 ((AssemblyImmediate)
                         (assemblyInstructions.get(1).getArgs().get(0))),
                 new AssemblyImmediate(1)
-        );
-        Assert.assertEquals(
-                ((AssemblyAbstractRegister)
-                        (assemblyInstructions.get(1).getArgs().get(1))).id,
-                0
         );
         Assert.assertEquals(assemblyInstructions.get(1).getOpCode(), OpCode.ADDQ);
     }
@@ -211,36 +213,23 @@ public class ExpressionTileTests {
                 ), assemblyInstructions);
 
         Assert.assertTrue(result instanceof AssemblyAbstractRegister);
-        Assert.assertEquals(AssemblyAbstractRegister.getCurId(), 3);
         Assert.assertEquals(assemblyInstructions.size(), 2);
         Assert.assertEquals(assemblyInstructions.get(0).getOpCode(), OpCode.MOVQ);
-        Assert.assertEquals(
-                ((AssemblyAbstractRegister)
-                        (assemblyInstructions.get(0).getArgs().get(0))).id,
-                0
+        Assert.assertTrue(
+                assemblyInstructions.get(0).getArgs().get(0)
+                        instanceof AssemblyAbstractRegister
+        );
+        Assert.assertTrue(
+                assemblyInstructions.get(1).getArgs().get(0)
+                        instanceof AssemblyAbstractRegister
         );
         Assert.assertEquals(
                 ((AssemblyAbstractRegister)
                         (assemblyInstructions.get(0).getArgs().get(1))).id,
-                2
-        );
-        Assert.assertEquals(
                 ((AssemblyAbstractRegister)
-                        (assemblyInstructions.get(1).getArgs().get(0))).id,
-                1
-        );
-        Assert.assertEquals(
-                ((AssemblyAbstractRegister)
-                        (assemblyInstructions.get(1).getArgs().get(1))).id,
-                2
+                        (assemblyInstructions.get(1).getArgs().get(1))).id
         );
 
-        Assert.assertEquals(
-                ((AssemblyAbstractRegister)
-                        (assemblyInstructions.get(0).getArgs().get(1))).id,
-                ((AssemblyAbstractRegister)
-                        (assemblyInstructions.get(0).getArgs().get(1))).id
-        );
         Assert.assertEquals(assemblyInstructions.get(1).getOpCode(), OpCode.ADDQ);
     }
 }
