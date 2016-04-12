@@ -123,13 +123,9 @@ public class StatementCodeGenerators {
         assert node instanceof IRCall;
         IRCall castedNode = (IRCall) node;
 
-        // allocate space for returned arguments, pass a pointer to that
-        AssemblyExpression name = AbstractAssemblyGenerator.tileContainer.matchExpression(castedNode.target(), instructions);
-        assert name instanceof AssemblyName;
-        String functionName = ((AssemblyName) name).getName();
-
         // Save all caller-saved registers
-        AssemblyPhysicalRegister.saveToStack(instructions, AbstractAssemblyGenerator.);
+        AssemblyPhysicalRegister.saveToStack(instructions, AbstractAssemblyGenerator.getCallerSpaceOffset(),
+                AssemblyPhysicalRegister.callerSavedRegisters);
 
         // pass pointer to return argument space as first argument (RDI)
         instructions.add(new AssemblyInstruction(
@@ -138,35 +134,7 @@ public class StatementCodeGenerators {
                 AssemblyPhysicalRegister.RDI
         ));
 
-        // put the stack pointer in rdi (first 'argument')
-        // we are about to allocate space for the return values
-        instructions.add(
-                new AssemblyInstruction(
-                        OpCode.MOVQ,
-                        new AssemblyPhysicalRegister(Register.RSP),
-                        new AssemblyPhysicalRegister(Register.RDI)
-                )
-        );
-        for (int i = 0; i < numReturnValues - 2; i++) {
-            instructions.add(
-                    new AssemblyInstruction(
-                            OpCode.PUSHQ,
-                            new AssemblyImmediate(0)
-                    )
-            );
-        }
-
-        // TODO: space to the callee function
-
-        // save all caller-save registers
-        for (AssemblyPhysicalRegister register : callerSavedRegisters) {
-            AssemblyPhysicalRegister.saveToStack(
-                    instructions, register
-            );
-        }
-
         // put arguments in order rsi rdx rcx r8 r9
-
         List<IRExpr> arguments = castedNode.args();
         List<Register> argumentRegisters = Arrays.asList(
                 Register.RSI,
@@ -179,10 +147,12 @@ public class StatementCodeGenerators {
         Stack<AssemblyExpression> reversedArguments = new Stack<>();
         for(int i = 0; i < numArguments; i++) {
             if (i < 5) {
+                AssemblyExpression e = tileContainer.matchExpression(arguments.get(i), instructions);
                 instructions.add(
                         new AssemblyInstruction(
                                 OpCode.MOVQ,
                                 AbstractAssemblyGenerator.tileContainer.matchExpression(arguments.get(i), instructions),
+                                e,
                                 new AssemblyPhysicalRegister(argumentRegisters.get(i))
                         )
                 );
@@ -193,27 +163,23 @@ public class StatementCodeGenerators {
             }
         }
         // further arguments go in stack in reverse order
-        AssemblyPhysicalRegister.saveToStack(instructions, AbstractAssemblyGenerator.getArgumentsOffset());
-        while (!reversedArguments.isEmpty()) {
-            instructions.add(
-                    new AssemblyInstruction(
-                            OpCode.PUSHQ,
-                            reversedArguments.pop()
-                    )
-            );
-        }
+        AssemblyPhysicalRegister.saveToStack(instructions, AbstractAssemblyGenerator.getArgumentsOffset(),
+                reversedArguments.toArray(new AssemblyPhysicalRegister[reversedArguments.size()]));
+
+         // get function name
+        AssemblyExpression name = tileContainer.matchExpression(castedNode.target(), instructions);
+        assert name instanceof AssemblyName;
 
         // add the call instruction to instructions
         instructions.add(
                 new AssemblyInstruction(
-                        OpCode.JMP,
+                        OpCode.CALL,
                         name
                 )
         );
 
         functionCallEpilogue(castedNode.args(), instructions);
 
-        //TODO: restore caller saved registers, but maybe put it in a separate function
     }
 
     private static void functionCallEpilogue(List<IRExpr> args, List<AssemblyInstruction> instructions) {
@@ -234,11 +200,8 @@ public class StatementCodeGenerators {
         }
 
         // now we restore all of the caller saved registers
-        for(int i = callerSavedRegisters.size() - 1; i >= 0; i--) {
-            AssemblyPhysicalRegister.restoreFromStack(
-                    instructions, callerSavedRegisters.get(i)
-            );
-        }
+        AssemblyPhysicalRegister.restoreFromStack(instructions, AbstractAssemblyGenerator.getCallerSpaceOffset(),
+                AssemblyPhysicalRegister.callerSavedRegisters);
 
         // TODO: undo space to the callee function
         // TODO: undo space for return values

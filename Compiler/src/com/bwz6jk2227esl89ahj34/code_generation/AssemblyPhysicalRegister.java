@@ -59,7 +59,7 @@ public class AssemblyPhysicalRegister extends AssemblyRegister {
     }
 
     /*
-        Saves the registers by pushing to the stack in order provided. NOTE puts them into scratch register space.
+        Saves the registers by pushing to the stack in order provided. NOTE: puts them into scratch register space.
     */
     public static void saveToStack(List<AssemblyInstruction> instructions, int offset, AssemblyPhysicalRegister... registers){
         for (int i = 0; i < registers.length; i++) {
