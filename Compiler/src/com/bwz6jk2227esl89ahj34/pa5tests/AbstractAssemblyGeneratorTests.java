@@ -80,4 +80,16 @@ public class AbstractAssemblyGeneratorTests {
         Assert.assertEquals(
                 AbstractAssemblyGenerator.numReturnValues("_Imultiple____underScores_p"), 0);
     }
+
+    @Test // num arguments for _Ijihun_t5iiiii
+    public void numArguments7() {
+        Assert.assertEquals(
+                AbstractAssemblyGenerator.numArguments("_Ijihun_t5iiiii"), 0);
+    }
+
+    @Test // num arguments for _Ijihun_t5iiiii
+    public void numReturnValues7() {
+        Assert.assertEquals(
+                AbstractAssemblyGenerator.numReturnValues("_Ijihun_t5iiiii"), 5);
+    }
 }
