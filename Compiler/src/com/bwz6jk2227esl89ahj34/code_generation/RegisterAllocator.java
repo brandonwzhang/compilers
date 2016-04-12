@@ -31,14 +31,18 @@ public class RegisterAllocator {
         instructions.add(instruction);
 
         List<AssemblyExpression> args = instruction.args;
-        // Number of spilled temps we've encountered in this instruction so far
-        int numSpilledTemps = 0;
+        if (args == null) {
+            // We have a label, so we don't need to translate any expressions
+            return instructions;
+        }
         // The registers we'll use to shuttle temps in and out
         // We only need 3
         AssemblyPhysicalRegister[] shuttleRegisters = {AssemblyPhysicalRegister.R13,
                 AssemblyPhysicalRegister.R14, AssemblyPhysicalRegister.R15};
         // Translate every argument and add any extra instructions needed for shuttling
         for (int i = 0; i < args.size(); i++) {
+            // Number of spilled temps we've encountered in this instruction so far
+            int numSpilledTemps = 0;
             AssemblyExpression arg = args.get(i);
             if (arg instanceof AssemblyAbstractRegister) {
                 AssemblyAbstractRegister register = (AssemblyAbstractRegister) arg;
