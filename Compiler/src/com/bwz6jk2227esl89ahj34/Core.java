@@ -22,6 +22,7 @@ import java_cup.runtime.Symbol;
 import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -381,9 +382,8 @@ public class Core {
         }
 
         AssemblyProgram program = new AssemblyProgram(irRoot.get());
-        program.toString();
+        Util.writeHelper(file, "S", assemblyPath, Collections.singletonList(program.toString()));
 
-        // TODO: PA5
         // System.out.println("Assembly code generation has not been implemented yet.");
     }
 }

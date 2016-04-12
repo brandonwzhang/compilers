@@ -94,7 +94,7 @@ public class CLI {
 
         // assembly generation
         Arrays.stream(filesArray)
-                .forEach(file -> Core.four20blaze(
+                .forEach(file -> Core.generateAssembly(
                         Main.sourcePath(),
                         Main.diagnosticPath(),
                         Main.libPath(),
