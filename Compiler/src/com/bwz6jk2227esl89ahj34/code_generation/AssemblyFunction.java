@@ -54,7 +54,7 @@ public class AssemblyFunction {
     private static List<AssemblyLine> generateFunctionPrologue() {
         List<AssemblyLine> lines = new LinkedList<>();
 
-        instructions.add(new AssemblyComment("Starting function prologue"));
+        lines.add(new AssemblyComment("Starting function prologue"));
         // Save old RBP and update RBP
         lines.add(new AssemblyInstruction(OpCode.PUSHQ, AssemblyPhysicalRegister.RBP));
         lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RSP, AssemblyPhysicalRegister.RBP));
@@ -76,7 +76,7 @@ public class AssemblyFunction {
         int currentStackOffset = Configuration.WORD_SIZE;
 
         // Save callee-save registers rbx rbp r12-r15
-        instructions.add(new AssemblyComment("Save callee-save registers rbx rbp r12-r15"));
+        lines.add(new AssemblyComment("Save callee-save registers rbx rbp r12-r15"));
         for (int i = 0; i < AssemblyPhysicalRegister.calleeSavedRegisters.length; i++) {
             lines.add(
                     new AssemblyInstruction(
