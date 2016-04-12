@@ -1,9 +1,6 @@
 package com.bwz6jk2227esl89ahj34;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A class that implements the command line interface for xic.
@@ -29,7 +26,6 @@ import java.util.Map;
 public class CLI {
     private Map<String, Option> options;
     private ArrayList<String> files;
-    public static String GENERATE_ASSEMBLY = "420blaze";
 
     public CLI() {
         // we use a LinkedHashMap because we want to preserve the order
@@ -95,17 +91,24 @@ public class CLI {
                 option.action.run(optionArgs);
             }
         }
+
+        // assembly generation
+        Arrays.stream(filesArray)
+                .forEach(file -> Core.four20blaze(
+                        Main.sourcePath(),
+                        Main.diagnosticPath(),
+                        Main.libPath(),
+                        Main.assemblyPath(),
+                        file
+                )
+        );
     }
 
     /**
      * Print all of the options and their descriptions
      */
     public void printOptions() {
-        String skip = "--" + GENERATE_ASSEMBLY;
         for (String option : options.keySet()) {
-            if (option.equals(skip)) {
-                continue;
-            }
             System.out.println(option + "\t\t" +
                     options.get(option).description);
         }

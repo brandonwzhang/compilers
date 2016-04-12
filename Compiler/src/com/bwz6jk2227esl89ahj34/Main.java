@@ -75,16 +75,8 @@ public class Main {
                 files -> Arrays.stream(files).forEach(file ->
                         Core.irRun(sourcePath, diagnosticPath, libPath, file)),
                 0);
-        cli.addOption("--" + CLI.GENERATE_ASSEMBLY,
-                "This should not appear in help.",
-                files -> Arrays.stream(files).forEach(file ->
-                        Core.four20blaze(sourcePath, diagnosticPath, libPath, assemblyPath, file)),
-                0);
 
-        String[] extendedArgs = new String[args.length + 1];
-        System.arraycopy(args, 0, extendedArgs, 0, args.length);
-        extendedArgs[extendedArgs.length - 1] = "--" + CLI.GENERATE_ASSEMBLY;
-        cli.execute(extendedArgs);
+        cli.execute(args);
 
         if(tests) { // put debug mode behaviors here
 
@@ -148,6 +140,22 @@ public class Main {
             return;
         }
         libPath = args[0] + "/";
+    }
+
+    public static String sourcePath() {
+        return sourcePath;
+    }
+
+    public static String diagnosticPath() {
+        return diagnosticPath;
+    }
+
+    public static String libPath() {
+        return libPath;
+    }
+
+    public static String assemblyPath() {
+        return assemblyPath;
     }
 
     /**
