@@ -156,16 +156,13 @@ public class AbstractAssemblyGenerator {
 
         /*
                 Return Address          (8 byte)
-         rbp--> Saved base pointer      (8 byte)                            1
-                Callee-saved registers  (8 byte)                            2
-                                        (8 byte)                            3
-                                        (8 byte)                            4
-                                        (8 byte)                            5
-                                        (8 byte)                            6
-                                        (8 byte)                            7
+         rbp--> Saved base pointer      (8 byte)
+                Callee-saved registers  (6 * 8 bytes)
+                Caller-saved registers  (10 * 8 bytes)
                 Func extra Return Space (this.maxNumReturnValues * 8 bytes)
                 Func extra arg space    (this.maxNumArguments * 8 bytes)
-                Scratch space for temps (variable number)
+                Scratch space for regs  (this.numScratchRegisters * 8 bytes)
+                Space for temps (variable number)
                 Empty alignment         (optional)
          */
 
@@ -184,6 +181,8 @@ public class AbstractAssemblyGenerator {
             );
             currentStackOffset += Configuration.WORD_SIZE;
         }
+        // Allocate space for caller-save registers rax, rcx, rsi, rdi, rdx, rsp, r8, r9, r10, r11
+        currentStackOffset += Configuration.WORD_SIZE * AssemblyPhysicalRegister.callerSavedRegisters.length;
 
         // Make space for return values
         currentStackOffset += Configuration.WORD_SIZE * maxNumReturnValues;

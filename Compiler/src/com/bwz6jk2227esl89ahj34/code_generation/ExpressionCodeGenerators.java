@@ -104,7 +104,7 @@ public class ExpressionCodeGenerators {
                 instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
                 instructions.add(new AssemblyInstruction(OpCode.MULQ, right));
                 instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RAX, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyPhysicalRegister.RDX, AssemblyPhysicalRegister.RAX);
+                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 return t;
             case HMUL:
                 // make new t
@@ -117,7 +117,7 @@ public class ExpressionCodeGenerators {
                 instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
                 instructions.add(new AssemblyInstruction(OpCode.MULQ, right));
                 instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RDX, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyPhysicalRegister.RDX, AssemblyPhysicalRegister.RAX);
+                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 return t;
             case DIV:
                 // save RAX, RDX to stack
@@ -131,7 +131,7 @@ public class ExpressionCodeGenerators {
                 instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
                 instructions.add(new AssemblyInstruction(OpCode.DIVQ, right));
                 instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RAX, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyPhysicalRegister.RDX, AssemblyPhysicalRegister.RAX);
+                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 return t;
             case MOD:
                 // save RAX, RDX to stack
@@ -144,7 +144,7 @@ public class ExpressionCodeGenerators {
                 instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
                 instructions.add(new AssemblyInstruction(OpCode.DIVQ, right));
                 instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RDX, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyPhysicalRegister.RDX, AssemblyPhysicalRegister.RAX);
+                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 return t;
             case AND:
                 // movq t1, t

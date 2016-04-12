@@ -11,11 +11,9 @@ import java.util.Stack;
 
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
+import com.sun.deploy.config.Config;
 
 public class StatementCodeGenerators {
-
-    private static List<AssemblyPhysicalRegister> callerSavedRegisters =
-            Arrays.asList(AssemblyPhysicalRegister.callerSavedRegisters);
 
     public StatementCodeGenerators() {
 
@@ -89,17 +87,17 @@ public class StatementCodeGenerators {
         */
         List<AssemblyInstruction> instructions = new LinkedList<>();
         // Restore callee-save registers
-        instructions.add(new AssemblyInstruction(OpCode.POPQ, new AssemblyPhysicalRegister(Register.R15)));
-        instructions.add(new AssemblyInstruction(OpCode.POPQ, new AssemblyPhysicalRegister(Register.R14)));
-        instructions.add(new AssemblyInstruction(OpCode.POPQ, new AssemblyPhysicalRegister(Register.R13)));
-        instructions.add(new AssemblyInstruction(OpCode.POPQ, new AssemblyPhysicalRegister(Register.R12)));
-        instructions.add(new AssemblyInstruction(OpCode.POPQ, new AssemblyPhysicalRegister(Register.RBP)));
-        instructions.add(new AssemblyInstruction(OpCode.POPQ, new AssemblyPhysicalRegister(Register.RBX)));
+        for (int i = 0; i < AssemblyPhysicalRegister.calleeSavedRegisters.length; i++) {
+            AssemblyPhysicalRegister register = AssemblyPhysicalRegister.calleeSavedRegisters[i];
+            instructions.add(new AssemblyInstruction(
+                    OpCode.MOVQ,
+                    register,
+                    AssemblyMemoryLocation.stackOffset(Configuration.WORD_SIZE * (1 + i))
+                    ));
+        }
         // Restore old RBP and RSP
-        AssemblyPhysicalRegister rbp = new AssemblyPhysicalRegister(Register.RBP);
-        AssemblyPhysicalRegister rsp = new AssemblyPhysicalRegister(Register.RSP);
-        instructions.add(new AssemblyInstruction(OpCode.MOVQ, rbp, rsp));
-        instructions.add(new AssemblyInstruction(OpCode.POPQ, rbp));
+        instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RBP, AssemblyPhysicalRegister.RSP));
+        instructions.add(new AssemblyInstruction(OpCode.POPQ, AssemblyPhysicalRegister.RBP));
         instructions.add(new AssemblyInstruction(OpCode.RETQ));
         return instructions;
     };
@@ -129,7 +127,17 @@ public class StatementCodeGenerators {
         AssemblyExpression name = AbstractAssemblyGenerator.tileContainer.matchExpression(castedNode.target(), instructions);
         assert name instanceof AssemblyName;
         String functionName = ((AssemblyName) name).getName();
-        int numReturnValues = AbstractAssemblyGenerator.numReturnValues.get(functionName);
+
+
+        // Save all caller-saved registers
+        AssemblyPhysicalRegister.saveToStack(instructions, AbstractAssemblyGenerator.);
+
+        // pass pointer to return argument space as first argument (RDI)
+        instructions.add(new AssemblyInstruction(
+                OpCode.MOVQ,
+                AssemblyMemoryLocation.stackOffset(AbstractAssemblyGenerator.getReturnValuesOffset()),
+                AssemblyPhysicalRegister.RDI
+        ));
 
         // put the stack pointer in rdi (first 'argument')
         // we are about to allocate space for the return values
@@ -186,6 +194,7 @@ public class StatementCodeGenerators {
             }
         }
         // further arguments go in stack in reverse order
+        AssemblyPhysicalRegister.saveToStack(instructions, AbstractAssemblyGenerator.getArgumentsOffset());
         while (!reversedArguments.isEmpty()) {
             instructions.add(
                     new AssemblyInstruction(
