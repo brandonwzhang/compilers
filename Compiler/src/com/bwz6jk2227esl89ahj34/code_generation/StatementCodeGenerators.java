@@ -132,6 +132,7 @@ public class StatementCodeGenerators {
         addAssemblyComment(root, "return1", instructions);
 
         // Restore callee-save registers
+        instructions.add(new AssemblyComment("restoring callee-save registers"));
         for (int i = 0; i < AssemblyPhysicalRegister.calleeSavedRegisters.length; i++) {
             AssemblyPhysicalRegister register = AssemblyPhysicalRegister.calleeSavedRegisters[i];
             instructions.add(new AssemblyInstruction(
@@ -141,6 +142,7 @@ public class StatementCodeGenerators {
                     ));
         }
         // Restore old RBP and RSP
+        instructions.add(new AssemblyComment("restore old RBP and RSP"));
         instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RBP, AssemblyPhysicalRegister.RSP));
         instructions.add(new AssemblyInstruction(OpCode.POPQ, AssemblyPhysicalRegister.RBP));
         instructions.add(new AssemblyInstruction(OpCode.RETQ));
