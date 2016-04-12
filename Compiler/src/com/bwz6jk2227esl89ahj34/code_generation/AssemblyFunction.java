@@ -47,8 +47,8 @@ public class AssemblyFunction {
         // Store the lines in this instance
         lines.addAll(functionPrologue);
         // Translate the function body from abstract assembly to assembly
-        lines.addAll(functionBody);
-//        lines.addAll(RegisterAllocator.translate(functionBody));
+//        lines.addAll(functionBody);
+        lines.addAll(RegisterAllocator.translate(functionBody));
     }
 
     private static List<AssemblyLine> generateFunctionPrologue() {
