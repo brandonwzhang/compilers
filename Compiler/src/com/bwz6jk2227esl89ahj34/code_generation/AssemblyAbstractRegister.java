@@ -48,4 +48,9 @@ public class AssemblyAbstractRegister extends AssemblyRegister {
     public String toString() {
         return "%a" + id;
     }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
 }
