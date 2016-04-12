@@ -56,7 +56,7 @@ public class ExpressionCodeGenerators {
         */
         IRName castedRoot = (IRName) root;
 
-        return new AssemblyName(castedRoot.label());
+        return new AssemblyName(castedRoot.name());
     };
 
     public static ExpressionTile.CodeGenerator binop1 = (root, instructions) -> {
