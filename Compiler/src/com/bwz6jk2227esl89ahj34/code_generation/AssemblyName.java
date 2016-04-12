@@ -1,8 +1,10 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode
 public class AssemblyName extends AssemblyExpression {
 
     private String name;
