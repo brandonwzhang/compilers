@@ -193,7 +193,7 @@ public class StatementCodeGenerators {
                 )
         );
 
-        functionCallEpilogue(castedNode.args(), instructions);
+        functionCallEpilogue(instructions);
 
     }
 
