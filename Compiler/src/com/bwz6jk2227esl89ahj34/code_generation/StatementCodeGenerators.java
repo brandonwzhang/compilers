@@ -66,7 +66,10 @@ public class StatementCodeGenerators {
         */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
         IRExp castedRoot = (IRExp) root;
-        // TODO
+
+        // prologue, call, epilogue
+        functionCall(castedRoot.expr(), instructions);
+        functionCallEpilogue(instructions);
         return instructions;
     };
 
@@ -74,7 +77,19 @@ public class StatementCodeGenerators {
     		/*
         		MOVE(TEMP, CALL(NAME))
         */
-        return null;
+        LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+        IRMove castedRoot = (IRMove) root;
+
+        // prologue, call, move, epilogue
+        functionCall(castedRoot.expr(), instructions);
+        instructions.add(
+                new AssemblyInstruction(OpCode.MOVQ,
+                        AssemblyPhysicalRegister.RAX,
+                        TileContainer.matchExpression(castedRoot.target(), instructions))
+        );
+        functionCallEpilogue(instructions);
+
+        return instructions;
     };
 
     /**
@@ -122,6 +137,8 @@ public class StatementCodeGenerators {
 
         assert node instanceof IRCall;
         IRCall castedNode = (IRCall) node;
+
+        /* Function Call Prologue */
 
         // Save all caller-saved registers
         AssemblyPhysicalRegister.saveToStack(instructions, AbstractAssemblyGenerator.getCallerSpaceOffset(),
@@ -180,28 +197,10 @@ public class StatementCodeGenerators {
 
     }
 
-    private static void functionCallEpilogue(List<IRExpr> args, List<AssemblyInstruction> instructions) {
-        int numArguments = args.size();
-
-        // if number of args was greater than 5, then we computed
-        // rdi as well as the first 5 into rdi...r9
-        // and the rest of the args are in the stack
-        // ... to ignore these args, we increment rsp
-        if (numArguments > 5) {
-            instructions.add(
-                    new AssemblyInstruction(
-                            OpCode.ADDQ,
-                            new AssemblyImmediate(8*(numArguments - 5)),
-                            new AssemblyPhysicalRegister(Register.RSP)
-                    )
-            );
-        }
-
+    private static void functionCallEpilogue(List<AssemblyInstruction> instructions) {
         // now we restore all of the caller saved registers
         AssemblyPhysicalRegister.restoreFromStack(instructions, AbstractAssemblyGenerator.getCallerSpaceOffset(),
                 AssemblyPhysicalRegister.callerSavedRegisters);
 
-        // TODO: undo space to the callee function
-        // TODO: undo space for return values
     }
 }
