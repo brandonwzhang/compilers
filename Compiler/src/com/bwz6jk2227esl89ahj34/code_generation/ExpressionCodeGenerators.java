@@ -24,20 +24,6 @@ public class ExpressionCodeGenerators {
         return new AssemblyAbstractRegister(castedRoot);
     };
 
-    /**
-     * Returns the number of the return temp. Returns -1 if not a return temp.
-     */
-    private static int getReturnTempNumber(IRTemp temp) {
-        String name = temp.name();
-        if (name.length() < 5) {
-            return -1;
-        }
-        if (name.substring(0, 4).equals(Configuration.ABSTRACT_RET_PREFIX)) {
-            return Integer.parseInt(name.substring(4));
-        }
-        return -1;
-    }
-
     public static ExpressionTile.CodeGenerator mem1 = (root, instructions) -> {
             /*
                 MEM(e)

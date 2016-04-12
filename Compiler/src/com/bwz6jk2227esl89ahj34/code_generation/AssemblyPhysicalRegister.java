@@ -41,6 +41,14 @@ public class AssemblyPhysicalRegister extends AssemblyRegister {
             RBX, RBP, R12, R13, R14, R15
     };
 
+    public static final AssemblyPhysicalRegister[] argumentRegisters = {
+            RDX, RCX, R8, R9
+    };
+
+    public static final AssemblyPhysicalRegister[] returnRegisters = {
+            RAX
+    };
+
     public enum Register {
         RAX, RBX, RCX, RDX, RBP, RSI, RDI, RSP,
         R8, R9, R10, R11, R12, R13, R14, R15,

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RegisterAllocator {
-    private Map<AssemblyAbstractRegister, AssemblyExpression> registerMap = new HashMap<>();
+    private static Map<AssemblyAbstractRegister, AssemblyExpression> registerMap = new HashMap<>();
 
     /**
      * Returns a list of instructions with all abstract registers with physical locations
@@ -35,8 +35,8 @@ public class RegisterAllocator {
         int numSpilledTemps = 0;
         // The registers we'll use to shuttle temps in and out
         // We only need 3
-        AssemblyPhysicalRegister[] shuttleRegisters = {AssemblyPhysicalRegister.R8,
-                AssemblyPhysicalRegister.R9, AssemblyPhysicalRegister.R10};
+        AssemblyPhysicalRegister[] shuttleRegisters = {AssemblyPhysicalRegister.R13,
+                AssemblyPhysicalRegister.R14, AssemblyPhysicalRegister.R15};
         // Translate every argument and add any extra instructions needed for shuttling
         for (int i = 0; i < args.size(); i++) {
             AssemblyExpression arg = args.get(i);
@@ -70,6 +70,12 @@ public class RegisterAllocator {
      * Returns the physical location of an abstract register
      */
     private AssemblyExpression getRegisterMapping(AssemblyAbstractRegister register) {
+        if (register.isArgument) {
+            return getArgumentMapping(register.id);
+        }
+        if (register.isReturn) {
+            return getReturnMapping(register.id);
+        }
         AssemblyExpression mapping = registerMap.get(register);
         if (mapping != null) {
             assert mapping instanceof AssemblyPhysicalRegister ||
@@ -81,5 +87,29 @@ public class RegisterAllocator {
                 AbstractAssemblyGenerator.getTempSpaceOffset() + Configuration.WORD_SIZE * register.id);
         registerMap.put(register, spillLocation);
         return spillLocation;
+    }
+
+    private AssemblyExpression getArgumentMapping(int id) {
+        // If the id is lower than the number of argument registers available,
+        // return the corresponding register
+        if (id < AssemblyPhysicalRegister.argumentRegisters.length) {
+            return AssemblyPhysicalRegister.argumentRegisters[id];
+        }
+        // Return the corresponding stack location
+        int stackOffset = AbstractAssemblyGenerator.getArgumentsOffset() +
+                Configuration.WORD_SIZE * (id - AssemblyPhysicalRegister.argumentRegisters.length);
+        return AssemblyMemoryLocation.stackOffset(stackOffset);
+    }
+
+    private AssemblyExpression getReturnMapping(int id) {
+        // If the id is lower than the number of return registers available,
+        // return the corresponding register
+        if (id < AssemblyPhysicalRegister.returnRegisters.length) {
+            return AssemblyPhysicalRegister.returnRegisters[id];
+        }
+        // Return the corresponding stack location
+        int stackOffset = AbstractAssemblyGenerator.getArgumentsOffset() +
+                Configuration.WORD_SIZE * (id - AssemblyPhysicalRegister.returnRegisters.length);
+        return AssemblyMemoryLocation.stackOffset(stackOffset);
     }
 }
