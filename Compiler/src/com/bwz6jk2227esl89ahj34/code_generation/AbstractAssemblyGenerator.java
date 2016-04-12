@@ -224,4 +224,8 @@ public class AbstractAssemblyGenerator {
     public static int getScratchSpaceOffset() {
         return getArgumentsOffset() + Configuration.WORD_SIZE * maxNumArguments;
     }
+
+    public static int getTempSpaceOffset() {
+        return getScratchSpaceOffset() + Configuration.WORD_SIZE * numScratchRegisters;
+    }
 }
