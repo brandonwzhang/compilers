@@ -33,7 +33,9 @@ $(GCLIBDIR)/configure:
 	rm -rf $(GCLIBDIR)
 	wget -N $(GCLIBURL)
 	tar -xzvf $(GCLIBZIP)
-	cp ../gcconfig.h $(GCLIBDIR)/include/private/
+	if [ -f ../gcconfig.h ] ; \
+	then cp ../gcconfig.h $(GCLIBDIR)/include/private/ ; \
+	fi;
 
 examples/fact:
 	./linkxi.sh examples/fact.S -o examples/fact
