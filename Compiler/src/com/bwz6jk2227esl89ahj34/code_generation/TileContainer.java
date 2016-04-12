@@ -36,7 +36,7 @@ public class TileContainer {
         }
     }
 
-    public static List<AssemblyInstruction> matchStatement(IRNode root) {
+    public static List<AssemblyLine> matchStatement(IRNode root) {
         assert root instanceof IRStmt;
         for (StatementTile tile : stmtTiles) {
             if (tile.match(root)) {
@@ -47,12 +47,12 @@ public class TileContainer {
         throw new RuntimeException("No code_generation matched! Please email jk2227@cornell.edu");
     }
 
-    public static AssemblyExpression matchExpression(IRNode root, List<AssemblyInstruction> assemblyCode) {
+    public static AssemblyExpression matchExpression(IRNode root, List<AssemblyLine> lines) {
         assert root instanceof IRExpr;
 
         for (ExpressionTile tile : exprTiles) {
             if (tile.match(root)) {
-                return tile.codeGenerator.generate(root, assemblyCode); // imperatively updates assemblyCode
+                return tile.codeGenerator.generate(root, lines); // imperatively updates assemblyCode
             }
         }
 

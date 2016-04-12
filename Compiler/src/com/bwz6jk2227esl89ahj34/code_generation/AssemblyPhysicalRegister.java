@@ -69,7 +69,7 @@ public class AssemblyPhysicalRegister extends AssemblyRegister {
     /*
         Saves the registers by pushing to the stack in order provided. NOTE: puts them into scratch register space.
     */
-    public static void saveToStack(List<AssemblyInstruction> instructions, int offset, AssemblyPhysicalRegister... registers){
+    public static void saveToStack(List<AssemblyLine> instructions, int offset, AssemblyPhysicalRegister... registers){
         for (int i = 0; i < registers.length; i++) {
             AssemblyPhysicalRegister register = registers[i];
             instructions.add(new AssemblyInstruction(
@@ -82,7 +82,7 @@ public class AssemblyPhysicalRegister extends AssemblyRegister {
     /*
         Restores the registers by popping from the stack in the reverse order provided (should be same as above).
     */
-    public static void restoreFromStack(List<AssemblyInstruction> instructions, int offset, AssemblyPhysicalRegister... registers){
+    public static void restoreFromStack(List<AssemblyLine> instructions, int offset, AssemblyPhysicalRegister... registers){
         for (int i = 0; i < registers.length; i++) {
             AssemblyPhysicalRegister register = registers[i];
             instructions.add(new AssemblyInstruction(
