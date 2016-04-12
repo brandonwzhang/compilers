@@ -147,7 +147,7 @@ public class StatementCodeGenerators {
         Stack<AssemblyExpression> reversedArguments = new Stack<>();
         for(int i = 0; i < numArguments; i++) {
             if (i < 5) {
-                AssemblyExpression e = tileContainer.matchExpression(arguments.get(i), instructions);
+                AssemblyExpression e = AbstractAssemblyGenerator.tileContainer.matchExpression(arguments.get(i), instructions);
                 instructions.add(
                         new AssemblyInstruction(
                                 OpCode.MOVQ,
@@ -167,7 +167,7 @@ public class StatementCodeGenerators {
                 reversedArguments.toArray(new AssemblyPhysicalRegister[reversedArguments.size()]));
 
          // get function name
-        AssemblyExpression name = tileContainer.matchExpression(castedNode.target(), instructions);
+        AssemblyExpression name = AbstractAssemblyGenerator.tileContainer.matchExpression(castedNode.target(), instructions);
         assert name instanceof AssemblyName;
 
         // add the call instruction to instructions
