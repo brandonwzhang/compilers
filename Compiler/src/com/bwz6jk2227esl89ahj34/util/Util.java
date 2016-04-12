@@ -2,8 +2,10 @@ package com.bwz6jk2227esl89ahj34.util;
 
 import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.AST.parse.ParserSym;
+import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
+import org.junit.rules.TestName;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -286,5 +288,13 @@ public class Util {
         }
 
         return charList;
+    }
+
+    public static void printInstructions(TestName name, List<AssemblyInstruction> instructions) {
+        System.out.println("Executing "+ name.getMethodName());
+        System.out.println();
+        for (AssemblyInstruction instruction : instructions) {
+          System.out.println(instruction);
+        }
     }
 }

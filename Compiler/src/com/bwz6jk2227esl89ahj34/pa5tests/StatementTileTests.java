@@ -3,16 +3,16 @@ package com.bwz6jk2227esl89ahj34.pa5tests;
 import com.bwz6jk2227esl89ahj34.code_generation.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.OpCode;
 import com.bwz6jk2227esl89ahj34.ir.*;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import com.bwz6jk2227esl89ahj34.util.Util;
+import org.junit.*;
+import org.junit.rules.TestName;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class StatementTileTests {
     private List<AssemblyInstruction> assemblyInstructions;
+    @Rule public TestName name = new TestName();
 
     // runs before every test invocation
     @Before
@@ -23,7 +23,7 @@ public class StatementTileTests {
     // runs after every test invocation
     @After
     public void tearDown() {
-        System.out.println("\nEnd of test\n");
+        System.out.println("\nEnd of " + name.getMethodName() + "\n");
     }
 
     @Test
@@ -39,8 +39,8 @@ public class StatementTileTests {
                 new AssemblyInstruction(OpCode.MOVQ, aar_src, aar_dst),
                 result.get(0)
         );
-        println("TEST: move1");
-        println(result.get(0).toString());
+
+        Util.printInstructions(name, result);
     }
 
     @Test
@@ -54,8 +54,7 @@ public class StatementTileTests {
                 new AssemblyInstruction(OpCode.JMP, new AssemblyName("l")),
                 result.get(0)
         );
-        println("TEST: jump1");
-        println(result.get(0).toString());
+        Util.printInstructions(name, result);
     }
 
     @Test(expected=AssertionError.class)
@@ -64,8 +63,7 @@ public class StatementTileTests {
         List<AssemblyInstruction> result =
                 TileContainer.matchStatement(label);
 
-        println("TEST: label1");
-        println(result.get(0).toString());
+        Util.printInstructions(name, result);
         AssemblyLabel duplicateLabel = new AssemblyLabel(new AssemblyName("l"));
     }
 
@@ -79,10 +77,7 @@ public class StatementTileTests {
         List<AssemblyInstruction> result =
                 TileContainer.matchStatement(cjump);
 
-        println("TEST: cjump1");
-        for (int i = 0; i < result.size(); i++) {
-            println(result.get(i).toString());
-        }
+        Util.printInstructions(name, result);
     }
 
     @Test
@@ -93,10 +88,7 @@ public class StatementTileTests {
         List<AssemblyInstruction> result =
                 TileContainer.matchStatement(move);
 
-        println("TEST: move2");
-        for (int i = 0; i < result.size(); i++) {
-            println(result.get(i).toString());
-        }
+        Util.printInstructions(name, result);
     }
 
     @Test
@@ -112,15 +104,9 @@ public class StatementTileTests {
         List<AssemblyInstruction> result =
                 TileContainer.matchStatement(moveTen);
 
-        println("TEST: test1");
-        for (int i = 0; i < result.size(); i++) {
-            println(result.get(i).toString());
-        }
+        Util.printInstructions(name, result);
     }
 
-    private void println(String str) {
-        System.out.println(str);
-    }
 
 //    @Test
 //    public void exp1() {
