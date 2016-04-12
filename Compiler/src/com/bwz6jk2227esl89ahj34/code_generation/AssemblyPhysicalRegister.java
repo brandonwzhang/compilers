@@ -63,7 +63,7 @@ public class AssemblyPhysicalRegister extends AssemblyRegister {
 
     @Override
     public String toString() {
-        return "%" + register;
+        return "%" + register.toString().toLowerCase();
     }
 
     /*

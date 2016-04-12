@@ -86,6 +86,20 @@ public class StatementTileTests {
     }
 
     @Test
+    public void move2() {
+        IRTemp temp = new IRTemp("t");
+        IRCall call = new IRCall(new IRName("foo_p"));
+        IRMove move = new IRMove(temp, call);
+        List<AssemblyInstruction> result =
+                TileContainer.matchStatement(move);
+
+        println("TEST: move2");
+        for (int i = 0; i < result.size(); i++) {
+            println(result.get(i).toString());
+        }
+    }
+
+    @Test
     public void test1() {
         IRStmt moveTen = new IRMove(
                 new IRTemp("temp0"),
