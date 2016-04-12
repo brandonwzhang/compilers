@@ -14,6 +14,7 @@ public class AssemblyAbstractRegister extends AssemblyRegister {
     private static int curId = 0;
     // Keeps track of id's that were assigned to given temp names
     private static HashMap<String, Integer> nameIdMap = new HashMap<>();
+    public static int numTemps = 0;
 
     // The id for this instance
     public int id;
@@ -28,9 +29,8 @@ public class AssemblyAbstractRegister extends AssemblyRegister {
         nameIdMap = new HashMap<>();
     }
 
-    public static int getCurId() { return curId; }
-
     public AssemblyAbstractRegister() {
+        numTemps++;
         id = curId++;
     }
 
@@ -41,6 +41,7 @@ public class AssemblyAbstractRegister extends AssemblyRegister {
      * If temp is an argument temp, mark the abstract register as an argument temp
      */
     public AssemblyAbstractRegister(IRTemp temp) {
+        numTemps++;
         // If temp is an argument, we set the isArgument flag and set its id
         // to the argument temp number (e.g. _ARG0 would have id 0)
         int argumentTempNumber = getArgumentTempNumber(temp);

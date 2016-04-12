@@ -7,16 +7,27 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class TileContainer {
-    TreeSet<StatementTile> stmtTiles;
-    TreeSet<ExpressionTile> exprTiles;
+    private static TreeSet<StatementTile> stmtTiles = new TreeSet<>(new TileComparator());;
+    private static TreeSet<ExpressionTile> exprTiles = new TreeSet<>(new TileComparator());;
 
-    public TileContainer() {
-        // these will be populated in the Tile constructor by calling addTile
-        stmtTiles = new TreeSet<>(new TileComparator());
-        exprTiles = new TreeSet<>(new TileComparator());
+    // Add all tiles to the container
+    static {
+        add(new ExpressionTile(ExpressionPatterns.const1, ExpressionCodeGenerators.const1));
+        add(new ExpressionTile(ExpressionPatterns.temp1, ExpressionCodeGenerators.temp1));
+        add(new ExpressionTile(ExpressionPatterns.mem1, ExpressionCodeGenerators.mem1));
+        add(new ExpressionTile(ExpressionPatterns.name1, ExpressionCodeGenerators.name1));
+        add(new ExpressionTile(ExpressionPatterns.binop1, ExpressionCodeGenerators.binop1));
+
+        add(new StatementTile(StatementPatterns.move1, StatementCodeGenerators.move1));
+        add(new StatementTile(StatementPatterns.move2, StatementCodeGenerators.move2));
+        add(new StatementTile(StatementPatterns.jump1, StatementCodeGenerators.jump1));
+        add(new StatementTile(StatementPatterns.label1, StatementCodeGenerators.label1));
+        add(new StatementTile(StatementPatterns.exp1, StatementCodeGenerators.exp1));
+        add(new StatementTile(StatementPatterns.return1, StatementCodeGenerators.return1));
+        add(new StatementTile(StatementPatterns.cjump1, StatementCodeGenerators.cjump1));
     }
 
-    public boolean add(Tile tile) {
+    public static boolean add(Tile tile) {
         if (tile instanceof StatementTile) {
             return stmtTiles.add((StatementTile)tile);
         }
@@ -25,7 +36,7 @@ public class TileContainer {
         }
     }
 
-    public List<AssemblyInstruction> matchStatement(IRNode root) {
+    public static List<AssemblyInstruction> matchStatement(IRNode root) {
         assert root instanceof IRStmt;
         for (StatementTile tile : stmtTiles) {
             if (tile.match(root)) {
@@ -36,7 +47,7 @@ public class TileContainer {
         throw new RuntimeException("No code_generation matched! Please email jk2227@cornell.edu");
     }
 
-    public AssemblyExpression matchExpression(IRNode root, List<AssemblyInstruction> assemblyCode) {
+    public static AssemblyExpression matchExpression(IRNode root, List<AssemblyInstruction> assemblyCode) {
         assert root instanceof IRExpr;
 
         for (ExpressionTile tile : exprTiles) {
@@ -49,7 +60,7 @@ public class TileContainer {
     }
 
 
-    private class TileComparator implements Comparator<Tile> {
+    private static class TileComparator implements Comparator<Tile> {
         @Override
         public int compare(Tile t1, Tile t2) {
             if (t2.size - t1.size == 0 ) return -1;

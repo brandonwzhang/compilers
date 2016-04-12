@@ -12,13 +12,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class StatementTileTests {
-    private TileContainer tileContainer;
     private List<AssemblyInstruction> assemblyInstructions;
 
     // runs before every test invocation
     @Before
     public void setUp() {
-        tileContainer = AbstractAssemblyGenerator.tileContainer;
         assemblyInstructions = new LinkedList<>();
     }
 
@@ -33,7 +31,7 @@ public class StatementTileTests {
         IRTemp dst = new IRTemp("t0");
         IRTemp src = new IRTemp("t1");
         List<AssemblyInstruction> result =
-                tileContainer.matchStatement(new IRMove(dst, src));
+                TileContainer.matchStatement(new IRMove(dst, src));
 
         AssemblyAbstractRegister aar_dst = new AssemblyAbstractRegister(dst);
         AssemblyAbstractRegister aar_src = new AssemblyAbstractRegister(src);
@@ -50,7 +48,7 @@ public class StatementTileTests {
         IRName label = new IRName("l");
         IRJump jump = new IRJump(label);
         List<AssemblyInstruction> result =
-                tileContainer.matchStatement(jump);
+                TileContainer.matchStatement(jump);
 
         Assert.assertEquals(
                 new AssemblyInstruction(OpCode.JMP, new AssemblyName("l")),
@@ -64,7 +62,7 @@ public class StatementTileTests {
     public void label1() {
         IRLabel label = new IRLabel("l");
         List<AssemblyInstruction> result =
-                tileContainer.matchStatement(label);
+                TileContainer.matchStatement(label);
 
         println("TEST: label1");
         println(result.get(0).toString());
@@ -79,7 +77,7 @@ public class StatementTileTests {
                 null
         );
         List<AssemblyInstruction> result =
-                tileContainer.matchStatement(cjump);
+                TileContainer.matchStatement(cjump);
 
         println("TEST: cjump1");
         for (int i = 0; i < result.size(); i++) {
@@ -98,7 +96,7 @@ public class StatementTileTests {
                 )
         );
         List<AssemblyInstruction> result =
-                tileContainer.matchStatement(moveTen);
+                TileContainer.matchStatement(moveTen);
 
         println("TEST: test1");
         for (int i = 0; i < result.size(); i++) {
@@ -115,7 +113,7 @@ public class StatementTileTests {
 //        IRExpr expr = new IRConst(4120);
 //        IRExp exp = new IRExp(expr);
 //        List<AssemblyInstruction> result =
-//                tileContainer.matchStatement(exp);
+//                TileContainer.matchStatement(exp);
 //
 //        Assert.assertEquals(
 //                new AssemblyInstruction(OpCode.JMP, new AssemblyName("l")),

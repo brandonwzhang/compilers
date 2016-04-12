@@ -25,8 +25,8 @@ public class StatementCodeGenerators {
         */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
         IRMove castedRoot = (IRMove) root;
-        AssemblyExpression src = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.expr(), instructions);
-        AssemblyExpression dst = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.target(), instructions);
+        AssemblyExpression src = TileContainer.matchExpression(castedRoot.expr(), instructions);
+        AssemblyExpression dst = TileContainer.matchExpression(castedRoot.target(), instructions);
 
         assert !(dst instanceof AssemblyImmediate);
         instructions.add(new AssemblyInstruction(OpCode.MOVQ, src, dst));
@@ -40,7 +40,7 @@ public class StatementCodeGenerators {
         */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
         IRJump castedRoot = (IRJump) root;
-        AssemblyExpression label = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.target(), instructions);
+        AssemblyExpression label = TileContainer.matchExpression(castedRoot.target(), instructions);
 
         assert label instanceof AssemblyName;
         instructions.add(new AssemblyInstruction(OpCode.JMP, label));
@@ -109,7 +109,7 @@ public class StatementCodeGenerators {
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
         IRCJump castedRoot = (IRCJump) root;
         assert castedRoot.falseLabel() == null; // assert lowered CJump
-        AssemblyExpression guard = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.expr(), instructions);
+        AssemblyExpression guard = TileContainer.matchExpression(castedRoot.expr(), instructions);
 
         // compare guard to 0, jump to trueLabel if not equal
         instructions.add(new AssemblyInstruction(OpCode.CMP, guard, new AssemblyImmediate(0)));
@@ -147,18 +147,18 @@ public class StatementCodeGenerators {
         Stack<AssemblyExpression> reversedArguments = new Stack<>();
         for(int i = 0; i < numArguments; i++) {
             if (i < 5) {
-                AssemblyExpression e = AbstractAssemblyGenerator.tileContainer.matchExpression(arguments.get(i), instructions);
+                AssemblyExpression e = TileContainer.matchExpression(arguments.get(i), instructions);
                 instructions.add(
                         new AssemblyInstruction(
                                 OpCode.MOVQ,
-                                AbstractAssemblyGenerator.tileContainer.matchExpression(arguments.get(i), instructions),
+                                TileContainer.matchExpression(arguments.get(i), instructions),
                                 e,
                                 new AssemblyPhysicalRegister(argumentRegisters.get(i))
                         )
                 );
             } else { // push onto stack
                 reversedArguments.push(
-                        AbstractAssemblyGenerator.tileContainer.matchExpression(arguments.get(i), instructions)
+                        TileContainer.matchExpression(arguments.get(i), instructions)
                 );
             }
         }
@@ -167,7 +167,7 @@ public class StatementCodeGenerators {
                 reversedArguments.toArray(new AssemblyPhysicalRegister[reversedArguments.size()]));
 
          // get function name
-        AssemblyExpression name = AbstractAssemblyGenerator.tileContainer.matchExpression(castedNode.target(), instructions);
+        AssemblyExpression name = TileContainer.matchExpression(castedNode.target(), instructions);
         assert name instanceof AssemblyName;
 
         // add the call instruction to instructions

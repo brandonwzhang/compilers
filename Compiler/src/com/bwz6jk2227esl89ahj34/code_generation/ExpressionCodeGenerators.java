@@ -29,7 +29,7 @@ public class ExpressionCodeGenerators {
                 MEM(e)
              */
         IRMem castedRoot = (IRMem) root;
-        AssemblyExpression e = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.expr(), instructions);
+        AssemblyExpression e = TileContainer.matchExpression(castedRoot.expr(), instructions);
         assert e instanceof AssemblyAbstractRegister;
 
         return new AssemblyMemoryLocation((AssemblyAbstractRegister)e);
@@ -50,8 +50,8 @@ public class ExpressionCodeGenerators {
         		Handles all BinOp(e1, e2), for all e1,e2 NOT IRMem
         */
         IRBinOp castedRoot = (IRBinOp) root;
-        AssemblyExpression e1 = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.left(), instructions);
-        AssemblyExpression e2 = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.right(), instructions);
+        AssemblyExpression e1 = TileContainer.matchExpression(castedRoot.left(), instructions);
+        AssemblyExpression e2 = TileContainer.matchExpression(castedRoot.right(), instructions);
 
         assert !(e1 instanceof AssemblyMemoryLocation);
         assert !(e2 instanceof AssemblyMemoryLocation);

@@ -13,13 +13,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ExpressionTileTests {
-    private TileContainer tileContainer;
     private List<AssemblyInstruction> assemblyInstructions;
 
     // runs before every test invocation
     @Before
     public void setUp() {
-        tileContainer = AbstractAssemblyGenerator.tileContainer;
         assemblyInstructions = new LinkedList<>();
     }
 
@@ -114,7 +112,7 @@ public class ExpressionTileTests {
     public void expressionConst1() {
         Assert.assertNotEquals(assemblyInstructions, null);
         AssemblyExpression result =
-                tileContainer.matchExpression(new IRConst(1), assemblyInstructions);
+                TileContainer.matchExpression(new IRConst(1), assemblyInstructions);
 
         //nothing should have been added
         Assert.assertEquals(assemblyInstructions.size(), 0);
@@ -124,7 +122,7 @@ public class ExpressionTileTests {
     @Test // TEMP(x)
     public void expressionTemp1() {
         AssemblyExpression result =
-                tileContainer.matchExpression(new IRTemp("x"), assemblyInstructions);
+                TileContainer.matchExpression(new IRTemp("x"), assemblyInstructions);
 
         //nothing should have been added
         Assert.assertEquals(assemblyInstructions.size(), 0 );
@@ -134,7 +132,7 @@ public class ExpressionTileTests {
     @Test // MEM(TEMP(x))
     public void expressionMem1() {
         AssemblyExpression result =
-                tileContainer.matchExpression(new IRMem(new IRTemp("x")), assemblyInstructions);
+                TileContainer.matchExpression(new IRMem(new IRTemp("x")), assemblyInstructions);
 
         //nothing should have been added
         Assert.assertEquals(assemblyInstructions.size(), 0 );
@@ -146,7 +144,7 @@ public class ExpressionTileTests {
     @Test // binop within mem MEM(TEMP(x) + 1) this also tests TEMP(x) + 1
     public void expresssionMem2() {
         AssemblyExpression result =
-                tileContainer.matchExpression(new IRMem(new IRBinOp(
+                TileContainer.matchExpression(new IRMem(new IRBinOp(
                         IRBinOp.OpType.ADD,
                         new IRTemp("x"),
                         new IRConst(1)
@@ -171,7 +169,7 @@ public class ExpressionTileTests {
     @Test // BINOP(+,1,1)
     public void expressionBinop1() {
         AssemblyExpression result =
-                tileContainer.matchExpression(new IRBinOp(
+                TileContainer.matchExpression(new IRBinOp(
                         IRBinOp.OpType.ADD,
                         new IRConst(1),
                         new IRConst(1)
@@ -206,7 +204,7 @@ public class ExpressionTileTests {
     @Test // BINOP(+,x,y)
     public void expressionBinop2() {
         AssemblyExpression result =
-                tileContainer.matchExpression(new IRBinOp(
+                TileContainer.matchExpression(new IRBinOp(
                         IRBinOp.OpType.ADD,
                         new IRTemp("x"),
                         new IRTemp("y")
