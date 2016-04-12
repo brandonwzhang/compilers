@@ -100,7 +100,7 @@ public class AssemblyFunction {
         currentStackOffset += Configuration.WORD_SIZE * numScratchRegisters; // RAX, RDX;
 
         // Make space for temps
-        currentStackOffset += Configuration.WORD_SIZE * AssemblyAbstractRegister.numTemps;
+        currentStackOffset += Configuration.WORD_SIZE * AssemblyAbstractRegister.counter;
 
         // Make sure stack frame is 16 byte aligned
         if (currentStackOffset % 16 != 0) {

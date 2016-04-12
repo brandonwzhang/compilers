@@ -1,16 +1,14 @@
 # 1 "examples/init.S"
-# 1 "<built-in>" 1
-# 1 "examples/init.S" 2
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "/usr/include/stdc-predef.h" 1 3 4
+# 1 "<command-line>" 2
+# 1 "examples/init.S"
 # 1 "examples/defs.h" 1
-
-## Mac OS X
 # 2 "examples/init.S" 2
  # An example of initialization.
-
  # link it in with some other XI program and it will do an
-
  # extra printf before the program starts.
-
  .data
  .align 8
 LC1:
@@ -22,12 +20,11 @@ test1:
  movq %rsp, %rbp
  leaq LC1(%rip), %rdi
 
- callq _GC_printf
+ callq GC_printf
  leave
  retq
 
- # table of functions to call automatically
-
- .mod_init_func
+# table of functions to call automatically
+ .section .ctors
  .align 4
  .quad test1

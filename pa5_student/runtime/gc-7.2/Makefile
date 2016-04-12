@@ -133,9 +133,9 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = x86_64-apple-darwin15.0.0
-host_triplet = x86_64-apple-darwin15.0.0
-target_triplet = x86_64-apple-darwin15.0.0
+build_triplet = x86_64-unknown-linux-gnu
+host_triplet = x86_64-unknown-linux-gnu
+target_triplet = x86_64-unknown-linux-gnu
 check_PROGRAMS = gctest$(EXEEXT) leaktest$(EXEEXT) middletest$(EXEEXT) \
 	smashtest$(EXEEXT) hugetest$(EXEEXT) realloc_test$(EXEEXT) \
 	staticrootstest$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2) \
@@ -144,7 +144,7 @@ check_PROGRAMS = gctest$(EXEEXT) leaktest$(EXEEXT) middletest$(EXEEXT) \
 # C Library: Architecture Dependent
 # ---------------------------------
 am__append_1 = pthread_start.c pthread_support.c pthread_stop_world.c
-am__append_2 = darwin_stop_world.c
+#am__append_2 = darwin_stop_world.c
 #am__append_3 = win32_threads.c
 
 # C++ Interface
@@ -240,7 +240,7 @@ am__libgc_la_SOURCES_DIST = allchblk.c alloc.c blacklst.c checksums.c \
 	win32_threads.c
 am__objects_1 = pthread_start.lo pthread_support.lo \
 	pthread_stop_world.lo
-am__objects_2 = darwin_stop_world.lo
+#am__objects_2 = darwin_stop_world.lo
 #am__objects_3 = win32_threads.lo
 am_libgc_la_OBJECTS = allchblk.lo alloc.lo blacklst.lo checksums.lo \
 	dbg_mlc.lo dyn_load.lo finalize.lo gc_dlopen.lo gcj_mlc.lo \
@@ -692,7 +692,7 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /Users/brandonzhang/IdeaProjects/compilers/pa5_student/runtime/gc-7.2/missing aclocal-1.14
+ACLOCAL = ${SHELL} /home/vagrant/shared/compilers/pa5_student/runtime/gc-7.2/missing aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_CFLAGS =  -fexceptions
 AM_CPPFLAGS = \
@@ -703,10 +703,10 @@ AM_DEFAULT_VERBOSITY = 1
 AR = ar
 ATOMIC_OPS_CFLAGS = -I$(top_builddir)/libatomic_ops/src -I$(top_srcdir)/libatomic_ops/src
 ATOMIC_OPS_LIBS = 
-AUTOCONF = ${SHELL} /Users/brandonzhang/IdeaProjects/compilers/pa5_student/runtime/gc-7.2/missing autoconf
-AUTOHEADER = ${SHELL} /Users/brandonzhang/IdeaProjects/compilers/pa5_student/runtime/gc-7.2/missing autoheader
-AUTOMAKE = ${SHELL} /Users/brandonzhang/IdeaProjects/compilers/pa5_student/runtime/gc-7.2/missing automake-1.14
-AWK = awk
+AUTOCONF = ${SHELL} /home/vagrant/shared/compilers/pa5_student/runtime/gc-7.2/missing autoconf
+AUTOHEADER = ${SHELL} /home/vagrant/shared/compilers/pa5_student/runtime/gc-7.2/missing autoheader
+AUTOMAKE = ${SHELL} /home/vagrant/shared/compilers/pa5_student/runtime/gc-7.2/missing automake-1.14
+AWK = gawk
 CC = gcc
 CCAS = gcc
 CCASDEPMODE = depmode=gcc3
@@ -716,48 +716,48 @@ CFLAGS = -g -O2 -fno-strict-aliasing
 CPP = gcc -E
 CPPFLAGS = 
 CXX = g++
-CXXCPP = g++ -E
-CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -g -O2
+CXXCPP = 
+CXXDEPMODE = depmode=none
+CXXFLAGS = 
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
 DLLTOOL = false
-DSYMUTIL = dsymutil
+DSYMUTIL = 
 DUMPBIN = 
-ECHO_C = \c
-ECHO_N = 
+ECHO_C = 
+ECHO_N = -n
 ECHO_T = 
-EGREP = /usr/bin/grep -E
+EGREP = /bin/grep -E
 EXEEXT = 
 EXTRA_TEST_LIBS = 
-FGREP = /usr/bin/grep -F
+FGREP = /bin/grep -F
 GC_CFLAGS =  -fexceptions
 GC_VERSION = 
-GREP = /usr/bin/grep
+GREP = /bin/grep
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LD = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
+LD = /usr/bin/ld -m elf_x86_64
 LDFLAGS = 
 LIBOBJS = 
 LIBS = 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
-LIPO = lipo
+LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
 MAINT = #
-MAKEINFO = ${SHELL} /Users/brandonzhang/IdeaProjects/compilers/pa5_student/runtime/gc-7.2/missing makeinfo
+MAKEINFO = ${SHELL} /home/vagrant/shared/compilers/pa5_student/runtime/gc-7.2/missing makeinfo
 MANIFEST_TOOL = :
-MKDIR_P = ./install-sh -c -d
+MKDIR_P = /bin/mkdir -p
 NM = /usr/bin/nm -B
-NMEDIT = nmedit
-OBJDUMP = false
+NMEDIT = 
+OBJDUMP = objdump
 OBJEXT = o
-OTOOL = otool
-OTOOL64 = :
+OTOOL = 
+OTOOL64 = 
 PACKAGE = gc
 PACKAGE_BUGREPORT = bdwgc@lists.opendylan.org
 PACKAGE_NAME = gc
@@ -770,20 +770,20 @@ PKG_CONFIG =
 PKG_CONFIG_LIBDIR = 
 PKG_CONFIG_PATH = 
 RANLIB = ranlib
-SED = /usr/bin/sed
+SED = /bin/sed
 SET_MAKE = 
-SHELL = /bin/sh
+SHELL = /bin/bash
 STRIP = strip
-THREADDLLIBS = -lpthread
+THREADDLLIBS = -lpthread -ldl
 UNWINDLIBS = 
 VERSION = 7.2
-abs_builddir = /Users/brandonzhang/IdeaProjects/compilers/pa5_student/runtime/gc-7.2
-abs_srcdir = /Users/brandonzhang/IdeaProjects/compilers/pa5_student/runtime/gc-7.2
-abs_top_builddir = /Users/brandonzhang/IdeaProjects/compilers/pa5_student/runtime/gc-7.2
-abs_top_srcdir = /Users/brandonzhang/IdeaProjects/compilers/pa5_student/runtime/gc-7.2
+abs_builddir = /home/vagrant/shared/compilers/pa5_student/runtime/gc-7.2
+abs_srcdir = /home/vagrant/shared/compilers/pa5_student/runtime/gc-7.2
+abs_top_builddir = /home/vagrant/shared/compilers/pa5_student/runtime/gc-7.2
+abs_top_srcdir = /home/vagrant/shared/compilers/pa5_student/runtime/gc-7.2
 ac_ct_AR = ar
 ac_ct_CC = gcc
-ac_ct_CXX = g++
+ac_ct_CXX = 
 ac_ct_DUMPBIN = 
 addlibs = 
 addobjs =  mach_dep.lo
@@ -793,27 +793,27 @@ am__quote =
 am__tar = $${TAR-tar} chof - "$$tardir"
 am__untar = $${TAR-tar} xf -
 bindir = ${exec_prefix}/bin
-build = x86_64-apple-darwin15.0.0
+build = x86_64-unknown-linux-gnu
 build_alias = 
 build_cpu = x86_64
-build_os = darwin15.0.0
-build_vendor = apple
+build_os = linux-gnu
+build_vendor = unknown
 builddir = .
 datadir = ${datarootdir}
 datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-extra_ldflags_libgc = -Wl,-single_module
-host = x86_64-apple-darwin15.0.0
+extra_ldflags_libgc = 
+host = x86_64-unknown-linux-gnu
 host_alias = 
 host_cpu = x86_64
-host_os = darwin15.0.0
-host_vendor = apple
+host_os = linux-gnu
+host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /Users/brandonzhang/IdeaProjects/compilers/pa5_student/runtime/gc-7.2/install-sh
+install_sh = ${SHELL} /home/vagrant/shared/compilers/pa5_student/runtime/gc-7.2/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -830,12 +830,12 @@ sharedstatedir = ${prefix}/com
 srcdir = .
 subdirs =  libatomic_ops
 sysconfdir = ${prefix}/etc
-target = x86_64-apple-darwin15.0.0
+target = x86_64-unknown-linux-gnu
 target_alias = 
 target_all = libgc.la
 target_cpu = x86_64
-target_os = darwin15.0.0
-target_vendor = apple
+target_os = linux-gnu
+target_vendor = unknown
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
@@ -1382,28 +1382,28 @@ include tests/$(DEPDIR)/trace_test.Po
 #	$(AM_V_CC_no)$(LTCOMPILE) -c -o $@ $<
 
 .cc.o:
-	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
-	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-	$(am__mv) $$depbase.Tpo $$depbase.Po
-#	$(AM_V_CXX)source='$<' object='$@' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXXCOMPILE) -c -o $@ $<
+#	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+#	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+#	$(am__mv) $$depbase.Tpo $$depbase.Po
+	$(AM_V_CXX)source='$<' object='$@' libtool=no \
+	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+	$(AM_V_CXX_no)$(CXXCOMPILE) -c -o $@ $<
 
 .cc.obj:
-	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
-	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
-	$(am__mv) $$depbase.Tpo $$depbase.Po
-#	$(AM_V_CXX)source='$<' object='$@' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+#	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+#	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+#	$(am__mv) $$depbase.Tpo $$depbase.Po
+	$(AM_V_CXX)source='$<' object='$@' libtool=no \
+	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+	$(AM_V_CXX_no)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .cc.lo:
-	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
-	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-	$(am__mv) $$depbase.Tpo $$depbase.Plo
-#	$(AM_V_CXX)source='$<' object='$@' libtool=yes \
-#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LTCXXCOMPILE) -c -o $@ $<
+#	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+#	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+#	$(am__mv) $$depbase.Tpo $$depbase.Plo
+	$(AM_V_CXX)source='$<' object='$@' libtool=yes \
+	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+	$(AM_V_CXX_no)$(LTCXXCOMPILE) -c -o $@ $<
 
 .s.o:
 	$(AM_V_CCAS)$(CCASCOMPILE) -c -o $@ $<

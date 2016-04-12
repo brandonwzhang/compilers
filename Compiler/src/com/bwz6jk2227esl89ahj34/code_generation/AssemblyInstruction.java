@@ -35,7 +35,7 @@ public class AssemblyInstruction extends AssemblyLine {
         for (int i = 0; i < args.size(); i++) {
             s += args.get(i);
             if (i < args.size() - 1) {
-                s += ",";
+                s += ", ";
             }
         }
         return s;

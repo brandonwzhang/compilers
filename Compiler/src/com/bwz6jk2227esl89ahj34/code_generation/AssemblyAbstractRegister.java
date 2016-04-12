@@ -10,11 +10,10 @@ import java.util.HashMap;
 @Data
 @EqualsAndHashCode
 public class AssemblyAbstractRegister extends AssemblyRegister {
-    // Maintains the next id to be assigned to a new register
-    private static int curId = 0;
+    // Maintains the number of temps that aren't return or argument temps
+    public static int counter = 0;
     // Keeps track of id's that were assigned to given temp names
     private static HashMap<String, Integer> nameIdMap = new HashMap<>();
-    public static int numTemps = 0;
 
     // The id for this instance
     public int id;
@@ -22,16 +21,15 @@ public class AssemblyAbstractRegister extends AssemblyRegister {
     public boolean isReturn = false;
 
     /**
-     * Resets the curId to 0 and nameIdMap to a new HashMap
+     * Resets the counter to 0 and nameIdMap to a new HashMap
      */
     public static void reset() {
-        curId = 0;
+        counter = 0;
         nameIdMap = new HashMap<>();
     }
 
     public AssemblyAbstractRegister() {
-        numTemps++;
-        id = curId++;
+        id = counter++;
     }
 
     /**
@@ -41,7 +39,6 @@ public class AssemblyAbstractRegister extends AssemblyRegister {
      * If temp is an argument temp, mark the abstract register as an argument temp
      */
     public AssemblyAbstractRegister(IRTemp temp) {
-        numTemps++;
         // If temp is an argument, we set the isArgument flag and set its id
         // to the argument temp number (e.g. _ARG0 would have id 0)
         int argumentTempNumber = getArgumentTempNumber(temp);
@@ -65,7 +62,7 @@ public class AssemblyAbstractRegister extends AssemblyRegister {
             id = registerId;
             return;
         }
-        id = curId++;
+        id = counter++;
         nameIdMap.put(name, id);
     }
 

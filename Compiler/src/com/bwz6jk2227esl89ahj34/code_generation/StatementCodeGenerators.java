@@ -19,10 +19,8 @@ public class StatementCodeGenerators {
     private static void addAssemblyComment(IRNode root,
                                            String name,
                                            List<AssemblyLine> lines) {
-        String irStr = ("" + root);
-        lines.add(new AssemblyComment(""));
-        lines.add(new AssemblyComment(irStr.substring(0, irStr.length() - 1)));
-        lines.add(new AssemblyComment(name));
+        String irStr = "" + root;
+        lines.add(new AssemblyComment(irStr.substring(0, irStr.length() - 1) + " -- " + name));
     }
 
     public static StatementTile.CodeGenerator move1 = (root) -> {
