@@ -16,4 +16,9 @@ public class AssemblyName extends AssemblyExpression {
     public String getName() {
         return this.name;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

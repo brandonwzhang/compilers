@@ -28,7 +28,7 @@ public class AssemblyInstruction {
     }
     @Override
     public String toString() {
-        String s = "" + opCode;
+        String s = opCode.toString().toLowerCase();
         for (AssemblyExpression e : args) {
             s += " " + e;
         }
