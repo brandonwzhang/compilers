@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
-class TileContainer {
+public class TileContainer {
     TreeSet<StatementTile> stmtTiles;
     TreeSet<ExpressionTile> exprTiles;
 
@@ -41,6 +41,7 @@ class TileContainer {
 
         for (ExpressionTile tile : exprTiles) {
             if (tile.match(root)) {
+                System.out.println("help");
                 return tile.codeGenerator.generate(root, assemblyCode); // imperatively updates assemblyCode
             }
         }
