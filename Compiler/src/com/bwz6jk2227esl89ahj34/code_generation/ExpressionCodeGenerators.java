@@ -73,44 +73,6 @@ public class ExpressionCodeGenerators {
         return binopHelper(castedRoot.opType(), e1, e2, instructions);
     };
 
-    public static ExpressionTile.CodeGenerator binop2 = (root, instructions) -> {
-    		/*
-        		Handles all BinOp(e, IRMem)
-        */
-        IRBinOp castedRoot = (IRBinOp) root;
-        AssemblyExpression e = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.left(), instructions);
-        AssemblyExpression mem = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.right(), instructions);
-        AssemblyAbstractRegister reg = new AssemblyAbstractRegister();
-        instructions.add(new AssemblyInstruction(OpCode.MOVQ, mem, reg));
-        return binopHelper(castedRoot.opType(), e, reg, instructions);
-    };
-
-    public static ExpressionTile.CodeGenerator binop3 = (root, instructions) -> {
-    		/*
-        		Handles all BinOp(IRMem, e)
-        */
-        IRBinOp castedRoot = (IRBinOp) root;
-        AssemblyExpression mem = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.left(), instructions);
-        AssemblyAbstractRegister reg = new AssemblyAbstractRegister();
-        instructions.add(new AssemblyInstruction(OpCode.MOVQ, mem, reg));
-        AssemblyExpression e = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.right(), instructions);
-        return binopHelper(castedRoot.opType(), reg, e, instructions);
-    };
-
-    public static ExpressionTile.CodeGenerator binop4 = (root, instructions) -> {
-    		/*
-        		Handles all BinOp(IRMem, IRMem)
-        */
-        IRBinOp castedRoot = (IRBinOp) root;
-        AssemblyExpression mem1 = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.left(), instructions);
-        AssemblyAbstractRegister reg1 = new AssemblyAbstractRegister();
-        instructions.add(new AssemblyInstruction(OpCode.MOVQ, mem1, reg1));
-        AssemblyExpression mem2 = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.right(), instructions);
-        AssemblyAbstractRegister reg2 = new AssemblyAbstractRegister();
-        instructions.add(new AssemblyInstruction(OpCode.MOVQ, mem2, reg2));
-        return binopHelper(castedRoot.opType(), reg1, reg2, instructions);
-    };
-
     private static AssemblyExpression binopHelper(OpType opType,
                                                   AssemblyExpression left,
                                                   AssemblyExpression right,

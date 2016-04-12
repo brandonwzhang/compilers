@@ -10,8 +10,8 @@ public class AssemblyInstruction {
         MOVZX;
     }
 
-    private OpCode opCode;
-    private List<AssemblyExpression> args;
+    public OpCode opCode;
+    public List<AssemblyExpression> args;
 
     public AssemblyInstruction() {
 
