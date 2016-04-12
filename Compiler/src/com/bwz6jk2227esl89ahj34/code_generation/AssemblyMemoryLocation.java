@@ -56,12 +56,12 @@ public class AssemblyMemoryLocation extends AssemblyExpression {
         if (baseRegister != null) {
             s += baseRegister;
         }
-        s += ",";
         if (offsetRegister != null) {
+            s += ",";
             s += offsetRegister;
         }
-        s += ",";
         if (scale != null) {
+            s += ",";
             s += scale;
         }
         s += ")";
