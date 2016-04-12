@@ -15,6 +15,7 @@ public class AbstractAssemblyGenerator {
     public static Map<String, Integer> numArguments = new HashMap<>();
     public static int maxNumReturnValues;
     public static int maxNumArguments;
+    public static final int numScratchRegisters = 2;
 
     /**
      * Add all instruction tiles to tileContainer
@@ -192,6 +193,9 @@ public class AbstractAssemblyGenerator {
 
         // Make space for arguments
         currentStackOffset += Configuration.WORD_SIZE * maxNumArguments;
+
+        // Make space for scratch registers
+        currentStackOffset += Configuration.WORD_SIZE * numScratchRegisters; // RAX, RDX;
 
         // Make space for temps
         currentStackOffset += Configuration.WORD_SIZE * AssemblyAbstractRegister.getCurId();
