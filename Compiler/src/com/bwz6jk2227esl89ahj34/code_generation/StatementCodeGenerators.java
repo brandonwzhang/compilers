@@ -16,17 +16,29 @@ public class StatementCodeGenerators {
 
     }
 
+    private static void addAssemblyComment(IRNode root,
+                                           String name,
+                                           List<AssemblyInstruction> instructions) {
+        String irStr = ("" + root);
+        instructions.add(new AssemblyComment(""));
+        instructions.add(new AssemblyComment(irStr.substring(0, irStr.length() - 1)));
+        instructions.add(new AssemblyComment(name));
+    }
+
     public static StatementTile.CodeGenerator move1 = (root) -> {
         /*
             MOVE(dst, src)
         */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+        addAssemblyComment(root, "move1", instructions);
+
+        // Add a comment showing the IRNode that was translated
+
         IRMove castedRoot = (IRMove) root;
         AssemblyExpression src = TileContainer.matchExpression(castedRoot.expr(), instructions);
         AssemblyExpression dst = TileContainer.matchExpression(castedRoot.target(), instructions);
 
         assert !(dst instanceof AssemblyImmediate);
-        instructions.add(new AssemblyComment("MOV(dst,src) -- move1"));
         instructions.add(new AssemblyInstruction(OpCode.MOVQ, src, dst));
 
         return instructions;
@@ -37,11 +49,14 @@ public class StatementCodeGenerators {
             JUMP(label)
         */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+
+        // Add a comment showing the IRNode that was translated
+        addAssemblyComment(root, "jump1", instructions);
+
         IRJump castedRoot = (IRJump) root;
         AssemblyExpression label = TileContainer.matchExpression(castedRoot.target(), instructions);
 
         assert label instanceof AssemblyName;
-        instructions.add(new AssemblyComment("JUMP(label) -- jump1"));
         instructions.add(new AssemblyInstruction(OpCode.JMP, label));
 
         return instructions;
@@ -52,10 +67,13 @@ public class StatementCodeGenerators {
             LABEL(name)
          */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+
+        // Add a comment showing the IRNode that was translated
+        addAssemblyComment(root, "label1", instructions);
+
         IRLabel castedRoot = (IRLabel) root;
         AssemblyLabel label = new AssemblyLabel(new AssemblyName(castedRoot.name()));
 
-        instructions.add(new AssemblyComment("LABEL(name) -- label1"));
         instructions.add(label);
         return instructions;
     };
@@ -65,6 +83,10 @@ public class StatementCodeGenerators {
         		EXP(CALL(NAME))
         */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+
+        // Add a comment showing the IRNode that was translated
+        addAssemblyComment(root, "exp1", instructions);
+
         IRExp castedRoot = (IRExp) root;
 
         // prologue, call, epilogue
@@ -78,6 +100,10 @@ public class StatementCodeGenerators {
         		MOVE(TEMP, CALL(NAME))
         */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+
+        // Add a comment showing the IRNode that was translated
+        addAssemblyComment(root, "move2", instructions);
+
         IRMove castedRoot = (IRMove) root;
 
         // prologue, call, move, epilogue
@@ -101,6 +127,10 @@ public class StatementCodeGenerators {
         		RETURN()
         */
         List<AssemblyInstruction> instructions = new LinkedList<>();
+
+        // Add a comment showing the IRNode that was translated
+        addAssemblyComment(root, "return1", instructions);
+
         // Restore callee-save registers
         for (int i = 0; i < AssemblyPhysicalRegister.calleeSavedRegisters.length; i++) {
             AssemblyPhysicalRegister register = AssemblyPhysicalRegister.calleeSavedRegisters[i];
@@ -122,6 +152,10 @@ public class StatementCodeGenerators {
             CJUMP(e, trueLabel)
          */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+
+        // Add a comment showing the IRNode that was translated
+        addAssemblyComment(root, "cjump1", instructions);
+
         IRCJump castedRoot = (IRCJump) root;
         assert castedRoot.falseLabel() == null; // assert lowered CJump
         AssemblyExpression guard = TileContainer.matchExpression(castedRoot.expr(), instructions);
