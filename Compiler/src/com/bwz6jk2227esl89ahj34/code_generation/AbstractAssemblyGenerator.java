@@ -23,12 +23,9 @@ public class AbstractAssemblyGenerator {
         TileContainer tileContainer = new TileContainer();
         tileContainer.add(new ExpressionTile(ExpressionPatterns.const1, ExpressionCodeGenerators.const1));
         tileContainer.add(new ExpressionTile(ExpressionPatterns.temp1, ExpressionCodeGenerators.temp1));
-        tileContainer.add(new ExpressionTile(ExpressionPatterns.mem1, ExpressionCodeGenerators.mem1));
+        //tileContainer.add(new ExpressionTile(ExpressionPatterns.mem1, ExpressionCodeGenerators.mem1));
         tileContainer.add(new ExpressionTile(ExpressionPatterns.name1, ExpressionCodeGenerators.name1));
-        tileContainer.add(new ExpressionTile(ExpressionPatterns.binop1, ExpressionCodeGenerators.binop1));
-        tileContainer.add(new ExpressionTile(ExpressionPatterns.binop2, ExpressionCodeGenerators.binop2));
-        tileContainer.add(new ExpressionTile(ExpressionPatterns.binop3, ExpressionCodeGenerators.binop3));
-        tileContainer.add(new ExpressionTile(ExpressionPatterns.binop4, ExpressionCodeGenerators.binop4));
+        //tileContainer.add(new ExpressionTile(ExpressionPatterns.binop1, ExpressionCodeGenerators.binop1));
 
         tileContainer.add(new StatementTile(StatementPatterns.move1, StatementCodeGenerators.move1));
         tileContainer.add(new StatementTile(StatementPatterns.move2, StatementCodeGenerators.move2));
