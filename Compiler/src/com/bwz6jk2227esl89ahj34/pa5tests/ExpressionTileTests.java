@@ -4,16 +4,16 @@ import com.bwz6jk2227esl89ahj34.code_generation.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.OpCode;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import com.bwz6jk2227esl89ahj34.ir.*;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import com.bwz6jk2227esl89ahj34.util.Util;
+import org.junit.*;
+import org.junit.rules.TestName;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class ExpressionTileTests {
     private List<AssemblyInstruction> assemblyInstructions;
+    @Rule public TestName name = new TestName();
 
     // runs before every test invocation
     @Before
@@ -24,7 +24,7 @@ public class ExpressionTileTests {
     // runs after every test invocation
     @After
     public void tearDown() {
-        System.out.println("nice");
+        System.out.println("\nEnd of " + name.getMethodName() + "\n");
     }
 
     @Test
@@ -106,6 +106,7 @@ public class ExpressionTileTests {
                 new IRTemp("x")
         ), ExpressionCodeGenerators.binop1);
         Assert.assertEquals(binop7Tile.size, 3);
+        Util.printInstructions(name, assemblyInstructions);
     }
 
     @Test // CONST(1)
@@ -117,6 +118,7 @@ public class ExpressionTileTests {
         //nothing should have been added
         Assert.assertEquals(assemblyInstructions.size(), 0);
         Assert.assertEquals(result, new AssemblyImmediate(1));
+        Util.printInstructions(name, assemblyInstructions);
     }
 
     @Test // TEMP(x)
@@ -127,6 +129,7 @@ public class ExpressionTileTests {
         //nothing should have been added
         Assert.assertEquals(assemblyInstructions.size(), 0 );
         Assert.assertEquals(result, new AssemblyAbstractRegister(new IRTemp("x")));
+        Util.printInstructions(name, assemblyInstructions);
     }
 
     @Test // MEM(TEMP(x))
@@ -139,6 +142,7 @@ public class ExpressionTileTests {
         Assert.assertEquals(result,
                 new AssemblyMemoryLocation(
                         new AssemblyAbstractRegister(new IRTemp("x"))));
+        Util.printInstructions(name, assemblyInstructions);
     }
 
     @Test // binop within mem MEM(TEMP(x) + 1) this also tests TEMP(x) + 1
@@ -170,6 +174,7 @@ public class ExpressionTileTests {
 
         Assert.assertTrue(((AssemblyMemoryLocation) result).getBaseRegister()
                 instanceof AssemblyAbstractRegister);
+        Util.printInstructions(name, assemblyInstructions);
     }
 
     @Test // BINOP(+,1,1)
@@ -201,6 +206,7 @@ public class ExpressionTileTests {
                 new AssemblyImmediate(1)
         );
         Assert.assertEquals(assemblyInstructions.get(1).getOpCode(), OpCode.ADDQ);
+        Util.printInstructions(name, assemblyInstructions);
     }
 
     @Test // BINOP(+,x,y)
@@ -231,6 +237,7 @@ public class ExpressionTileTests {
         );
 
         Assert.assertEquals(assemblyInstructions.get(1).getOpCode(), OpCode.ADDQ);
+        Util.printInstructions(name, assemblyInstructions);
     }
 
     @Test //BINOP(+, BINOP(+,1,2),3)
@@ -245,9 +252,8 @@ public class ExpressionTileTests {
                         ),
                         new IRConst(3)
                 ), assemblyInstructions);
-
-        System.out.println();
+        Assert.assertEquals(assemblyInstructions.size(), 4);
+        Util.printInstructions(name, assemblyInstructions);
     }
-
 }
 
