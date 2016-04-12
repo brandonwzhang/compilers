@@ -15,6 +15,7 @@ public class AbstractAssemblyGenerator {
     public static Map<String, Integer> numArguments = new HashMap<>();
     public static int maxNumReturnValues;
     public static int maxNumArguments;
+    public static final int numScratchRegisters = 2;
 
     /**
      * Add all instruction tiles to tileContainer
@@ -153,6 +154,23 @@ public class AbstractAssemblyGenerator {
         instructions.add(new AssemblyInstruction(OpCode.PUSHQ, AssemblyPhysicalRegister.RBP));
         instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RSP, AssemblyPhysicalRegister.RBP));
 
+        /*
+                Return Address          (8 byte)
+         rbp--> Saved base pointer      (8 byte)                            1
+                Callee-saved registers  (8 byte)                            2
+                                        (8 byte)                            3
+                                        (8 byte)                            4
+                                        (8 byte)                            5
+                                        (8 byte)                            6
+                                        (8 byte)                            7
+                Func extra Return Space (this.maxNumReturnValues * 8 bytes)
+                Func extra arg space    (this.maxNumArguments * 8 bytes)
+                Scratch space for temps (variable number)
+                Empty alignment         (optional)
+         */
+
+        // Represents the "offset" of the base point (rbp - currentStackOffset).
+        // Treats
         int currentStackOffset = Configuration.WORD_SIZE;
 
         // Save callee-save registers rbx rbp r12-r15
@@ -172,6 +190,9 @@ public class AbstractAssemblyGenerator {
 
         // Make space for arguments
         currentStackOffset += Configuration.WORD_SIZE * maxNumArguments;
+
+        // Make space for scratch registers
+        currentStackOffset += Configuration.WORD_SIZE * numScratchRegisters; // RAX, RDX;
 
         // Make space for temps
         currentStackOffset += Configuration.WORD_SIZE * AssemblyAbstractRegister.getCurId();

@@ -9,7 +9,6 @@ import java.util.List;
 
 public class ExpressionCodeGenerators {
     private static TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
-
     public static ExpressionTile.CodeGenerator const1 = (root, instructions) -> {
             /*
                 CONST(i)
