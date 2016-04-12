@@ -1,5 +1,8 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
+import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
+import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.OpCode;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,30 +11,64 @@ import java.util.Map;
 public class RegisterAllocator {
     private Map<AssemblyAbstractRegister, AssemblyExpression> registerMap = new HashMap<>();
 
-    public List<AssemblyInstruction> allocate(List<AssemblyInstruction> instructions) {
+    /**
+     * Returns a list of instructions with all abstract registers with physical locations
+     */
+    public List<AssemblyInstruction> translate(List<AssemblyInstruction> instructions) {
         List<AssemblyInstruction> translatedInstructions = new LinkedList<>();
         for (AssemblyInstruction instruction : instructions) {
-            translatedInstructions.addAll(translate(instruction));
+            // For each instruction we may need to shuttle temps in and out if
+            // they spilled onto the stack
+            translatedInstructions.addAll(translateInstruction(instruction));
         }
         return translatedInstructions;
     }
 
-    private List<AssemblyInstruction> translate(AssemblyInstruction instruction) {
+    private List<AssemblyInstruction> translateInstruction(AssemblyInstruction instruction) {
         List<AssemblyInstruction> instructions = new LinkedList<>();
 
         // First, add the original instruction
         instructions.add(instruction);
 
         List<AssemblyExpression> args = instruction.args;
+        // Number of spilled temps we've encountered in this instruction so far
+        int numSpilledTemps = 0;
+        // The registers we'll use to shuttle temps in and out
+        // We only need 3
+        AssemblyPhysicalRegister[] shuttleRegisters = {AssemblyPhysicalRegister.R8,
+                AssemblyPhysicalRegister.R9, AssemblyPhysicalRegister.R10};
+        // Translate every argument and add any extra instructions needed for shuttling
         for (int i = 0; i < args.size(); i++) {
             AssemblyExpression arg = args.get(i);
             if (arg instanceof AssemblyAbstractRegister) {
+                AssemblyAbstractRegister register = (AssemblyAbstractRegister) arg;
+                // Get the physical location of this temp
+                AssemblyExpression mapping = getRegisterMapping(register);
+                // Replace the abstract register with its mapping
+                args.set(i, mapping);
 
+                if (mapping instanceof AssemblyPhysicalRegister) {
+                    // If it maps to a register, we don't need to add any extra instructions
+                    instructions.add(instruction);
+                    continue;
+                }
+                // The temp was spilled onto the stack, so we need to shuttle it in
+                assert mapping instanceof AssemblyMemoryLocation;
+                AssemblyMemoryLocation location = (AssemblyMemoryLocation) mapping;
+                // Shuttle temp in by adding a move instruction to the beginning
+                instructions.add(0, new AssemblyInstruction(OpCode.MOVQ,
+                        location, shuttleRegisters[numSpilledTemps++]));
+                // Shuttle temp out by adding a move instruction to the end
+                instructions.add(new AssemblyInstruction(OpCode.MOVQ,
+                        shuttleRegisters[numSpilledTemps++], location));
             }
         }
-        return null;
+        return instructions;
     }
 
+    /**
+     * Returns the physical location of an abstract register
+     */
     private AssemblyExpression getRegisterMapping(AssemblyAbstractRegister register) {
         AssemblyExpression mapping = registerMap.get(register);
         if (mapping != null) {
@@ -39,6 +76,10 @@ public class RegisterAllocator {
                     mapping instanceof AssemblyMemoryLocation;
             return mapping;
         }
-        AssemblyMemoryLocation spillLocation = AssemblyMemoryLocation.stackOffset(AbstractAssemblyGenerator.getScratchSpaceOffset());
+        // Naive register allocation: we assign each temp a location on the stack corresponding to its id
+        AssemblyMemoryLocation spillLocation = AssemblyMemoryLocation.stackOffset(
+                AbstractAssemblyGenerator.getTempSpaceOffset() + Configuration.WORD_SIZE * register.id);
+        registerMap.put(register, spillLocation);
+        return spillLocation;
     }
 }
