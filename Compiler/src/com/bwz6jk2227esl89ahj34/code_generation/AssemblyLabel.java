@@ -8,7 +8,7 @@ import java.util.HashSet;
 
 @Data
 @EqualsAndHashCode
-public class AssemblyLabel extends AssemblyInstruction {
+public class AssemblyLabel extends AssemblyLine {
     private static HashSet<String> allLabels = new HashSet<String>();
     private AssemblyName name;
 

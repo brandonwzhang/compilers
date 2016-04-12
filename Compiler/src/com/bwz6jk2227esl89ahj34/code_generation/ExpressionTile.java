@@ -12,6 +12,6 @@ public class ExpressionTile extends Tile {
         this.codeGenerator = codeGenerator;
     }
     public interface CodeGenerator {
-        AssemblyExpression generate(IRNode root, List<AssemblyInstruction> instructions);
+        AssemblyExpression generate(IRNode root, List<AssemblyLine> lines);
     }
 }

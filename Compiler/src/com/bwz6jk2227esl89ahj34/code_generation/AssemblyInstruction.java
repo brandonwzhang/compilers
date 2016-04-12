@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode
-public class AssemblyInstruction {
+public class AssemblyInstruction extends AssemblyLine {
     public enum OpCode {
         ADDQ, SUBQ, ANDQ, CMP, DIVQ ,ORQ, MOVQ, MULQ, SETZQ, SETNZQ, SETLQ, SETGQ, SETLEQ,
         SETGEQ, PUSHQ, POPQ, JMP, XORQ, RETQ, JE, JNE, MOVZX, CALLQ

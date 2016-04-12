@@ -18,104 +18,104 @@ public class StatementCodeGenerators {
 
     private static void addAssemblyComment(IRNode root,
                                            String name,
-                                           List<AssemblyInstruction> instructions) {
+                                           List<AssemblyLine> lines) {
         String irStr = ("" + root);
-        instructions.add(new AssemblyComment(""));
-        instructions.add(new AssemblyComment(irStr.substring(0, irStr.length() - 1)));
-        instructions.add(new AssemblyComment(name));
+        lines.add(new AssemblyComment(""));
+        lines.add(new AssemblyComment(irStr.substring(0, irStr.length() - 1)));
+        lines.add(new AssemblyComment(name));
     }
 
     public static StatementTile.CodeGenerator move1 = (root) -> {
         /*
             MOVE(dst, src)
         */
-        LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
-        addAssemblyComment(root, "move1", instructions);
+        LinkedList<AssemblyLine> lines = new LinkedList<>();
+        addAssemblyComment(root, "move1", lines);
 
         // Add a comment showing the IRNode that was translated
 
         IRMove castedRoot = (IRMove) root;
-        AssemblyExpression src = TileContainer.matchExpression(castedRoot.expr(), instructions);
-        AssemblyExpression dst = TileContainer.matchExpression(castedRoot.target(), instructions);
+        AssemblyExpression src = TileContainer.matchExpression(castedRoot.expr(), lines);
+        AssemblyExpression dst = TileContainer.matchExpression(castedRoot.target(), lines);
 
         assert !(dst instanceof AssemblyImmediate);
-        instructions.add(new AssemblyInstruction(OpCode.MOVQ, src, dst));
+        lines.add(new AssemblyInstruction(OpCode.MOVQ, src, dst));
 
-        return instructions;
+        return lines;
     };
 
     public static StatementTile.CodeGenerator jump1 = (root) -> {
         /*
             JUMP(label)
         */
-        LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+        LinkedList<AssemblyLine> lines = new LinkedList<>();
 
         // Add a comment showing the IRNode that was translated
-        addAssemblyComment(root, "jump1", instructions);
+        addAssemblyComment(root, "jump1", lines);
 
         IRJump castedRoot = (IRJump) root;
-        AssemblyExpression label = TileContainer.matchExpression(castedRoot.target(), instructions);
+        AssemblyExpression label = TileContainer.matchExpression(castedRoot.target(), lines);
 
         assert label instanceof AssemblyName;
-        instructions.add(new AssemblyInstruction(OpCode.JMP, label));
+        lines.add(new AssemblyInstruction(OpCode.JMP, label));
 
-        return instructions;
+        return lines;
     };
 
     public static StatementTile.CodeGenerator label1 = (root) -> {
         /*
             LABEL(name)
          */
-        LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+        LinkedList<AssemblyLine> lines = new LinkedList<>();
 
         // Add a comment showing the IRNode that was translated
-        addAssemblyComment(root, "label1", instructions);
+        addAssemblyComment(root, "label1", lines);
 
         IRLabel castedRoot = (IRLabel) root;
         AssemblyLabel label = new AssemblyLabel(new AssemblyName(castedRoot.name()));
 
-        instructions.add(label);
-        return instructions;
+        lines.add(label);
+        return lines;
     };
 
     public static StatementTile.CodeGenerator exp1 = (root) -> {
       	/*
         		EXP(CALL(NAME))
         */
-        LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+        LinkedList<AssemblyLine> lines = new LinkedList<>();
 
         // Add a comment showing the IRNode that was translated
-        addAssemblyComment(root, "exp1", instructions);
+        addAssemblyComment(root, "exp1", lines);
 
         IRExp castedRoot = (IRExp) root;
 
         // prologue, call, epilogue
-        functionCall(castedRoot.expr(), instructions);
-        functionCallEpilogue(instructions);
-        return instructions;
+        functionCall(castedRoot.expr(), lines);
+        functionCallEpilogue(lines);
+        return lines;
     };
 
     public static StatementTile.CodeGenerator move2 = (root) -> {
     		/*
         		MOVE(TEMP, CALL(NAME))
         */
-        LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+        LinkedList<AssemblyLine> lines = new LinkedList<>();
 
         // Add a comment showing the IRNode that was translated
-        addAssemblyComment(root, "move2", instructions);
+        addAssemblyComment(root, "move2", lines);
 
         IRMove castedRoot = (IRMove) root;
 
         // prologue, call, move, epilogue
-        functionCall(castedRoot.expr(), instructions);
-        instructions.add(
+        functionCall(castedRoot.expr(), lines);
+        lines.add(
                 new AssemblyInstruction(OpCode.MOVQ,
                         AssemblyPhysicalRegister.RAX,
-                        TileContainer.matchExpression(castedRoot.target(), instructions))
+                        TileContainer.matchExpression(castedRoot.target(), lines))
         );
-        functionCallEpilogue(instructions);
+        functionCallEpilogue(lines);
 
-        return instructions;
+        return lines;
     };
 
     /**
@@ -126,69 +126,69 @@ public class StatementCodeGenerators {
         /*
         		RETURN()
         */
-        List<AssemblyInstruction> instructions = new LinkedList<>();
+        List<AssemblyLine> lines = new LinkedList<>();
 
         // Add a comment showing the IRNode that was translated
-        addAssemblyComment(root, "return1", instructions);
+        addAssemblyComment(root, "return1", lines);
 
         // Restore callee-save registers
         for (int i = 0; i < AssemblyPhysicalRegister.calleeSavedRegisters.length; i++) {
             AssemblyPhysicalRegister register = AssemblyPhysicalRegister.calleeSavedRegisters[i];
-            instructions.add(new AssemblyInstruction(
+            lines.add(new AssemblyInstruction(
                     OpCode.MOVQ,
                     AssemblyMemoryLocation.stackOffset(Configuration.WORD_SIZE * (1 + i)),
                     register
                     ));
         }
         // Restore old RBP and RSP
-        instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RBP, AssemblyPhysicalRegister.RSP));
-        instructions.add(new AssemblyInstruction(OpCode.POPQ, AssemblyPhysicalRegister.RBP));
-        instructions.add(new AssemblyInstruction(OpCode.RETQ));
-        return instructions;
+        lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RBP, AssemblyPhysicalRegister.RSP));
+        lines.add(new AssemblyInstruction(OpCode.POPQ, AssemblyPhysicalRegister.RBP));
+        lines.add(new AssemblyInstruction(OpCode.RETQ));
+        return lines;
     };
 
     public static StatementTile.CodeGenerator cjump1 = (root) -> {
         /*
             CJUMP(e, trueLabel)
          */
-        LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
+        LinkedList<AssemblyLine> lines = new LinkedList<>();
 
         // Add a comment showing the IRNode that was translated
-        addAssemblyComment(root, "cjump1", instructions);
+        addAssemblyComment(root, "cjump1", lines);
 
         IRCJump castedRoot = (IRCJump) root;
         assert castedRoot.falseLabel() == null; // assert lowered CJump
-        AssemblyExpression guard = TileContainer.matchExpression(castedRoot.expr(), instructions);
+        AssemblyExpression guard = TileContainer.matchExpression(castedRoot.expr(), lines);
 
         // compare guard to 0, jump to trueLabel if not equal
-        instructions.add(new AssemblyInstruction(OpCode.CMP, guard, new AssemblyImmediate(0)));
-        instructions.add(new AssemblyInstruction(OpCode.JNE, new AssemblyName(castedRoot.trueLabel())));
+        lines.add(new AssemblyInstruction(OpCode.CMP, guard, new AssemblyImmediate(0)));
+        lines.add(new AssemblyInstruction(OpCode.JNE, new AssemblyName(castedRoot.trueLabel())));
 
-        return instructions;
+        return lines;
     };
 
-    private static void functionCall(IRNode node, List<AssemblyInstruction> instructions) {
+    private static void functionCall(IRNode node, List<AssemblyLine> lines) {
 
         assert node instanceof IRCall;
         IRCall castedNode = (IRCall) node;
 
         /* Function Call Prologue */
-        instructions.add(new AssemblyComment("beginning of function call prologue"));
+        lines.add(new AssemblyComment("beginning of function call prologue"));
         // Save all caller-saved registers
-        instructions.add(new AssemblyComment("save all caller-saved registers"));
-        AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getCallerSpaceOffset(),
+        lines.add(new AssemblyComment("save all caller-saved registers"));
+        AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getCallerSpaceOffset(),
                 AssemblyPhysicalRegister.callerSavedRegisters);
 
         // pass pointer to return space as first argument (RDI)
-        instructions.add(new AssemblyComment("pass pointer to return space as first argument"));
-        instructions.add(new AssemblyInstruction(
+        lines.add(new AssemblyComment("pass pointer to return space as first argument"));
+        lines.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getReturnValuesOffset()),
                 AssemblyPhysicalRegister.RDI
         ));
 
         // pass pointer to additional argument space as second argument (RSI)
-        instructions.add(new AssemblyInstruction(
+        lines.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()),
                 AssemblyPhysicalRegister.RSI
@@ -199,18 +199,18 @@ public class StatementCodeGenerators {
 
         for(int i = 0; i < arguments.size(); i++) {
             if (i < AssemblyPhysicalRegister.returnRegisters.length) {
-                instructions.add(
+                lines.add(
                         new AssemblyInstruction(
                                 OpCode.MOVQ,
-                                TileContainer.matchExpression(arguments.get(i), instructions),
+                                TileContainer.matchExpression(arguments.get(i), lines),
                                 AssemblyPhysicalRegister.returnRegisters[i]
                         )
                 );
             } else { // put into stack location
-                 instructions.add(
+                 lines.add(
                     new AssemblyInstruction(
                             OpCode.MOVQ,
-                            TileContainer.matchExpression(arguments.get(i), instructions),
+                            TileContainer.matchExpression(arguments.get(i), lines),
                             AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()
                                     + Configuration.WORD_SIZE * i))
                 );
@@ -218,24 +218,24 @@ public class StatementCodeGenerators {
         }
 
          // get function name
-        AssemblyExpression name = TileContainer.matchExpression(castedNode.target(), instructions);
+        AssemblyExpression name = TileContainer.matchExpression(castedNode.target(), lines);
         assert name instanceof AssemblyName;
 
-        // add the call instruction to instructions
-        instructions.add(
+        // add the call instruction to lines
+        lines.add(
                 new AssemblyInstruction(
                         OpCode.CALLQ,
                         name
                 )
         );
 
-        functionCallEpilogue(instructions);
+        functionCallEpilogue(lines);
 
     }
 
-    private static void functionCallEpilogue(List<AssemblyInstruction> instructions) {
+    private static void functionCallEpilogue(List<AssemblyLine> lines) {
         // now we restore all of the caller saved registers
-        AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyFunction.getCallerSpaceOffset(),
+        AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getCallerSpaceOffset(),
                 AssemblyPhysicalRegister.callerSavedRegisters);
 
     }

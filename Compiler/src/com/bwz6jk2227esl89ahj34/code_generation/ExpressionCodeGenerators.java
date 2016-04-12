@@ -8,7 +8,7 @@ import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import java.util.List;
 
 public class ExpressionCodeGenerators {
-    public static ExpressionTile.CodeGenerator const1 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator const1 = (root, lines) -> {
             /*
                 CONST(i)
              */
@@ -16,7 +16,7 @@ public class ExpressionCodeGenerators {
         return new AssemblyImmediate(castedRoot.value());
     };
 
-    public static ExpressionTile.CodeGenerator temp1 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator temp1 = (root, lines) -> {
             /*
                 TEMP(t)
              */
@@ -24,19 +24,19 @@ public class ExpressionCodeGenerators {
         return new AssemblyAbstractRegister(castedRoot);
     };
 
-    public static ExpressionTile.CodeGenerator mem1 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator mem1 = (root, lines) -> {
             /*
                 MEM(e)
              */
         IRMem castedRoot = (IRMem) root;
-        AssemblyExpression e = TileContainer.matchExpression(castedRoot.expr(), instructions);
+        AssemblyExpression e = TileContainer.matchExpression(castedRoot.expr(), lines);
         assert e instanceof AssemblyAbstractRegister;
 
         return new AssemblyMemoryLocation((AssemblyAbstractRegister)e);
     };
 
 
-    public static ExpressionTile.CodeGenerator name1 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator name1 = (root, lines) -> {
         /*
         	NAME("name")
         */
@@ -45,39 +45,39 @@ public class ExpressionCodeGenerators {
         return new AssemblyName(castedRoot.name());
     };
 
-    public static ExpressionTile.CodeGenerator binop1 = (root, instructions) -> {
+    public static ExpressionTile.CodeGenerator binop1 = (root, lines) -> {
       	/*
         		Handles all BinOp(e1, e2), for all e1,e2 NOT IRMem
         */
         IRBinOp castedRoot = (IRBinOp) root;
-        AssemblyExpression e1 = TileContainer.matchExpression(castedRoot.left(), instructions);
-        AssemblyExpression e2 = TileContainer.matchExpression(castedRoot.right(), instructions);
+        AssemblyExpression e1 = TileContainer.matchExpression(castedRoot.left(), lines);
+        AssemblyExpression e2 = TileContainer.matchExpression(castedRoot.right(), lines);
 
         assert !(e1 instanceof AssemblyMemoryLocation);
         assert !(e2 instanceof AssemblyMemoryLocation);
 
-        return binopHelper(castedRoot.opType(), e1, e2, instructions);
+        return binopHelper(castedRoot.opType(), e1, e2, lines);
     };
 
     private static AssemblyExpression binopHelper(OpType opType,
                                                   AssemblyExpression left,
                                                   AssemblyExpression right,
-                                                  List<AssemblyInstruction> instructions) {
+                                                  List<AssemblyLine> lines) {
         AssemblyAbstractRegister t = new AssemblyAbstractRegister();
         switch(opType) {
             case ADD:
                 // make new t
                 // movq left, t
                 // addq right, t
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, t));
-                instructions.add(new AssemblyInstruction(OpCode.ADDQ, right, t));
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, left, t));
+                lines.add(new AssemblyInstruction(OpCode.ADDQ, right, t));
                 return t;
             case SUB:
                 // make new t
                 // movq left, t
                 // subq t, right
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, t));
-                instructions.add(new AssemblyInstruction(OpCode.SUBQ, right, t));
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, left, t));
+                lines.add(new AssemblyInstruction(OpCode.SUBQ, right, t));
                 return t;
             case MUL:
                 // make new t
@@ -86,12 +86,12 @@ public class ExpressionCodeGenerators {
                 // mulq t2
                 // movq RAX, t
                 // restore RDX, RAX
-                AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
-                instructions.add(new AssemblyInstruction(OpCode.MULQ, right));
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RAX, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
+                lines.add(new AssemblyInstruction(OpCode.MULQ, right));
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RAX, t));
+                AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 return t;
             case HMUL:
@@ -101,12 +101,12 @@ public class ExpressionCodeGenerators {
                 // mulq t2
                 // movq RDX, t
                 // restore RDX, RAX
-                AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
-                instructions.add(new AssemblyInstruction(OpCode.MULQ, right));
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RDX, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
+                lines.add(new AssemblyInstruction(OpCode.MULQ, right));
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RDX, t));
+                AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 return t;
             case DIV:
@@ -116,13 +116,13 @@ public class ExpressionCodeGenerators {
                 // divq t2 #divides RDX:RAX by t2
                 // movq RAX, t #RAX contains quotient
                 // restore RDX, RAX
-                AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, new AssemblyImmediate(0), AssemblyPhysicalRegister.RDX));
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
-                instructions.add(new AssemblyInstruction(OpCode.DIVQ, right));
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RAX, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, new AssemblyImmediate(0), AssemblyPhysicalRegister.RDX));
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
+                lines.add(new AssemblyInstruction(OpCode.DIVQ, right));
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RAX, t));
+                AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 return t;
             case MOD:
@@ -131,97 +131,97 @@ public class ExpressionCodeGenerators {
                 // movq t1, RAX
                 // divq t2 #divides RDX:RAX by t2
                 // movq RDX, t #RDX contains remainder
-                AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, new AssemblyImmediate(0), AssemblyPhysicalRegister.RDX));
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
-                instructions.add(new AssemblyInstruction(OpCode.DIVQ, right));
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RDX, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, new AssemblyImmediate(0), AssemblyPhysicalRegister.RDX));
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
+                lines.add(new AssemblyInstruction(OpCode.DIVQ, right));
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RDX, t));
+                AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 return t;
             case AND:
                 // movq t1, t
                 // andq t2, t
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, t));
-                instructions.add(new AssemblyInstruction(OpCode.ANDQ, right, t));
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, left, t));
+                lines.add(new AssemblyInstruction(OpCode.ANDQ, right, t));
                 return t;
             case OR:
                 // movq t1, t
                 // orq t2, t
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, t));
-                instructions.add(new AssemblyInstruction(OpCode.ORQ, right, t));
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, left, t));
+                lines.add(new AssemblyInstruction(OpCode.ORQ, right, t));
                 return t;
             case XOR:
                 // movq t1, t
                 // xorq t2, t
-                instructions.add(new AssemblyInstruction(OpCode.MOVQ, left, t));
-                instructions.add(new AssemblyInstruction(OpCode.XORQ, right, t));
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, left, t));
+                lines.add(new AssemblyInstruction(OpCode.XORQ, right, t));
                 return t;
             case EQ:
                 // cmp t1, t2
                 // setzq t #sets t to 1 if zero flag
-                AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
-                instructions.add(new AssemblyInstruction(OpCode.CMP, left, right));
-                instructions.add(new AssemblyInstruction(OpCode.SETZQ, AssemblyPhysicalRegister.AL));
-                instructions.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                lines.add(new AssemblyInstruction(OpCode.CMP, left, right));
+                lines.add(new AssemblyInstruction(OpCode.SETZQ, AssemblyPhysicalRegister.AL));
+                lines.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
+                AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
                 return t;
             case NEQ:
                 // cmp t1, t2
                 // setnzq t #sets t to 0 if zero flag
-                AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
-                instructions.add(new AssemblyInstruction(OpCode.CMP, left, right));
-                instructions.add(new AssemblyInstruction(OpCode.SETNZQ, AssemblyPhysicalRegister.AL));
-                instructions.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                lines.add(new AssemblyInstruction(OpCode.CMP, left, right));
+                lines.add(new AssemblyInstruction(OpCode.SETNZQ, AssemblyPhysicalRegister.AL));
+                lines.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
+                AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
                 return t;
             case LT:
                 // cmp t1, t2
                 // setlq t #sets t to 1 if sign flag != overflow flag
-                AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
-                instructions.add(new AssemblyInstruction(OpCode.CMP, left, right));
-                instructions.add(new AssemblyInstruction(OpCode.SETLQ, AssemblyPhysicalRegister.AL));
-                instructions.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                lines.add(new AssemblyInstruction(OpCode.CMP, left, right));
+                lines.add(new AssemblyInstruction(OpCode.SETLQ, AssemblyPhysicalRegister.AL));
+                lines.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
+                AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
                 return t;
             case GT:
                 // cmp t1, t2
                 // setgq t #sets t to 1 if zero flag = 0 or sign flag = overflow flag
-                AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
-                instructions.add(new AssemblyInstruction(OpCode.CMP, left, right));
-                instructions.add(new AssemblyInstruction(OpCode.SETGQ, AssemblyPhysicalRegister.AL));
-                instructions.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                lines.add(new AssemblyInstruction(OpCode.CMP, left, right));
+                lines.add(new AssemblyInstruction(OpCode.SETGQ, AssemblyPhysicalRegister.AL));
+                lines.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
+                AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
                 return t;
             case LEQ:
                 // cmp t1, t2
                 // setleq t #sets t to 1 if zero flag = 1 or sign flag != overflow flag
-                AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
-                instructions.add(new AssemblyInstruction(OpCode.CMP, left, right));
-                instructions.add(new AssemblyInstruction(OpCode.SETLEQ, AssemblyPhysicalRegister.AL));
-                instructions.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                lines.add(new AssemblyInstruction(OpCode.CMP, left, right));
+                lines.add(new AssemblyInstruction(OpCode.SETLEQ, AssemblyPhysicalRegister.AL));
+                lines.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
+                AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
                 return t;
             case GEQ:
                 // cmp t1, t2
                 // setgeq t #sets t to 1 if
-                AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
-                instructions.add(new AssemblyInstruction(OpCode.CMP, left, right));
-                instructions.add(new AssemblyInstruction(OpCode.SETGEQ, AssemblyPhysicalRegister.AL));
-                instructions.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
-                AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyFunction.getScratchSpaceOffset(),
+                lines.add(new AssemblyInstruction(OpCode.CMP, left, right));
+                lines.add(new AssemblyInstruction(OpCode.SETGEQ, AssemblyPhysicalRegister.AL));
+                lines.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
+                AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
                 return t;
             default:

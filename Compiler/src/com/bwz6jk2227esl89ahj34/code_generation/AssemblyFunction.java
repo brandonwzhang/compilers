@@ -15,7 +15,7 @@ public class AssemblyFunction {
 
     private String name;
     private List<String> global;
-    private List<AssemblyInstruction> instructions = new LinkedList<>();
+    private List<AssemblyLine> lines = new LinkedList<>();
 
     /**
      * Generate abstract assembly code for a single function
@@ -33,30 +33,30 @@ public class AssemblyFunction {
         // Reset the space for abstract registers
         AssemblyAbstractRegister.reset();
 
-        // Generate assembly instructions for this function
+        // Generate assembly lines for this function
         IRSeq seq = (IRSeq) func.body();
-        List<AssemblyInstruction> functionBody = new LinkedList<>();
+        List<AssemblyLine> functionBody = new LinkedList<>();
         for (IRStmt statement : seq.stmts()) {
             functionBody.addAll(TileContainer.matchStatement(statement));
         }
 
         // generateFunctionPrologue needs to be called after the body has been
         // generated to know the number of spilled temps that need to be allocated
-        List<AssemblyInstruction> functionPrologue = generateFunctionPrologue();
+        List<AssemblyLine> functionPrologue = generateFunctionPrologue();
 
-        // Store the instructions in this instance
-        instructions.addAll(functionPrologue);
+        // Store the lines in this instance
+        lines.addAll(functionPrologue);
         // Translate the function body from abstract assembly to assembly
-        instructions.addAll(functionBody);
-//        instructions.addAll(RegisterAllocator.translate(functionBody));
+        lines.addAll(functionBody);
+//        lines.addAll(RegisterAllocator.translate(functionBody));
     }
 
-    private static List<AssemblyInstruction> generateFunctionPrologue() {
-        List<AssemblyInstruction> instructions = new LinkedList<>();
+    private static List<AssemblyLine> generateFunctionPrologue() {
+        List<AssemblyLine> lines = new LinkedList<>();
 
         // Save old RBP and update RBP
-        instructions.add(new AssemblyInstruction(OpCode.PUSHQ, AssemblyPhysicalRegister.RBP));
-        instructions.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RSP, AssemblyPhysicalRegister.RBP));
+        lines.add(new AssemblyInstruction(OpCode.PUSHQ, AssemblyPhysicalRegister.RBP));
+        lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RSP, AssemblyPhysicalRegister.RBP));
 
         /*
                 Return Address          (8 byte)
@@ -76,7 +76,7 @@ public class AssemblyFunction {
 
         // Save callee-save registers rbx rbp r12-r15
         for (int i = 0; i < AssemblyPhysicalRegister.calleeSavedRegisters.length; i++) {
-            instructions.add(
+            lines.add(
                     new AssemblyInstruction(
                             OpCode.MOVQ,
                             AssemblyPhysicalRegister.calleeSavedRegisters[i],
@@ -105,15 +105,15 @@ public class AssemblyFunction {
             currentStackOffset += Configuration.WORD_SIZE;
         }
 
-        // Decrement RSP at the beginning of the instructions to make space for everything
-        instructions.add(0,
+        // Decrement RSP at the beginning of the lines to make space for everything
+        lines.add(0,
                 new AssemblyInstruction(
                         OpCode.SUBQ,
                         new AssemblyImmediate(currentStackOffset),
                         AssemblyPhysicalRegister.RSP
                 )
         );
-        return instructions;
+        return lines;
     }
 
     public static int getCalleeSpaceOffset() {
@@ -147,11 +147,11 @@ public class AssemblyFunction {
         }
         s += "\t\t.align\t4\n";
         s += "FUNC(" + name + "):\n";
-        for (AssemblyInstruction instruction : instructions) {
-            if (instruction instanceof AssemblyLabel) {
-                s += instruction + "\n";
+        for (AssemblyLine line : lines) {
+            if (line instanceof AssemblyLabel) {
+                s += line + "\n";
             } else {
-                s += "\t\t" + instruction + "\n";
+                s += "\t\t" + line + "\n";
             }
         }
         return s;

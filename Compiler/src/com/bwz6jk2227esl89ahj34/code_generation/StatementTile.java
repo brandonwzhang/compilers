@@ -12,6 +12,6 @@ public class StatementTile extends Tile {
         this.codeGenerator = codeGenerator;
     }
     public interface CodeGenerator {
-        List<AssemblyInstruction> generate(IRNode root);
+        List<AssemblyLine> generate(IRNode root);
     }
 }
