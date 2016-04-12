@@ -1,5 +1,8 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
+import lombok.Data;
+
+@Data
 public class AssemblyMemoryLocation extends AssemblyExpression {
     private Long displacement;
     private Long scale;

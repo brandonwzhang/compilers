@@ -1,8 +1,11 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
 
+import lombok.Data;
+
 import java.util.HashSet;
 
+@Data
 public class AssemblyLabel extends AssemblyInstruction {
     private static HashSet<String> allLabels = new HashSet<String>();
     private AssemblyName name;
