@@ -128,7 +128,6 @@ public class StatementCodeGenerators {
         assert name instanceof AssemblyName;
         String functionName = ((AssemblyName) name).getName();
 
-
         // Save all caller-saved registers
         AssemblyPhysicalRegister.saveToStack(instructions, AbstractAssemblyGenerator.);
 

@@ -212,8 +212,14 @@ public class AbstractAssemblyGenerator {
         return instructions;
     }
 
+    public static int getCalleeSpaceOffset() {
+        return Configuration.WORD_SIZE * (1);
+    }
+    public static int getCallerSpaceOffset() {
+        return getCalleeSpaceOffset() + Configuration.WORD_SIZE * AssemblyPhysicalRegister.calleeSavedRegisters.length;
+    }
     public static int getReturnValuesOffset() {
-        return Configuration.WORD_SIZE * (2 + AssemblyPhysicalRegister.calleeSavedRegisters.length);
+        return getCallerSpaceOffset() + Configuration.WORD_SIZE * AssemblyPhysicalRegister.callerSavedRegisters.length;
     }
 
     public static int getArgumentsOffset() {

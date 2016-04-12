@@ -40,7 +40,7 @@ public class AssemblyMemoryLocation extends AssemblyExpression {
     }
 
     public static AssemblyMemoryLocation stackOffset(int offset) {
-        return new AssemblyMemoryLocation(AssemblyPhysicalRegister.RBP, null, offset);
+        return new AssemblyMemoryLocation(AssemblyPhysicalRegister.RBP, null, -offset);
     }
 
     @Override
