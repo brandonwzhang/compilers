@@ -6,6 +6,7 @@ import com.bwz6jk2227esl89ahj34.AST.parse.Parser;
 import com.bwz6jk2227esl89ahj34.AST.parse.ParserSym;
 import com.bwz6jk2227esl89ahj34.AST.type.TypeException;
 import com.bwz6jk2227esl89ahj34.AST.visit.*;
+import com.bwz6jk2227esl89ahj34.code_generation.AssemblyProgram;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRLexer;
@@ -21,6 +22,7 @@ import java_cup.runtime.Symbol;
 import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -369,17 +371,19 @@ public class Core {
         sim.call("_Imain_paai", 0);
     }
 
-    public static void four20blaze(String sourcePath,
-                                   String diagnosticPath,
-                                   String libPath,
-                                   String assemblyPath,
-                                   String file) {
+    public static void generateAssembly(String sourcePath,
+                                        String diagnosticPath,
+                                        String libPath,
+                                        String assemblyPath,
+                                        String file) {
         Optional<IRCompUnit> irRoot = irGen(sourcePath, diagnosticPath, libPath, file, false);
         if (!irRoot.isPresent()) {
             return;
         }
 
-        // TODO: PA5
-        System.out.println("Assembly code generation has not been implemented yet.");
+        AssemblyProgram program = new AssemblyProgram(irRoot.get());
+        Util.writeHelper(file, "S", assemblyPath, Collections.singletonList(program.toString()));
+
+        // System.out.println("Assembly code generation has not been implemented yet.");
     }
 }

@@ -92,6 +92,11 @@ public class StatementTileTests {
     }
 
     @Test
+    public void exp1() {
+
+    }
+
+    @Test
     public void test1() {
         IRStmt moveTen = new IRMove(
                 new IRTemp("temp0"),

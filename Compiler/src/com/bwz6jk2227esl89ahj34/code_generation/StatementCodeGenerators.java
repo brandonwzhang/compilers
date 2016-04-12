@@ -1,17 +1,14 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
-import com.bwz6jk2227esl89ahj34.AST.WhileStatement;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyPhysicalRegister.Register;
 
-import java.util.Arrays;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
-import com.sun.deploy.config.Config;
 
 public class StatementCodeGenerators {
 
@@ -141,20 +138,20 @@ public class StatementCodeGenerators {
         /* Function Call Prologue */
 
         // Save all caller-saved registers
-        AssemblyPhysicalRegister.saveToStack(instructions, AbstractAssemblyGenerator.getCallerSpaceOffset(),
+        AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getCallerSpaceOffset(),
                 AssemblyPhysicalRegister.callerSavedRegisters);
 
         // pass pointer to return space as first argument (RDI)
         instructions.add(new AssemblyInstruction(
                 OpCode.MOVQ,
-                AssemblyMemoryLocation.stackOffset(AbstractAssemblyGenerator.getReturnValuesOffset()),
+                AssemblyMemoryLocation.stackOffset(AssemblyFunction.getReturnValuesOffset()),
                 AssemblyPhysicalRegister.RDI
         ));
 
         // pass pointer to additional argument space as second argument (RSI)
         instructions.add(new AssemblyInstruction(
                 OpCode.MOVQ,
-                AssemblyMemoryLocation.stackOffset(AbstractAssemblyGenerator.getArgumentsOffset()),
+                AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()),
                 AssemblyPhysicalRegister.RSI
         ));
 
@@ -175,7 +172,7 @@ public class StatementCodeGenerators {
                     new AssemblyInstruction(
                             OpCode.MOVQ,
                             TileContainer.matchExpression(arguments.get(i), instructions),
-                            AssemblyMemoryLocation.stackOffset(AbstractAssemblyGenerator.getArgumentsOffset()
+                            AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()
                                     + Configuration.WORD_SIZE * i))
                 );
            }
@@ -188,7 +185,7 @@ public class StatementCodeGenerators {
         // add the call instruction to instructions
         instructions.add(
                 new AssemblyInstruction(
-                        OpCode.CALL,
+                        OpCode.CALLQ,
                         name
                 )
         );
@@ -199,7 +196,7 @@ public class StatementCodeGenerators {
 
     private static void functionCallEpilogue(List<AssemblyInstruction> instructions) {
         // now we restore all of the caller saved registers
-        AssemblyPhysicalRegister.restoreFromStack(instructions, AbstractAssemblyGenerator.getCallerSpaceOffset(),
+        AssemblyPhysicalRegister.restoreFromStack(instructions, AssemblyFunction.getCallerSpaceOffset(),
                 AssemblyPhysicalRegister.callerSavedRegisters);
 
     }
