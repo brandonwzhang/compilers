@@ -87,7 +87,9 @@ public abstract class Tile {
      * Returns the number of nodes in a tile pattern
      */
     public int getPatternSize(IRNode curRoot) {
-        if (curRoot instanceof IRBinOp) {
+        if (curRoot == null) {
+            return 0;
+        } else if (curRoot instanceof IRBinOp) {
             IRBinOp castedRoot = (IRBinOp) curRoot;
             return 1 + getPatternSize(castedRoot.left()) + getPatternSize(castedRoot.right());
         } else if (curRoot instanceof IRCall) { // need to check if content wrapped as target are same type

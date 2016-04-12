@@ -12,5 +12,4 @@ public class ExpressionPatterns {
     public static IRExpr name1 = new IRName("");
 
     //public static IRExpr binop1 = new IRBinOp(null, null, null);
-
 }
