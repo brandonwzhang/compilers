@@ -376,7 +376,7 @@ public class Core {
                                         String libPath,
                                         String assemblyPath,
                                         String file) {
-        Optional<IRCompUnit> irRoot = irGen(sourcePath, diagnosticPath, libPath, file, false);
+        Optional<IRCompUnit> irRoot = irGen(sourcePath, diagnosticPath, libPath, file, true);
         if (!irRoot.isPresent()) {
             return;
         }

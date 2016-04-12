@@ -135,7 +135,7 @@ public class AssemblyFunction {
     @Override
     public String toString() {
         String s = "";
-        s += "\t\t.globl\tFUNC(" + name + ")\n";
+        s += "\t\t.globl\tFUNC(" + name + "):\n";
         s += "\t\t.align\t4\n";
         s += "FUNC(" + name + ")\n";
         for (AssemblyInstruction instruction : instructions) {

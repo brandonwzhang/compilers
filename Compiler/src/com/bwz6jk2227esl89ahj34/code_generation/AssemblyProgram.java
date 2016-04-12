@@ -3,10 +3,11 @@ package com.bwz6jk2227esl89ahj34.code_generation;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AssemblyProgram {
-    private List<AssemblyFunction> functions;
+    private List<AssemblyFunction> functions = new ArrayList<>();
 
     /**
      * Generate abstract assembly code for a program
