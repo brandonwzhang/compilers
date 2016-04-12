@@ -127,44 +127,42 @@ public class StatementCodeGenerators {
         AssemblyPhysicalRegister.saveToStack(instructions, AbstractAssemblyGenerator.getCallerSpaceOffset(),
                 AssemblyPhysicalRegister.callerSavedRegisters);
 
-        // pass pointer to return argument space as first argument (RDI)
+        // pass pointer to return space as first argument (RDI)
         instructions.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 AssemblyMemoryLocation.stackOffset(AbstractAssemblyGenerator.getReturnValuesOffset()),
                 AssemblyPhysicalRegister.RDI
         ));
 
-        // put arguments in order rsi rdx rcx r8 r9
+        // pass pointer to additional argument space as second argument (RSI)
+        instructions.add(new AssemblyInstruction(
+                OpCode.MOVQ,
+                AssemblyMemoryLocation.stackOffset(AbstractAssemblyGenerator.getArgumentsOffset()),
+                AssemblyPhysicalRegister.RSI
+        ));
+
+        // put arguments in order rdx rcx r8 r9
         List<IRExpr> arguments = castedNode.args();
-        List<Register> argumentRegisters = Arrays.asList(
-                Register.RSI,
-                Register.RDX,
-                Register.RCX,
-                Register.R8,
-                Register.R9
-        );
-        int numArguments = arguments.size();
-        Stack<AssemblyExpression> reversedArguments = new Stack<>();
-        for(int i = 0; i < numArguments; i++) {
-            if (i < 5) {
-                AssemblyExpression e = TileContainer.matchExpression(arguments.get(i), instructions);
+
+        for(int i = 0; i < arguments.size(); i++) {
+            if (i < AssemblyPhysicalRegister.returnRegisters.length) {
                 instructions.add(
                         new AssemblyInstruction(
                                 OpCode.MOVQ,
                                 TileContainer.matchExpression(arguments.get(i), instructions),
-                                e,
-                                new AssemblyPhysicalRegister(argumentRegisters.get(i))
+                                AssemblyPhysicalRegister.returnRegisters[i]
                         )
                 );
-            } else { // push onto stack
-                reversedArguments.push(
-                        TileContainer.matchExpression(arguments.get(i), instructions)
+            } else { // put into stack location
+                 instructions.add(
+                    new AssemblyInstruction(
+                            OpCode.MOVQ,
+                            TileContainer.matchExpression(arguments.get(i), instructions),
+                            AssemblyMemoryLocation.stackOffset(AbstractAssemblyGenerator.getArgumentsOffset()
+                                    + Configuration.WORD_SIZE * i))
                 );
-            }
+           }
         }
-        // further arguments go in stack in reverse order
-        AssemblyPhysicalRegister.saveToStack(instructions, AbstractAssemblyGenerator.getArgumentsOffset(),
-                reversedArguments.toArray(new AssemblyPhysicalRegister[reversedArguments.size()]));
 
          // get function name
         AssemblyExpression name = TileContainer.matchExpression(castedNode.target(), instructions);

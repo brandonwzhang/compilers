@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.TreeSet;
 
 public class TileContainer {
-    private static TreeSet<StatementTile> stmtTiles = new TreeSet<>(new TileComparator());;
-    private static TreeSet<ExpressionTile> exprTiles = new TreeSet<>(new TileComparator());;
+    private static TreeSet<StatementTile> stmtTiles = new TreeSet<>(new TileComparator());
+    private static TreeSet<ExpressionTile> exprTiles = new TreeSet<>(new TileComparator());
 
     // Add all tiles to the container
     static {
