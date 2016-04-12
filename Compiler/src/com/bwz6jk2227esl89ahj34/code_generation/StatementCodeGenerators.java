@@ -26,6 +26,7 @@ public class StatementCodeGenerators {
         AssemblyExpression dst = TileContainer.matchExpression(castedRoot.target(), instructions);
 
         assert !(dst instanceof AssemblyImmediate);
+        instructions.add(new AssemblyComment("MOV(dst,src) -- move1"));
         instructions.add(new AssemblyInstruction(OpCode.MOVQ, src, dst));
 
         return instructions;
@@ -40,6 +41,7 @@ public class StatementCodeGenerators {
         AssemblyExpression label = TileContainer.matchExpression(castedRoot.target(), instructions);
 
         assert label instanceof AssemblyName;
+        instructions.add(new AssemblyComment("JUMP(label) -- jump1"));
         instructions.add(new AssemblyInstruction(OpCode.JMP, label));
 
         return instructions;
@@ -53,6 +55,7 @@ public class StatementCodeGenerators {
         IRLabel castedRoot = (IRLabel) root;
         AssemblyLabel label = new AssemblyLabel(new AssemblyName(castedRoot.name()));
 
+        instructions.add(new AssemblyComment("LABEL(name) -- label1"));
         instructions.add(label);
         return instructions;
     };
@@ -136,12 +139,14 @@ public class StatementCodeGenerators {
         IRCall castedNode = (IRCall) node;
 
         /* Function Call Prologue */
-
+        instructions.add(new AssemblyComment("beginning of function call prologue"));
         // Save all caller-saved registers
+        instructions.add(new AssemblyComment("save all caller-saved registers"));
         AssemblyPhysicalRegister.saveToStack(instructions, AssemblyFunction.getCallerSpaceOffset(),
                 AssemblyPhysicalRegister.callerSavedRegisters);
 
         // pass pointer to return space as first argument (RDI)
+        instructions.add(new AssemblyComment("pass pointer to return space as first argument"));
         instructions.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getReturnValuesOffset()),
