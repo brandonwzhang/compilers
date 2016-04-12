@@ -76,6 +76,22 @@ public class PA5TestsAndy {
     }
 
     @Test
+    public void cjump1() {
+        IRCJump cjump = new IRCJump(
+                new IRConst(0),
+                "t",
+                null
+        );
+        List<AssemblyInstruction> result =
+                tileContainer.matchStatement(cjump);
+
+        println("TEST: cjump1");
+        for (int i = 0; i < result.size(); i++) {
+            println(result.get(i).toString());
+        }
+    }
+
+    @Test
     public void test1() {
         IRStmt moveTen = new IRMove(
                 new IRTemp("temp0"),
@@ -89,7 +105,7 @@ public class PA5TestsAndy {
                 tileContainer.matchStatement(moveTen);
 
         println("TEST: test1");
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < result.size(); i++) {
             println(result.get(i).toString());
         }
     }
