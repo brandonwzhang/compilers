@@ -1,9 +1,11 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
 import com.bwz6jk2227esl89ahj34.ir.IRTemp;
+import lombok.Data;
 
 import java.util.HashMap;
 
+@Data
 public class AssemblyAbstractRegister extends AssemblyRegister {
     // Maintains the next id to be assigned to a new register
     private static int curId = 0;

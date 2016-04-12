@@ -41,7 +41,6 @@ public class TileContainer {
 
         for (ExpressionTile tile : exprTiles) {
             if (tile.match(root)) {
-                System.out.println("help");
                 return tile.codeGenerator.generate(root, assemblyCode); // imperatively updates assemblyCode
             }
         }
@@ -53,6 +52,7 @@ public class TileContainer {
     private class TileComparator implements Comparator<Tile> {
         @Override
         public int compare(Tile t1, Tile t2) {
+            if (t2.size - t1.size == 0 ) return -1;
             return t2.size - t1.size; // order by highest size first
         }
     }

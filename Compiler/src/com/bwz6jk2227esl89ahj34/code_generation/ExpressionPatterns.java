@@ -11,5 +11,5 @@ public class ExpressionPatterns {
     public static IRExpr mem1 = new IRMem((IRExpr)(null));
     public static IRExpr name1 = new IRName("");
 
-    public static IRExpr binop1 = new IRBinOp(null, null, null);
+    public static IRExpr binop1 = new IRBinOp(null, (IRExpr)(null), (IRExpr)(null));
 }
