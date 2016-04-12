@@ -145,7 +145,7 @@ public class ExpressionTileTests {
     public void expresssionMem2() {
         AssemblyExpression result =
                 TileContainer.matchExpression(new IRMem(new IRBinOp(
-                        IRBinOp.OpType.ADD,
+                        OpType.ADD,
                         new IRTemp("x"),
                         new IRConst(1)
                 )), assemblyInstructions);
@@ -176,7 +176,7 @@ public class ExpressionTileTests {
     public void expressionBinop1() {
         AssemblyExpression result =
                 TileContainer.matchExpression(new IRBinOp(
-                        IRBinOp.OpType.ADD,
+                        OpType.ADD,
                         new IRConst(1),
                         new IRConst(1)
                 ), assemblyInstructions);
@@ -207,7 +207,7 @@ public class ExpressionTileTests {
     public void expressionBinop2() {
         AssemblyExpression result =
                 TileContainer.matchExpression(new IRBinOp(
-                        IRBinOp.OpType.ADD,
+                        OpType.ADD,
                         new IRTemp("x"),
                         new IRTemp("y")
                 ), assemblyInstructions);
@@ -232,5 +232,22 @@ public class ExpressionTileTests {
 
         Assert.assertEquals(assemblyInstructions.get(1).getOpCode(), OpCode.ADDQ);
     }
+
+    @Test //BINOP(+, BINOP(+,1,2),3)
+    public void expressionBinop3() {
+        AssemblyExpression result =
+                TileContainer.matchExpression(new IRBinOp(
+                        OpType.ADD,
+                        new IRBinOp(
+                                OpType.ADD,
+                                new IRConst(1),
+                                new IRConst(2)
+                        ),
+                        new IRConst(3)
+                ), assemblyInstructions);
+
+        System.out.println();
+    }
+
 }
 

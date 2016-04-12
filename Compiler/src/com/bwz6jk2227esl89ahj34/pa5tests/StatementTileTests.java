@@ -23,7 +23,7 @@ public class StatementTileTests {
     // runs after every test invocation
     @After
     public void tearDown() {
-        System.out.println("nice\n");
+        System.out.println("\nEnd of test\n");
     }
 
     @Test
