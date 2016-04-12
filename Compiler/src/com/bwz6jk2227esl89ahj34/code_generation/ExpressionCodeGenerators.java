@@ -8,7 +8,6 @@ import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 import java.util.List;
 
 public class ExpressionCodeGenerators {
-    private static TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
     public static ExpressionTile.CodeGenerator const1 = (root, instructions) -> {
             /*
                 CONST(i)
@@ -44,7 +43,7 @@ public class ExpressionCodeGenerators {
                 MEM(e)
              */
         IRMem castedRoot = (IRMem) root;
-        AssemblyExpression e = tileContainer.matchExpression(castedRoot.expr(), instructions);
+        AssemblyExpression e = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.expr(), instructions);
         assert e instanceof AssemblyAbstractRegister;
 
         return new AssemblyMemoryLocation((AssemblyAbstractRegister)e);
@@ -65,8 +64,8 @@ public class ExpressionCodeGenerators {
         		Handles all BinOp(e1, e2), for all e1,e2 NOT IRMem
         */
         IRBinOp castedRoot = (IRBinOp) root;
-        AssemblyExpression e1 = tileContainer.matchExpression(castedRoot.left(), instructions);
-        AssemblyExpression e2 = tileContainer.matchExpression(castedRoot.right(), instructions);
+        AssemblyExpression e1 = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.left(), instructions);
+        AssemblyExpression e2 = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.right(), instructions);
 
         assert !(e1 instanceof AssemblyMemoryLocation);
         assert !(e2 instanceof AssemblyMemoryLocation);
@@ -79,8 +78,8 @@ public class ExpressionCodeGenerators {
         		Handles all BinOp(e, IRMem)
         */
         IRBinOp castedRoot = (IRBinOp) root;
-        AssemblyExpression e = tileContainer.matchExpression(castedRoot.left(), instructions);
-        AssemblyExpression mem = tileContainer.matchExpression(castedRoot.right(), instructions);
+        AssemblyExpression e = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.left(), instructions);
+        AssemblyExpression mem = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.right(), instructions);
         AssemblyAbstractRegister reg = new AssemblyAbstractRegister();
         instructions.add(new AssemblyInstruction(OpCode.MOVQ, mem, reg));
         return binopHelper(castedRoot.opType(), e, reg, instructions);
@@ -91,10 +90,10 @@ public class ExpressionCodeGenerators {
         		Handles all BinOp(IRMem, e)
         */
         IRBinOp castedRoot = (IRBinOp) root;
-        AssemblyExpression mem = tileContainer.matchExpression(castedRoot.left(), instructions);
+        AssemblyExpression mem = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.left(), instructions);
         AssemblyAbstractRegister reg = new AssemblyAbstractRegister();
         instructions.add(new AssemblyInstruction(OpCode.MOVQ, mem, reg));
-        AssemblyExpression e = tileContainer.matchExpression(castedRoot.right(), instructions);
+        AssemblyExpression e = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.right(), instructions);
         return binopHelper(castedRoot.opType(), reg, e, instructions);
     };
 
@@ -103,10 +102,10 @@ public class ExpressionCodeGenerators {
         		Handles all BinOp(IRMem, IRMem)
         */
         IRBinOp castedRoot = (IRBinOp) root;
-        AssemblyExpression mem1 = tileContainer.matchExpression(castedRoot.left(), instructions);
+        AssemblyExpression mem1 = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.left(), instructions);
         AssemblyAbstractRegister reg1 = new AssemblyAbstractRegister();
         instructions.add(new AssemblyInstruction(OpCode.MOVQ, mem1, reg1));
-        AssemblyExpression mem2 = tileContainer.matchExpression(castedRoot.right(), instructions);
+        AssemblyExpression mem2 = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.right(), instructions);
         AssemblyAbstractRegister reg2 = new AssemblyAbstractRegister();
         instructions.add(new AssemblyInstruction(OpCode.MOVQ, mem2, reg2));
         return binopHelper(castedRoot.opType(), reg1, reg2, instructions);

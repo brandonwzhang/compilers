@@ -13,7 +13,6 @@ import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
 public class StatementCodeGenerators {
-    private static TileContainer tileContainer = AbstractAssemblyGenerator.tileContainer;
 
     private static List<AssemblyPhysicalRegister> callerSavedRegisters =
             Arrays.asList(AssemblyPhysicalRegister.callerSavedRegisters);
@@ -28,8 +27,8 @@ public class StatementCodeGenerators {
         */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
         IRMove castedRoot = (IRMove) root;
-        AssemblyExpression src = tileContainer.matchExpression(castedRoot.expr(), instructions);
-        AssemblyExpression dst = tileContainer.matchExpression(castedRoot.target(), instructions);
+        AssemblyExpression src = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.expr(), instructions);
+        AssemblyExpression dst = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.target(), instructions);
 
         assert !(dst instanceof AssemblyImmediate);
         instructions.add(new AssemblyInstruction(OpCode.MOVQ, src, dst));
@@ -43,7 +42,7 @@ public class StatementCodeGenerators {
         */
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
         IRJump castedRoot = (IRJump) root;
-        AssemblyExpression label = tileContainer.matchExpression(castedRoot.target(), instructions);
+        AssemblyExpression label = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.target(), instructions);
 
         assert label instanceof AssemblyName;
         instructions.add(new AssemblyInstruction(OpCode.JMP, label));
@@ -112,7 +111,7 @@ public class StatementCodeGenerators {
         LinkedList<AssemblyInstruction> instructions = new LinkedList<>();
         IRCJump castedRoot = (IRCJump) root;
         assert castedRoot.falseLabel() == null; // assert lowered CJump
-        AssemblyExpression guard = tileContainer.matchExpression(castedRoot.expr(), instructions);
+        AssemblyExpression guard = AbstractAssemblyGenerator.tileContainer.matchExpression(castedRoot.expr(), instructions);
 
         // compare guard to 0, jump to trueLabel if not equal
         instructions.add(new AssemblyInstruction(OpCode.CMP, guard, new AssemblyImmediate(0)));
@@ -127,7 +126,7 @@ public class StatementCodeGenerators {
         IRCall castedNode = (IRCall) node;
 
         // allocate space for returned arguments, pass a pointer to that
-        AssemblyExpression name = tileContainer.matchExpression(castedNode.target(), instructions);
+        AssemblyExpression name = AbstractAssemblyGenerator.tileContainer.matchExpression(castedNode.target(), instructions);
         assert name instanceof AssemblyName;
         String functionName = ((AssemblyName) name).getName();
         int numReturnValues = AbstractAssemblyGenerator.numReturnValues.get(functionName);
@@ -176,13 +175,13 @@ public class StatementCodeGenerators {
                 instructions.add(
                         new AssemblyInstruction(
                                 OpCode.MOVQ,
-                                tileContainer.matchExpression(arguments.get(i), instructions),
+                                AbstractAssemblyGenerator.tileContainer.matchExpression(arguments.get(i), instructions),
                                 new AssemblyPhysicalRegister(argumentRegisters.get(i))
                         )
                 );
             } else { // push onto stack
                 reversedArguments.push(
-                        tileContainer.matchExpression(arguments.get(i), instructions)
+                        AbstractAssemblyGenerator.tileContainer.matchExpression(arguments.get(i), instructions)
                 );
             }
         }
