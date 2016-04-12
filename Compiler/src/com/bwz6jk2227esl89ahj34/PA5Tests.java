@@ -38,9 +38,10 @@ public class PA5Tests {
     @Test
     public void expressionConst1() {
         Assert.assertNotEquals(assemblyInstructions, null);
-        tileContainer.matchExpression(new IRConst(1), assemblyInstructions);
-        Assert.assertEquals(assemblyInstructions.size(), 1);
-        Assert.assertEquals(assemblyInstructions.get(0), new AssemblyImmediate(1));
+        AssemblyExpression result =
+                tileContainer.matchExpression(new IRConst(1), assemblyInstructions);
+        Assert.assertEquals(assemblyInstructions.size(), 0); // nothing should have been added
+        Assert.assertEquals(result, new AssemblyImmediate(1));
     }
 }
 
