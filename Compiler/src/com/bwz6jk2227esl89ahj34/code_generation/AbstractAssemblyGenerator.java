@@ -36,7 +36,7 @@ public class AbstractAssemblyGenerator {
     /**
      * Returns the number of return values for a given function
      */
-    private static int numArguments(String functionName) {
+    public static int numArguments(String functionName) {
         int numArguments = 0;
         int lastUnderscore = functionName.lastIndexOf('_');
         String types = functionName.substring(lastUnderscore + 1);
@@ -81,7 +81,7 @@ public class AbstractAssemblyGenerator {
     /**
      * Returns the number of return values for a given function
      */
-    private static int numReturnValues(String functionName) {
+    public static int numReturnValues(String functionName) {
         int numReturnValues;
         int lastUnderscore = functionName.lastIndexOf('_');
         String returnTypes = functionName.substring(lastUnderscore + 1);
