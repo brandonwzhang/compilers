@@ -96,40 +96,40 @@ public class AssemblyProgramTests {
     @Test // num arguments for _Ieric_pai should be 1
     public void numArguments8() {
         Assert.assertEquals(
-                AbstractAssemblyGenerator.numArguments("_Ieric_pai"), 1);
+                AssemblyProgram.numArguments("_Ieric_pai"), 1);
     }
 
     @Test // num arguments for _Ieric_pai should be 0
     public void numReturnValues8() {
         Assert.assertEquals(
-                AbstractAssemblyGenerator.numReturnValues("_Ieric_pai"), 0);
+                AssemblyProgram.numReturnValues("_Ieric_pai"), 0);
     }
 
     @Test // num arguments for _Ibrandon_t2aaaaaaaaaaaiaaaaaaaaaaaaaab should be 0
     public void numArgument9() {
         Assert.assertEquals(
-                AbstractAssemblyGenerator.numArguments("_Ibrandon_t2aaaaaaaaaaaiaaaaaaaaaaaaaab"), 0);
+                AssemblyProgram.numArguments("_Ibrandon_t2aaaaaaaaaaaiaaaaaaaaaaaaaab"), 0);
 
     }
 
     @Test // num arguments for _Ibrandon_t2aaaaaaaaaaaiaaaaaaaaaaaaaab should be 2
     public void numReturnValues9() {
         Assert.assertEquals(
-                AbstractAssemblyGenerator.numReturnValues("_Ibrandon_t2aaaaaaaaaaaiaaaaaaaaaaaaaab"), 2);
+                AssemblyProgram.numReturnValues("_Ibrandon_t2aaaaaaaaaaaiaaaaaaaaaaaaaab"), 2);
 
     }
 
     @Test // num arguments for _Iandy_t2aaaaaaaaaaaiaaaaaaaaaaaaaabiaiab should be 3
     public void numArgument10() {
         Assert.assertEquals(
-                AbstractAssemblyGenerator.numArguments("_Iandy_t2aaaaaaaaaaaiaaaaaaaaaaaaaabiaiab"), 3);
+                AssemblyProgram.numArguments("_Iandy_t2aaaaaaaaaaaiaaaaaaaaaaaaaabiaiab"), 3);
 
     }
 
     @Test // num arguments for _Iandy_t2aaaaaaaaaaaiaaaaaaaaaaaaaabiaiab should be 2
     public void numReturnValues10() {
         Assert.assertEquals(
-                AbstractAssemblyGenerator.numReturnValues("_Iandy_t2aaaaaaaaaaaiaaaaaaaaaaaaaabiaiab"), 2);
+                AssemblyProgram.numReturnValues("_Iandy_t2aaaaaaaaaaaiaaaaaaaaaaaaaabiaiab"), 2);
 
     }
 }
