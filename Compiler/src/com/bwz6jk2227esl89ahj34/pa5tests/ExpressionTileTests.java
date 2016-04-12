@@ -253,6 +253,39 @@ public class ExpressionTileTests {
                         new IRConst(3)
                 ), assemblyInstructions);
         Assert.assertEquals(assemblyInstructions.size(), 4);
+
+        Assert.assertEquals(
+                assemblyInstructions.get(0).getArgs().get(0),
+                new AssemblyImmediate(1)
+        );
+
+        Assert.assertEquals(
+                assemblyInstructions.get(0).getArgs().get(1),
+                assemblyInstructions.get(1).getArgs().get(1)
+        );
+
+        Assert.assertEquals(
+                assemblyInstructions.get(1).getArgs().get(0),
+                new AssemblyImmediate(2)
+        );
+
+        Assert.assertEquals(
+                assemblyInstructions.get(0).getArgs().get(1),
+                assemblyInstructions.get(2).getArgs().get(0)
+        );
+
+        Assert.assertEquals(
+                assemblyInstructions.get(2).getArgs().get(1),
+                assemblyInstructions.get(3).getArgs().get(1)
+        );
+
+        Assert.assertEquals(
+                assemblyInstructions.get(3).getArgs().get(0),
+                new AssemblyImmediate(3)
+        );
+
+        Assert.assertTrue(result instanceof AssemblyAbstractRegister);
+
         Util.printInstructions(name, assemblyInstructions);
     }
 }
