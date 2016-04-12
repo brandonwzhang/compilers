@@ -6,6 +6,7 @@ import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
 import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.AST.parse.ParserSym;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction;
+import com.bwz6jk2227esl89ahj34.code_generation.AssemblyLine;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import org.junit.rules.TestName;
@@ -293,10 +294,10 @@ public class Util {
         return charList;
     }
 
-    public static void printInstructions(TestName name, List<AssemblyInstruction> instructions) {
+    public static void printInstructions(TestName name, List<AssemblyLine> instructions) {
         System.out.println("Executing "+ name.getMethodName());
         System.out.println();
-        for (AssemblyInstruction instruction : instructions) {
+        for (AssemblyLine instruction : instructions) {
           System.out.println(instruction);
         }
     }

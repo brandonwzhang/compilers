@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ExpressionTileTests {
-    private List<AssemblyInstruction> assemblyInstructions;
+    private List<AssemblyLine> assemblyInstructions;
     @Rule public TestName name = new TestName();
 
     // runs before every test invocation
@@ -155,7 +155,7 @@ public class ExpressionTileTests {
                 )), assemblyInstructions);
         Assert.assertEquals(assemblyInstructions.size() , 2);
 
-        AssemblyInstruction moveInstruction = assemblyInstructions.get(0);
+        AssemblyInstruction moveInstruction = (AssemblyInstruction) assemblyInstructions.get(0);
         Assert.assertEquals(moveInstruction.getOpCode(), OpCode.MOVQ);
         List<AssemblyExpression> moveInstructionArgs = moveInstruction.getArgs();
         Assert.assertEquals(moveInstructionArgs.size(), 2);
@@ -163,7 +163,7 @@ public class ExpressionTileTests {
         Assert.assertTrue(moveInstructionArgs.get(0) instanceof AssemblyAbstractRegister);
         Assert.assertTrue(moveInstructionArgs.get(1) instanceof AssemblyAbstractRegister);
 
-        AssemblyInstruction addInstruction = assemblyInstructions.get(1);
+        AssemblyInstruction addInstruction = (AssemblyInstruction) assemblyInstructions.get(1);
         Assert.assertEquals(addInstruction.getOpCode(), OpCode.ADDQ);
         List<AssemblyExpression> addInstructionArgs = addInstruction.getArgs();
         Assert.assertEquals(addInstructionArgs.size(), 2);
@@ -188,24 +188,24 @@ public class ExpressionTileTests {
 
         Assert.assertTrue(result instanceof AssemblyAbstractRegister);
         Assert.assertEquals(assemblyInstructions.size(), 2);
-        Assert.assertEquals(assemblyInstructions.get(0).getOpCode(), OpCode.MOVQ);
+        Assert.assertEquals(((AssemblyInstruction) assemblyInstructions.get(0)).getOpCode(), OpCode.MOVQ);
         Assert.assertEquals(
                 ((AssemblyImmediate)
-                        (assemblyInstructions.get(0).getArgs().get(0))),
+                        (((AssemblyInstruction)assemblyInstructions.get(0)).getArgs().get(0))),
                 new AssemblyImmediate(1)
                 );
         Assert.assertEquals(
                 ((AssemblyAbstractRegister)
-                        (assemblyInstructions.get(0).getArgs().get(1))).id,
+                        (((AssemblyInstruction)assemblyInstructions.get(0)).getArgs().get(1))).id,
                 ((AssemblyAbstractRegister)
-                        (assemblyInstructions.get(1).getArgs().get(1))).id
+                        (((AssemblyInstruction) assemblyInstructions.get(1)).getArgs().get(1))).id
         );
         Assert.assertEquals(
                 ((AssemblyImmediate)
-                        (assemblyInstructions.get(1).getArgs().get(0))),
+                        (((AssemblyInstruction)assemblyInstructions.get(1)).getArgs().get(0))),
                 new AssemblyImmediate(1)
         );
-        Assert.assertEquals(assemblyInstructions.get(1).getOpCode(), OpCode.ADDQ);
+        Assert.assertEquals(((AssemblyInstruction)assemblyInstructions.get(1)).getOpCode(), OpCode.ADDQ);
         Util.printInstructions(name, assemblyInstructions);
     }
 
@@ -220,23 +220,23 @@ public class ExpressionTileTests {
 
         Assert.assertTrue(result instanceof AssemblyAbstractRegister);
         Assert.assertEquals(assemblyInstructions.size(), 2);
-        Assert.assertEquals(assemblyInstructions.get(0).getOpCode(), OpCode.MOVQ);
+        Assert.assertEquals(((AssemblyInstruction) assemblyInstructions.get(0)).getOpCode(), OpCode.MOVQ);
         Assert.assertTrue(
-                assemblyInstructions.get(0).getArgs().get(0)
+                ((AssemblyInstruction) assemblyInstructions.get(0)).getArgs().get(0)
                         instanceof AssemblyAbstractRegister
         );
         Assert.assertTrue(
-                assemblyInstructions.get(1).getArgs().get(0)
+                ((AssemblyInstruction)assemblyInstructions.get(1)).getArgs().get(0)
                         instanceof AssemblyAbstractRegister
         );
         Assert.assertEquals(
                 ((AssemblyAbstractRegister)
-                        (assemblyInstructions.get(0).getArgs().get(1))).id,
+                        (((AssemblyInstruction)assemblyInstructions.get(0)).getArgs().get(1))).id,
                 ((AssemblyAbstractRegister)
-                        (assemblyInstructions.get(1).getArgs().get(1))).id
+                        (((AssemblyInstruction)assemblyInstructions.get(1)).getArgs().get(1))).id
         );
 
-        Assert.assertEquals(assemblyInstructions.get(1).getOpCode(), OpCode.ADDQ);
+        Assert.assertEquals(((AssemblyInstruction)assemblyInstructions.get(1)).getOpCode(), OpCode.ADDQ);
         Util.printInstructions(name, assemblyInstructions);
     }
 
@@ -255,32 +255,32 @@ public class ExpressionTileTests {
         Assert.assertEquals(assemblyInstructions.size(), 4);
 
         Assert.assertEquals(
-                assemblyInstructions.get(0).getArgs().get(0),
+                ((AssemblyInstruction)assemblyInstructions.get(0)).getArgs().get(0),
                 new AssemblyImmediate(1)
         );
 
         Assert.assertEquals(
-                assemblyInstructions.get(0).getArgs().get(1),
-                assemblyInstructions.get(1).getArgs().get(1)
+                ((AssemblyInstruction)assemblyInstructions.get(0)).getArgs().get(1),
+                ((AssemblyInstruction)assemblyInstructions.get(1)).getArgs().get(1)
         );
 
         Assert.assertEquals(
-                assemblyInstructions.get(1).getArgs().get(0),
+                ((AssemblyInstruction)assemblyInstructions.get(1)).getArgs().get(0),
                 new AssemblyImmediate(2)
         );
 
         Assert.assertEquals(
-                assemblyInstructions.get(0).getArgs().get(1),
-                assemblyInstructions.get(2).getArgs().get(0)
+                ((AssemblyInstruction)assemblyInstructions.get(0)).getArgs().get(1),
+                ((AssemblyInstruction)assemblyInstructions.get(2)).getArgs().get(0)
         );
 
         Assert.assertEquals(
-                assemblyInstructions.get(2).getArgs().get(1),
-                assemblyInstructions.get(3).getArgs().get(1)
+                ((AssemblyInstruction)assemblyInstructions.get(2)).getArgs().get(1),
+                ((AssemblyInstruction)assemblyInstructions.get(3)).getArgs().get(1)
         );
 
         Assert.assertEquals(
-                assemblyInstructions.get(3).getArgs().get(0),
+                ((AssemblyInstruction)assemblyInstructions.get(3)).getArgs().get(0),
                 new AssemblyImmediate(3)
         );
 

@@ -55,6 +55,7 @@ public class AssemblyProgram {
                 // think carefully
                 numReturnValues *= 10;
                 numReturnValues += Integer.parseInt("" + types.charAt(i));
+                i++;
             }
 
             // preemptively compensate for the # of return values
