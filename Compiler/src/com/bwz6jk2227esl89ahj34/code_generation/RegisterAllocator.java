@@ -84,7 +84,7 @@ public class RegisterAllocator {
         }
         // Naive register allocation: we assign each temp a location on the stack corresponding to its id
         AssemblyMemoryLocation spillLocation = AssemblyMemoryLocation.stackOffset(
-                AbstractAssemblyGenerator.getTempSpaceOffset() + Configuration.WORD_SIZE * register.id);
+                AssemblyFunction.getTempSpaceOffset() + Configuration.WORD_SIZE * register.id);
         registerMap.put(register, spillLocation);
         return spillLocation;
     }
@@ -96,7 +96,7 @@ public class RegisterAllocator {
             return AssemblyPhysicalRegister.argumentRegisters[id];
         }
         // Return the corresponding stack location
-        int stackOffset = AbstractAssemblyGenerator.getArgumentsOffset() +
+        int stackOffset = AssemblyFunction.getArgumentsOffset() +
                 Configuration.WORD_SIZE * (id - AssemblyPhysicalRegister.argumentRegisters.length);
         return AssemblyMemoryLocation.stackOffset(stackOffset);
     }
@@ -108,7 +108,7 @@ public class RegisterAllocator {
             return AssemblyPhysicalRegister.returnRegisters[id];
         }
         // Return the corresponding stack location
-        int stackOffset = AbstractAssemblyGenerator.getArgumentsOffset() +
+        int stackOffset = AssemblyFunction.getArgumentsOffset() +
                 Configuration.WORD_SIZE * (id - AssemblyPhysicalRegister.returnRegisters.length);
         return AssemblyMemoryLocation.stackOffset(stackOffset);
     }

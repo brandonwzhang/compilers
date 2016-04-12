@@ -2,126 +2,46 @@ package com.bwz6jk2227esl89ahj34.code_generation;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.OpCode;
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyPhysicalRegister.Register;
 
 
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
 import java.util.*;
 
-public class AbstractAssemblyGenerator {
+public class AssemblyFunction {
     public static int maxNumReturnValues;
     public static int maxNumArguments;
     public static final int numScratchRegisters = 2;
 
-    /**
-     * Generate abstract assembly code for a program
-     * @param root IRCompUnit of program
-     * @return
-     */
-    public static Map<String, List<AssemblyInstruction>> generate(IRCompUnit root) {
-        // Get the maximum number of return values and arguments in all functions
-        for (String functionName : root.functions().keySet()) {
-            maxNumReturnValues = Math.max(maxNumReturnValues, numReturnValues(functionName));
-            maxNumArguments = Math.max(maxNumArguments, numArguments(functionName));
-        }
-
-        Map<String, List<AssemblyInstruction>> functions = new LinkedHashMap<>();
-        for (String functionName : root.functions().keySet()) {
-            functions.put(functionName, generateFunction(root.functions().get(functionName)));
-        }
-        return functions;
-    }
-
-    /**
-     * Returns the number of return values for a given function
-     */
-    public static int numArguments(String functionName) {
-        int numArguments = 0;
-        int lastUnderscore = functionName.lastIndexOf('_');
-        String types = functionName.substring(lastUnderscore + 1);
-        int i = 0;
-
-        if (types.charAt(0) == 'p') {
-            // example: main(args: int[][]) -> _Imain_paai
-            i = 1;
-
-        } else if (types.charAt(0) == 't') {
-            // example: parseInt(str: int[]): int, bool -> _IparseInt_t2ibai
-            i = 1;
-            int numReturnValues = 0;
-            while (Character.isDigit(types.charAt(i))) {
-                // think carefully
-                numReturnValues *= 10;
-                numReturnValues += Integer.parseInt("" + types.charAt(i));
-                i++;
-            }
-
-            // preemptively compensate for the # of return values
-            numArguments -= numReturnValues;
-
-        } else {
-            // example: unparseInt(n: int): int[] -> _IunparseInt_aii
-
-            // see above
-            numArguments--;
-        }
-
-        // adds up number of arguments and number of return values
-        while (i < types.length()) {
-            while (i < types.length() && types.charAt(i) == 'a') {
-                i++;
-            }
-            numArguments++;
-            i++;
-        }
-
-        return numArguments;
-    }
-
-    /**
-     * Returns the number of return values for a given function
-     */
-    public static int numReturnValues(String functionName) {
-        int numReturnValues;
-        int lastUnderscore = functionName.lastIndexOf('_');
-        String returnTypes = functionName.substring(lastUnderscore + 1);
-
-        if (returnTypes.contains("p")) {
-            // example: main(args: int[][]) -> _Imain_paai
-            numReturnValues = 0;
-
-        } else if (!returnTypes.contains("t")) {
-            // example: unparseInt(n: int): int[] -> _IunparseInt_aii
-            numReturnValues = 1;
-
-        } else {
-            // example: parseInt(str: int[]): int, bool -> _IparseInt_t2ibai
-            int i = 1;
-            while (Character.isDigit(returnTypes.charAt(i))) {
-                i++;
-            }
-            numReturnValues = Integer.parseInt(returnTypes.substring(1, i));
-        }
-        return numReturnValues;
-    }
+    private String name;
+    private List<AssemblyInstruction> instructions = new LinkedList<>();
 
     /**
      * Generate abstract assembly code for a single function
      * @param func the IRFuncDecl to be translated to abstract assembly
      * @return
      */
-    private static List<AssemblyInstruction> generateFunction(IRFuncDecl func) {
+    public AssemblyFunction(IRFuncDecl func) {
+        // Save the function name
+        name = func.name();
+
         // Reset the space for abstract registers
         AssemblyAbstractRegister.reset();
 
         // Generate assembly instructions for this function
         IRSeq seq = (IRSeq) func.body();
-        List<AssemblyInstruction> instructions = new LinkedList<>();
+        List<AssemblyInstruction> functionBody = new LinkedList<>();
         for (IRStmt statement : seq.stmts()) {
-            instructions.addAll(TileContainer.matchStatement(statement));
+            functionBody.addAll(TileContainer.matchStatement(statement));
         }
-        return instructions;
+
+        // generateFunctionPrologue needs to be called after the body has been
+        // generated to know the number of spilled temps that need to be allocated
+        List<AssemblyInstruction> functionPrologue = generateFunctionPrologue();
+
+        // Store the instructions in this instance
+        instructions.addAll(functionPrologue);
+        instructions.addAll(functionBody);
     }
 
     private static List<AssemblyInstruction> generateFunctionPrologue() {
@@ -139,7 +59,7 @@ public class AbstractAssemblyGenerator {
                 Func extra Return Space (this.maxNumReturnValues * 8 bytes)
                 Func extra arg space    (this.maxNumArguments * 8 bytes)
                 Scratch space for regs  (this.numScratchRegisters * 8 bytes)
-                Space for temps (variable number)
+                Space for temps         (variable number)
                 Empty alignment         (optional)
          */
 
@@ -209,5 +129,21 @@ public class AbstractAssemblyGenerator {
 
     public static int getTempSpaceOffset() {
         return getScratchSpaceOffset() + Configuration.WORD_SIZE * numScratchRegisters;
+    }
+
+    @Override
+    public String toString() {
+        String s = "";
+        s += "\t\t.globl\tFUNC(" + name + ")\n";
+        s += "\t\t.align\t4\n";
+        s += "FUNC(" + name + ")\n";
+        for (AssemblyInstruction instruction : instructions) {
+            if (instruction instanceof AssemblyLabel) {
+                s += instruction + "\n";
+            } else {
+                s += "\t\t" + instruction + "\n";
+            }
+        }
+        return s;
     }
 }
