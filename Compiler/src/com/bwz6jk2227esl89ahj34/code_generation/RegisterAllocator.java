@@ -14,7 +14,7 @@ public class RegisterAllocator {
     /**
      * Returns a list of instructions with all abstract registers with physical locations
      */
-    public List<AssemblyInstruction> translate(List<AssemblyInstruction> instructions) {
+    public static List<AssemblyInstruction> translate(List<AssemblyInstruction> instructions) {
         List<AssemblyInstruction> translatedInstructions = new LinkedList<>();
         for (AssemblyInstruction instruction : instructions) {
             // For each instruction we may need to shuttle temps in and out if
@@ -24,7 +24,7 @@ public class RegisterAllocator {
         return translatedInstructions;
     }
 
-    private List<AssemblyInstruction> translateInstruction(AssemblyInstruction instruction) {
+    private static List<AssemblyInstruction> translateInstruction(AssemblyInstruction instruction) {
         List<AssemblyInstruction> instructions = new LinkedList<>();
 
         // First, add the original instruction
@@ -69,7 +69,7 @@ public class RegisterAllocator {
     /**
      * Returns the physical location of an abstract register
      */
-    private AssemblyExpression getRegisterMapping(AssemblyAbstractRegister register) {
+    private static AssemblyExpression getRegisterMapping(AssemblyAbstractRegister register) {
         if (register.isArgument) {
             return getArgumentMapping(register.id);
         }
@@ -89,7 +89,7 @@ public class RegisterAllocator {
         return spillLocation;
     }
 
-    private AssemblyExpression getArgumentMapping(int id) {
+    private static AssemblyExpression getArgumentMapping(int id) {
         // If the id is lower than the number of argument registers available,
         // return the corresponding register
         if (id < AssemblyPhysicalRegister.argumentRegisters.length) {
@@ -101,7 +101,7 @@ public class RegisterAllocator {
         return AssemblyMemoryLocation.stackOffset(stackOffset);
     }
 
-    private AssemblyExpression getReturnMapping(int id) {
+    private static AssemblyExpression getReturnMapping(int id) {
         // If the id is lower than the number of return registers available,
         // return the corresponding register
         if (id < AssemblyPhysicalRegister.returnRegisters.length) {
