@@ -47,7 +47,8 @@ public class AssemblyFunction {
         // Store the instructions in this instance
         instructions.addAll(functionPrologue);
         // Translate the function body from abstract assembly to assembly
-        instructions.addAll(RegisterAllocator.translate(functionBody));
+        instructions.addAll(functionBody);
+//        instructions.addAll(RegisterAllocator.translate(functionBody));
     }
 
     private static List<AssemblyInstruction> generateFunctionPrologue() {

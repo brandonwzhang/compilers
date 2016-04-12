@@ -99,6 +99,14 @@ public class AssemblyAbstractRegister extends AssemblyRegister {
 
     @Override
     public String toString() {
-        return "%a" + id;
+        String s;
+        if (isArgument) {
+            s = "%arg";
+        } else if (isReturn) {
+            s = "%ret";
+        } else {
+            s = "%r";
+        }
+        return s + id;
     }
 }
