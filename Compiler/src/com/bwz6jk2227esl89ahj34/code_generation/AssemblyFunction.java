@@ -108,7 +108,7 @@ public class AssemblyFunction {
         instructions.add(0,
                 new AssemblyInstruction(
                         OpCode.SUBQ,
-                        new AssemblyImmediate(currentStackOffset - Configuration.WORD_SIZE),
+                        new AssemblyImmediate(currentStackOffset),
                         AssemblyPhysicalRegister.RSP
                 )
         );
