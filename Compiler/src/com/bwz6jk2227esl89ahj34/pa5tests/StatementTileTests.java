@@ -11,11 +11,7 @@ import org.junit.Test;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- *
- * Created by andy on 4/11/16.
- */
-public class PA5TestsAndy {
+public class StatementTileTests {
     private TileContainer tileContainer;
     private List<AssemblyInstruction> assemblyInstructions;
 

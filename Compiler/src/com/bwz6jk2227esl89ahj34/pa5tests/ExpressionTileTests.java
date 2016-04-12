@@ -12,10 +12,7 @@ import org.junit.Test;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by jihunkim on 4/11/16.
- */
-public class PA5Tests {
+public class ExpressionTileTests {
     private TileContainer tileContainer;
     private List<AssemblyInstruction> assemblyInstructions;
 
@@ -248,7 +245,5 @@ public class PA5Tests {
         );
         Assert.assertEquals(assemblyInstructions.get(1).getOpCode(), OpCode.ADDQ);
     }
-
-
 }
 
