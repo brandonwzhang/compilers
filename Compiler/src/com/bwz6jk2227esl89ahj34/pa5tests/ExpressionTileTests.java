@@ -357,5 +357,11 @@ public class ExpressionTileTests {
                 ((AssemblyMemoryLocation)result).getBaseRegister()
         );
     }
+
+    @Test // just testing AssemblyComment
+    public void assemblyComment() {
+        assemblyInstructions.add(new AssemblyComment("This is a test \n nice nice nice \n ay"));
+        Util.printInstructions(name, assemblyInstructions);
+    }
 }
 

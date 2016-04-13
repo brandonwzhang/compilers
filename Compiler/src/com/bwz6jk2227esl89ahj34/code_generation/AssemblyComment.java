@@ -8,6 +8,7 @@ public class AssemblyComment extends AssemblyLine {
 
     @Override
     public String toString() {
-        return "# " + comment;
+        return "# " + comment.replace("\n", "\n#");
     }
+
 }
