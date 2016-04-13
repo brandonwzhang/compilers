@@ -79,4 +79,46 @@ public class StatementPatterns {
             )
     );
 
+    public static IRStmt move7 = new IRMove(
+            new IRTemp(""),
+            new IRBinOp(
+                    OpType.ADD,
+                    new IRTemp(""),
+                    new IRConst(0)
+            )
+    );
+
+    public static IRStmt move8 = new IRMove(
+            new IRTemp(""),
+            new IRBinOp(
+                    OpType.SUB,
+                    new IRTemp(""),
+                    new IRConst(0)
+            )
+    );
+
+    public static IRStmt move9 = new IRMove(
+            new IRTemp(""),
+            new IRBinOp(
+                    OpType.ADD,
+                    new IRTemp(""),
+                    new IRTemp("")
+            )
+    );
+
+    public static IRStmt move10 = new IRMove(
+            new IRTemp(""),
+            new IRBinOp(
+                    OpType.SUB,
+                    new IRTemp(""),
+                    new IRTemp("")
+            )
+    );
+
+//    public static IRStmt move7 = new IRMove(new IRTemp(""),
+//            new IRBinOp(
+//
+//            )
+//    );
+
 }

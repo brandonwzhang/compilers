@@ -2,6 +2,7 @@ package com.bwz6jk2227esl89ahj34.code_generation.tiles;
 
 import com.bwz6jk2227esl89ahj34.code_generation.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 
 
 import java.util.LinkedList;
@@ -183,6 +184,39 @@ public class StatementCodeGenerators {
                 new AssemblyAbstractRegister(dest)
         ));
 
+        return lines;
+    };
+
+    public static StatementTile.CodeGenerator move78910 = (root) ->{
+        /*
+                           MOVE
+                  TEMP(t1)                ADD/SUB
+                                   TEMP(t1)     CONST/TEMP
+                  allow the add/sub to be commutative
+         */
+
+        LinkedList<AssemblyLine> lines = new LinkedList<>();
+        lines.add(new AssemblyComment("nontrivial tile move3456"));
+        IRMove castedRoot = (IRMove) root;
+        IRTemp t = (IRTemp) (castedRoot.target());
+        IRBinOp binOp = (IRBinOp) (castedRoot.expr());
+        IRExpr expr = binOp.left() instanceof IRTemp ? binOp.right() : binOp.left();
+        OpCode opcode = binOp.opType() == OpType.ADD ? OpCode.ADDQ : OpCode.SUBQ;
+        if (expr instanceof IRTemp) {
+            lines.add(new AssemblyInstruction(
+                    opcode,
+                    new AssemblyAbstractRegister((IRTemp)expr),
+                    new AssemblyAbstractRegister(t)
+                    )
+            );
+        } else {
+            lines.add(new AssemblyInstruction(
+                    opcode,
+                    new AssemblyImmediate(((IRConst)expr).value()),
+                    new AssemblyAbstractRegister(t)
+              )
+            );
+        }
         return lines;
     };
 

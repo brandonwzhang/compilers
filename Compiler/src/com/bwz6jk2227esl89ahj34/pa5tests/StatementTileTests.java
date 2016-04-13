@@ -295,6 +295,21 @@ public class StatementTileTests {
         Assert.assertNotEquals(1, result.size());
     }
 
+    @Test
+    public void newTileTest() {
+        IRStmt stmt = new IRMove(
+                new IRTemp("x"),
+                new IRBinOp(
+                        OpType.ADD,
+                        new IRTemp("x"),
+                        new IRConst(1)
+                )
+        );
+        List<AssemblyLine> result = TileContainer.matchStatement(stmt);
+
+        Util.printInstructions(name, result);
+    }
+
 //    @Test
 //    public void exp1() {
 //        IRExpr expr = new IRConst(4120);

@@ -20,7 +20,6 @@ public class TileContainer {
         add(new ExpressionTile(ExpressionPatterns.name1, ExpressionCodeGenerators.name1));
         add(new ExpressionTile(ExpressionPatterns.binop1, ExpressionCodeGenerators.binop1));
 
-        //TODO: comment out unless unit testing @Andy
         add(new ExpressionTile(ExpressionPatterns.mem2, ExpressionCodeGenerators.mem234));
         add(new ExpressionTile(ExpressionPatterns.mem3, ExpressionCodeGenerators.mem234));
         add(new ExpressionTile(ExpressionPatterns.mem4, ExpressionCodeGenerators.mem234));
@@ -34,11 +33,15 @@ public class TileContainer {
         add(new StatementTile(StatementPatterns.return1, StatementCodeGenerators.return1));
         add(new StatementTile(StatementPatterns.cjump1, StatementCodeGenerators.cjump1));
 
-        //TODO: comment out unless unit testing @Andy
         add(new NontrivialStatementTile(StatementPatterns.move3, StatementCodeGenerators.move3456));
         add(new NontrivialStatementTile(StatementPatterns.move4, StatementCodeGenerators.move3456));
         add(new NontrivialStatementTile(StatementPatterns.move5, StatementCodeGenerators.move3456));
         add(new NontrivialStatementTile(StatementPatterns.move6, StatementCodeGenerators.move3456));
+
+        add(new NontrivialStatementTile(StatementPatterns.move7, StatementCodeGenerators.move78910));
+        add(new NontrivialStatementTile(StatementPatterns.move8, StatementCodeGenerators.move78910));
+        add(new NontrivialStatementTile(StatementPatterns.move9, StatementCodeGenerators.move78910));
+        add(new NontrivialStatementTile(StatementPatterns.move10, StatementCodeGenerators.move78910));
     }
 
     public static boolean add(Tile tile) {
