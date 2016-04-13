@@ -99,7 +99,7 @@ public class StatementTileTests {
         Assert.assertTrue(result.get(1) instanceof AssemblyInstruction);
         Assert.assertTrue(result.get(2) instanceof AssemblyInstruction);
 
-        Assert.assertEquals(((AssemblyInstruction) result.get(1)).getOpCode(), OpCode.CMP);
+        Assert.assertEquals(((AssemblyInstruction) result.get(1)).getOpCode(), OpCode.CMPQ);
         Assert.assertEquals(
                 ((AssemblyInstruction) result.get(1)).getArgs().get(0),
                 new AssemblyImmediate(0));
