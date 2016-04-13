@@ -123,6 +123,7 @@
       <zipfileset file="${basedir}/META-INF/MANIFEST.MF" prefix="META-INF"/>
       <zipfileset file="${basedir}/java_cup.jar"/>
       <zipfileset file="${basedir}/lombok.jar"/>
+      <zipfileset file="${basedir}/junit.jar"/>
     </jar>
     <copy file="${temp.jar.path.Compiler.jar}" tofile="${artifact.temp.output.compiler:jar}/Compiler.jar"/>
   </target>
