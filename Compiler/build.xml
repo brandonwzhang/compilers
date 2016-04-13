@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="compiler" default="all">
-  
-  <property environment="env"/>  
+
+  <property environment="env"/>
   <property file="build.properties"/>
   <!-- Uncomment the following property if no tests compilation is needed -->
-  <!-- 
+  <!--
   <property name="skip.tests" value="true"/>
    -->
-  
+
   <!-- Compiler options -->
-  
+
   <property name="compiler.debug" value="on"/>
   <property name="compiler.generate.no.warnings" value="off"/>
   <property name="compiler.args" value=""/>
@@ -54,9 +54,9 @@
     <exclude name="**/?*.clj"/>
     <exclude name="**/?*.aj"/>
   </patternset>
-  
+
   <!-- JDK definitions -->
-  
+
   <property name="jdk.bin.1.8" value="${jdk.home.1.8}/bin"/>
   <path id="jdk.classpath.1.8">
     <fileset dir="${jdk.home.1.8}">
@@ -88,31 +88,33 @@
       <include name="lib/tools.jar"/>
     </fileset>
   </path>
-  
+
   <property name="project.jdk.home" value="${jdk.home.1.8}"/>
   <property name="project.jdk.bin" value="${jdk.bin.1.8}"/>
   <property name="project.jdk.classpath" value="jdk.classpath.1.8"/>
-  
-  
+
+
   <!-- Project Libraries -->
-  
+
   <!-- Modules -->
-  
+
   <import file="${basedir}/module_compiler.xml"/>
-  
+
   <target name="init" description="Build initialization">
     <!-- Perform any build initialization in this target -->
   </target>
-  
-  <target name="build.modules" depends="init, compile.module.compiler" description="build all modules"/>
-  
+
+  <target name="clean" depends="clean.module.compiler" description="cleanup all"/>
+
+  <target name="build.modules" depends="init, clean, compile.module.compiler" description="build all modules"/>
+
   <target name="init.artifacts">
     <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
     <property name="artifact.output.compiler:jar" value="${basedir}/out/artifacts/Compiler_jar"/>
     <mkdir dir="${artifacts.temp.dir}"/>
     <property name="temp.jar.path.Compiler.jar" value="${artifacts.temp.dir}/Compiler.jar"/>
   </target>
-  
+
   <target name="artifact.compiler:jar" depends="init.artifacts, compile.module.compiler" description="Build &#39;Compiler:jar&#39; artifact">
     <property name="artifact.temp.output.compiler:jar" value="${artifacts.temp.dir}/Compiler_jar"/>
     <mkdir dir="${artifact.temp.output.compiler:jar}"/>
@@ -124,16 +126,16 @@
     </jar>
     <copy file="${temp.jar.path.Compiler.jar}" tofile="${artifact.temp.output.compiler:jar}/Compiler.jar"/>
   </target>
-  
+
   <target name="build.all.artifacts" depends="artifact.compiler:jar" description="Build all artifacts">
     <mkdir dir="${artifact.output.compiler:jar}"/>
     <copy todir="${artifact.output.compiler:jar}">
       <fileset dir="${artifact.temp.output.compiler:jar}"/>
     </copy>
-    
+
     <!-- Delete temporary files -->
     <delete dir="${artifacts.temp.dir}"/>
   </target>
-  
+
   <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
 </project>
