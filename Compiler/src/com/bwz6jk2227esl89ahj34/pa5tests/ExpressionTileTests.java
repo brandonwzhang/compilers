@@ -261,7 +261,7 @@ public class ExpressionTileTests {
     public void mem2() {
         AssemblyExpression result = TileContainer.matchExpression(new IRMem(
                 new IRBinOp(
-                  OpType.ADD,
+                        OpType.ADD,
                         new IRConst(48),
                         new IRTemp("x")
                 )
@@ -272,7 +272,83 @@ public class ExpressionTileTests {
                 instanceof AssemblyAbstractRegister);
 
         Assert.assertEquals(new Long(((AssemblyMemoryLocation)result).getDisplacement())
-               , new Long(48));
+                , new Long(48));
+
+    }
+
+    @Test // MEM(TEMP + CONST)
+    public void mem3() {
+        AssemblyExpression result = TileContainer.matchExpression(new IRMem(
+                new IRBinOp(
+                        OpType.ADD,
+                        new IRTemp("x"),
+                        new IRConst(48)
+                )
+        ), assemblyInstructions);
+
+        assert result instanceof AssemblyMemoryLocation;
+        Assert.assertTrue(((AssemblyMemoryLocation)result).getBaseRegister()
+                instanceof AssemblyAbstractRegister);
+
+        Assert.assertEquals(new Long(((AssemblyMemoryLocation)result).getDisplacement())
+                , new Long(48));
+
+    }
+
+    @Test // MEM(CONST - TEMP)
+    public void mem4() {
+        AssemblyExpression result = TileContainer.matchExpression(new IRMem(
+                new IRBinOp(
+                        OpType.SUB,
+                        new IRConst(48),
+                        new IRTemp("x")
+                )
+        ), assemblyInstructions);
+
+        assert result instanceof AssemblyMemoryLocation;
+        Assert.assertTrue(((AssemblyMemoryLocation)result).getBaseRegister()
+                instanceof AssemblyAbstractRegister);
+
+        Assert.assertEquals(new Long(((AssemblyMemoryLocation)result).getDisplacement())
+                , new Long(-48));
+
+    }
+
+    @Test // MEM(TEMP - CONST)
+    public void mem5() {
+        AssemblyExpression result = TileContainer.matchExpression(new IRMem(
+                new IRBinOp(
+                        OpType.SUB,
+                        new IRTemp("x"),
+                        new IRConst(48)
+                )
+        ), assemblyInstructions);
+
+        assert result instanceof AssemblyMemoryLocation;
+        Assert.assertTrue(((AssemblyMemoryLocation)result).getBaseRegister()
+                instanceof AssemblyAbstractRegister);
+
+        Assert.assertEquals(new Long(((AssemblyMemoryLocation)result).getDisplacement())
+                , new Long(-48));
+
+    }
+
+    @Test // MEM(TEMP + TEMP)
+    public void mem6() {
+        AssemblyExpression result = TileContainer.matchExpression(new IRMem(
+                new IRBinOp(
+                        OpType.ADD,
+                        new IRTemp("x"),
+                        new IRTemp("y")
+                )
+        ), assemblyInstructions);
+
+        assert result instanceof AssemblyMemoryLocation;
+        Assert.assertTrue(((AssemblyMemoryLocation)result).getBaseRegister()
+                instanceof AssemblyAbstractRegister);
+
+        Assert.assertEquals(new Long(((AssemblyMemoryLocation)result).getDisplacement())
+                , new Long(-48));
 
     }
 }
