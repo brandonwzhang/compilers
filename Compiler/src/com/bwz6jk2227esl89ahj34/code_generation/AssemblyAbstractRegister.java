@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import java.util.HashMap;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class AssemblyAbstractRegister extends AssemblyRegister {
     // Maintains the number of temps that aren't return or argument temps
     public static int counter = 0;

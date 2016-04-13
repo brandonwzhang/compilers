@@ -4,12 +4,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class AssemblyMemoryLocation extends AssemblyExpression {
-    private Long displacement;
-    private Long scale;
-    private AssemblyRegister offsetRegister;
-    private AssemblyRegister baseRegister;
+    public Long displacement;
+    public Long scale;
+    public AssemblyRegister offsetRegister;
+    public AssemblyRegister baseRegister;
 
     public AssemblyMemoryLocation(AssemblyRegister baseRegister) {
         this.baseRegister = baseRegister;

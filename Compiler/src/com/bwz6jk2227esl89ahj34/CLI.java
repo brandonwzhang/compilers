@@ -92,6 +92,11 @@ public class CLI {
             }
         }
 
+        if (!Main.target().equals("linux")) {
+            System.out.println("\nError: target operating system must be linux.");
+            return;
+        }
+
         // assembly generation
         Arrays.stream(filesArray)
                 .forEach(file -> Core.generateAssembly(
