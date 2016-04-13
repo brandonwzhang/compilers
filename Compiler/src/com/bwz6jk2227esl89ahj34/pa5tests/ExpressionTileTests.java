@@ -116,6 +116,8 @@ public class ExpressionTileTests {
         AssemblyExpression result =
                 TileContainer.matchExpression(new IRConst(1), assemblyInstructions);
 
+        assemblyInstructions = Util.removeComments(assemblyInstructions);
+
         //nothing should have been added
         Assert.assertEquals(assemblyInstructions.size(), 0);
         Assert.assertEquals(result, new AssemblyImmediate(1));
@@ -127,6 +129,8 @@ public class ExpressionTileTests {
         AssemblyExpression result =
                 TileContainer.matchExpression(new IRTemp("x"), assemblyInstructions);
 
+        assemblyInstructions = Util.removeComments(assemblyInstructions);
+
         //nothing should have been added
         Assert.assertEquals(assemblyInstructions.size(), 0 );
         Assert.assertEquals(result, new AssemblyAbstractRegister(new IRTemp("x")));
@@ -137,6 +141,8 @@ public class ExpressionTileTests {
     public void expressionMem1() {
         AssemblyExpression result =
                 TileContainer.matchExpression(new IRMem(new IRTemp("x")), assemblyInstructions);
+
+        assemblyInstructions = Util.removeComments(assemblyInstructions);
 
         //nothing should have been added
         Assert.assertEquals(assemblyInstructions.size(), 0 );
@@ -154,6 +160,8 @@ public class ExpressionTileTests {
                         new IRConst(1),
                         new IRConst(1)
                 ), assemblyInstructions);
+
+        assemblyInstructions = Util.removeComments(assemblyInstructions);
 
         Assert.assertTrue(result instanceof AssemblyAbstractRegister);
         Assert.assertEquals(assemblyInstructions.size(), 2);
@@ -186,6 +194,8 @@ public class ExpressionTileTests {
                         new IRTemp("x"),
                         new IRTemp("y")
                 ), assemblyInstructions);
+
+        assemblyInstructions = Util.removeComments(assemblyInstructions);
 
         Assert.assertTrue(result instanceof AssemblyAbstractRegister);
         Assert.assertEquals(assemblyInstructions.size(), 2);
@@ -221,6 +231,9 @@ public class ExpressionTileTests {
                         ),
                         new IRConst(3)
                 ), assemblyInstructions);
+
+        assemblyInstructions = Util.removeComments(assemblyInstructions);
+
         Assert.assertEquals(assemblyInstructions.size(), 4);
 
         Assert.assertEquals(
@@ -358,10 +371,11 @@ public class ExpressionTileTests {
         );
     }
 
-    @Test // just testing AssemblyComment
     public void assemblyComment() {
         assemblyInstructions.add(new AssemblyComment("This is a test \n nice nice nice \n ay"));
         Util.printInstructions(name, assemblyInstructions);
+        assemblyInstructions = Util.removeComments(assemblyInstructions);
+        Assert.assertEquals(assemblyInstructions.size(), 0);
     }
 }
 

@@ -9,11 +9,9 @@ import com.bwz6jk2227esl89ahj34.util.Util;
 import org.junit.*;
 import org.junit.rules.TestName;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class StatementTileTests {
-    private List<AssemblyLine> assemblyInstructions;
     @Rule public TestName name = new TestName();
     private AssemblyInstruction move3456instruction =
             new AssemblyInstruction(
@@ -33,7 +31,7 @@ public class StatementTileTests {
     // runs before every test invocation
     @Before
     public void setUp() {
-        assemblyInstructions = new LinkedList<>();
+        System.out.println("\nStart of " + name.getMethodName() + "\n");
     }
 
     // runs after every test invocation
@@ -48,6 +46,7 @@ public class StatementTileTests {
         IRTemp src = new IRTemp("t1");
         List<AssemblyLine> result =
                 TileContainer.matchStatement(new IRMove(dst, src));
+
 
         AssemblyAbstractRegister aar_dst = new AssemblyAbstractRegister(dst);
         AssemblyAbstractRegister aar_src = new AssemblyAbstractRegister(src);
@@ -66,9 +65,11 @@ public class StatementTileTests {
         List<AssemblyLine> result =
                 TileContainer.matchStatement(jump);
 
+        result = Util.removeComments(result);
+
         Assert.assertEquals(
                 new AssemblyInstruction(OpCode.JMP, new AssemblyName("l")),
-                result.get(1)
+                result.get(0)
         );
         Util.printInstructions(name, result);
     }
@@ -79,11 +80,13 @@ public class StatementTileTests {
         List<AssemblyLine> result =
                 TileContainer.matchStatement(label);
 
+        result = Util.removeComments(result);
+
         Util.printInstructions(name, result);
         AssemblyLabel duplicateLabel = new AssemblyLabel(new AssemblyName("l"));
 
-        Assert.assertTrue(result.get(1) instanceof AssemblyLabel);
-        Assert.assertEquals((AssemblyLabel) result.get(1) , duplicateLabel);
+        Assert.assertTrue(result.get(0) instanceof AssemblyLabel);
+        Assert.assertEquals((AssemblyLabel) result.get(0) , duplicateLabel);
     }
 
     @Test
@@ -95,16 +98,18 @@ public class StatementTileTests {
         List<AssemblyLine> result =
                 TileContainer.matchStatement(cjump);
 
-        Assert.assertEquals(result.size(), 3);
-        Assert.assertTrue(result.get(1) instanceof AssemblyInstruction);
-        Assert.assertTrue(result.get(2) instanceof AssemblyInstruction);
+        result = Util.removeComments(result);
 
-        Assert.assertEquals(((AssemblyInstruction) result.get(1)).getOpCode(), OpCode.CMPQ);
+        Assert.assertEquals(result.size(), 2);
+        Assert.assertTrue(result.get(0) instanceof AssemblyInstruction);
+        Assert.assertTrue(result.get(1) instanceof AssemblyInstruction);
+
+        Assert.assertEquals(((AssemblyInstruction) result.get(0)).getOpCode(), OpCode.CMPQ);
         Assert.assertEquals(
-                ((AssemblyInstruction) result.get(1)).getArgs().get(0),
+                ((AssemblyInstruction) result.get(0)).getArgs().get(0),
                 new AssemblyImmediate(0));
 
-        Assert.assertEquals(((AssemblyInstruction) result.get(2)).getOpCode(),
+        Assert.assertEquals(((AssemblyInstruction) result.get(1)).getOpCode(),
                 OpCode.JNE);
 
         Util.printInstructions(name, result);
@@ -161,9 +166,9 @@ public class StatementTileTests {
                 )
         );
         List<AssemblyLine> result = TileContainer.matchStatement(move3);
-
+        result = Util.removeComments(result);
         Util.printInstructions(name, result);
-        Assert.assertEquals(move3456instruction, result.get(1));
+        Assert.assertEquals(move3456instruction, result.get(0));
     }
 
     @Test
@@ -186,8 +191,10 @@ public class StatementTileTests {
         );
         List<AssemblyLine> result = TileContainer.matchStatement(move3);
 
+        result = Util.removeComments(result);
+
         Util.printInstructions(name, result);
-        Assert.assertNotEquals(2, result.size());
+        Assert.assertNotEquals(1, result.size());
     }
 
     @Test
@@ -209,9 +216,10 @@ public class StatementTileTests {
                 )
         );
         List<AssemblyLine> result = TileContainer.matchStatement(move4);
+        result = Util.removeComments(result);
 
         Util.printInstructions(name, result);
-        Assert.assertEquals(move3456instruction, result.get(1));
+        Assert.assertEquals(move3456instruction, result.get(0));
     }
 
     @Test
@@ -234,8 +242,9 @@ public class StatementTileTests {
         );
         List<AssemblyLine> result = TileContainer.matchStatement(move5);
 
+        result = Util.removeComments(result);
         Util.printInstructions(name, result);
-        Assert.assertEquals(move3456instruction, result.get(1));
+        Assert.assertEquals(move3456instruction, result.get(0));
     }
 
     @Test
@@ -257,9 +266,9 @@ public class StatementTileTests {
                 )
         );
         List<AssemblyLine> result = TileContainer.matchStatement(move5);
-
+        result = Util.removeComments(result);
         Util.printInstructions(name, result);
-        Assert.assertEquals(move3456instruction, result.get(1));
+        Assert.assertEquals(move3456instruction, result.get(0));
     }
 
     @Test
@@ -280,8 +289,10 @@ public class StatementTileTests {
         );
         List<AssemblyLine> result = TileContainer.matchStatement(move);
 
+        result = Util.removeComments(result);
+
         Util.printInstructions(name, result);
-        Assert.assertNotEquals(2, result.size());
+        Assert.assertNotEquals(1, result.size());
     }
 
 //    @Test

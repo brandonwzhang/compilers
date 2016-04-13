@@ -5,6 +5,7 @@ import com.bwz6jk2227esl89ahj34.AST.FunctionType;
 import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
 import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.AST.parse.ParserSym;
+import com.bwz6jk2227esl89ahj34.code_generation.AssemblyComment;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyLine;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
@@ -343,5 +344,15 @@ public class Util {
         }
         irName += ret + arg;
         return irName;
+    }
+
+    public static List<AssemblyLine> removeComments(List<AssemblyLine> lst) {
+       List<AssemblyLine> filteredList = new LinkedList<>();
+        for(AssemblyLine assemblyLine : lst) {
+           if (! (assemblyLine instanceof AssemblyComment)) {
+               filteredList.add(assemblyLine);
+           }
+       }
+        return filteredList;
     }
 }
