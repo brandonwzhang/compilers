@@ -407,7 +407,9 @@ public class Core {
         Util.writeHelper(file, "s", assemblyPath, Collections.singletonList(program.toString()));
 
         // Link and run the assembly file
-        ProcessBuilder pb = new ProcessBuilder("./runtime/linkxi.sh", file.replace(".xi", ".s")).inheritIO();
+        String fileName = file.replace(".xi", "");
+        ProcessBuilder pb =
+                new ProcessBuilder("./runtime/linkxi.sh", "-o", fileName, fileName + ".s").inheritIO();
         try {
             Process linkProcess = pb.start();
             linkProcess.waitFor();
