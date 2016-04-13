@@ -323,7 +323,7 @@ public class Util {
     public static String getIRFunctionName(FunctionDeclaration node) {
         String funcName = node.getIdentifier().getName();
         FunctionType funcType = node.getFunctionType();
-        String irName = "I" + funcName + "_";
+        String irName = "_I" + funcName + "_";
 
         String ret = "";
         List<VariableType> retList = funcType.getReturnTypeList().getVariableTypeList();

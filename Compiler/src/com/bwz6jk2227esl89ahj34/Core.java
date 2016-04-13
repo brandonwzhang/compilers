@@ -404,7 +404,7 @@ public class Core {
 
         AssemblyProgram program = new AssemblyProgram(irRoot.get(),
                 IRfunctionNamesFromUseStatements);
-        Util.writeHelper(file, "S", assemblyPath, Collections.singletonList(program.toString()));
+        Util.writeHelper(file, "s", assemblyPath, Collections.singletonList(program.toString()));
 
         // System.out.println("Assembly code generation has not been implemented yet.");
     }

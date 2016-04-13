@@ -28,10 +28,6 @@ public class AssemblyInstruction extends AssemblyLine {
     @Override
     public String toString() {
         String s = opCode.toString().toLowerCase() + "\t";
-        if (opCode == OpCode.CALLQ) {
-            s += " FUNC(" + args.get(0) + ")";
-            return s;
-        }
         for (int i = 0; i < args.size(); i++) {
             s += args.get(i);
             if (i < args.size() - 1) {

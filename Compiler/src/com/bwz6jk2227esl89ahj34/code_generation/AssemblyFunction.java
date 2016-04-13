@@ -163,12 +163,12 @@ public class AssemblyFunction {
     @Override
     public String toString() {
         String s = "";
-        s += "\t\t.globl\tFUNC(" + name + ")\n";
+        s += "\t\t.globl\t" + name + "\n";
         for(String globalName : global) {
-            s+= "\t\t.globl\tFUNC(" + globalName + ")\n";
+            s+= "\t\t.globl\t" + globalName + "\n";
         }
         s += "\t\t.align\t4\n";
-        s += "FUNC(" + name + "):\n";
+        s += name + ":\n";
         for (AssemblyLine line : lines) {
             if (line instanceof AssemblyLabel) {
                 s += line + "\n";
