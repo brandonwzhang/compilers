@@ -218,7 +218,7 @@ public class StatementCodeGenerators {
             AssemblyMemoryLocation argLocation;
             if (isUsed) {
                 // Get the argument from the parent's stack frame
-                argLocation = new AssemblyMemoryLocation(AssemblyPhysicalRegister.R9);
+                argLocation = new AssemblyMemoryLocation(AssemblyPhysicalRegister.RBP, Configuration.WORD_SIZE * 2);
             } else {
                 // Move the argument to the argument space in our stack frame for
                 // and functions we call to access
@@ -240,7 +240,8 @@ public class StatementCodeGenerators {
                 retLocation = AssemblyMemoryLocation.stackOffset(AssemblyFunction.getReturnValuesOffset());
             } else {
                 // Move the return value to the parent's stack frame so it can access it
-                retLocation = new AssemblyMemoryLocation(AssemblyPhysicalRegister.R8);
+                // We were passed the pointer to the return space in the parent stack frame
+                retLocation = new AssemblyMemoryLocation(AssemblyPhysicalRegister.R9);
             }
             return getReturnMapping(returnTempNumber, retLocation);
         }
@@ -287,7 +288,7 @@ public class StatementCodeGenerators {
             return AssemblyPhysicalRegister.argumentRegisters[id];
         }
         // Return the corresponding memory location
-        argumentsSpace.displacement -=
+        argumentsSpace.displacement +=
                 Configuration.WORD_SIZE * (id - AssemblyPhysicalRegister.argumentRegisters.length);
         return argumentsSpace;
     }
@@ -302,7 +303,7 @@ public class StatementCodeGenerators {
             return AssemblyPhysicalRegister.returnRegisters[id];
         }
         // Return the corresponding memory location
-        returnValuesSpace.displacement -=
+        returnValuesSpace.displacement +=
                 Configuration.WORD_SIZE * (id - AssemblyPhysicalRegister.returnRegisters.length);
         return returnValuesSpace;
     }
