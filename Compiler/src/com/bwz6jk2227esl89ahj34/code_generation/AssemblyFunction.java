@@ -103,7 +103,7 @@ public class AssemblyFunction {
         }
 
         // Decrement RSP at the beginning of the lines to make space for everything
-        lines.add(0,
+        lines.add(
                 new AssemblyInstruction(
                         OpCode.SUBQ,
                         new AssemblyImmediate(currentStackOffset),
