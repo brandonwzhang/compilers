@@ -107,32 +107,13 @@ public class StatementCodeGenerators {
     };
 
     /**
-     * For convenience, we take care of the "function epilogue"
-     * along with the return statement 
+     * For convenience, we take care of the "function epilogue" in AssemblyFunction
+     * In the IR, we guarantee that there is only a single return at the end of a function
      */
     public static StatementTile.CodeGenerator return1 = (root) -> {
         /* RETURN() */
-        List<AssemblyLine> lines = new LinkedList<>();
-
-        // Add a comment showing the IRNode that was translated
-        addAssemblyComment(root, "return1", lines);
-
-        // Restore callee-save registers
-        lines.add(new AssemblyComment("restoring callee-save registers"));
-        for (int i = 0; i < AssemblyPhysicalRegister.calleeSavedRegisters.length; i++) {
-            AssemblyPhysicalRegister register = AssemblyPhysicalRegister.calleeSavedRegisters[i];
-            lines.add(new AssemblyInstruction(
-                    OpCode.MOVQ,
-                    AssemblyMemoryLocation.stackOffset(Configuration.WORD_SIZE * (1 + i)),
-                    register
-                    ));
-        }
-        // Restore old RBP and RSP
-        lines.add(new AssemblyComment("restore old RBP and RSP"));
-        lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RBP, AssemblyPhysicalRegister.RSP));
-        lines.add(new AssemblyInstruction(OpCode.POPQ, AssemblyPhysicalRegister.RBP));
-        lines.add(new AssemblyInstruction(OpCode.RETQ));
-        return lines;
+        // Handled in AssemblyFunction.generateFunctionEpilogue
+        return new LinkedList<>();
     };
 
     public static StatementTile.CodeGenerator cjump1 = (root) -> {
