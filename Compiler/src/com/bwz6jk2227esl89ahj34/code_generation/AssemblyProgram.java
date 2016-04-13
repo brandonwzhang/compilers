@@ -119,7 +119,7 @@ public class AssemblyProgram {
         s += "#define ARG5() %r8\n";
         s += "#define ARG6() %r9\n";
         s += "#define INITFUNC() .section \t .ctors\n";
-        s += "#define GCFUNC(x) x";
+        s += "#define GCFUNC(x) x\n";
 
         s += "\t\t.text\n";
         for (AssemblyFunction function : functions) {
