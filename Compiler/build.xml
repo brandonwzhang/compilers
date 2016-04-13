@@ -104,9 +104,7 @@
     <!-- Perform any build initialization in this target -->
   </target>
 
-  <target name="clean" depends="clean.module.compiler" description="cleanup all"/>
-
-  <target name="build.modules" depends="init, clean, compile.module.compiler" description="build all modules"/>
+  <target name="build.modules" depends="init, compile.module.compiler" description="build all modules"/>
 
   <target name="init.artifacts">
     <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>

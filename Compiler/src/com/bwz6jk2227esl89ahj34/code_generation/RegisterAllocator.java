@@ -10,6 +10,9 @@ import java.util.Map;
 
 public class RegisterAllocator {
     private static Map<AssemblyAbstractRegister, AssemblyExpression> registerMap = new HashMap<>();
+    // Counts the number of spilled temps that have been encountered in an instruction
+    // For each instruction, this should be reset to 0
+    private static int numSpilledTemps = 0;
 
     /**
      * Returns a list of instructions with all abstract registers with physical locations
@@ -38,58 +41,71 @@ public class RegisterAllocator {
         lines.add(instruction);
 
         List<AssemblyExpression> args = instruction.args;
-        // Number of spilled temps we've encountered in this instruction so far
-        Integer spilledTempNum = new Integer(0);
+        numSpilledTemps = 0;
         // Translate every argument and add any extra lines needed for shuttling
         for (int i = 0; i < args.size(); i++) {
             AssemblyExpression arg = args.get(i);
             if (arg instanceof AssemblyAbstractRegister) {
                 AssemblyAbstractRegister register = (AssemblyAbstractRegister) arg;
-                translateRegister(register, args, lines, spilledTempNum, i);
+                args.set(i, translateRegister(register, lines));
             } else if (arg instanceof AssemblyMemoryLocation) {
                 AssemblyMemoryLocation location = (AssemblyMemoryLocation) arg;
-
+                args.set(i, translateMemoryLocation(location, lines));
             }
         }
         return lines;
     }
 
-    private static void translateRegister(AssemblyAbstractRegister register,
-                                          List<AssemblyExpression> args,
-                                          List<AssemblyLine> lines,
-                                          Integer spilledTempNum,
-                                          int argNum) {
+    /**
+     * Translate an abstract register to a physical one
+     */
+    private static AssemblyPhysicalRegister translateRegister(AssemblyAbstractRegister register,
+                                                              List<AssemblyLine> lines) {
         // Get the physical location of this temp
         AssemblyExpression mapping = getRegisterMapping(register);
         // Replace the abstract register with its mapping
         if (mapping instanceof AssemblyPhysicalRegister) {
-            args.set(argNum, mapping);
-            return;
+            return (AssemblyPhysicalRegister) mapping;
         }
 
         // The temp was spilled onto the stack, so we need to shuttle it in
         assert mapping instanceof AssemblyMemoryLocation;
         AssemblyMemoryLocation location = (AssemblyMemoryLocation) mapping;
-        args.set(argNum, shuttleRegister(location, lines, spilledTempNum));
+        return shuttleRegister(location, lines);
     }
 
-    private static void translateMemoryLocation() {
-        //TODO: Handle abstract register inside memory location
+    /**
+     * Translate a memory location to contain no abstract registers
+     */
+    private static AssemblyMemoryLocation translateMemoryLocation(AssemblyMemoryLocation location,
+                                                                  List<AssemblyLine> lines) {
+        // Translate base and offset register if they're abstract registers
+        if (location.baseRegister instanceof AssemblyAbstractRegister) {
+            location.baseRegister =
+                    translateRegister((AssemblyAbstractRegister) location.baseRegister, lines);
+        }
+        if (location.offsetRegister instanceof AssemblyAbstractRegister) {
+            location.offsetRegister =
+                    translateRegister((AssemblyAbstractRegister) location.offsetRegister, lines);
+        }
+        return location;
     }
 
-    private static AssemblyExpression shuttleRegister(AssemblyMemoryLocation location,
-                                                      List<AssemblyLine> lines,
-                                                      Integer spilledTempNum) {
+    /**
+     * Add instructions to shuttle a temp in and out
+     */
+    private static AssemblyPhysicalRegister shuttleRegister(AssemblyMemoryLocation location,
+                                                            List<AssemblyLine> lines) {
         AssemblyPhysicalRegister[] shuttleRegisters = {AssemblyPhysicalRegister.R13,
                 AssemblyPhysicalRegister.R14, AssemblyPhysicalRegister.R15};
-        AssemblyPhysicalRegister shuttleRegister = shuttleRegisters[spilledTempNum];
+        AssemblyPhysicalRegister shuttleRegister = shuttleRegisters[numSpilledTemps];
         // Shuttle temp in by adding a move instruction to the beginning
         lines.add(0, new AssemblyInstruction(OpCode.MOVQ,
                 location, shuttleRegister));
         // Shuttle temp out by adding a move instruction to the end
         lines.add(new AssemblyInstruction(OpCode.MOVQ,
                 shuttleRegister, location));
-        spilledTempNum++;
+        numSpilledTemps++;
         return shuttleRegister;
     }
 
@@ -116,6 +132,9 @@ public class RegisterAllocator {
         return spillLocation;
     }
 
+    /**
+     * Returns the argument register or memory location that the argument temp corresponds to
+     */
     private static AssemblyExpression getArgumentMapping(int id) {
         // If the id is lower than the number of argument registers available,
         // return the corresponding register
@@ -128,6 +147,11 @@ public class RegisterAllocator {
         return AssemblyMemoryLocation.stackOffset(stackOffset);
     }
 
+    /**
+     * Returns the return register or memory location that the return temp corresponds to
+     * @param id
+     * @return
+     */
     private static AssemblyExpression getReturnMapping(int id) {
         // If the id is lower than the number of return registers available,
         // return the corresponding register

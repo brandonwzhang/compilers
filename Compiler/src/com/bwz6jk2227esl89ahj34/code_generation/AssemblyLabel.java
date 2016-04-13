@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import java.util.HashSet;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class AssemblyLabel extends AssemblyLine {
     private static HashSet<String> allLabels = new HashSet<String>();
     private AssemblyName name;

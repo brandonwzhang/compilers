@@ -23,21 +23,21 @@ FUNC(_Imain_paai):
 		movq	%rdx, %r13
 		movq	%r13, -160(%rbp)
 		# (MOVE (TEMP args) (TEMP temp_0)) -- move1
-		movq	-168(%rbp), %r13
+		movq	-168(%rbp), %r14
 		movq	-160(%rbp), %r13
-		movq	%r13, %r13
+		movq	%r13, %r14
 		movq	%r13, -160(%rbp)
-		movq	%r13, -168(%rbp)
+		movq	%r14, -168(%rbp)
 		# (MOVE (TEMP temp_1) (CONST 2)) -- move1
 		movq	-176(%rbp), %r13
 		movq	$2, %r13
 		movq	%r13, -176(%rbp)
 		# (MOVE (TEMP x) (TEMP temp_1)) -- move1
-		movq	-184(%rbp), %r13
+		movq	-184(%rbp), %r14
 		movq	-176(%rbp), %r13
-		movq	%r13, %r13
+		movq	%r13, %r14
 		movq	%r13, -176(%rbp)
-		movq	%r13, -184(%rbp)
+		movq	%r14, -184(%rbp)
 		# (JUMP (NAME temp_2)) -- jump1
 		jmp	temp_2
 		# (LABEL temp_2) -- label1
