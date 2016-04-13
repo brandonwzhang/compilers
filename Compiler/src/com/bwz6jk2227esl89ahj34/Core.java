@@ -22,6 +22,7 @@ import com.bwz6jk2227esl89ahj34.util.Util;
 import java_cup.runtime.Symbol;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileReader;
 import java.util.*;
 
@@ -390,8 +391,7 @@ public class Core {
             Program programAST = programASTOptional.get();
             List<FunctionDeclaration> useFunctionDeclarations =
                     programAST.getFunctionsFromUseStatement(libPath);
-            for(FunctionDeclaration useFunctionDeclaration :
-                    useFunctionDeclarations) {
+            for(FunctionDeclaration useFunctionDeclaration : useFunctionDeclarations) {
                 IRfunctionNamesFromUseStatements.add(Util.getIRFunctionName(useFunctionDeclaration));
             }
         }
@@ -405,6 +405,17 @@ public class Core {
         AssemblyProgram program = new AssemblyProgram(irRoot.get(),
                 IRfunctionNamesFromUseStatements);
         Util.writeHelper(file, "s", assemblyPath, Collections.singletonList(program.toString()));
+
+        // Link and run the assembly file
+        ProcessBuilder pb = new ProcessBuilder("./runtime/linkxi.sh", file + ".s");
+        pb.directory(new File(System.getProperty("user.dir")));
+        try {
+            Process linkProcess = pb.start();
+            linkProcess.waitFor();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
 
         // System.out.println("Assembly code generation has not been implemented yet.");
     }
