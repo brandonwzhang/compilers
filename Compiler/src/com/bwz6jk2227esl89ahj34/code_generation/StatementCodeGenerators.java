@@ -200,15 +200,16 @@ public class StatementCodeGenerators {
         AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getCallerSpaceOffset(),
                 AssemblyPhysicalRegister.callerSavedRegisters);
 
-        // Pass pointer to return space as first argument (RDI)
-        lines.add(new AssemblyComment("Pass pointer to return space as first argument"));
+        // Pass pointer to return space as first argument (R8)
+        lines.add(new AssemblyComment("Pass pointer to return space in R8"));
         lines.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getReturnValuesOffset()),
                 AssemblyPhysicalRegister.R8
         ));
 
-        // Pass pointer to additional argument space as second argument (RSI)
+        // Pass pointer to additional argument space as second argument (R9)
+        lines.add(new AssemblyComment("Pass pointer to return space in R9"));
         lines.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()),
