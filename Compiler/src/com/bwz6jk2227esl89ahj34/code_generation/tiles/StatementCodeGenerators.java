@@ -1,7 +1,7 @@
-package com.bwz6jk2227esl89ahj34.code_generation;
+package com.bwz6jk2227esl89ahj34.code_generation.tiles;
 
+import com.bwz6jk2227esl89ahj34.code_generation.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyPhysicalRegister.Register;
 
 
 import java.util.LinkedList;
@@ -26,16 +26,38 @@ public class StatementCodeGenerators {
     public static StatementTile.CodeGenerator move1 = (root) -> {
         /* MOVE(dst, src) */
         LinkedList<AssemblyLine> lines = new LinkedList<>();
-        addAssemblyComment(root, "move1", lines);
 
         // Add a comment showing the IRNode that was translated
+        addAssemblyComment(root, "move1", lines);
 
         IRMove castedRoot = (IRMove) root;
-        AssemblyExpression src = TileContainer.matchExpression(castedRoot.expr(), lines);
-        AssemblyExpression dst = TileContainer.matchExpression(castedRoot.target(), lines);
+
+        AssemblyExpression src = translateExpression(castedRoot.expr(), lines, true);
+        AssemblyExpression dst = translateExpression(castedRoot.target(), lines, false);
 
         assert !(dst instanceof AssemblyImmediate);
         lines.add(new AssemblyInstruction(OpCode.MOVQ, src, dst));
+
+        return lines;
+    };
+
+    public static StatementTile.CodeGenerator move2 = (root) -> {
+        /* MOVE(TEMP, CALL(NAME)) */
+        LinkedList<AssemblyLine> lines = new LinkedList<>();
+
+        // Add a comment showing the IRNode that was translated
+        addAssemblyComment(root, "move2", lines);
+
+        IRMove castedRoot = (IRMove) root;
+
+        // prologue, call, move, epilogue
+        functionCall(castedRoot.expr(), lines);
+        lines.add(
+                new AssemblyInstruction(OpCode.MOVQ,
+                        AssemblyPhysicalRegister.RAX,
+                        translateExpression(castedRoot.target(), lines, false))
+        );
+        functionCallEpilogue(lines);
 
         return lines;
     };
@@ -48,7 +70,7 @@ public class StatementCodeGenerators {
         addAssemblyComment(root, "jump1", lines);
 
         IRJump castedRoot = (IRJump) root;
-        AssemblyExpression label = TileContainer.matchExpression(castedRoot.target(), lines);
+        AssemblyExpression label = translateExpression(castedRoot.target(), lines, true);
 
         assert label instanceof AssemblyName;
         lines.add(new AssemblyInstruction(OpCode.JMP, label));
@@ -85,27 +107,6 @@ public class StatementCodeGenerators {
         return lines;
     };
 
-    public static StatementTile.CodeGenerator move2 = (root) -> {
-        /* MOVE(TEMP, CALL(NAME)) */
-        LinkedList<AssemblyLine> lines = new LinkedList<>();
-
-        // Add a comment showing the IRNode that was translated
-        addAssemblyComment(root, "move2", lines);
-
-        IRMove castedRoot = (IRMove) root;
-
-        // prologue, call, move, epilogue
-        functionCall(castedRoot.expr(), lines);
-        lines.add(
-                new AssemblyInstruction(OpCode.MOVQ,
-                        AssemblyPhysicalRegister.RAX,
-                        TileContainer.matchExpression(castedRoot.target(), lines))
-        );
-        functionCallEpilogue(lines);
-
-        return lines;
-    };
-
     /**
      * For convenience, we take care of the "function epilogue" in AssemblyFunction
      * In the IR, we guarantee that there is only a single return at the end of a function
@@ -125,7 +126,7 @@ public class StatementCodeGenerators {
 
         IRCJump castedRoot = (IRCJump) root;
         assert castedRoot.falseLabel() == null; // assert lowered CJump
-        AssemblyExpression guard = TileContainer.matchExpression(castedRoot.expr(), lines);
+        AssemblyExpression guard = translateExpression(castedRoot.expr(), lines, true);
 
         // compare guard to 0, jump to trueLabel if not equal
         lines.add(new AssemblyInstruction(OpCode.CMPQ, guard, new AssemblyImmediate(0)));
@@ -165,8 +166,8 @@ public class StatementCodeGenerators {
             offset = (IRConst) castedMemExpr.left();
             temp = (IRTemp) castedMemExpr.right();
         } else {
-           offset = (IRConst) castedMemExpr.right();
-           temp =  (IRTemp) castedMemExpr.left();
+            offset = (IRConst) castedMemExpr.right();
+            temp =  (IRTemp) castedMemExpr.left();
         }
 
         AssemblyMemoryLocation memLocation =
@@ -186,6 +187,127 @@ public class StatementCodeGenerators {
     };
 
     /**
+     * Translate an IRExpr in to its corresponding abstract assembly
+     * representation
+     * If the IRExpr is an argument or return temp, it will translate directly
+     * to a physical location
+     * All moves should use this function to translate
+     * @param expr the IRExpr to be translated
+     * @param lines the List<AssemblyLine> to add instructions to
+     * @param isUsed a boolean indicating whether this IRExpr is being used as opposed to being set
+     */
+    private static AssemblyExpression translateExpression(IRExpr expr,
+                                                          List<AssemblyLine> lines,
+                                                          boolean isUsed) {
+        // If it's not an IRTemp, we just need to match it normally
+        if (!(expr instanceof IRTemp)) {
+            return TileContainer.matchExpression(expr, lines);
+        }
+
+        // If we have a temp, we need to determine if it's an argument temp,
+        // a return temp, or neither
+
+        // If it's an argument temp, the expression we translate to depends on
+        // whether the temp is being used or being set
+        // If it's being used, we need to access it from our parent's stack frame
+        // If it's being set, we just put it in our stack frame in the argument space
+        IRTemp temp = (IRTemp) expr;
+        int argTempNumber = getArgumentTempNumber(temp);
+        if (argTempNumber >= 0) {
+            // We have an argument temp
+            AssemblyMemoryLocation argLocation;
+            if (isUsed) {
+                // Get the argument from the parent's stack frame
+                argLocation = new AssemblyMemoryLocation(AssemblyPhysicalRegister.R9);
+            } else {
+                // Move the argument to the argument space in our stack frame for
+                // and functions we call to access
+                argLocation = AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset());
+            }
+            return getArgumentMapping(argTempNumber, argLocation);
+        }
+
+        // If it's a return temp, the expression we translate to depends on
+        // whether the temp is being used or set
+        // If it's being used, we just need to take it from the return space of
+        // our stack frame
+        int returnTempNumber = getReturnTempNumber(temp);
+        if (returnTempNumber >= 0) {
+            // We have a return temp
+            AssemblyMemoryLocation retLocation;
+            if (isUsed) {
+                // Get the return value from our stack frame that another function returned
+                retLocation = AssemblyMemoryLocation.stackOffset(AssemblyFunction.getReturnValuesOffset());
+            } else {
+                // Move the return value to the parent's stack frame so it can access it
+                retLocation = new AssemblyMemoryLocation(AssemblyPhysicalRegister.R8);
+            }
+            return getReturnMapping(returnTempNumber, retLocation);
+        }
+
+        // We don't have an argument or return temp, so we just translate it normally
+        return TileContainer.matchExpression(temp, lines);
+    }
+
+    /**
+     * Returns the number of the return temp. Returns -1 if not a return temp.
+     */
+    private static int getArgumentTempNumber(IRTemp temp) {
+        String name = temp.name();
+        if (name.length() < 5) {
+            return -1;
+        }
+        if (name.substring(0, 4).equals(Configuration.ABSTRACT_ARG_PREFIX)) {
+            return Integer.parseInt(name.substring(4));
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the number of the return temp. Returns -1 if not a return temp.
+     */
+    private static int getReturnTempNumber(IRTemp temp) {
+        String name = temp.name();
+        if (name.length() < 5) {
+            return -1;
+        }
+        if (name.substring(0, 4).equals(Configuration.ABSTRACT_RET_PREFIX)) {
+            return Integer.parseInt(name.substring(4));
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the argument register or memory location that the argument temp corresponds to
+     */
+    private static AssemblyExpression getArgumentMapping(int id, AssemblyMemoryLocation argumentsSpace) {
+        // If the id is lower than the number of argument registers available,
+        // return the corresponding register
+        if (id < AssemblyPhysicalRegister.argumentRegisters.length) {
+            return AssemblyPhysicalRegister.argumentRegisters[id];
+        }
+        // Return the corresponding memory location
+        argumentsSpace.displacement -=
+                Configuration.WORD_SIZE * (id - AssemblyPhysicalRegister.argumentRegisters.length);
+        return argumentsSpace;
+    }
+
+    /**
+     * Returns the return register or memory location that the return temp corresponds to
+     */
+    private static AssemblyExpression getReturnMapping(int id, AssemblyMemoryLocation returnValuesSpace) {
+        // If the id is lower than the number of return registers available,
+        // return the corresponding register
+        if (id < AssemblyPhysicalRegister.returnRegisters.length) {
+            return AssemblyPhysicalRegister.returnRegisters[id];
+        }
+        // Return the corresponding memory location
+        returnValuesSpace.displacement -=
+                Configuration.WORD_SIZE * (id - AssemblyPhysicalRegister.returnRegisters.length);
+        return returnValuesSpace;
+    }
+
+    /**
      * Adds the function prologue and the call itself
      * Does not handle the function epilogue
      */
@@ -201,7 +323,7 @@ public class StatementCodeGenerators {
                 AssemblyPhysicalRegister.callerSavedRegisters);
 
         // Pass pointer to return space as first argument (R8)
-        lines.add(new AssemblyComment("Pass pointer to return space in R8"));
+        lines.add(new AssemblyComment("Pass pointer to return space"));
         lines.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getReturnValuesOffset()),
@@ -209,7 +331,7 @@ public class StatementCodeGenerators {
         ));
 
         // Pass pointer to additional argument space as second argument (R9)
-        lines.add(new AssemblyComment("Pass pointer to return space in R9"));
+        lines.add(new AssemblyComment("Pass pointer to argument space"));
         lines.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()),
@@ -219,28 +341,19 @@ public class StatementCodeGenerators {
         // Put arguments in order rdi rsi rdx rcx
         List<IRExpr> arguments = castedNode.args();
 
+        // Move the return values to the return value space in the parent's stack
         for(int i = 0; i < arguments.size(); i++) {
-            if (i < AssemblyPhysicalRegister.argumentRegisters.length) {
-                lines.add(
-                        new AssemblyInstruction(
-                                OpCode.MOVQ,
-                                TileContainer.matchExpression(arguments.get(i), lines),
-                                AssemblyPhysicalRegister.argumentRegisters[i]
-                        )
-                );
-            } else { // put into stack location
-                 lines.add(
+            lines.add(
                     new AssemblyInstruction(
                             OpCode.MOVQ,
-                            TileContainer.matchExpression(arguments.get(i), lines),
-                            AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()
-                                    + Configuration.WORD_SIZE * i))
-                );
-           }
+                            translateExpression(arguments.get(i), lines, true),
+                            AssemblyPhysicalRegister.argumentRegisters[i]
+                    )
+            );
         }
 
          // Get function name
-        AssemblyExpression name = TileContainer.matchExpression(castedNode.target(), lines);
+        AssemblyExpression name = translateExpression(castedNode.target(), lines, true);
         assert name instanceof AssemblyName;
 
         // Add the call instruction to lines

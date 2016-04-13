@@ -1,4 +1,4 @@
-package com.bwz6jk2227esl89ahj34.code_generation;
+package com.bwz6jk2227esl89ahj34.code_generation.tiles;
 
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp;
 import com.bwz6jk2227esl89ahj34.ir.IRMove;

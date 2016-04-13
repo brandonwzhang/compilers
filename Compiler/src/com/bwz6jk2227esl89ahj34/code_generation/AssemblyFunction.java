@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
+import com.bwz6jk2227esl89ahj34.code_generation.tiles.TileContainer;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.OpCode;
 
@@ -66,9 +67,41 @@ public class AssemblyFunction {
                 Empty alignment         (optional)
          */
 
-        // Represents the "offset" of the base point (rbp - currentStackOffset).
+        // Represents the "offset" of the base point (rbp - stackFrameSize).
         // Treats
-        int currentStackOffset = Configuration.WORD_SIZE;
+        int stackFrameSize = Configuration.WORD_SIZE;
+
+        // Allocate space for callee-save registers rbx rbp r12-r15
+        stackFrameSize += Configuration.WORD_SIZE * AssemblyPhysicalRegister.calleeSavedRegisters.length;
+
+        // Allocate space for caller-save registers rax, rcx, rsi, rdi, rdx, rsp, r8, r9, r10, r11
+        stackFrameSize += Configuration.WORD_SIZE * AssemblyPhysicalRegister.callerSavedRegisters.length;
+
+        // Make space for return values
+        stackFrameSize += Configuration.WORD_SIZE * maxNumReturnValues;
+
+        // Make space for arguments
+        stackFrameSize += Configuration.WORD_SIZE * maxNumArguments;
+
+        // Make space for scratch registers
+        stackFrameSize += Configuration.WORD_SIZE * numScratchRegisters; // RAX, RDX;
+
+        // Make space for temps
+        stackFrameSize += Configuration.WORD_SIZE * AssemblyAbstractRegister.counter;
+
+        // Make sure stack frame is 16 byte aligned
+        if (stackFrameSize % 16 != 0) {
+            stackFrameSize += Configuration.WORD_SIZE;
+        }
+
+        // Decrement RSP before saving anything to the stack to allocate the frame
+        lines.add(
+                new AssemblyInstruction(
+                        OpCode.SUBQ,
+                        new AssemblyImmediate(stackFrameSize),
+                        AssemblyPhysicalRegister.RSP
+                )
+        );
 
         // Save callee-save registers rbx rbp r12-r15
         lines.add(new AssemblyComment("Save callee-save registers rbx rbp r12-r15"));
@@ -77,40 +110,12 @@ public class AssemblyFunction {
                     new AssemblyInstruction(
                             OpCode.MOVQ,
                             AssemblyPhysicalRegister.calleeSavedRegisters[i],
-                            AssemblyMemoryLocation.stackOffset(currentStackOffset)
+                            AssemblyMemoryLocation.stackOffset(stackFrameSize)
                     )
             );
-            currentStackOffset += Configuration.WORD_SIZE;
-        }
-        // Allocate space for caller-save registers rax, rcx, rsi, rdi, rdx, rsp, r8, r9, r10, r11
-        currentStackOffset += Configuration.WORD_SIZE * AssemblyPhysicalRegister.callerSavedRegisters.length;
-
-        // Make space for return values
-        currentStackOffset += Configuration.WORD_SIZE * maxNumReturnValues;
-
-        // Make space for arguments
-        currentStackOffset += Configuration.WORD_SIZE * maxNumArguments;
-
-        // Make space for scratch registers
-        currentStackOffset += Configuration.WORD_SIZE * numScratchRegisters; // RAX, RDX;
-
-        // Make space for temps
-        currentStackOffset += Configuration.WORD_SIZE * AssemblyAbstractRegister.counter;
-
-        // Make sure stack frame is 16 byte aligned
-        if (currentStackOffset % 16 != 0) {
-            currentStackOffset += Configuration.WORD_SIZE;
         }
 
-        // Decrement RSP at the beginning of the lines to make space for everything
-        lines.add(
-                new AssemblyInstruction(
-                        OpCode.SUBQ,
-                        new AssemblyImmediate(currentStackOffset),
-                        AssemblyPhysicalRegister.RSP
-                )
-        );
-        return currentStackOffset;
+        return stackFrameSize;
     }
 
     private static void generateFunctionEpilogue(List<AssemblyLine> lines, int stackFrameSize) {

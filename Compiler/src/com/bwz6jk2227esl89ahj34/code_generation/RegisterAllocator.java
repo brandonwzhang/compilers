@@ -113,12 +113,6 @@ public class RegisterAllocator {
      * Returns the physical location of an abstract register
      */
     private static AssemblyExpression getRegisterMapping(AssemblyAbstractRegister register) {
-        if (register.isArgument) {
-            return getArgumentMapping(register.id);
-        }
-        if (register.isReturn) {
-            return getReturnMapping(register.id);
-        }
         AssemblyExpression mapping = registerMap.get(register);
         if (mapping != null) {
             assert mapping instanceof AssemblyPhysicalRegister ||
@@ -130,37 +124,5 @@ public class RegisterAllocator {
         AssemblyMemoryLocation spillLocation = AssemblyMemoryLocation.stackOffset(stackOffset);
         registerMap.put(register, spillLocation);
         return spillLocation;
-    }
-
-    /**
-     * Returns the argument register or memory location that the argument temp corresponds to
-     */
-    private static AssemblyExpression getArgumentMapping(int id) {
-        // If the id is lower than the number of argument registers available,
-        // return the corresponding register
-        if (id < AssemblyPhysicalRegister.argumentRegisters.length) {
-            return AssemblyPhysicalRegister.argumentRegisters[id];
-        }
-        // Return the corresponding stack location
-        int stackOffset = AssemblyFunction.getArgumentsOffset() +
-                Configuration.WORD_SIZE * (id - AssemblyPhysicalRegister.argumentRegisters.length);
-        return AssemblyMemoryLocation.stackOffset(stackOffset);
-    }
-
-    /**
-     * Returns the return register or memory location that the return temp corresponds to
-     * @param id
-     * @return
-     */
-    private static AssemblyExpression getReturnMapping(int id) {
-        // If the id is lower than the number of return registers available,
-        // return the corresponding register
-        if (id < AssemblyPhysicalRegister.returnRegisters.length) {
-            return AssemblyPhysicalRegister.returnRegisters[id];
-        }
-        // Return the corresponding stack location
-        int stackOffset = AssemblyFunction.getArgumentsOffset() +
-                Configuration.WORD_SIZE * (id - AssemblyPhysicalRegister.returnRegisters.length);
-        return AssemblyMemoryLocation.stackOffset(stackOffset);
     }
 }
