@@ -205,26 +205,26 @@ public class StatementCodeGenerators {
         lines.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getReturnValuesOffset()),
-                AssemblyPhysicalRegister.RDI
+                AssemblyPhysicalRegister.R8
         ));
 
         // Pass pointer to additional argument space as second argument (RSI)
         lines.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()),
-                AssemblyPhysicalRegister.RSI
+                AssemblyPhysicalRegister.R9
         ));
 
-        // Put arguments in order rdx rcx r8 r9
+        // Put arguments in order rdi rsi rdx rcx
         List<IRExpr> arguments = castedNode.args();
 
         for(int i = 0; i < arguments.size(); i++) {
-            if (i < AssemblyPhysicalRegister.returnRegisters.length) {
+            if (i < AssemblyPhysicalRegister.argumentRegisters.length) {
                 lines.add(
                         new AssemblyInstruction(
                                 OpCode.MOVQ,
                                 TileContainer.matchExpression(arguments.get(i), lines),
-                                AssemblyPhysicalRegister.returnRegisters[i]
+                                AssemblyPhysicalRegister.argumentRegisters[i]
                         )
                 );
             } else { // put into stack location
