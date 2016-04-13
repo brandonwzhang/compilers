@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34.code_generation;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 
 public class StatementPatterns {
     /*
@@ -17,5 +18,65 @@ public class StatementPatterns {
     public static IRStmt return1 = new IRReturn();
 
     public static IRStmt cjump1 = new IRCJump(null, "");
+
+    /*
+       Some non-trivial tiles
+    */
+
+    public static IRStmt move3 = new IRMove(new IRTemp(""),
+            new IRBinOp(
+                    OpType.ADD,
+                    new IRTemp(""),
+                    new IRMem(
+                            new IRBinOp(
+                                    OpType.ADD,
+                                    new IRTemp(""),
+                                    new IRConst(0)
+                            )
+                    )
+            )
+    );
+
+    public static IRStmt move4 = new IRMove(new IRTemp(""),
+            new IRBinOp(
+                    OpType.ADD,
+                    new IRMem(
+                            new IRBinOp(
+                                    OpType.ADD,
+                                    new IRTemp(""),
+                                    new IRConst(0)
+                            )
+                    ),
+                    new IRTemp("")
+            )
+    );
+
+    public static IRStmt move5 = new IRMove(new IRTemp(""),
+            new IRBinOp(
+                    OpType.ADD,
+                    new IRTemp(""),
+                    new IRMem(
+                            new IRBinOp(
+                                    OpType.ADD,
+                                    new IRTemp(""),
+                                    new IRConst(0)
+                            )
+                    )
+            )
+    );
+
+    public static IRStmt move6 = new IRMove(new IRTemp(""),
+            new IRBinOp(
+                    OpType.ADD,
+                    new IRTemp(""),
+                    new IRMem(
+                            new IRBinOp(
+                                    OpType.ADD,
+                                    new IRConst(0),
+                                    new IRTemp("")
+                            )
+                    )
+            )
+    );
 
 }

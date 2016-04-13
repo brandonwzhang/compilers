@@ -167,6 +167,57 @@ public class StatementCodeGenerators {
         return lines;
     };
 
+    public static StatementTile.CodeGenerator move3456 = (root) -> {
+        /*
+                           MOVE
+                  TEMP(t1)                ADD
+                                   TEMP(t1)     MEM
+                                                ADD
+                                           TEMP(fp) 4
+                  allow the additions to be commutative
+         */
+        LinkedList<AssemblyLine> lines = new LinkedList<>();
+
+        lines.add(new AssemblyComment("nontrivial tile move3"));
+
+        IRMove castedRoot = (IRMove) root;
+        assert castedRoot.target() instanceof IRTemp;
+        IRTemp dest = (IRTemp) castedRoot.target();
+
+        assert castedRoot.expr() instanceof IRBinOp;
+        IRBinOp castedBinOp = (IRBinOp) castedRoot.expr();
+        IRMem mem = (castedBinOp.left() instanceof IRMem)
+                ? (IRMem) castedBinOp.left() : (IRMem) castedBinOp.right();
+
+        assert mem.expr() instanceof IRBinOp;
+        IRBinOp castedMemExpr = (IRBinOp)mem.expr();
+
+        IRConst offset;
+        IRTemp temp;
+        if (castedMemExpr.left() instanceof IRConst) {
+            offset = (IRConst) castedMemExpr.left();
+            temp = (IRTemp) castedMemExpr.right();
+        } else {
+           offset = (IRConst) castedMemExpr.right();
+           temp =  (IRTemp) castedMemExpr.left();
+        }
+
+        AssemblyMemoryLocation memLocation =
+                new AssemblyMemoryLocation(
+                        new AssemblyAbstractRegister(temp),
+                        null,
+                        offset.value()
+                );
+
+        lines.add(new AssemblyInstruction(
+                OpCode.ADDQ,
+                memLocation,
+                new AssemblyAbstractRegister(dest)
+        ));
+
+        return lines;
+    };
+
     private static void functionCall(IRNode node, List<AssemblyLine> lines) {
 
         assert node instanceof IRCall;

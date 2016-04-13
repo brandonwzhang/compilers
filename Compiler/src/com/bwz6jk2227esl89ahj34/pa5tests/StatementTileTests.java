@@ -3,6 +3,7 @@ package com.bwz6jk2227esl89ahj34.pa5tests;
 import com.bwz6jk2227esl89ahj34.code_generation.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.OpCode;
 import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import org.junit.*;
 import org.junit.rules.TestName;
@@ -122,6 +123,26 @@ public class StatementTileTests {
         );
         List<AssemblyLine> result =
                 TileContainer.matchStatement(moveTen);
+
+        Util.printInstructions(name, result);
+    }
+
+    @Test
+    public void move3() {
+        IRStmt move3 = new IRMove(new IRTemp(""),
+                new IRBinOp(
+                        OpType.ADD,
+                        new IRTemp(""),
+                        new IRMem(
+                                new IRBinOp(
+                                        OpType.ADD,
+                                        new IRTemp(""),
+                                        new IRConst(0)
+                                )
+                        )
+                )
+        );
+        List<AssemblyLine> result = TileContainer.matchStatement(move3);
 
         Util.printInstructions(name, result);
     }
