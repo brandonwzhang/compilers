@@ -19,10 +19,8 @@ public class ExpressionPatterns {
     public static IRExpr mem3 =
             new IRMem(new IRBinOp(OpType.ADD, new IRTemp(""), new IRConst(0)));
     public static IRExpr mem4 =
-            new IRMem(new IRBinOp(OpType.SUB, new IRConst(0), new IRTemp("")));
-    public static IRExpr mem5 =
             new IRMem(new IRBinOp(OpType.SUB, new IRTemp(""), new IRConst(0)));
-    public static IRExpr mem6 =
+    public static IRExpr mem5 =
             new IRMem(new IRBinOp(OpType.ADD, new IRTemp(""), new IRTemp("")));
 
 }

@@ -42,18 +42,13 @@ public class AssemblyFunction {
 
         // generateFunctionPrologue needs to be called after the body has been
         // generated to know the number of spilled temps that need to be allocated
-        List<AssemblyLine> functionPrologue = generateFunctionPrologue();
 
-        // Store the lines in this instance
-        lines.addAll(functionPrologue);
-        // Translate the function body from abstract assembly to assembly
-//        lines.addAll(functionBody);
+        int stackFrameSize = generateFunctionPrologue(lines);
         lines.addAll(RegisterAllocator.translate(functionBody));
+        generateFunctionEpilogue(lines, stackFrameSize);
     }
 
-    private static List<AssemblyLine> generateFunctionPrologue() {
-        List<AssemblyLine> lines = new LinkedList<>();
-
+    private static int generateFunctionPrologue(List<AssemblyLine> lines) {
         lines.add(new AssemblyComment("Starting function prologue"));
         // Save old RBP and update RBP
         lines.add(new AssemblyInstruction(OpCode.PUSHQ, AssemblyPhysicalRegister.RBP));
@@ -115,7 +110,29 @@ public class AssemblyFunction {
                         AssemblyPhysicalRegister.RSP
                 )
         );
-        return lines;
+        return currentStackOffset;
+    }
+
+    private static void generateFunctionEpilogue(List<AssemblyLine> lines, int stackFrameSize) {
+        lines.add(new AssemblyComment("Function epilogue"));
+
+        // Restore callee-save registers
+        lines.add(new AssemblyComment("Restoring callee-save registers"));
+        for (int i = 0; i < AssemblyPhysicalRegister.calleeSavedRegisters.length; i++) {
+            AssemblyPhysicalRegister register = AssemblyPhysicalRegister.calleeSavedRegisters[i];
+            lines.add(new AssemblyInstruction(
+                    OpCode.MOVQ,
+                    AssemblyMemoryLocation.stackOffset(Configuration.WORD_SIZE * (1 + i)),
+                    register
+            ));
+        }
+        // Restore old RBP and RSP
+        lines.add(new AssemblyComment("Restore old RBP and RSP"));
+        lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RBP, AssemblyPhysicalRegister.RSP));
+        lines.add(new AssemblyInstruction(OpCode.POPQ, AssemblyPhysicalRegister.RBP));
+        // Put %rsp back to where the instruction pointer is
+        lines.add(new AssemblyInstruction(OpCode.ADDQ, new AssemblyImmediate(stackFrameSize), AssemblyPhysicalRegister.RSP));
+        lines.add(new AssemblyInstruction(OpCode.RETQ));
     }
 
     public static int getCalleeSpaceOffset() {
