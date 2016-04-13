@@ -129,9 +129,9 @@ public class AssemblyFunction {
         // Restore old RBP and RSP
         lines.add(new AssemblyComment("Restore old RBP and RSP"));
         lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RBP, AssemblyPhysicalRegister.RSP));
-        lines.add(new AssemblyInstruction(OpCode.POPQ, AssemblyPhysicalRegister.RBP));
         // Put %rsp back to where the instruction pointer is
         lines.add(new AssemblyInstruction(OpCode.ADDQ, new AssemblyImmediate(stackFrameSize), AssemblyPhysicalRegister.RSP));
+        lines.add(new AssemblyInstruction(OpCode.POPQ, AssemblyPhysicalRegister.RBP));
         lines.add(new AssemblyInstruction(OpCode.RETQ));
     }
 
