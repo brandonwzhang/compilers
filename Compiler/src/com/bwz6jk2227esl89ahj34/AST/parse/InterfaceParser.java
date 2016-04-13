@@ -154,7 +154,6 @@ public class InterfaceParser
      * @return              a String of the error or null if no error
      */
     public static String parseInterface(String libPath, String interfaceName, List<FunctionDeclaration> declarations) {
-        assert(declarations.size() == 0);
         try {
             FileReader reader = new FileReader(libPath + interfaceName + ".ixi");
             Lexer lexer = new Lexer(reader);
