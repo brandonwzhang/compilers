@@ -53,9 +53,6 @@ public class ExpressionCodeGenerators {
         AssemblyExpression e1 = TileContainer.matchExpression(castedRoot.left(), lines);
         AssemblyExpression e2 = TileContainer.matchExpression(castedRoot.right(), lines);
 
-        assert !(e1 instanceof AssemblyMemoryLocation);
-        assert !(e2 instanceof AssemblyMemoryLocation);
-
         return binopHelper(castedRoot.opType(), e1, e2, lines);
     };
 

@@ -164,7 +164,7 @@ public class StatementCodeGenerators {
          */
         LinkedList<AssemblyLine> lines = new LinkedList<>();
 
-        lines.add(new AssemblyComment("nontrivial tile move3"));
+        lines.add(new AssemblyComment("nontrivial tile move3456"));
 
         IRMove castedRoot = (IRMove) root;
         assert castedRoot.target() instanceof IRTemp;

@@ -33,10 +33,10 @@ public class TileContainer {
         add(new StatementTile(StatementPatterns.cjump1, StatementCodeGenerators.cjump1));
 
         //TODO: comment out unless unit testing @Andy
-       // add(new NontrivialStatementTile(StatementPatterns.move3, StatementCodeGenerators.move3456));
-       // add(new NontrivialStatementTile(StatementPatterns.move4, StatementCodeGenerators.move3456));
-       // add(new NontrivialStatementTile(StatementPatterns.move5, StatementCodeGenerators.move3456));
-       // add(new NontrivialStatementTile(StatementPatterns.move6, StatementCodeGenerators.move3456));
+        add(new NontrivialStatementTile(StatementPatterns.move3, StatementCodeGenerators.move3456));
+        add(new NontrivialStatementTile(StatementPatterns.move4, StatementCodeGenerators.move3456));
+        add(new NontrivialStatementTile(StatementPatterns.move5, StatementCodeGenerators.move3456));
+        add(new NontrivialStatementTile(StatementPatterns.move6, StatementCodeGenerators.move3456));
     }
 
     public static boolean add(Tile tile) {
