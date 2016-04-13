@@ -37,7 +37,7 @@ public class StatementTileTests {
         AssemblyAbstractRegister aar_src = new AssemblyAbstractRegister(src);
         Assert.assertEquals(
                 new AssemblyInstruction(OpCode.MOVQ, aar_src, aar_dst),
-                result.get(3)
+                result.get(1)
         );
 
         Util.printInstructions(name, result);
@@ -52,7 +52,7 @@ public class StatementTileTests {
 
         Assert.assertEquals(
                 new AssemblyInstruction(OpCode.JMP, new AssemblyName("l")),
-                result.get(3)
+                result.get(1)
         );
         Util.printInstructions(name, result);
     }
@@ -65,17 +65,31 @@ public class StatementTileTests {
 
         Util.printInstructions(name, result);
         AssemblyLabel duplicateLabel = new AssemblyLabel(new AssemblyName("l"));
+
+        Assert.assertTrue(result.get(1) instanceof AssemblyLabel);
+        Assert.assertEquals((AssemblyLabel) result.get(1) , duplicateLabel);
     }
 
     @Test
     public void cjump1() {
         IRCJump cjump = new IRCJump(
                 new IRConst(0),
-                "t",
-                null
+                "t"
         );
         List<AssemblyLine> result =
                 TileContainer.matchStatement(cjump);
+
+        Assert.assertEquals(result.size(), 3);
+        Assert.assertTrue(result.get(1) instanceof AssemblyInstruction);
+        Assert.assertTrue(result.get(2) instanceof AssemblyInstruction);
+
+        Assert.assertEquals(((AssemblyInstruction) result.get(1)).getOpCode(), OpCode.CMP);
+        Assert.assertEquals(
+                ((AssemblyInstruction) result.get(1)).getArgs().get(0),
+                new AssemblyImmediate(0));
+
+        Assert.assertEquals(((AssemblyInstruction) result.get(2)).getOpCode(),
+                OpCode.JNE);
 
         Util.printInstructions(name, result);
     }
