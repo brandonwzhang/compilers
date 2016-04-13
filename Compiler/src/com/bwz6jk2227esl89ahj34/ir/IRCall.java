@@ -117,9 +117,6 @@ public class IRCall extends IRExpr {
         eseq = (IRESeq)(call_n_.target());
         IRESeq og =  (IRESeq)(call_n_.target());
         addStatements(stmtList, eseq.stmt());
-        t = new IRTemp(MIRLowerVisitor.getFreshVariable());
-        addStatements(stmtList, new IRMove(t, eseq.expr()));
-        tempList.add(t);
 
         for (IRExpr e : call_n_.args()) {
             assert e instanceof IRESeq;
@@ -132,14 +129,9 @@ public class IRCall extends IRExpr {
 
         t = new IRTemp(MIRLowerVisitor.getFreshVariable());
         assert !tempList.isEmpty();
-        IRExpr target = tempList.remove(0);
-        if(og.expr() instanceof IRName) {
+        assert og.expr() instanceof IRName;
             addStatements(stmtList,
                     new IRMove(t, new IRCall((IRName)(og.expr()), tempList)));
-        } else {
-            addStatements(stmtList,
-                    new IRMove(t, new IRCall(target, tempList)));
-        }
         return new IRESeq(new IRSeq(stmtList), t);
     }
 }
