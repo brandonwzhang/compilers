@@ -24,9 +24,7 @@ public class StatementCodeGenerators {
     }
 
     public static StatementTile.CodeGenerator move1 = (root) -> {
-        /*
-            MOVE(dst, src)
-        */
+        /* MOVE(dst, src) */
         LinkedList<AssemblyLine> lines = new LinkedList<>();
         addAssemblyComment(root, "move1", lines);
 
@@ -43,9 +41,7 @@ public class StatementCodeGenerators {
     };
 
     public static StatementTile.CodeGenerator jump1 = (root) -> {
-        /*
-            JUMP(label)
-        */
+        /* JUMP(label) */
         LinkedList<AssemblyLine> lines = new LinkedList<>();
 
         // Add a comment showing the IRNode that was translated
@@ -61,9 +57,7 @@ public class StatementCodeGenerators {
     };
 
     public static StatementTile.CodeGenerator label1 = (root) -> {
-        /*
-            LABEL(name)
-         */
+        /* LABEL(name) */
         LinkedList<AssemblyLine> lines = new LinkedList<>();
 
         // Add a comment showing the IRNode that was translated
@@ -77,9 +71,7 @@ public class StatementCodeGenerators {
     };
 
     public static StatementTile.CodeGenerator exp1 = (root) -> {
-      	/*
-        		EXP(CALL(NAME))
-        */
+      	/* EXP(CALL(NAME)) */
         LinkedList<AssemblyLine> lines = new LinkedList<>();
 
         // Add a comment showing the IRNode that was translated
@@ -94,9 +86,7 @@ public class StatementCodeGenerators {
     };
 
     public static StatementTile.CodeGenerator move2 = (root) -> {
-    		/*
-        		MOVE(TEMP, CALL(NAME))
-        */
+        /* MOVE(TEMP, CALL(NAME)) */
         LinkedList<AssemblyLine> lines = new LinkedList<>();
 
         // Add a comment showing the IRNode that was translated
@@ -121,9 +111,7 @@ public class StatementCodeGenerators {
      * along with the return statement 
      */
     public static StatementTile.CodeGenerator return1 = (root) -> {
-        /*
-        		RETURN()
-        */
+        /* RETURN() */
         List<AssemblyLine> lines = new LinkedList<>();
 
         // Add a comment showing the IRNode that was translated
@@ -148,9 +136,7 @@ public class StatementCodeGenerators {
     };
 
     public static StatementTile.CodeGenerator cjump1 = (root) -> {
-        /*
-            CJUMP(e, trueLabel)
-         */
+        /* CJUMP(e, trueLabel) */
         LinkedList<AssemblyLine> lines = new LinkedList<>();
 
         // Add a comment showing the IRNode that was translated
@@ -218,34 +204,37 @@ public class StatementCodeGenerators {
         return lines;
     };
 
+    /**
+     * Adds the function prologue and the call itself
+     * Does not handle the function epilogue
+     */
     private static void functionCall(IRNode node, List<AssemblyLine> lines) {
-
         assert node instanceof IRCall;
         IRCall castedNode = (IRCall) node;
 
         /* Function Call Prologue */
-        lines.add(new AssemblyComment("beginning of function call prologue"));
+        lines.add(new AssemblyComment("Function call prologue"));
         // Save all caller-saved registers
-        lines.add(new AssemblyComment("save all caller-saved registers"));
+        lines.add(new AssemblyComment("Save all caller-saved registers"));
         AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getCallerSpaceOffset(),
                 AssemblyPhysicalRegister.callerSavedRegisters);
 
-        // pass pointer to return space as first argument (RDI)
-        lines.add(new AssemblyComment("pass pointer to return space as first argument"));
+        // Pass pointer to return space as first argument (RDI)
+        lines.add(new AssemblyComment("Pass pointer to return space as first argument"));
         lines.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getReturnValuesOffset()),
                 AssemblyPhysicalRegister.RDI
         ));
 
-        // pass pointer to additional argument space as second argument (RSI)
+        // Pass pointer to additional argument space as second argument (RSI)
         lines.add(new AssemblyInstruction(
                 OpCode.MOVQ,
                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()),
                 AssemblyPhysicalRegister.RSI
         ));
 
-        // put arguments in order rdx rcx r8 r9
+        // Put arguments in order rdx rcx r8 r9
         List<IRExpr> arguments = castedNode.args();
 
         for(int i = 0; i < arguments.size(); i++) {
@@ -268,24 +257,25 @@ public class StatementCodeGenerators {
            }
         }
 
-         // get function name
+         // Get function name
         AssemblyExpression name = TileContainer.matchExpression(castedNode.target(), lines);
         assert name instanceof AssemblyName;
 
-        // add the call instruction to lines
+        // Add the call instruction to lines
         lines.add(
                 new AssemblyInstruction(
                         OpCode.CALLQ,
                         name
                 )
         );
-
-        functionCallEpilogue(lines);
-
     }
 
+    /**
+     * Restores the caller-save registers
+     */
     private static void functionCallEpilogue(List<AssemblyLine> lines) {
-        // now we restore all of the caller saved registers
+        lines.add(new AssemblyComment("Function call epilogue"));
+        // Now we restore all of the caller saved registers
         AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getCallerSpaceOffset(),
                 AssemblyPhysicalRegister.callerSavedRegisters);
 

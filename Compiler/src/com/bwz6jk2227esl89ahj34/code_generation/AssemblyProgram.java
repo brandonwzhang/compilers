@@ -110,6 +110,17 @@ public class AssemblyProgram {
     @Override
     public String toString() {
         String s = "";
+        /* Linux header */
+        s += "#define FUNC(x) _##x\n";
+        s += "#define ARG1() %rdi\n";
+        s += "#define ARG2() %rsi\n";
+        s += "#define ARG3() %rdx\n";
+        s += "#define ARG4() %rcx\n";
+        s += "#define ARG5() %r8\n";
+        s += "#define ARG6() %r9\n";
+        s += "#define INITFUNC() .section \t .ctors\n";
+        s += "#define GCFUNC(x) x\n";
+
         s += "\t\t.text\n";
         for (AssemblyFunction function : functions) {
             s += function + "\n";

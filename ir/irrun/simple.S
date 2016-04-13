@@ -1,4 +1,12 @@
-		.text
+#define FUNC(x) _##x
+#define ARG1() %rdi
+#define ARG2() %rsi
+#define ARG3() %rdx
+#define ARG4() %rcx
+#define ARG5() %r8
+#define ARG6() %r9
+#define INITFUNC() .section 	 .ctors
+#define GCFUNC(x) x		.text
 		.globl	FUNC(_Imain_paai)
 		.globl	FUNC(_Iprint_pai)
 		.globl	FUNC(_Iprintln_pai)
