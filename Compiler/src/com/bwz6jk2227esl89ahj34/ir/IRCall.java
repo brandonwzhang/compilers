@@ -128,7 +128,6 @@ public class IRCall extends IRExpr {
         }
 
         t = new IRTemp(MIRLowerVisitor.getFreshVariable());
-        assert !tempList.isEmpty();
         assert og.expr() instanceof IRName;
             addStatements(stmtList,
                     new IRMove(t, new IRCall((IRName)(og.expr()), tempList)));
