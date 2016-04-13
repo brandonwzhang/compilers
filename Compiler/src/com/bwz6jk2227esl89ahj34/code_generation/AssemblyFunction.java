@@ -60,11 +60,11 @@ public class AssemblyFunction {
          rbp--> Saved base pointer      (8 byte)
                 Callee-saved registers  (6 * 8 bytes)
                 Caller-saved registers  (10 * 8 bytes)
-                Func extra Return Space (this.maxNumReturnValues * 8 bytes)
-                Func extra arg space    (this.maxNumArguments * 8 bytes)
+                Func extra Return Space (n * 8 bytes, goes in Rn ... R3 by decreasing address)
                 Scratch space for regs  (this.numScratchRegisters * 8 bytes)
                 Space for temps         (variable number)
                 Empty alignment         (optional)
+                Func extra Arg Space    (n * 8 bytes, goes in An ... A6 by decreasing address)
          */
 
         // Represents the "offset" of the base point (rbp - stackFrameSize).
