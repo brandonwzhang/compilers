@@ -26,6 +26,7 @@ public class TileContainer {
         add(new StatementTile(StatementPatterns.return1, StatementCodeGenerators.return1));
         add(new StatementTile(StatementPatterns.cjump1, StatementCodeGenerators.cjump1));
 
+        //TODO: comment out unless unit testing @Andy 
        // add(new StatementTile(StatementPatterns.move3, StatementCodeGenerators.move3456));
        // add(new StatementTile(StatementPatterns.move4, StatementCodeGenerators.move3456));
        // add(new StatementTile(StatementPatterns.move5, StatementCodeGenerators.move3456));
