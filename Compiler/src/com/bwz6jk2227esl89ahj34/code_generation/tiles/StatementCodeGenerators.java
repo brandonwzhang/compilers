@@ -129,7 +129,7 @@ public class StatementCodeGenerators {
         AssemblyExpression guard = translateExpression(castedRoot.expr(), lines, true);
 
         // compare guard to 0, jump to trueLabel if not equal
-        lines.add(new AssemblyInstruction(OpCode.CMPQ, guard, new AssemblyImmediate(0)));
+        lines.add(new AssemblyInstruction(OpCode.CMPQ, new AssemblyImmediate(0), guard));
         lines.add(new AssemblyInstruction(OpCode.JNE, new AssemblyName(castedRoot.trueLabel())));
 
         return lines;
