@@ -323,19 +323,11 @@ public class StatementCodeGenerators {
         AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getCallerSpaceOffset(),
                 AssemblyPhysicalRegister.callerSavedRegisters);
 
-        // Pass pointer to return space as first argument (R8)
+        // Pass pointer to return space as first argument (R9)
         lines.add(new AssemblyComment("Pass pointer to return space"));
         lines.add(new AssemblyInstruction(
-                OpCode.MOVQ,
+                OpCode.LEAQ,
                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getReturnValuesOffset()),
-                AssemblyPhysicalRegister.R8
-        ));
-
-        // Pass pointer to additional argument space as second argument (R9)
-        lines.add(new AssemblyComment("Pass pointer to argument space"));
-        lines.add(new AssemblyInstruction(
-                OpCode.MOVQ,
-                AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()),
                 AssemblyPhysicalRegister.R9
         ));
 
