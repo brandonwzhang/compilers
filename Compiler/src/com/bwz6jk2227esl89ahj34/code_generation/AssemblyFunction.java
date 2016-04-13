@@ -51,9 +51,6 @@ public class AssemblyFunction {
 
     private static int generateFunctionPrologue(List<AssemblyLine> lines) {
         lines.add(new AssemblyComment("Starting function prologue"));
-        // Save old RBP and update RBP
-        lines.add(new AssemblyInstruction(OpCode.PUSHQ, AssemblyPhysicalRegister.RBP));
-        lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RSP, AssemblyPhysicalRegister.RBP));
 
         /*
                 Return Address          (8 byte)
@@ -93,12 +90,15 @@ public class AssemblyFunction {
             stackFrameSize += Configuration.WORD_SIZE;
         }
 
-        // Decrement RSP before saving anything to the stack to allocate the frame
+        // ENTER stackFrameSize 0 is equivalent to
+        // push rbp
+        // mov rsp, rbp
+        // sub stackFrameSize rsp
         lines.add(
                 new AssemblyInstruction(
-                        OpCode.SUBQ,
+                        OpCode.ENTER,
                         new AssemblyImmediate(stackFrameSize),
-                        AssemblyPhysicalRegister.RSP
+                        new AssemblyImmediate(0)
                 )
         );
 
@@ -134,8 +134,7 @@ public class AssemblyFunction {
         // Restore old RBP and RSP
         lines.add(new AssemblyComment("Restore old RBP and RSP"));
         // Put %rsp back to where the instruction pointer is
-        lines.add(new AssemblyInstruction(OpCode.ADDQ, new AssemblyImmediate(stackFrameSize), AssemblyPhysicalRegister.RSP));
-        lines.add(new AssemblyInstruction(OpCode.POPQ, AssemblyPhysicalRegister.RBP));
+        lines.add(new AssemblyInstruction(OpCode.LEAVE));
         lines.add(new AssemblyInstruction(OpCode.RETQ));
     }
 
