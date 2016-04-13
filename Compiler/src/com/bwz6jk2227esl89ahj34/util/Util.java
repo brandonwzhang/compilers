@@ -295,7 +295,7 @@ public class Util {
     }
 
     public static void printInstructions(TestName name, List<AssemblyLine> instructions) {
-        System.out.println("Executing "+ name.getMethodName());
+        System.out.println("==============================\nExecuting "+ name.getMethodName());
         System.out.println();
         for (AssemblyLine instruction : instructions) {
           System.out.println(instruction);

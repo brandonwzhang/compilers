@@ -8,12 +8,27 @@ import com.bwz6jk2227esl89ahj34.util.Util;
 import org.junit.*;
 import org.junit.rules.TestName;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class StatementTileTests {
     private List<AssemblyLine> assemblyInstructions;
     @Rule public TestName name = new TestName();
+    private AssemblyInstruction move3456instruction =
+            new AssemblyInstruction(
+                    OpCode.ADDQ,
+                    new AssemblyMemoryLocation(
+                            new AssemblyAbstractRegister(
+                                    new IRTemp("t0")
+                            ),
+                            null,
+                            4
+                    ),
+                    new AssemblyAbstractRegister(
+                            new IRTemp("t1")
+                    )
+    );
 
     // runs before every test invocation
     @Before
@@ -106,10 +121,10 @@ public class StatementTileTests {
         Util.printInstructions(name, result);
     }
 
-    @Test
-    public void exp1() {
-
-    }
+//    @Test
+//    public void exp1() {
+//
+//    }
 
     @Test
     public void test1() {
@@ -129,15 +144,18 @@ public class StatementTileTests {
 
     @Test
     public void move3() {
-        IRStmt move3 = new IRMove(new IRTemp(""),
+        IRTemp temp0 = new IRTemp("t0");
+        IRTemp temp1 = new IRTemp("t1");
+        IRStmt move3 = new IRMove(
+                temp1,
                 new IRBinOp(
                         OpType.ADD,
-                        new IRTemp(""),
+                        temp1,
                         new IRMem(
                                 new IRBinOp(
                                         OpType.ADD,
-                                        new IRTemp(""),
-                                        new IRConst(0)
+                                        temp0,
+                                        new IRConst(4)
                                 )
                         )
                 )
@@ -145,8 +163,126 @@ public class StatementTileTests {
         List<AssemblyLine> result = TileContainer.matchStatement(move3);
 
         Util.printInstructions(name, result);
+        Assert.assertEquals(move3456instruction, result.get(1));
     }
 
+    @Test
+    public void move3wrongop() {
+        IRTemp temp0 = new IRTemp("t0");
+        IRTemp temp1 = new IRTemp("t1");
+        IRStmt move3 = new IRMove(
+                temp1,
+                new IRBinOp(
+                        OpType.MUL,
+                        temp1,
+                        new IRMem(
+                                new IRBinOp(
+                                        OpType.MUL,
+                                        temp0,
+                                        new IRConst(4)
+                                )
+                        )
+                )
+        );
+        List<AssemblyLine> result = TileContainer.matchStatement(move3);
+
+        Util.printInstructions(name, result);
+        Assert.assertNotEquals(2, result.size());
+    }
+
+    @Test
+    public void move4() {
+        IRTemp temp0 = new IRTemp("t0");
+        IRTemp temp1 = new IRTemp("t1");
+        IRStmt move4 = new IRMove(
+                temp1,
+                new IRBinOp(
+                        OpType.ADD,
+                        new IRMem(
+                                new IRBinOp(
+                                        OpType.ADD,
+                                        temp0,
+                                        new IRConst(4)
+                                )
+                        ),
+                        temp1
+                )
+        );
+        List<AssemblyLine> result = TileContainer.matchStatement(move4);
+
+        Util.printInstructions(name, result);
+        Assert.assertEquals(move3456instruction, result.get(1));
+    }
+
+    @Test
+    public void move5() {
+        IRTemp temp0 = new IRTemp("t0");
+        IRTemp temp1 = new IRTemp("t1");
+        IRStmt move5 = new IRMove(
+                temp1,
+                new IRBinOp(
+                        OpType.ADD,
+                        temp1,
+                        new IRMem(
+                                new IRBinOp(
+                                        OpType.ADD,
+                                        new IRConst(4),
+                                        temp0
+                                )
+                        )
+                )
+        );
+        List<AssemblyLine> result = TileContainer.matchStatement(move5);
+
+        Util.printInstructions(name, result);
+        Assert.assertEquals(move3456instruction, result.get(1));
+    }
+
+    @Test
+    public void move6() {
+        IRTemp temp0 = new IRTemp("t0");
+        IRTemp temp1 = new IRTemp("t1");
+        IRStmt move5 = new IRMove(
+                temp1,
+                new IRBinOp(
+                        OpType.ADD,
+                        new IRMem(
+                                new IRBinOp(
+                                        OpType.ADD,
+                                        new IRConst(4),
+                                        temp0
+                                )
+                        ),
+                        temp1
+                )
+        );
+        List<AssemblyLine> result = TileContainer.matchStatement(move5);
+
+        Util.printInstructions(name, result);
+        Assert.assertEquals(move3456instruction, result.get(1));
+    }
+
+    @Test
+    public void move3nomatch() {
+        IRStmt move = new IRMove(
+                new IRTemp("t2"),
+                new IRBinOp(
+                        OpType.ADD,
+                        new IRTemp("t1"),
+                        new IRMem(
+                                new IRBinOp(
+                                        OpType.ADD,
+                                        new IRTemp("t0"),
+                                        new IRConst(4)
+                                )
+                        )
+                )
+        );
+        List<AssemblyLine> result = TileContainer.matchStatement(move);
+
+        Util.printInstructions(name, result);
+        Assert.assertNotEquals(2, result.size());
+    }
 
 //    @Test
 //    public void exp1() {

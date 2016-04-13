@@ -58,8 +58,8 @@ public class StatementPatterns {
                     new IRMem(
                             new IRBinOp(
                                     OpType.ADD,
-                                    new IRTemp(""),
-                                    new IRConst(0)
+                                    new IRConst(0),
+                                    new IRTemp("")
                             )
                     )
             )
@@ -68,14 +68,14 @@ public class StatementPatterns {
     public static IRStmt move6 = new IRMove(new IRTemp(""),
             new IRBinOp(
                     OpType.ADD,
-                    new IRTemp(""),
                     new IRMem(
                             new IRBinOp(
                                     OpType.ADD,
                                     new IRConst(0),
                                     new IRTemp("")
                             )
-                    )
+                    ),
+                    new IRTemp("")
             )
     );
 
