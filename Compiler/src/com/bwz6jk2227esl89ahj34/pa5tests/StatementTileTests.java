@@ -296,18 +296,123 @@ public class StatementTileTests {
     }
 
     @Test
-    public void newTileTest() {
-        IRStmt stmt = new IRMove(
-                new IRTemp("x"),
+    public void move7() {
+        IRTemp temp_x = new IRTemp("x");
+        IRStmt move = new IRMove(
+                temp_x,
                 new IRBinOp(
                         OpType.ADD,
-                        new IRTemp("x"),
-                        new IRConst(1)
+                        temp_x,
+                        new IRConst(4740)
                 )
         );
-        List<AssemblyLine> result = TileContainer.matchStatement(stmt);
+        List<AssemblyLine> result = TileContainer.matchStatement(move);
 
+        result = Util.removeComments(result);
         Util.printInstructions(name, result);
+        Assert.assertEquals(
+                new AssemblyInstruction(
+                        OpCode.ADDQ,
+                        new AssemblyImmediate(4740),
+                        new AssemblyAbstractRegister(temp_x)
+                ),
+                result.get(0)
+        );
+    }
+
+    @Test
+    public void move7nomatch() {
+        IRTemp temp_x = new IRTemp("x");
+        IRStmt move = new IRMove(
+                temp_x,
+                new IRBinOp(
+                        OpType.MUL,
+                        temp_x,
+                        new IRConst(4740)
+                )
+        );
+        List<AssemblyLine> result = TileContainer.matchStatement(move);
+
+        result = Util.removeComments(result);
+        Util.printInstructions(name, result);
+        Assert.assertNotEquals(1, result.size());
+    }
+
+    @Test
+    public void move8() {
+        IRTemp temp_x = new IRTemp("x");
+        IRStmt move = new IRMove(
+                temp_x,
+                new IRBinOp(
+                        OpType.SUB,
+                        temp_x,
+                        new IRConst(3350)
+                )
+        );
+        List<AssemblyLine> result = TileContainer.matchStatement(move);
+
+        result = Util.removeComments(result);
+        Util.printInstructions(name, result);
+        Assert.assertEquals(
+                new AssemblyInstruction(
+                        OpCode.SUBQ,
+                        new AssemblyImmediate(3350),
+                        new AssemblyAbstractRegister(temp_x)
+                ),
+                result.get(0)
+        );
+    }
+
+    @Test
+    public void move9() {
+        IRTemp temp_x = new IRTemp("x");
+        IRTemp temp_y = new IRTemp("y");
+        IRStmt move = new IRMove(
+                temp_x,
+                new IRBinOp(
+                        OpType.ADD,
+                        temp_x,
+                        temp_y
+                )
+        );
+        List<AssemblyLine> result = TileContainer.matchStatement(move);
+
+        result = Util.removeComments(result);
+        Util.printInstructions(name, result);
+        Assert.assertEquals(
+                new AssemblyInstruction(
+                        OpCode.ADDQ,
+                        new AssemblyAbstractRegister(temp_y),
+                        new AssemblyAbstractRegister(temp_x)
+                ),
+                result.get(0)
+        );
+    }
+
+    @Test
+    public void move10() {
+        IRTemp temp_x = new IRTemp("x");
+        IRTemp temp_y = new IRTemp("y");
+        IRStmt move = new IRMove(
+                temp_x,
+                new IRBinOp(
+                        OpType.SUB,
+                        temp_x,
+                        temp_y
+                )
+        );
+        List<AssemblyLine> result = TileContainer.matchStatement(move);
+
+        result = Util.removeComments(result);
+        Util.printInstructions(name, result);
+        Assert.assertEquals(
+                new AssemblyInstruction(
+                        OpCode.SUBQ,
+                        new AssemblyAbstractRegister(temp_y),
+                        new AssemblyAbstractRegister(temp_x)
+                ),
+                result.get(0)
+        );
     }
 
 //    @Test
