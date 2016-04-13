@@ -13,6 +13,8 @@ public class AssemblyFunction {
     public static int maxNumReturnValues;
     public static int maxNumArguments;
     public static final int numScratchRegisters = 2;
+    // Number of bytes to pad onto stack frame to make it 16 byte aligned
+    public static int padding;
 
     private String name;
     private List<String> global;
@@ -44,12 +46,13 @@ public class AssemblyFunction {
         // generateFunctionPrologue needs to be called after the body has been
         // generated to know the number of spilled temps that need to be allocated
 
-        int stackFrameSize = generateFunctionPrologue(lines);
+        lines.addAll(generateFunctionPrologue());
         lines.addAll(RegisterAllocator.translate(functionBody));
-        generateFunctionEpilogue(lines, stackFrameSize);
+        lines.addAll(generateFunctionEpilogue());
     }
 
-    private static int generateFunctionPrologue(List<AssemblyLine> lines) {
+    private static List<AssemblyLine> generateFunctionPrologue() {
+        List<AssemblyLine> lines = new LinkedList<>();
         lines.add(new AssemblyComment("Starting function prologue"));
 
         /*
@@ -76,9 +79,6 @@ public class AssemblyFunction {
         // Make space for return values
         stackFrameSize += Configuration.WORD_SIZE * maxNumReturnValues;
 
-        // Make space for arguments
-        stackFrameSize += Configuration.WORD_SIZE * maxNumArguments;
-
         // Make space for scratch registers
         stackFrameSize += Configuration.WORD_SIZE * numScratchRegisters; // RAX, RDX;
 
@@ -87,8 +87,12 @@ public class AssemblyFunction {
 
         // Make sure stack frame is 16 byte aligned
         if (stackFrameSize % 16 != 0) {
-            stackFrameSize += Configuration.WORD_SIZE;
+            padding = Configuration.WORD_SIZE;
+            stackFrameSize += padding;
         }
+
+        // Make space for arguments
+        stackFrameSize += Configuration.WORD_SIZE * maxNumArguments;
 
         // ENTER stackFrameSize 0 is equivalent to
         // push rbp
@@ -115,10 +119,11 @@ public class AssemblyFunction {
             );
         }
 
-        return stackFrameSize;
+        return lines;
     }
 
-    private static void generateFunctionEpilogue(List<AssemblyLine> lines, int stackFrameSize) {
+    private static List<AssemblyLine> generateFunctionEpilogue() {
+        List<AssemblyLine> lines = new LinkedList<>();
         lines.add(new AssemblyComment("Function epilogue"));
 
         // Restore callee-save registers
@@ -136,28 +141,52 @@ public class AssemblyFunction {
         // Put %rsp back to where the instruction pointer is
         lines.add(new AssemblyInstruction(OpCode.LEAVE));
         lines.add(new AssemblyInstruction(OpCode.RETQ));
+        return lines;
     }
 
+    /**
+     * Returns the highest memory address in the caller save register space
+     */
     public static int getCalleeSpaceOffset() {
-        return Configuration.WORD_SIZE * (1);
+        return Configuration.WORD_SIZE;
     }
+
+    /**
+     * Returns the highest memory address in the caller save register space
+     */
     public static int getCallerSpaceOffset() {
         return getCalleeSpaceOffset() + Configuration.WORD_SIZE * AssemblyPhysicalRegister.calleeSavedRegisters.length;
     }
+
+    /**
+     * Returns lowest memory address in the return value space
+     */
     public static int getReturnValuesOffset() {
-        return getCallerSpaceOffset() + Configuration.WORD_SIZE * AssemblyPhysicalRegister.callerSavedRegisters.length;
+        return getCallerSpaceOffset() +
+                Configuration.WORD_SIZE * AssemblyPhysicalRegister.callerSavedRegisters.length +
+                Configuration.WORD_SIZE * (maxNumReturnValues - 1);
     }
 
-    public static int getArgumentsOffset() {
-        return getReturnValuesOffset() + Configuration.WORD_SIZE * maxNumReturnValues;
-    }
-
+    /**
+     * Returns the highest memory address in the scratch space
+     */
     public static int getScratchSpaceOffset() {
-        return getArgumentsOffset() + Configuration.WORD_SIZE * maxNumArguments;
+        return getReturnValuesOffset() + Configuration.WORD_SIZE;
     }
 
+    /**
+     * Returns the highest memory address in the spilled temp space
+     */
     public static int getTempSpaceOffset() {
         return getScratchSpaceOffset() + Configuration.WORD_SIZE * numScratchRegisters;
+    }
+
+    /**
+     * Returns lowest memory address in the argument space
+     */
+    public static int getArgumentsOffset() {
+        return getTempSpaceOffset() + Configuration.WORD_SIZE * AssemblyAbstractRegister.counter +
+                Configuration.WORD_SIZE * (maxNumArguments - 1);
     }
 
     @Override

@@ -209,10 +209,10 @@ public class ExpressionCodeGenerators {
             case EQ: {
                 // cmp t2, t1 (does t1 - t2)
                 // setzq t #sets t to 1 if zero flag
-                AssemblyRegister left_ = makeTemp(left, lines);
+                AssemblyRegister right_ = makeTemp(right, lines);
                 AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
-                lines.add(new AssemblyInstruction(OpCode.CMPQ, right, left_));
+                lines.add(new AssemblyInstruction(OpCode.CMPQ, right_, left));
                 lines.add(new AssemblyInstruction(OpCode.SETZ, AssemblyPhysicalRegister.AL));
                 lines.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
                 AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
@@ -222,10 +222,10 @@ public class ExpressionCodeGenerators {
             case NEQ: {
                 // cmp t2, t1 (does t1 - t2)
                 // setnzq t #sets t to 0 if zero flag
-                AssemblyRegister left_ = makeTemp(left, lines);
+                AssemblyRegister right_ = makeTemp(right, lines);
                 AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
-                lines.add(new AssemblyInstruction(OpCode.CMPQ, right, left_));
+                lines.add(new AssemblyInstruction(OpCode.CMPQ, right_, left));
                 lines.add(new AssemblyInstruction(OpCode.SETNZ, AssemblyPhysicalRegister.AL));
                 lines.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
                 AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
@@ -235,10 +235,10 @@ public class ExpressionCodeGenerators {
             case LT: {
                 // cmp t2, t1 (does t1 - t2)
                 // setlq t #sets t to 1 if sign flag != overflow flag
-                AssemblyRegister left_ = makeTemp(left, lines);
+                AssemblyRegister right_ = makeTemp(right, lines);
                 AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
-                lines.add(new AssemblyInstruction(OpCode.CMPQ, right, left_));
+                lines.add(new AssemblyInstruction(OpCode.CMPQ, right_, left));
                 lines.add(new AssemblyInstruction(OpCode.SETL, AssemblyPhysicalRegister.AL));
                 lines.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
                 AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
@@ -248,10 +248,10 @@ public class ExpressionCodeGenerators {
             case GT: {
                 // cmp t2, t1 (does t1 - t2)
                 // setgq t #sets t to 1 if zero flag = 0 or sign flag = overflow flag
-                AssemblyRegister left_ = makeTemp(left, lines);
+                AssemblyRegister right_ = makeTemp(right, lines);
                 AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
-                lines.add(new AssemblyInstruction(OpCode.CMPQ, right, left_));
+                lines.add(new AssemblyInstruction(OpCode.CMPQ, right_, left));
                 lines.add(new AssemblyInstruction(OpCode.SETG, AssemblyPhysicalRegister.AL));
                 lines.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
                 AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
@@ -261,10 +261,10 @@ public class ExpressionCodeGenerators {
             case LEQ: {
                 // cmp t2, t1 (does t1 - t2)
                 // setleq t #sets t to 1 if zero flag = 1 or sign flag != overflow flag
-                AssemblyRegister left_ = makeTemp(left, lines);
+                AssemblyRegister right_ = makeTemp(right, lines);
                 AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
-                lines.add(new AssemblyInstruction(OpCode.CMPQ, right, left_));
+                lines.add(new AssemblyInstruction(OpCode.CMPQ, right_, left));
                 lines.add(new AssemblyInstruction(OpCode.SETLE, AssemblyPhysicalRegister.AL));
                 lines.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
                 AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
@@ -274,10 +274,10 @@ public class ExpressionCodeGenerators {
             case GEQ: {
                 // cmp t2, t1 (does t1 - t2)
                 // setgeq t #sets t to 1 if sign flag = overflow flag
-                AssemblyRegister left_ = makeTemp(left, lines);
+                AssemblyRegister right_ = makeTemp(right, lines);
                 AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX);
-                lines.add(new AssemblyInstruction(OpCode.CMPQ, right, left_));
+                lines.add(new AssemblyInstruction(OpCode.CMPQ, right_, left));
                 lines.add(new AssemblyInstruction(OpCode.SETGE, AssemblyPhysicalRegister.AL));
                 lines.add(new AssemblyInstruction(OpCode.MOVZX, AssemblyPhysicalRegister.AL, t));
                 AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),

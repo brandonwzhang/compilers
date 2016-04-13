@@ -42,7 +42,7 @@ public class AssemblyPhysicalRegister extends AssemblyRegister {
     };
 
     public static final AssemblyPhysicalRegister[] argumentRegisters = {
-            RDI, RSI, RDX, RCX
+            RDI, RSI, RDX, RCX, R8
     };
 
     public static final AssemblyPhysicalRegister[] returnRegisters = {
