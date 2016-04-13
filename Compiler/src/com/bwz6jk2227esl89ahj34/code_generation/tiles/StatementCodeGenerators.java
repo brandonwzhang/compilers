@@ -343,13 +343,23 @@ public class StatementCodeGenerators {
 
         // Move the return values to the return value space in the parent's stack
         for(int i = 0; i < arguments.size(); i++) {
-            lines.add(
-                    new AssemblyInstruction(
-                            OpCode.MOVQ,
-                            translateExpression(arguments.get(i), lines, true),
-                            AssemblyPhysicalRegister.argumentRegisters[i]
-                    )
-            );
+            if (i < AssemblyPhysicalRegister.argumentRegisters.length) {
+                lines.add(
+                        new AssemblyInstruction(
+                                OpCode.MOVQ,
+                                translateExpression(arguments.get(i), lines, true),
+                                AssemblyPhysicalRegister.argumentRegisters[i]
+                        )
+                );
+            } else { // put into stack location
+                lines.add(
+                        new AssemblyInstruction(
+                                OpCode.MOVQ,
+                                translateExpression(arguments.get(i), lines, true),
+                                AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()
+                                        + Configuration.WORD_SIZE * i))
+                );
+            }
         }
 
          // Get function name
