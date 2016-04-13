@@ -128,7 +128,7 @@ public class StatementCodeGenerators {
         AssemblyExpression guard = TileContainer.matchExpression(castedRoot.expr(), lines);
 
         // compare guard to 0, jump to trueLabel if not equal
-        lines.add(new AssemblyInstruction(OpCode.CMP, guard, new AssemblyImmediate(0)));
+        lines.add(new AssemblyInstruction(OpCode.CMPQ, guard, new AssemblyImmediate(0)));
         lines.add(new AssemblyInstruction(OpCode.JNE, new AssemblyName(castedRoot.trueLabel())));
 
         return lines;
