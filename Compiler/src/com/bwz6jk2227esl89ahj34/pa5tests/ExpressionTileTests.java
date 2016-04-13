@@ -271,8 +271,10 @@ public class ExpressionTileTests {
         Assert.assertTrue(((AssemblyMemoryLocation)result).getBaseRegister()
                 instanceof AssemblyAbstractRegister);
 
-        Assert.assertEquals(new Long(((AssemblyMemoryLocation)result).getDisplacement())
-                , new Long(48));
+        Assert.assertEquals(
+                new Long(((AssemblyMemoryLocation)result).getDisplacement()),
+                new Long(48)
+        );
 
     }
 
@@ -290,9 +292,10 @@ public class ExpressionTileTests {
         Assert.assertTrue(((AssemblyMemoryLocation)result).getBaseRegister()
                 instanceof AssemblyAbstractRegister);
 
-        Assert.assertEquals(new Long(((AssemblyMemoryLocation)result).getDisplacement())
-                , new Long(48));
-
+        Assert.assertEquals(
+                new Long(((AssemblyMemoryLocation)result).getDisplacement()),
+                new Long(48)
+        );
     }
 
     @Test // MEM(CONST - TEMP)
@@ -306,12 +309,7 @@ public class ExpressionTileTests {
         ), assemblyInstructions);
 
         assert result instanceof AssemblyMemoryLocation;
-        Assert.assertTrue(((AssemblyMemoryLocation)result).getBaseRegister()
-                instanceof AssemblyAbstractRegister);
-
-        Assert.assertEquals(new Long(((AssemblyMemoryLocation)result).getDisplacement())
-                , new Long(-48));
-
+        Assert.assertEquals(assemblyInstructions.size(), 2);
     }
 
     @Test // MEM(TEMP - CONST)
@@ -328,8 +326,10 @@ public class ExpressionTileTests {
         Assert.assertTrue(((AssemblyMemoryLocation)result).getBaseRegister()
                 instanceof AssemblyAbstractRegister);
 
-        Assert.assertEquals(new Long(((AssemblyMemoryLocation)result).getDisplacement())
-                , new Long(-48));
+        Assert.assertEquals(
+                new Long(((AssemblyMemoryLocation)result).getDisplacement()),
+                new Long(-48)
+        );
 
     }
 
