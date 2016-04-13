@@ -407,16 +407,12 @@ public class Core {
         Util.writeHelper(file, "s", assemblyPath, Collections.singletonList(program.toString()));
 
         // Link and run the assembly file
-        ProcessBuilder pb = new ProcessBuilder("./runtime/linkxi.sh", file + ".s");
-        pb.directory(new File(System.getProperty("user.dir")));
+        ProcessBuilder pb = new ProcessBuilder("./runtime/linkxi.sh", file + ".s").inheritIO();
         try {
             Process linkProcess = pb.start();
             linkProcess.waitFor();
         } catch(Exception e) {
             e.printStackTrace();
         }
-
-
-        // System.out.println("Assembly code generation has not been implemented yet.");
     }
 }
