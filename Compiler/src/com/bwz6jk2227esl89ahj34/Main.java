@@ -8,6 +8,7 @@ public class Main {
     private static String diagnosticPath = "./";
     private static String libPath = "./";
     private static String assemblyPath = "./";
+    private static String target = "linux";
     private static boolean debug;
     private static boolean optimizations = true;
     private static boolean tests;
@@ -46,6 +47,11 @@ public class Main {
         cli.addOption("-libpath",
                 "Set the path for interface files. Takes one argument.",
                 Main::setLibPath,
+                1);
+        cli.addOption("-target",
+                "Specify the operating system. Default is linux. " +
+                        "windows and macos are not allowed.",
+                Main::setTarget,
                 1);
         cli.addOption("--lex",
                 "Lex the .xi source files to .lexed files.",
@@ -142,6 +148,14 @@ public class Main {
         libPath = args[0] + "/";
     }
 
+    public static void setTarget(String[] args) {
+        if (args.length == 0 || args[0] == null) {
+            System.out.println("Please provide target");
+            return;
+        }
+        target = args[0];
+    }
+
     public static String sourcePath() {
         return sourcePath;
     }
@@ -156,6 +170,10 @@ public class Main {
 
     public static String assemblyPath() {
         return assemblyPath;
+    }
+
+    public static String target() {
+        return target;
     }
 
     /**
