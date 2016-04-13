@@ -350,7 +350,7 @@ public class StatementCodeGenerators {
                                 OpCode.MOVQ,
                                 translateExpression(arguments.get(i), lines, true),
                                 AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()
-                                        + Configuration.WORD_SIZE * i))
+                                        - Configuration.WORD_SIZE * i))
                 );
             }
         }
