@@ -242,7 +242,7 @@ public class IRFuncDecl extends IRNode {
                 blocks, new boolean[blocks.size()]));
 
         // Remove last return statement before we add epilogue block
-        if (!(finalStatements.get(finalStatements.size() - 1) instanceof IRReturn)) {
+        if (finalStatements.get(finalStatements.size() - 1) instanceof IRReturn) {
             finalStatements.remove(finalStatements.size() - 1);
         }
 
