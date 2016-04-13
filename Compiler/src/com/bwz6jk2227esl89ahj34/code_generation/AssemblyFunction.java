@@ -68,7 +68,6 @@ public class AssemblyFunction {
          */
 
         // Represents the "offset" of the base point (rbp - stackFrameSize).
-        // Treats
         int stackFrameSize = Configuration.WORD_SIZE;
 
         // Allocate space for callee-save registers rbx rbp r12-r15

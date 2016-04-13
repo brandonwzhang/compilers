@@ -6,13 +6,19 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class AssemblyMemoryLocation extends AssemblyExpression {
-    public Long displacement;
-    public Long scale;
+    public long displacement = 0;
+    public long scale = 1;
     public AssemblyRegister offsetRegister;
     public AssemblyRegister baseRegister;
 
     public AssemblyMemoryLocation(AssemblyRegister baseRegister) {
         this.baseRegister = baseRegister;
+    }
+
+    public AssemblyMemoryLocation(AssemblyRegister baseRegister,
+                                  long displacement) {
+        this.baseRegister = baseRegister;
+        this.displacement = displacement;
     }
 
     public AssemblyMemoryLocation(AssemblyRegister baseRegister,
@@ -48,7 +54,7 @@ public class AssemblyMemoryLocation extends AssemblyExpression {
     public String toString() {
         // syntax is displacement(base register, offset register, scalar multiplier)
         String s = "";
-        if (displacement != null) {
+        if (displacement != 0) {
             s += displacement;
         }
         s += "(";
@@ -60,7 +66,7 @@ public class AssemblyMemoryLocation extends AssemblyExpression {
             s += ",";
             s += offsetRegister;
         }
-        if (scale != null) {
+        if (scale != 1) {
             s += ",";
             s += scale;
         }

@@ -19,6 +19,7 @@ FUNC(IreturnOne_i):
 		# Starting function prologue
 		pushq	%rbp
 		movq	%rsp, %rbp
+		subq	$192, %rsp
 		# Save callee-save registers rbx rbp r12-r15
 		movq	%rbx, -8(%rbp)
 		movq	%rbp, -16(%rbp)
@@ -26,7 +27,6 @@ FUNC(IreturnOne_i):
 		movq	%r13, -32(%rbp)
 		movq	%r14, -40(%rbp)
 		movq	%r15, -48(%rbp)
-		subq	$192, %rsp
 		# (MOVE (TEMP temp_0) (CONST 1)) -- move1
 		movq	-168(%rbp), %r13
 		movq	$1, %r13
@@ -75,6 +75,7 @@ FUNC(Imain_paai):
 		# Starting function prologue
 		pushq	%rbp
 		movq	%rsp, %rbp
+		subq	$368, %rsp
 		# Save callee-save registers rbx rbp r12-r15
 		movq	%rbx, -8(%rbp)
 		movq	%rbp, -16(%rbp)
@@ -82,7 +83,6 @@ FUNC(Imain_paai):
 		movq	%r13, -32(%rbp)
 		movq	%r14, -40(%rbp)
 		movq	%r15, -48(%rbp)
-		subq	$368, %rsp
 		# (MOVE (TEMP temp_3) (TEMP _ARG0)) -- move1
 		movq	-168(%rbp), %r13
 		movq	%rdi, %r13
@@ -106,9 +106,9 @@ FUNC(Imain_paai):
 		movq	%r9, -112(%rbp)
 		movq	%r10, -120(%rbp)
 		movq	%r11, -128(%rbp)
-		# Pass pointer to return space in R8
+		# Pass pointer to return space
 		movq	-136(%rbp), %r8
-		# Pass pointer to return space in R9
+		# Pass pointer to argument space
 		movq	-144(%rbp), %r9
 		callq	 FUNC(IreturnOne_i)
 		movq	-184(%rbp), %r13
@@ -168,9 +168,9 @@ FUNC(Imain_paai):
 		movq	%r9, -112(%rbp)
 		movq	%r10, -120(%rbp)
 		movq	%r11, -128(%rbp)
-		# Pass pointer to return space in R8
+		# Pass pointer to return space
 		movq	-136(%rbp), %r8
-		# Pass pointer to return space in R9
+		# Pass pointer to argument space
 		movq	-144(%rbp), %r9
 		movq	-224(%rbp), %r13
 		movq	%r13, %rdi
@@ -321,9 +321,9 @@ FUNC(Imain_paai):
 		movq	%r9, -112(%rbp)
 		movq	%r10, -120(%rbp)
 		movq	%r11, -128(%rbp)
-		# Pass pointer to return space in R8
+		# Pass pointer to return space
 		movq	-136(%rbp), %r8
-		# Pass pointer to return space in R9
+		# Pass pointer to argument space
 		movq	-144(%rbp), %r9
 		movq	-344(%rbp), %r13
 		movq	%r13, %rdi
