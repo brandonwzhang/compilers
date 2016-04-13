@@ -18,6 +18,12 @@ public class TileContainer {
         add(new ExpressionTile(ExpressionPatterns.name1, ExpressionCodeGenerators.name1));
         add(new ExpressionTile(ExpressionPatterns.binop1, ExpressionCodeGenerators.binop1));
 
+        //TODO: comment out unless unit testing @Andy
+        //add(new ExpressionTile(ExpressionPatterns.mem2, ExpressionCodeGenerators.mem2345));
+        //add(new ExpressionTile(ExpressionPatterns.mem3, ExpressionCodeGenerators.mem2345));
+        //add(new ExpressionTile(ExpressionPatterns.mem4, ExpressionCodeGenerators.mem2345));
+        //add(new ExpressionTile(ExpressionPatterns.mem5, ExpressionCodeGenerators.mem2345));
+
         add(new StatementTile(StatementPatterns.move1, StatementCodeGenerators.move1));
         add(new StatementTile(StatementPatterns.move2, StatementCodeGenerators.move2));
         add(new StatementTile(StatementPatterns.jump1, StatementCodeGenerators.jump1));

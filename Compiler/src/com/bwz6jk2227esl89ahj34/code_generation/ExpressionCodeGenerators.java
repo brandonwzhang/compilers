@@ -59,6 +59,49 @@ public class ExpressionCodeGenerators {
         return binopHelper(castedRoot.opType(), e1, e2, lines);
     };
 
+    //TODO: test 
+    public static ExpressionTile.CodeGenerator mem2345 = (root, lines) -> {
+      /*
+         Handles mem2 - mem5, hence the name
+            MEM
+           ADD/SUB
+         CONST  TEMP   or vice versa
+       */
+        IRMem castedRoot = (IRMem) root;
+        IRBinOp binop = (IRBinOp)castedRoot.expr();
+        AssemblyExpression e1 = TileContainer.matchExpression(binop.left(), lines);
+        AssemblyExpression e2 = TileContainer.matchExpression(binop.right(), lines);
+        long value = e1 instanceof AssemblyImmediate
+                ? ((AssemblyImmediate)e1).getValue()
+                : ((AssemblyImmediate)e2).getValue();
+        if (binop.opType() == OpType.SUB) {
+            value = -1 * value;
+        }
+
+        if (e1 instanceof AssemblyImmediate) {
+            return new AssemblyMemoryLocation((AssemblyRegister)e2, null,
+                    value);
+        } else {
+            return new AssemblyMemoryLocation((AssemblyRegister)e1, null,
+                    value);
+        }
+    };
+
+    //TODO: test
+    public static ExpressionTile.CodeGenerator mem6 = (root, lines) -> {
+        /*
+          Handles mem6
+            MEM
+            ADD
+         TEMP   TEMP
+         */
+        IRMem castedRoot = (IRMem) root;
+        IRBinOp binop = (IRBinOp) castedRoot.expr();
+        AssemblyExpression e1 = TileContainer.matchExpression(binop.left(), lines);
+        AssemblyExpression e2 = TileContainer.matchExpression(binop.right(), lines);
+        return new AssemblyMemoryLocation((AssemblyRegister) e1, (AssemblyRegister) e2);
+    };
+
     private static AssemblyExpression binopHelper(OpType opType,
                                                   AssemblyExpression left,
                                                   AssemblyExpression right,
