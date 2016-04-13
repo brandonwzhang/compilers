@@ -296,7 +296,7 @@ public class ExpressionTileTests {
     }
 
     @Test // MEM(CONST - TEMP)
-    public void mem4() {
+    public void mem_nomatch() {
         AssemblyExpression result = TileContainer.matchExpression(new IRMem(
                 new IRBinOp(
                         OpType.SUB,
@@ -315,7 +315,7 @@ public class ExpressionTileTests {
     }
 
     @Test // MEM(TEMP - CONST)
-    public void mem5() {
+    public void mem4() {
         AssemblyExpression result = TileContainer.matchExpression(new IRMem(
                 new IRBinOp(
                         OpType.SUB,
@@ -334,7 +334,7 @@ public class ExpressionTileTests {
     }
 
     @Test // MEM(TEMP + TEMP)
-    public void mem6() {
+    public void mem5() {
         AssemblyExpression result = TileContainer.matchExpression(new IRMem(
                 new IRBinOp(
                         OpType.ADD,
@@ -347,9 +347,14 @@ public class ExpressionTileTests {
         Assert.assertTrue(((AssemblyMemoryLocation)result).getBaseRegister()
                 instanceof AssemblyAbstractRegister);
 
-        Assert.assertEquals(new Long(((AssemblyMemoryLocation)result).getDisplacement())
-                , new Long(-48));
-
+        Assert.assertEquals(
+                new AssemblyAbstractRegister(new IRTemp("y")),
+                ((AssemblyMemoryLocation)result).getOffsetRegister()
+        );
+        Assert.assertEquals(
+                new AssemblyAbstractRegister(new IRTemp("x")),
+                ((AssemblyMemoryLocation)result).getBaseRegister()
+        );
     }
 }
 

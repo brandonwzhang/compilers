@@ -57,7 +57,7 @@ public class ExpressionCodeGenerators {
     };
 
     //TODO: test
-    public static ExpressionTile.CodeGenerator mem2345 = (root, lines) -> {
+    public static ExpressionTile.CodeGenerator mem234 = (root, lines) -> {
       /*
          Handles mem2 - mem5, hence the name
             MEM
@@ -85,7 +85,7 @@ public class ExpressionCodeGenerators {
     };
 
     //TODO: test
-    public static ExpressionTile.CodeGenerator mem6 = (root, lines) -> {
+    public static ExpressionTile.CodeGenerator mem5 = (root, lines) -> {
         /*
           Handles mem6
             MEM
