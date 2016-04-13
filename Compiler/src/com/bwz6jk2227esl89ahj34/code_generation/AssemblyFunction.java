@@ -110,7 +110,8 @@ public class AssemblyFunction {
                     new AssemblyInstruction(
                             OpCode.MOVQ,
                             AssemblyPhysicalRegister.calleeSavedRegisters[i],
-                            AssemblyMemoryLocation.stackOffset(stackFrameSize)
+                            AssemblyMemoryLocation.stackOffset(
+                                    getCalleeSpaceOffset() + Configuration.WORD_SIZE * i)
                     )
             );
         }
