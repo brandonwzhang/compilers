@@ -384,8 +384,8 @@ public class StatementCodeGenerators {
                         new AssemblyInstruction(
                                 OpCode.MOVQ,
                                 translateExpression(arguments.get(i), lines, true),
-                                AssemblyMemoryLocation.stackOffset(AssemblyFunction.getArgumentsOffset()
-                                        - Configuration.WORD_SIZE * (i - numArgs)))
+                                new AssemblyMemoryLocation(AssemblyPhysicalRegister.RSP,
+                                        Configuration.WORD_SIZE * (i - numArgs)))
                 );
             }
         }
