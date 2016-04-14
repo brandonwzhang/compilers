@@ -184,6 +184,9 @@ public class TypeCheckVisitor implements NodeVisitor {
             if (!leftType.equals(expression.getType())) {
                 throw new TypeException("Types on LHS and RHS must match", expression.getRow(), expression.getCol());
             }
+        } else if (variables.size() == 1 && variables.get(0) instanceof Underscore
+                && !(expression instanceof FunctionCall)) {
+            throw new TypeException("Expected Function Call", expression.getRow(), expression.getCol());
         }
 
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
