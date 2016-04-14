@@ -67,8 +67,7 @@ public class AssemblyFunction {
                 Func extra Arg Space    (n * 8 bytes, goes in An ... A6 by decreasing address)
          */
 
-        // Represents the "offset" of the base point (rbp - stackFrameSize).
-        int stackFrameSize = Configuration.WORD_SIZE;
+        int stackFrameSize = 0;
 
         // Allocate space for callee-save registers rbx rbp r12-r15
         stackFrameSize += Configuration.WORD_SIZE * AssemblyPhysicalRegister.calleeSavedRegisters.length;
@@ -186,7 +185,7 @@ public class AssemblyFunction {
      */
     public static int getArgumentsOffset() {
         return getTempSpaceOffset() + Configuration.WORD_SIZE * AssemblyAbstractRegister.counter +
-                Configuration.WORD_SIZE * (maxNumArguments - 1);
+                padding + Configuration.WORD_SIZE * (maxNumArguments - 1);
     }
 
     @Override
