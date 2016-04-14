@@ -396,7 +396,7 @@ public class Core {
             }
         }
 
-        Optional<IRCompUnit> irRoot = irGen(sourcePath, diagnosticPath, libPath, file, true);
+        Optional<IRCompUnit> irRoot = irGen(sourcePath, diagnosticPath, libPath, file, false);
         if (!irRoot.isPresent()) {
             return;
         }
