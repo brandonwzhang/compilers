@@ -369,6 +369,7 @@ public class StatementCodeGenerators {
         List<IRExpr> arguments = castedNode.args();
 
         // Move the return values to the return value space in the parent's stack
+        lines.add(new AssemblyComment("Passing in arguments..."));
         int numArgs = AssemblyPhysicalRegister.argumentRegisters.length;
         for(int i = 0; i < arguments.size(); i++) {
             if (i < numArgs) {
