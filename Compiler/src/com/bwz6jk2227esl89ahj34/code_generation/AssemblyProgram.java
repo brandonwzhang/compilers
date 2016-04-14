@@ -8,8 +8,8 @@ import java.util.List;
 
 public class AssemblyProgram {
     private List<AssemblyFunction> functions = new ArrayList<>();
-    private List<String> global; // has IR function names of functions from
-                                // the ixi files in the program's use statements
+    // Holds the names of functions in the interfaces used by this program
+    private List<String> global;
 
     /**
      * Generate abstract assembly code for a program
@@ -30,7 +30,7 @@ public class AssemblyProgram {
 
         // Store all the functions
         for (IRFuncDecl funcDecl : root.functions().values()) {
-            functions.add(new AssemblyFunction(funcDecl, global));
+            functions.add(new AssemblyFunction(funcDecl));
         }
     }
 
@@ -112,6 +112,9 @@ public class AssemblyProgram {
         String s = "";
         s += "\t\t.text\n";
         for (AssemblyFunction function : functions) {
+            for(String globalName : global) {
+                s+= "\t\t.globl\t" + globalName + "\n";
+            }
             s += function + "\n";
         }
         return s;

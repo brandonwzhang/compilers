@@ -123,7 +123,7 @@ public class ExpressionCodeGenerators {
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, left, t));
                 lines.add(new AssemblyInstruction(OpCode.SUBQ, right, t));
                 return t;
-            case MUL:
+            case MUL: {
                 // make new t
                 // save whatever in RAX and RDX into stack
                 // movq t1, RAX
@@ -133,14 +133,14 @@ public class ExpressionCodeGenerators {
                 AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
-                AssemblyAbstractRegister hmulTemp = new AssemblyAbstractRegister();
-                lines.add(new AssemblyInstruction(OpCode.MOVQ, right, hmulTemp));
-                lines.add(new AssemblyInstruction(OpCode.MULQ, hmulTemp));
+                AssemblyRegister right_ = makeTemp(right, lines);
+                lines.add(new AssemblyInstruction(OpCode.MULQ, right_));
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RAX, t));
                 AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 return t;
-            case HMUL:
+            }
+            case HMUL: {
                 // make new t
                 // save RAX, RDX into stack
                 // movq t1, RAX
@@ -150,14 +150,14 @@ public class ExpressionCodeGenerators {
                 AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
-                AssemblyAbstractRegister mulTemp = new AssemblyAbstractRegister();
-                lines.add(new AssemblyInstruction(OpCode.MOVQ, right, mulTemp));
-                lines.add(new AssemblyInstruction(OpCode.MULQ, mulTemp));
+                AssemblyRegister right_ = makeTemp(right, lines);
+                lines.add(new AssemblyInstruction(OpCode.MULQ, right_));
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RDX, t));
                 AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 return t;
-            case DIV:
+            }
+            case DIV: {
                 // save RAX, RDX to stack
                 // movq $0, RDX
                 // movq t1, RAX
@@ -168,12 +168,14 @@ public class ExpressionCodeGenerators {
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, new AssemblyImmediate(0), AssemblyPhysicalRegister.RDX));
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
-                lines.add(new AssemblyInstruction(OpCode.DIVQ, right));
+                AssemblyRegister right_ = makeTemp(right, lines);
+                lines.add(new AssemblyInstruction(OpCode.DIVQ, right_));
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RAX, t));
                 AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 return t;
-            case MOD:
+            }
+            case MOD: {
                 // save RAX, RDX to stack
                 // movq $0, RDX
                 // movq t1, RAX
@@ -183,11 +185,13 @@ public class ExpressionCodeGenerators {
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, new AssemblyImmediate(0), AssemblyPhysicalRegister.RDX));
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
-                lines.add(new AssemblyInstruction(OpCode.DIVQ, right));
+                AssemblyRegister right_ = makeTemp(right, lines);
+                lines.add(new AssemblyInstruction(OpCode.DIVQ, right_));
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RDX, t));
                 AssemblyPhysicalRegister.restoreFromStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
                 return t;
+            }
             case AND:
                 // movq t1, t
                 // andq t2, t
