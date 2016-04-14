@@ -376,16 +376,21 @@ public class Core {
                                         String libPath,
                                         String assemblyPath,
                                         String file) {
+
+        // Read the file. If something went wrong (e.g. file not found), then
+        // return without doing anything.
         Optional<FileReader> reader = Util.getFileReader(sourcePath, file);
         if (!reader.isPresent()) {
             return;
         }
 
+        // Lex, parse, and typecheck the xi source file.
         Lexer lexer = new Lexer(reader.get());
         Parser parser = new Parser(lexer);
         List<String> lines = new LinkedList<>();
         Optional<Program> programASTOptional = typeCheckHelper(parser, libPath, lines);
 
+        // Get the names of functions defined in files that are imported.
         List<String> IRfunctionNamesFromUseStatements = new LinkedList<>();
         if (programASTOptional.isPresent()) {
             Program programAST = programASTOptional.get();
@@ -396,12 +401,14 @@ public class Core {
             }
         }
 
+        // Generate the IR. Does not write a .ir file.
         Optional<IRCompUnit> irRoot = irGen(sourcePath, diagnosticPath, libPath, file, false);
         if (!irRoot.isPresent()) {
             return;
         }
 
-
+        // Instantiate an AssemblyProgram, which processes the ir and prepares
+        // the assembly code.
         AssemblyProgram program = new AssemblyProgram(irRoot.get(),
                 IRfunctionNamesFromUseStatements);
         Util.writeHelper(file, "s", assemblyPath, Collections.singletonList(program.toString()));
