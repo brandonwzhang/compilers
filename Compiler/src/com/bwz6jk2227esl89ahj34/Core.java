@@ -100,7 +100,7 @@ public class Core {
         Parser parser = new Parser(lexer);
 
         List<String> lines = new ArrayList<>();
-        parseHelper(parser, lines);
+        parseHelper(parser, lines, false);
         Util.writeHelper(file, "parsed", diagnosticPath, lines);
     }
 
@@ -119,7 +119,8 @@ public class Core {
      * @return an Optional that might contain the result of the parsing
      */
     public static Optional<Symbol> parseHelper(Parser parser,
-                                               List<String> lines) {
+                                               List<String> lines,
+                                               boolean printError) {
         Symbol result;
         try {
             result = parser.parse();
@@ -138,7 +139,9 @@ public class Core {
             lines.clear();
             lines.add(errMessage);
 
-            Util.printError("Syntax", lines.get(0));
+            if (printError || Main.debugOn()) {
+                Util.printError("Syntax", lines.get(0));
+            }
 
             return Optional.empty();
         }
@@ -175,7 +178,7 @@ public class Core {
         Lexer lexer = new Lexer(reader.get());
         Parser parser = new Parser(lexer);
         List<String> lines = new ArrayList<>();
-        Optional<Program> program = typeCheckHelper(parser, libPath, lines);
+        Optional<Program> program = typeCheckHelper(parser, libPath, lines, false);
         Util.writeHelper(file, "typed", diagnosticPath, lines);
 
         if (program.isPresent()) {
@@ -202,10 +205,11 @@ public class Core {
      */
     public static Optional<Program> typeCheckHelper(Parser parser,
                                                     String libPath,
-                                                    List<String> lines) {
+                                                    List<String> lines,
+                                                    boolean printError) {
         lines.clear();
 
-        Optional<Symbol> result = parseHelper(parser, lines);
+        Optional<Symbol> result = parseHelper(parser, lines, printError);
         if (!result.isPresent()) {
             return Optional.empty();
         }
@@ -218,7 +222,9 @@ public class Core {
             lines.add("Valid Xi Program");
             return Optional.of(program);
         } catch (TypeException e) {
-            Util.printError("Semantic", e.toString());
+            if (printError || Main.debugOn()) {
+                Util.printError("Semantic", e.toString());
+            }
             lines.add(e.toString());
             return Optional.empty();
         }
@@ -235,7 +241,8 @@ public class Core {
     public static Optional<IRCompUnit> translateToMIR(
             String sourcePath,
             String libPath,
-            String file) {
+            String file,
+            boolean printError) {
 
         Optional<FileReader> reader = Util.getFileReader(sourcePath, file);
         if (!reader.isPresent()) {
@@ -245,7 +252,7 @@ public class Core {
         Lexer lexer = new Lexer(reader.get());
         Parser parser = new Parser(lexer);
         List<String> lines = new ArrayList<>();
-        Optional<Program> program = typeCheckHelper(parser, libPath, lines);
+        Optional<Program> program = typeCheckHelper(parser, libPath, lines, printError);
         if (!program.isPresent()) {
             return Optional.empty();
         }
@@ -282,11 +289,12 @@ public class Core {
      * be written to a .mir file.
      */
     public static Optional<IRCompUnit> mirGen(String sourcePath,
-                             String diagnosticPath,
-                             String libPath,
-                             String file) {
+                                              String diagnosticPath,
+                                              String libPath,
+                                              String file,
+                                              boolean printError) {
         Optional<IRCompUnit> root =
-                translateToMIR(sourcePath, libPath, file);
+                translateToMIR(sourcePath, libPath, file, printError);
         if (!root.isPresent()) {
             return Optional.empty();
         }
@@ -306,9 +314,10 @@ public class Core {
             String diagnosticPath,
             String libPath,
             String file,
-            boolean write) {
+            boolean write,
+            boolean printError) {
         Optional<IRCompUnit> mirRoot =
-                mirGen(sourcePath, diagnosticPath, libPath, file);
+                mirGen(sourcePath, diagnosticPath, libPath, file, printError);
         if (!mirRoot.isPresent()) {
             return Optional.empty();
         }
@@ -339,7 +348,7 @@ public class Core {
         // TODO: lower the IR (use irGen instead of mirGen)
 
         // reads Xi source file and writes an .mir file
-        irGen(sourcePath, diagnosticPath, libPath, file, true);
+        irGen(sourcePath, diagnosticPath, libPath, file, true, false);
 
         Optional<FileReader> reader =
                 Util.getFileReader(
@@ -388,7 +397,7 @@ public class Core {
         Lexer lexer = new Lexer(reader.get());
         Parser parser = new Parser(lexer);
         List<String> lines = new LinkedList<>();
-        Optional<Program> programASTOptional = typeCheckHelper(parser, libPath, lines);
+        Optional<Program> programASTOptional = typeCheckHelper(parser, libPath, lines, false);
 
         // Get the names of functions defined in files that are imported.
         List<String> IRfunctionNamesFromUseStatements = new LinkedList<>();
@@ -402,7 +411,7 @@ public class Core {
         }
 
         // Generate the IR. Does not write a .ir file.
-        Optional<IRCompUnit> irRoot = irGen(sourcePath, diagnosticPath, libPath, file, false);
+        Optional<IRCompUnit> irRoot = irGen(sourcePath, diagnosticPath, libPath, file, false, true);
         if (!irRoot.isPresent()) {
             return;
         }
