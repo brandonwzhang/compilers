@@ -85,14 +85,14 @@ public class AssemblyFunction {
         // Make space for temps
         stackFrameSize += Configuration.WORD_SIZE * AssemblyAbstractRegister.counter;
 
+        // Make space for arguments
+        stackFrameSize += Configuration.WORD_SIZE * maxNumArguments;
+
         // Make sure stack frame is 16 byte aligned
         if (stackFrameSize % 16 != 0) {
             padding = Configuration.WORD_SIZE;
             stackFrameSize += padding;
         }
-
-        // Make space for arguments
-        stackFrameSize += Configuration.WORD_SIZE * maxNumArguments;
 
         // ENTER stackFrameSize 0 is equivalent to
         // push rbp
