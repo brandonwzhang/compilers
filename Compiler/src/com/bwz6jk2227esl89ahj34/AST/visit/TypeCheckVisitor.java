@@ -583,7 +583,8 @@ public class TypeCheckVisitor implements NodeVisitor {
             }
             FunctionType funcType = funcDec.getFunctionType();
             contexts.peek().put(funcName, funcType);
-            funcName.accept(this);
+            //funcName.accept(this);
+            funcName.setType(funcType);
         }
 
         // Add function declarations from interface files
