@@ -455,7 +455,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(Identifier node) {
         // Check if identifier is in context
         Type type = contexts.peek().get(node);
-        if (type == null || type instanceof FunctionType) {
+        if (type == null) {
             throw new TypeException("Identifier does not exist in context", node.getRow(), node.getCol());
         }
         node.setType(type);
