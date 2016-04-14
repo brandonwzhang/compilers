@@ -17,7 +17,6 @@ public class AssemblyFunction {
     public static int padding;
 
     private String name;
-    private List<String> global;
     private List<AssemblyLine> lines = new LinkedList<>();
 
     /**
@@ -25,13 +24,9 @@ public class AssemblyFunction {
      * @param func the IRFuncDecl to be translated to abstract assembly
      * @return
      */
-    public AssemblyFunction(IRFuncDecl func, List<String> global) {
+    public AssemblyFunction(IRFuncDecl func) {
         // Save the function name
         name = func.name();
-
-        // the name of functions introduced by the use statement is set as global
-        this.global = global;
-
 
         // Reset the space for abstract registers
         AssemblyAbstractRegister.reset();
@@ -192,9 +187,6 @@ public class AssemblyFunction {
     public String toString() {
         String s = "";
         s += "\t\t.globl\t" + name + "\n";
-        for(String globalName : global) {
-            s+= "\t\t.globl\t" + globalName + "\n";
-        }
         s += "\t\t.align\t4\n";
         s += name + ":\n";
         for (AssemblyLine line : lines) {
