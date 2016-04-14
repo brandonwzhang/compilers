@@ -348,7 +348,11 @@ public class Core {
         // TODO: lower the IR (use irGen instead of mirGen)
 
         // reads Xi source file and writes an .mir file
-        irGen(sourcePath, diagnosticPath, libPath, file, true, false);
+        Optional<IRCompUnit> root =
+                irGen(sourcePath, diagnosticPath, libPath, file, true, false);
+        if (!root.isPresent()) {
+            return;
+        }
 
         Optional<FileReader> reader =
                 Util.getFileReader(
@@ -369,14 +373,13 @@ public class Core {
             throw new RuntimeException("IR parsing failed");
         }
 
-        IRCompUnit root = result.value();
+        IRCompUnit root_ = result.value();
 
         CheckCanonicalIRVisitor cv = new CheckCanonicalIRVisitor();
-        System.out.println(cv.visit(root));
-        //System.out.println(root);
+        System.out.println(cv.visit(root_));
 
         System.out.println("====================================");
-        IRSimulator sim = new IRSimulator(root);
+        IRSimulator sim = new IRSimulator(root_);
         sim.call("_Imain_paai", 0);
     }
 

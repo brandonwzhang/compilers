@@ -53,7 +53,7 @@ public class Tests {
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
                 .forEach(filename -> Core.mirGen("ir/irgen/",
-                        "ir/irgen/diagnostics/mir/", "ir/lib/", filename));
+                        "ir/irgen/diagnostics/mir/", "ir/lib/", filename, false));
     }
 
     /**
@@ -66,7 +66,7 @@ public class Tests {
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
                 .forEach(filename -> Core.irGen("ir/irgen/",
-                        "ir/irgen/diagnostics/ir/", "ir/lib/", filename, true));
+                        "ir/irgen/diagnostics/ir/", "ir/lib/", filename, true, false));
     }
 
 
@@ -92,7 +92,7 @@ public class Tests {
         Lexer lexer = new Lexer(reader.get());
         Parser parser = new Parser(lexer);
         List<String> lines = new ArrayList<>();
-        Optional<Program> program = Core.typeCheckHelper(parser, "constantfold/", lines);
+        Optional<Program> program = Core.typeCheckHelper(parser, "constantfold/", lines, false);
         if (!program.isPresent()) {
             return;
         }
