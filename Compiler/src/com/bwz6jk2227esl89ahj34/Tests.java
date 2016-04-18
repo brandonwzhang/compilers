@@ -23,31 +23,51 @@ public class Tests {
 
     /**
      * Compares the output of executable to IR simulation
+     * Must be run from the directory containing the xi files
      */
     public static void regressionTest() {
+        // Get all files in test directory
         List<String> files = Util.getDirectoryFiles("./").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
                 .collect(Collectors.toList());
+
         List<String> results = new LinkedList<>();
         for (String file : files) {
-            String[] irCommand = {"../xic", "-libpath", "../lib", "-D", "irtests", "--irrun", file};
-            Core.generateAssembly("./", "./", "../lib/", "assemblytests", file);
+            String[] irCommand = {Util.rootPath + "/xic", "-libpath", Util.rootPath + "/lib", "--irrun", file};
+            Core.generateAssembly("./", "./", Util.rootPath + "/lib", "./", file);
             String[] assemblyCommand = {"./" + file.replace(".xi", "")};
+            // Run the IR and executable and print the outputs
             System.out.println("***************" + file + "***************");
             System.out.println("==================IR==================");
             List<String> irResults = Util.runCommand(irCommand);
             System.out.println("===============Assembly===============");
             List<String> assemblyResults = Util.runCommand(assemblyCommand);
+
+            // Store results
             if (irResults.equals(assemblyResults)) {
                 results.add(file + ": passed");
             } else {
                 results.add(file + ": failed");
             }
         }
+
+        // Print out results
         for (String result : results) {
             System.out.println(result);
         }
+
+        // Get rid of output files
+        String[] mkdir = {"mkdir", "xifiles"};
+        Util.runCommand(mkdir);
+        String[] moveXiFiles = {"mv", "*.xi", "xifiles"};
+        Util.runCommand(moveXiFiles);
+        String[] removeOutputFiles = {"rm", "*"};
+        Util.runCommand(removeOutputFiles);
+        String[] moveXiFilesBack = {"mv", "xifiles/*", "."};
+        Util.runCommand(moveXiFilesBack);
+        String[] rmdir = {"rm", "-r", "xifiles"};
+        Util.runCommand(rmdir);
     }
 
     /**
