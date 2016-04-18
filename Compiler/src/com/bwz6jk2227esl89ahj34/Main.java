@@ -1,5 +1,7 @@
 package com.bwz6jk2227esl89ahj34;
 
+import com.bwz6jk2227esl89ahj34.util.Util;
+
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -101,7 +103,9 @@ public class Main {
             //Tests.mirGenTests();
             //Tests.irGenTests();
             //Tests.irRunTests();
-            Tests.regressionTest();
+            //Tests.regressionTest();
+            String[] primesCommand = {"./primes"};
+            System.out.println(Util.runCommand(primesCommand));
         }
     }
 

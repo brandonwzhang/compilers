@@ -34,7 +34,7 @@ public class Tests {
             String[] irCommand = {"../xic", "-libpath", "../lib", "-D", "irtests", "--irrun", file};
             Core.generateAssembly("./", "./", "../lib/", "assemblytests", file);
             String[] assemblyCommand = {"./" + file.replace(".xi", "")};
-            if (equalOutput(irCommand, assemblyCommand)) {
+            if (Util.runCommand(irCommand).equals(Util.runCommand(assemblyCommand))) {
                 results.add(file + ": passed");
             } else {
                 results.add(file + ": failed");
@@ -43,53 +43,6 @@ public class Tests {
         for (String result : results) {
             System.out.println(result);
         }
-    }
-
-    /**
-     * Test equality of standard output between two commands
-     */
-    public static boolean equalOutput(String[] command1, String[] command2) {
-        ProcessBuilder pb1 = new ProcessBuilder(command1);
-        ProcessBuilder pb2 = new ProcessBuilder(command2);
-        Process process1;
-        Process process2;
-        List<String> lines1 = new LinkedList<>();
-        List<String> lines2 = new LinkedList<>();
-        try {
-            process1 = pb1.start();
-            process2 = pb2.start();
-            process1.waitFor();
-            process2.waitFor();
-            // Store the standard output of these processes in lines1 and lines2
-            BufferedReader outputReader1 = new BufferedReader(new InputStreamReader(process1.getInputStream()));
-            String nextLine1 = outputReader1.readLine();
-            while (nextLine1 != null) {
-                System.out.println(nextLine1);
-                lines1.add(nextLine1);
-                nextLine1 = outputReader1.readLine();
-            }
-            BufferedReader outputReader2 = new BufferedReader(new InputStreamReader(process2.getInputStream()));
-            String nextLine2 = outputReader2.readLine();
-            while (nextLine2 != null) {
-                System.out.println(nextLine2);
-                lines2.add(nextLine2);
-                nextLine2 = outputReader2.readLine();
-            }
-        } catch(Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Exception occurred reading stdout of processes");
-        }
-        // If the number of lines returned is different, return false
-        if (lines1.size() != lines2.size()) {
-            return false;
-        }
-        // If there is a mismatch in any line, return false
-        for (int i = 0; i < lines1.size(); i++) {
-            if (!lines1.get(i).equals(lines2.get(i))) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
