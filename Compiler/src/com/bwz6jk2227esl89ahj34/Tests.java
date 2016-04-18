@@ -64,11 +64,13 @@ public class Tests {
             BufferedReader outputReader1 = new BufferedReader(new InputStreamReader(process1.getInputStream()));
             String nextLine1 = outputReader1.readLine();
             while (nextLine1 != null) {
+                System.out.println(nextLine1);
                 lines1.add(nextLine1);
             }
             BufferedReader outputReader2 = new BufferedReader(new InputStreamReader(process2.getInputStream()));
             String nextLine2 = outputReader2.readLine();
             while (nextLine2 != null) {
+                System.out.println(nextLine2);
                 lines2.add(nextLine2);
             }
         } catch(Exception e) {
