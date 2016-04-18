@@ -49,8 +49,8 @@ public class Tests {
      * Test equality of standard output between two commands
      */
     public static boolean equalOutput(String[] command1, String[] command2) {
-        ProcessBuilder pb1 = new ProcessBuilder(command1).inheritIO();
-        ProcessBuilder pb2 = new ProcessBuilder(command2).inheritIO();
+        ProcessBuilder pb1 = new ProcessBuilder(command1);
+        ProcessBuilder pb2 = new ProcessBuilder(command2);
         Process process1;
         Process process2;
         List<String> lines1 = new LinkedList<>();
