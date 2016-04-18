@@ -32,15 +32,15 @@ public class Main {
                       0);
         cli.addOption("-sourcepath",
                       "Set the path for source files. Takes one argument.",
-                      Main::setSourcePath,
+                      path -> setSourcePath(path[0]),
                       1);
         cli.addOption("-D",
                       "Set the path for diagnostic files. Takes one argument.",
-                      Main::setDiagnosticPath,
+                      path -> setDiagnosticPath(path[0]),
                       1);
         cli.addOption("-d",
                       "Specifies where to place the generated assembly files.",
-                      Main::setAssemblyPath,
+                      path -> setAssemblyPath(path[0]),
                       1);
         cli.addOption("-O",
                       "Turn off optimizations",
@@ -48,12 +48,12 @@ public class Main {
                       0);
         cli.addOption("-libpath",
                       "Set the path for interface files. Takes one argument.",
-                      Main::setLibPath,
+                      path -> setLibPath(path[0]),
                       1);
         cli.addOption("-target",
                       "Specify the operating system. Default is linux. " +
                               "windows and macos are not allowed.",
-                      Main::setTarget,
+                      path -> setTarget(path[0]),
                       1);
         cli.addOption("--lex",
                       "Lex the .xi source files to .lexed files.",
@@ -107,56 +107,24 @@ public class Main {
         }
     }
 
-    /**
-     * Sets the path for source files
-     * @param args single element String array containing the path
-     */
-    public static void setSourcePath(String[] args) {
-        if (args.length == 0 || args[0] == null) {
-            System.out.println("Please provide source path");
-            return;
-        }
-        sourcePath = args[0] + "/";
+    public static void setSourcePath(String path) {
+        sourcePath = sourcePath + "/";
     }
 
-    /**
-     * Sets the path for diagnostic files
-     * @param args single element String array containing the path
-     */
-    public static void setDiagnosticPath(String[] args) {
-        if (args.length == 0 || args[0] == null) {
-            System.out.println("Please provide diagnostic path");
-            return;
-        }
-        diagnosticPath = args[0] + "/";
+    public static void setDiagnosticPath(String path) {
+        diagnosticPath = path + "/";
     }
 
-    /**
-     * Specifies where to place the generated assembly files.
-     * @param args single element String array containing the path
-     */
-    public static void setAssemblyPath(String[] args) {
-        if (args.length == 0 || args[0] == null) {
-            System.out.println("Please provide diagnostic path");
-            return;
-        }
-        assemblyPath = args[0] + "/";
+    public static void setAssemblyPath(String path) {
+        assemblyPath = path + "/";
     }
 
-    public static void setLibPath(String[] args) {
-        if (args.length == 0 || args[0] == null) {
-            System.out.println("Please provide lib path");
-            return;
-        }
-        libPath = args[0] + "/";
+    public static void setLibPath(String path) {
+        libPath = path + "/";
     }
 
-    public static void setTarget(String[] args) {
-        if (args.length == 0 || args[0] == null) {
-            System.out.println("Please provide target");
-            return;
-        }
-        target = args[0];
+    public static void setTarget(String path) {
+        target = path;
     }
 
     public static String sourcePath() {
