@@ -129,7 +129,7 @@ public class Util {
                                    String diagnosticPath,
                                    List<String> lines) {
         String output = file.replace(".xi", "." + extension);
-        String writeFile = diagnosticPath + output;
+        String writeFile = diagnosticPath + '/' +  output;
         makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
         writeAndClose(writeFile, lines);
     }

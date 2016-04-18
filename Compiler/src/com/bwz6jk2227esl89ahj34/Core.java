@@ -429,7 +429,7 @@ public class Core {
         String path = new File(Core.class.getProtectionDomain().getCodeSource().getLocation().getPath()).
                 getParentFile().getParentFile().getParentFile().getParentFile().getParent();
         ProcessBuilder pb =
-                new ProcessBuilder(path + "/runtime/linkxi.sh", "-o", fileName, fileName + ".s").inheritIO();
+                new ProcessBuilder(path + "/runtime/linkxi.sh", "-o", fileName, assemblyPath + "/" + fileName + ".s").inheritIO();
         try {
             Process linkProcess = pb.start();
             linkProcess.waitFor();
