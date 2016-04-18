@@ -35,7 +35,7 @@ public class Tests {
         List<String> results = new LinkedList<>();
         for (String file : files) {
             String[] irCommand = {Util.rootPath + "/xic", "-libpath", Util.rootPath + "/lib", "--irrun", file};
-            Core.generateAssembly("./", "./", Util.rootPath + "/lib", "./", file);
+            Core.generateAssembly("./", "./", Util.rootPath + "/lib/", "./", file);
             String[] assemblyCommand = {"./" + file.replace(".xi", "")};
             // Run the IR and executable and print the outputs
             System.out.println("***************" + file + "***************");
