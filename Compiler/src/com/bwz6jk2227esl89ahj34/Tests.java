@@ -63,16 +63,15 @@ public class Tests {
             // Store the standard output of these processes in lines1 and lines2
             BufferedReader outputReader1 = new BufferedReader(new InputStreamReader(process1.getInputStream()));
             String nextLine1 = outputReader1.readLine();
-            int counter = 0;
             while (nextLine1 != null) {
-                System.out.println(nextLine1 + counter++);
                 lines1.add(nextLine1);
+                nextLine1 = outputReader1.readLine();
             }
             BufferedReader outputReader2 = new BufferedReader(new InputStreamReader(process2.getInputStream()));
             String nextLine2 = outputReader2.readLine();
             while (nextLine2 != null) {
-                System.out.println(nextLine2 + counter++);
                 lines2.add(nextLine2);
+                nextLine2 = outputReader1.readLine();
             }
         } catch(Exception e) {
             e.printStackTrace();
