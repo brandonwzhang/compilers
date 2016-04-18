@@ -427,7 +427,8 @@ public class Core {
 
         // Link and run the assembly file
         String fileName = file.replace(".xi", "");
-        String path = new File(Core.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getParentFile().getParentFile().getParentFile().getParent();
+        String path = new File(Core.class.getProtectionDomain().getCodeSource().getLocation().getPath()).
+                getParentFile().getParentFile().getParentFile().getParentFile().getParent();
         ProcessBuilder pb =
                 new ProcessBuilder(path + "/runtime/linkxi.sh", "-o", fileName, fileName + ".s").inheritIO();
         try {

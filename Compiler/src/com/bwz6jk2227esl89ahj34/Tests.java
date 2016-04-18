@@ -9,10 +9,9 @@ import com.bwz6jk2227esl89ahj34.AST.visit.PrintVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Tests {
 
@@ -21,6 +20,67 @@ public class Tests {
      * set do not contain a file extension.
      */
     public static Set<String> exclude = new HashSet<>();
+
+    /**
+     *
+     */
+    public static void regressionTest() {
+        List<String> files = Util.getDirectoryFiles("./").stream()
+                .filter(filename -> filename.contains(".xi"))
+                .filter(filename -> !excluded(filename))
+                .collect(Collectors.toList());
+        for (String file : files) {
+            String[] irCommand = {"../xic", "-libpath", "../lib", "-D", "irtests", "--irrun", file};
+            Core.generateAssembly("./", "./", "../lib/", "assemblytests", file);
+            String[] assemblyCommand = {"./" + file.replace(".xi", "")};
+            if (!equalOutput(irCommand, assemblyCommand)) {
+                System.out.println(file + ": produced different output");
+            }
+        }
+    }
+
+    /**
+     * Test equality of standard output between two commands
+     */
+    public static boolean equalOutput(String[] command1, String[] command2) {
+        ProcessBuilder pb1 = new ProcessBuilder(command1).inheritIO();
+        ProcessBuilder pb2 = new ProcessBuilder(command2).inheritIO();
+        Process process1;
+        Process process2;
+        List<String> lines1 = new LinkedList<>();
+        List<String> lines2 = new LinkedList<>();
+        try {
+            process1 = pb1.start();
+            process2 = pb2.start();
+            process1.waitFor();
+            process2.waitFor();
+            // Store the standard output of these processes in lines1 and lines2
+            BufferedReader outputReader1 = new BufferedReader(new InputStreamReader(process1.getInputStream()));
+            String nextLine1 = outputReader1.readLine();
+            while (nextLine1 != null) {
+                lines1.add(nextLine1);
+            }
+            BufferedReader outputReader2 = new BufferedReader(new InputStreamReader(process2.getInputStream()));
+            String nextLine2 = outputReader2.readLine();
+            while (nextLine2 != null) {
+                lines2.add(nextLine2);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Exception occurred reading stdout of processes");
+        }
+        // If the number of lines returned is different, return false
+        if (lines1.size() != lines2.size()) {
+            return false;
+        }
+        // If there is a mismatch in any line, return false
+        for (int i = 0; i < lines1.size(); i++) {
+            if (!lines1.get(i).equals(lines2.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * Returns true if the given file is excluded from testing. Assumes that
@@ -117,7 +177,6 @@ public class Tests {
      * Automated tests for typecheck.
      */
     public static void typeCheckTests() {
-
         System.out.println("\n================Typecheck Tests================");
 
         System.out.println("\n================Passed Tests================");

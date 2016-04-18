@@ -22,6 +22,9 @@ import java.util.*;
  * A class containing static utility methods and variables.
  */
 public class Util {
+    public static String rootPath = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).
+            getParentFile().getParentFile().getParentFile().getParentFile().getParent();
+
     /**
      * Translates symbol numbers into print-friendly strings. Used for lexer
      * and parser outputting.
