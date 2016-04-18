@@ -325,6 +325,9 @@ public class Core {
         MIRLowerVisitor mirv = new MIRLowerVisitor();
         IRCompUnit lirRoot = (IRCompUnit) mirv.visit(mirRoot.get());
 
+        CheckCanonicalIRVisitor cv = new CheckCanonicalIRVisitor();
+        assert cv.visit(lirRoot);
+
         if (Main.optimizationsOn()) {
             IRVisitor mircfv = new IRConstantFoldingVisitor();
             lirRoot = (IRCompUnit) mircfv.visit(lirRoot);
@@ -375,10 +378,6 @@ public class Core {
 
         IRCompUnit root_ = result.value();
 
-        CheckCanonicalIRVisitor cv = new CheckCanonicalIRVisitor();
-        System.out.println(cv.visit(root_));
-
-        System.out.println("====================================");
         IRSimulator sim = new IRSimulator(root_);
         sim.call("_Imain_paai", 0);
     }
