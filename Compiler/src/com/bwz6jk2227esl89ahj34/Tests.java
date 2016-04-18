@@ -22,20 +22,26 @@ public class Tests {
     public static Set<String> exclude = new HashSet<>();
 
     /**
-     *
+     * Compares the output of executable to IR simulation
      */
     public static void regressionTest() {
         List<String> files = Util.getDirectoryFiles("./").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
                 .collect(Collectors.toList());
+        List<String> results = new LinkedList<>();
         for (String file : files) {
             String[] irCommand = {"../xic", "-libpath", "../lib", "-D", "irtests", "--irrun", file};
             Core.generateAssembly("./", "./", "../lib/", "assemblytests", file);
             String[] assemblyCommand = {"./" + file.replace(".xi", "")};
-            if (!equalOutput(irCommand, assemblyCommand)) {
-                System.out.println(file + ": produced different output");
+            if (equalOutput(irCommand, assemblyCommand)) {
+                results.add(file + ": passed");
+            } else {
+                results.add(file + ": failed");
             }
+        }
+        for (String result : results) {
+            System.out.println(result);
         }
     }
 
