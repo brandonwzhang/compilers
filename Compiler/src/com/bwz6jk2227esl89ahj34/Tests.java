@@ -34,7 +34,12 @@ public class Tests {
             String[] irCommand = {"../xic", "-libpath", "../lib", "-D", "irtests", "--irrun", file};
             Core.generateAssembly("./", "./", "../lib/", "assemblytests", file);
             String[] assemblyCommand = {"./" + file.replace(".xi", "")};
-            if (Util.runCommand(irCommand).equals(Util.runCommand(assemblyCommand))) {
+            System.out.println("***************" + file + "***************");
+            System.out.println("==================IR==================");
+            List<String> irResults = Util.runCommand(irCommand);
+            System.out.println("===============Assembly===============");
+            List<String> assemblyResults = Util.runCommand(assemblyCommand);
+            if (irResults.equals(assemblyResults)) {
                 results.add(file + ": passed");
             } else {
                 results.add(file + ": failed");
