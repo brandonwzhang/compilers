@@ -103,9 +103,7 @@ public class Main {
             //Tests.mirGenTests();
             //Tests.irGenTests();
             //Tests.irRunTests();
-            //Tests.regressionTest();
-            String[] primesCommand = {"./primes"};
-            System.out.println(Util.runCommand(primesCommand));
+            Tests.regressionTest();
         }
     }
 
