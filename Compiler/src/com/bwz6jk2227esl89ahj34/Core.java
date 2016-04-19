@@ -424,7 +424,7 @@ public class Core {
         AssemblyProgram program = new AssemblyProgram(irRoot.get(),
                 IRfunctionNamesFromUseStatements,
                 target);
-        Util.writeHelper(file, (target.equalsIgnoreCase("osx")) ? "sx" : "s", assemblyPath, Collections.singletonList(program.toString()));
+        Util.writeHelper(file, "s", assemblyPath, Collections.singletonList(program.toString()));
 
         // Link and run the assembly file
         String fileName = file.substring(0, file.lastIndexOf('.'));
