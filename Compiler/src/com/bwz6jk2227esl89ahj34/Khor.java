@@ -251,7 +251,7 @@ public class Khor {
             lirRoot = (IRCompUnit) mircfv.visit(lirRoot);
         }
 
-        if (Main.irgen()) {
+        if (Main.irgen() || Main.irrun()) {
             Util.writeIRTree(lirRoot, Main.diagnosticPath(), file, "ir");
         }
 
@@ -289,13 +289,6 @@ public class Khor {
     }
 
     public static void generateAssembly(String file) {
-
-        // Read the file. If something went wrong (e.g. file not found), then
-        // return without doing anything.
-        Optional<FileReader> reader = Util.getFileReader(Main.sourcePath(), file);
-        if (!reader.isPresent()) {
-            return;
-        }
 
         lexFile(file);
 

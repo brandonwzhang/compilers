@@ -62,31 +62,23 @@ public class Main {
                       1);
         cli.addOption("--lex",
                       "Lex the .xi source files to .lexed files.",
-                      files -> Arrays.stream(files).forEach(file ->
-                              Core.lexFile(sourcePath, diagnosticPath,
-                                      file)),
+                      Main::turnLexDiagnosticsOn,
                       0);
         cli.addOption("--parse",
                       "Parse the .xi source files to .parsed files.",
-                      files -> Arrays.stream(files).forEach(file ->
-                              Core.parseFile(sourcePath, diagnosticPath,
-                                      file)),
+                      Main::turnParseDiagnosticsOn,
                       0);
         cli.addOption("--typecheck",
                       "Typecheck the .xi source files",
-                      files -> Arrays.stream(files).forEach(file ->
-                                      Core.typeCheck(sourcePath, diagnosticPath,
-                                              libPath, file)),
+                      Main::turnTypeCheckDiagnosticsOn,
                       0);
         cli.addOption("--irgen",
                       "Generate intermediate code and write its S-expression representation.",
-                      files -> Arrays.stream(files).forEach(file ->
-                              Core.irGen(sourcePath, diagnosticPath, libPath, file, true, false)),
+                      Main::turnIRGenDiagnosticsOn,
                       0);
         cli.addOption("--irrun",
                       "Generate and interpret intermediate code",
-                      files -> Arrays.stream(files).forEach(file ->
-                              Core.irRun(sourcePath, diagnosticPath, libPath, file)),
+                      Main::turnIRRunDiagnosticsOn,
                       0);
 
         cli.execute(args);
@@ -98,22 +90,22 @@ public class Main {
             System.out.println("\nDEBUG: Excluding: " + Tests.exclude.toString());
 
             try {
-               // Tests.parseTests();
+               //Tests2.parseTests();
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            //Tests.typeCheckTests();
+            Tests2.typeCheckTests();
             //Tests.constantFoldTests();
             //Tests.mirGenTests();
             //Tests.irGenTests();
             //Tests.irRunTests();
-            Tests.regressionTest();
+            //Tests.regressionTest();
         }
     }
 
     public static void setSourcePath(String path) {
-        sourcePath = sourcePath + "/";
+        sourcePath = path + "/";
     }
 
     public static void setDiagnosticPath(String path) {
@@ -177,6 +169,26 @@ public class Main {
 
     public static boolean optimizationsOn() {
         return optimizations;
+    }
+
+    public static void turnLexDiagnosticsOn(String[] args) {
+        lex = true;
+    }
+
+    public static void turnParseDiagnosticsOn(String[] args) {
+        parse = true;
+    }
+
+    public static void turnTypeCheckDiagnosticsOn(String[] args) {
+        typecheck = true;
+    }
+
+    public static void turnIRGenDiagnosticsOn(String[] args) {
+        irgen = true;
+    }
+
+    public static void turnIRRunDiagnosticsOn(String[] args) {
+        irrun = true;
     }
 
     public static boolean lex() {
