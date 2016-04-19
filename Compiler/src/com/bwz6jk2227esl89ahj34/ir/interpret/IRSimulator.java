@@ -237,84 +237,84 @@ public class IRSimulator {
         final int ws = Configuration.WORD_SIZE;
         try {
             switch (name) {
-            // io declarations
-            case "_Iprint_pai": {
-                long ptr = args[0], size = read(ptr - ws);
-                for (long i = 0; i < size; ++i)
-                    System.out.print((char) read(ptr + i * ws));
-                return 0;
-            }
-            case "_Iprintln_pai": {
-                long ptr = args[0], size = read(ptr - ws);
-                for (long i = 0; i < size; ++i)
-                    System.out.print((char) read(ptr + i * ws));
-                System.out.println();
-                return 0;
-            }
-            case "_Ireadln_ai": {
-                String line = inReader.readLine();
-                int len = line.length();
-                long ptr = malloc((len + 1) * ws);
-                store(ptr, len);
-                for (int i = 0; i < len; ++i)
-                    store(ptr + (i + 1) * ws, line.charAt(i));
-                put(null, Configuration.ABSTRACT_RET_PREFIX + 0, ptr + ws);
-                return ptr + ws;
-            }
-            case "_Igetchar_i": {
-                long result = inReader.read();
-                put(null, Configuration.ABSTRACT_RET_PREFIX + 0, result);
-                return result;
-            }
-            case "_Ieof_b": {
-                long result = inReader.ready() ? 0 : 1;
-                put(null, Configuration.ABSTRACT_RET_PREFIX + 0, result);
-                return result;
-            }
+                // io declarations
+                case "_Iprint_pai": {
+                    long ptr = args[0], size = read(ptr - ws);
+                    for (long i = 0; i < size; ++i)
+                        System.out.print((char) read(ptr + i * ws));
+                    return 0;
+                }
+                case "_Iprintln_pai": {
+                    long ptr = args[0], size = read(ptr - ws);
+                    for (long i = 0; i < size; ++i)
+                        System.out.print((char) read(ptr + i * ws));
+                    System.out.println();
+                    return 0;
+                }
+                case "_Ireadln_ai": {
+                    String line = inReader.readLine();
+                    int len = line.length();
+                    long ptr = malloc((len + 1) * ws);
+                    store(ptr, len);
+                    for (int i = 0; i < len; ++i)
+                        store(ptr + (i + 1) * ws, line.charAt(i));
+                    put(null, Configuration.ABSTRACT_RET_PREFIX + 0, ptr + ws);
+                    return ptr + ws;
+                }
+                case "_Igetchar_i": {
+                    long result = inReader.read();
+                    put(null, Configuration.ABSTRACT_RET_PREFIX + 0, result);
+                    return result;
+                }
+                case "_Ieof_b": {
+                    long result = inReader.ready() ? 0 : 1;
+                    put(null, Configuration.ABSTRACT_RET_PREFIX + 0, result);
+                    return result;
+                }
                 // conv declarations
-            case "_IunparseInt_aii": {
-                String line = String.valueOf(args[0]);
-                int len = line.length();
-                long ptr = malloc((len + 1) * ws);
-                store(ptr, len);
-                for (int i = 0; i < len; ++i)
-                    store(ptr + (i + 1) * ws, line.charAt(i));
-                put(null, Configuration.ABSTRACT_RET_PREFIX + 0, ptr + ws);
-                return ptr + ws;
-            }
-            case "_IparseInt_t2ibai": {
-                StringBuffer buf = new StringBuffer();
-                long ptr = args[0], size = read(ptr - ws);
-                for (int i = 0; i < size; ++i)
-                    buf.append((char) read(ptr + i * ws));
-                int result = 0, success = 1;
-                try {
-                    result = Integer.parseInt(buf.toString());
+                case "_IunparseInt_aii": {
+                    String line = String.valueOf(args[0]);
+                    int len = line.length();
+                    long ptr = malloc((len + 1) * ws);
+                    store(ptr, len);
+                    for (int i = 0; i < len; ++i)
+                        store(ptr + (i + 1) * ws, line.charAt(i));
+                    put(null, Configuration.ABSTRACT_RET_PREFIX + 0, ptr + ws);
+                    return ptr + ws;
                 }
-                catch (NumberFormatException e) {
-                    success = 0;
+                case "_IparseInt_t2ibai": {
+                    StringBuffer buf = new StringBuffer();
+                    long ptr = args[0], size = read(ptr - ws);
+                    for (int i = 0; i < size; ++i)
+                        buf.append((char) read(ptr + i * ws));
+                    int result = 0, success = 1;
+                    try {
+                        result = Integer.parseInt(buf.toString());
+                    }
+                    catch (NumberFormatException e) {
+                        success = 0;
+                    }
+                    put(null, Configuration.ABSTRACT_RET_PREFIX + 0, result);
+                    put(null, Configuration.ABSTRACT_RET_PREFIX + 1, success);
+                    return result;
                 }
-                put(null, Configuration.ABSTRACT_RET_PREFIX + 0, result);
-                put(null, Configuration.ABSTRACT_RET_PREFIX + 1, success);
-                return result;
-            }
                 // special declarations
-            case "_I_alloc_i": {
-                long result = malloc(args[0]);
-                put(null, Configuration.ABSTRACT_RET_PREFIX + 0, result);
-                return result;
-            }
-            case "_I_outOfBounds_p": {
-                throw new Trap("Out of bounds!");
-            }
+                case "_I_alloc_i": {
+                    long result = malloc(args[0]);
+                    put(null, Configuration.ABSTRACT_RET_PREFIX + 0, result);
+                    return result;
+                }
+                case "_I_outOfBounds_p": {
+                    throw new Trap("Out of bounds!");
+                }
                 // other declarations
-            case "_Iassert_pb": {
-                if (args[0] != 1) throw new Trap("Assertion error!");
-                return 0;
-            }
-            default:
-                throw new InternalCompilerError("Unsupported library function: "
-                        + name);
+                case "_Iassert_pb": {
+                    if (args[0] != 1) throw new Trap("Assertion error!");
+                    return 0;
+                }
+                default:
+                    throw new InternalCompilerError("Unsupported library function: "
+                            + name);
             }
         }
         catch (IOException e) {
@@ -334,67 +334,67 @@ public class IRSimulator {
             long l = exprStack.popValue();
             long result;
             switch (((IRBinOp) frame.ip).opType()) {
-            case ADD:
-                result = l + r;
-                break;
-            case SUB:
-                result = l - r;
-                break;
-            case MUL:
-                result = l * r;
-                break;
-            case HMUL:
-                result = BigInteger.valueOf(l)
-                                   .multiply(BigInteger.valueOf(r))
-                                   .shiftRight(64)
-                                   .longValue();
-                break;
-            case DIV:
-                if (r == 0) throw new Trap("Division by zero!");
-                result = l / r;
-                break;
-            case MOD:
-                if (r == 0) throw new Trap("Division by zero!");
-                result = l % r;
-                break;
-            case AND:
-                result = l & r;
-                break;
-            case OR:
-                result = l | r;
-                break;
-            case XOR:
-                result = l ^ r;
-                break;
-            case LSHIFT:
-                result = l << r;
-                break;
-            case RSHIFT:
-                result = l >>> r;
-                break;
-            case ARSHIFT:
-                result = l >> r;
-                break;
-            case EQ:
-                result = l == r ? 1 : 0;
-                break;
-            case NEQ:
-                result = l != r ? 1 : 0;
-                break;
-            case LT:
-                result = l < r ? 1 : 0;
-                break;
-            case GT:
-                result = l > r ? 1 : 0;
-                break;
-            case LEQ:
-                result = l <= r ? 1 : 0;
-                break;
-            case GEQ:
-                result = l >= r ? 1 : 0;
-                break;
-            default:
-                throw new InternalCompilerError("Invalid binary operation");
+                case ADD:
+                    result = l + r;
+                    break;
+                case SUB:
+                    result = l - r;
+                    break;
+                case MUL:
+                    result = l * r;
+                    break;
+                case HMUL:
+                    result = BigInteger.valueOf(l)
+                            .multiply(BigInteger.valueOf(r))
+                            .shiftRight(64)
+                            .longValue();
+                    break;
+                case DIV:
+                    if (r == 0) throw new Trap("Division by zero!");
+                    result = l / r;
+                    break;
+                case MOD:
+                    if (r == 0) throw new Trap("Division by zero!");
+                    result = l % r;
+                    break;
+                case AND:
+                    result = l & r;
+                    break;
+                case OR:
+                    result = l | r;
+                    break;
+                case XOR:
+                    result = l ^ r;
+                    break;
+                case LSHIFT:
+                    result = l << r;
+                    break;
+                case RSHIFT:
+                    result = l >>> r;
+                    break;
+                case ARSHIFT:
+                    result = l >> r;
+                    break;
+                case EQ:
+                    result = l == r ? 1 : 0;
+                    break;
+                case NEQ:
+                    result = l != r ? 1 : 0;
+                    break;
+                case LT:
+                    result = l < r ? 1 : 0;
+                    break;
+                case GT:
+                    result = l > r ? 1 : 0;
+                    break;
+                case LEQ:
+                    result = l <= r ? 1 : 0;
+                    break;
+                case GEQ:
+                    result = l >= r ? 1 : 0;
+                    break;
+                default:
+                    throw new InternalCompilerError("Invalid binary operation");
             }
             exprStack.pushValue(result);
         }
@@ -435,18 +435,18 @@ public class IRSimulator {
             long r = exprStack.popValue();
             StackItem stackItem = exprStack.pop();
             switch (stackItem.type) {
-            case MEM:
-                if (debugLevel > 0)
-                    System.out.println("mem[" + stackItem.addr + "]=" + r);
-                store(stackItem.addr, r);
-                break;
-            case TEMP:
-                if (debugLevel > 0)
-                    System.out.println("temp[" + stackItem.temp + "]=" + r);
-                put(frame, stackItem.temp, r);
-                break;
-            default:
-                throw new InternalCompilerError("Invalid MOVE!");
+                case MEM:
+                    if (debugLevel > 0)
+                        System.out.println("mem[" + stackItem.addr + "]=" + r);
+                    store(stackItem.addr, r);
+                    break;
+                case TEMP:
+                    if (debugLevel > 0)
+                        System.out.println("temp[" + stackItem.temp + "]=" + r);
+                    put(frame, stackItem.temp, r);
+                    break;
+                default:
+                    throw new InternalCompilerError("Invalid MOVE!");
             }
         }
         else if (frame.ip instanceof IRExp) {
@@ -464,7 +464,7 @@ public class IRSimulator {
             else if (top == 1)
                 label = irCJump.trueLabel();
             else throw new InternalCompilerError("Invalid value in CJUMP - expected 0/1, got "
-                    + top);
+                        + top);
             if (label != null) frame.setIP(indexToInsn.get(findLabel(label)));
         }
         else if (frame.ip instanceof IRReturn) frame.setIP(null);
