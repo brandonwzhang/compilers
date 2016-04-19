@@ -58,16 +58,20 @@ public class Tests {
         }
 
         // Get rid of output files
-        String[] mkdir = {"mkdir", "xifiles"};
-        Util.runCommand(mkdir);
-        String[] moveXiFiles = {"mv", "*.xi", "xifiles"};
-        Util.runCommand(moveXiFiles);
-        String[] removeOutputFiles = {"rm", "*"};
-        Util.runCommand(removeOutputFiles);
-        String[] moveXiFilesBack = {"mv", "xifiles/*", "."};
-        Util.runCommand(moveXiFilesBack);
-        String[] rmdir = {"rm", "-r", "xifiles"};
-        Util.runCommand(rmdir);
+        try {
+            ProcessBuilder mkdir = new ProcessBuilder("mkdir", "xifiles");
+            mkdir.inheritIO().start().waitFor();
+            ProcessBuilder mv = new ProcessBuilder("mv", "*.xi", "xifiles");
+            mv.inheritIO().start().waitFor();
+            ProcessBuilder rm = new ProcessBuilder("rm", "*");
+            rm.inheritIO().start().waitFor();
+            ProcessBuilder mvXiFiles = new ProcessBuilder("mv", "xifiles/*", ".");
+            mvXiFiles.inheritIO().start().waitFor();
+            ProcessBuilder rmdir = new ProcessBuilder("rm", "-r", "xifiles");
+            rmdir.inheritIO().start().waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
