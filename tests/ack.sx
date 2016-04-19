@@ -1,0 +1,2674 @@
+		.text
+		.globl	_Iprint_pai
+		.globl	_Iprintln_pai
+		.globl	_Ireadln_ai
+		.globl	_Igetchar_i
+		.globl	_Ieof_b
+		.globl	_IparseInt_t2ibai
+		.globl	_IunparseInt_aii
+		.globl	_Iusage_p
+		.align	4
+_Iusage_p:
+		# Starting function prologue
+		enter	$1200, $0
+		# Save callee-save registers rbx rbp r12-r15
+		movq	%rbx, -8(%rbp)
+		movq	%rbp, -16(%rbp)
+		movq	%r12, -24(%rbp)
+		movq	%r13, -32(%rbp)
+		movq	%r14, -40(%rbp)
+		movq	%r15, -48(%rbp)
+		# (MOVE (TEMP temp_0) (CONST 240)) -- move1
+		movq	-160(%rbp), %r13
+		movq	$240, %r13
+		movq	%r13, -160(%rbp)
+		# (MOVE (TEMP temp_1) (CALL (NAME _I_alloc_i) (TEMP temp_0))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-160(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -160(%rbp)
+		callq	_I_alloc_i
+		movq	-168(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -168(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_2) (TEMP temp_1)) -- move1
+		movq	-176(%rbp), %r14
+		movq	-168(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -168(%rbp)
+		movq	%r14, -176(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_2)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-176(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -176(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_3) (CONST 29)) -- move1
+		movq	-192(%rbp), %r13
+		movq	$29, %r13
+		movq	%r13, -192(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_3)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-192(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -192(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_4) (TEMP temp0)) -- move1
+		movq	-200(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -200(%rbp)
+		# (MOVE (TEMP temp_5) (ADD (TEMP temp_4) (CONST 8))) -- move1
+		movq	-208(%rbp), %r14
+		movq	-200(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -200(%rbp)
+		movq	%r14, -208(%rbp)
+		movq	-208(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -208(%rbp)
+		movq	-216(%rbp), %r14
+		movq	-208(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -208(%rbp)
+		movq	%r14, -216(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_5)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-216(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -216(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_6) (CONST 80)) -- move1
+		movq	-224(%rbp), %r13
+		movq	$80, %r13
+		movq	%r13, -224(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_6)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-224(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -224(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_7) (TEMP temp0)) -- move1
+		movq	-232(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -232(%rbp)
+		# (MOVE (TEMP temp_8) (ADD (TEMP temp_7) (CONST 8))) -- move1
+		movq	-240(%rbp), %r14
+		movq	-232(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -232(%rbp)
+		movq	%r14, -240(%rbp)
+		movq	-240(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -240(%rbp)
+		movq	-248(%rbp), %r14
+		movq	-240(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -240(%rbp)
+		movq	%r14, -248(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_8)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-248(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -248(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_9) (CONST 108)) -- move1
+		movq	-256(%rbp), %r13
+		movq	$108, %r13
+		movq	%r13, -256(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_9)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-256(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -256(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_10) (TEMP temp0)) -- move1
+		movq	-264(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -264(%rbp)
+		# (MOVE (TEMP temp_11) (ADD (TEMP temp_10) (CONST 8))) -- move1
+		movq	-272(%rbp), %r14
+		movq	-264(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -264(%rbp)
+		movq	%r14, -272(%rbp)
+		movq	-272(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -272(%rbp)
+		movq	-280(%rbp), %r14
+		movq	-272(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -272(%rbp)
+		movq	%r14, -280(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_11)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-280(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -280(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_12) (CONST 101)) -- move1
+		movq	-288(%rbp), %r13
+		movq	$101, %r13
+		movq	%r13, -288(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_12)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-288(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -288(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_13) (TEMP temp0)) -- move1
+		movq	-296(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -296(%rbp)
+		# (MOVE (TEMP temp_14) (ADD (TEMP temp_13) (CONST 8))) -- move1
+		movq	-304(%rbp), %r14
+		movq	-296(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -296(%rbp)
+		movq	%r14, -304(%rbp)
+		movq	-304(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -304(%rbp)
+		movq	-312(%rbp), %r14
+		movq	-304(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -304(%rbp)
+		movq	%r14, -312(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_14)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-312(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -312(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_15) (CONST 97)) -- move1
+		movq	-320(%rbp), %r13
+		movq	$97, %r13
+		movq	%r13, -320(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_15)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-320(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -320(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_16) (TEMP temp0)) -- move1
+		movq	-328(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -328(%rbp)
+		# (MOVE (TEMP temp_17) (ADD (TEMP temp_16) (CONST 8))) -- move1
+		movq	-336(%rbp), %r14
+		movq	-328(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -328(%rbp)
+		movq	%r14, -336(%rbp)
+		movq	-336(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -336(%rbp)
+		movq	-344(%rbp), %r14
+		movq	-336(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -336(%rbp)
+		movq	%r14, -344(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_17)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-344(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -344(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_18) (CONST 115)) -- move1
+		movq	-352(%rbp), %r13
+		movq	$115, %r13
+		movq	%r13, -352(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_18)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-352(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -352(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_19) (TEMP temp0)) -- move1
+		movq	-360(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -360(%rbp)
+		# (MOVE (TEMP temp_20) (ADD (TEMP temp_19) (CONST 8))) -- move1
+		movq	-368(%rbp), %r14
+		movq	-360(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -360(%rbp)
+		movq	%r14, -368(%rbp)
+		movq	-368(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -368(%rbp)
+		movq	-376(%rbp), %r14
+		movq	-368(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -368(%rbp)
+		movq	%r14, -376(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_20)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-376(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -376(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_21) (CONST 101)) -- move1
+		movq	-384(%rbp), %r13
+		movq	$101, %r13
+		movq	%r13, -384(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_21)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-384(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -384(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_22) (TEMP temp0)) -- move1
+		movq	-392(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -392(%rbp)
+		# (MOVE (TEMP temp_23) (ADD (TEMP temp_22) (CONST 8))) -- move1
+		movq	-400(%rbp), %r14
+		movq	-392(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -392(%rbp)
+		movq	%r14, -400(%rbp)
+		movq	-400(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -400(%rbp)
+		movq	-408(%rbp), %r14
+		movq	-400(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -400(%rbp)
+		movq	%r14, -408(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_23)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-408(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -408(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_24) (CONST 32)) -- move1
+		movq	-416(%rbp), %r13
+		movq	$32, %r13
+		movq	%r13, -416(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_24)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-416(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -416(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_25) (TEMP temp0)) -- move1
+		movq	-424(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -424(%rbp)
+		# (MOVE (TEMP temp_26) (ADD (TEMP temp_25) (CONST 8))) -- move1
+		movq	-432(%rbp), %r14
+		movq	-424(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -424(%rbp)
+		movq	%r14, -432(%rbp)
+		movq	-432(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -432(%rbp)
+		movq	-440(%rbp), %r14
+		movq	-432(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -432(%rbp)
+		movq	%r14, -440(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_26)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-440(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -440(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_27) (CONST 115)) -- move1
+		movq	-448(%rbp), %r13
+		movq	$115, %r13
+		movq	%r13, -448(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_27)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-448(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -448(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_28) (TEMP temp0)) -- move1
+		movq	-456(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -456(%rbp)
+		# (MOVE (TEMP temp_29) (ADD (TEMP temp_28) (CONST 8))) -- move1
+		movq	-464(%rbp), %r14
+		movq	-456(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -456(%rbp)
+		movq	%r14, -464(%rbp)
+		movq	-464(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -464(%rbp)
+		movq	-472(%rbp), %r14
+		movq	-464(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -464(%rbp)
+		movq	%r14, -472(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_29)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-472(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -472(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_30) (CONST 112)) -- move1
+		movq	-480(%rbp), %r13
+		movq	$112, %r13
+		movq	%r13, -480(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_30)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-480(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -480(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_31) (TEMP temp0)) -- move1
+		movq	-488(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -488(%rbp)
+		# (MOVE (TEMP temp_32) (ADD (TEMP temp_31) (CONST 8))) -- move1
+		movq	-496(%rbp), %r14
+		movq	-488(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -488(%rbp)
+		movq	%r14, -496(%rbp)
+		movq	-496(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -496(%rbp)
+		movq	-504(%rbp), %r14
+		movq	-496(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -496(%rbp)
+		movq	%r14, -504(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_32)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-504(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -504(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_33) (CONST 101)) -- move1
+		movq	-512(%rbp), %r13
+		movq	$101, %r13
+		movq	%r13, -512(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_33)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-512(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -512(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_34) (TEMP temp0)) -- move1
+		movq	-520(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -520(%rbp)
+		# (MOVE (TEMP temp_35) (ADD (TEMP temp_34) (CONST 8))) -- move1
+		movq	-528(%rbp), %r14
+		movq	-520(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -520(%rbp)
+		movq	%r14, -528(%rbp)
+		movq	-528(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -528(%rbp)
+		movq	-536(%rbp), %r14
+		movq	-528(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -528(%rbp)
+		movq	%r14, -536(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_35)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-536(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -536(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_36) (CONST 99)) -- move1
+		movq	-544(%rbp), %r13
+		movq	$99, %r13
+		movq	%r13, -544(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_36)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-544(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -544(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_37) (TEMP temp0)) -- move1
+		movq	-552(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -552(%rbp)
+		# (MOVE (TEMP temp_38) (ADD (TEMP temp_37) (CONST 8))) -- move1
+		movq	-560(%rbp), %r14
+		movq	-552(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -552(%rbp)
+		movq	%r14, -560(%rbp)
+		movq	-560(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -560(%rbp)
+		movq	-568(%rbp), %r14
+		movq	-560(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -560(%rbp)
+		movq	%r14, -568(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_38)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-568(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -568(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_39) (CONST 105)) -- move1
+		movq	-576(%rbp), %r13
+		movq	$105, %r13
+		movq	%r13, -576(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_39)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-576(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -576(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_40) (TEMP temp0)) -- move1
+		movq	-584(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -584(%rbp)
+		# (MOVE (TEMP temp_41) (ADD (TEMP temp_40) (CONST 8))) -- move1
+		movq	-592(%rbp), %r14
+		movq	-584(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -584(%rbp)
+		movq	%r14, -592(%rbp)
+		movq	-592(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -592(%rbp)
+		movq	-600(%rbp), %r14
+		movq	-592(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -592(%rbp)
+		movq	%r14, -600(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_41)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-600(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -600(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_42) (CONST 102)) -- move1
+		movq	-608(%rbp), %r13
+		movq	$102, %r13
+		movq	%r13, -608(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_42)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-608(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -608(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_43) (TEMP temp0)) -- move1
+		movq	-616(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -616(%rbp)
+		# (MOVE (TEMP temp_44) (ADD (TEMP temp_43) (CONST 8))) -- move1
+		movq	-624(%rbp), %r14
+		movq	-616(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -616(%rbp)
+		movq	%r14, -624(%rbp)
+		movq	-624(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -624(%rbp)
+		movq	-632(%rbp), %r14
+		movq	-624(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -624(%rbp)
+		movq	%r14, -632(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_44)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-632(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -632(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_45) (CONST 121)) -- move1
+		movq	-640(%rbp), %r13
+		movq	$121, %r13
+		movq	%r13, -640(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_45)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-640(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -640(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_46) (TEMP temp0)) -- move1
+		movq	-648(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -648(%rbp)
+		# (MOVE (TEMP temp_47) (ADD (TEMP temp_46) (CONST 8))) -- move1
+		movq	-656(%rbp), %r14
+		movq	-648(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -648(%rbp)
+		movq	%r14, -656(%rbp)
+		movq	-656(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -656(%rbp)
+		movq	-664(%rbp), %r14
+		movq	-656(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -656(%rbp)
+		movq	%r14, -664(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_47)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-664(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -664(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_48) (CONST 32)) -- move1
+		movq	-672(%rbp), %r13
+		movq	$32, %r13
+		movq	%r13, -672(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_48)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-672(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -672(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_49) (TEMP temp0)) -- move1
+		movq	-680(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -680(%rbp)
+		# (MOVE (TEMP temp_50) (ADD (TEMP temp_49) (CONST 8))) -- move1
+		movq	-688(%rbp), %r14
+		movq	-680(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -680(%rbp)
+		movq	%r14, -688(%rbp)
+		movq	-688(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -688(%rbp)
+		movq	-696(%rbp), %r14
+		movq	-688(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -688(%rbp)
+		movq	%r14, -696(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_50)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-696(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -696(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_51) (CONST 116)) -- move1
+		movq	-704(%rbp), %r13
+		movq	$116, %r13
+		movq	%r13, -704(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_51)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-704(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -704(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_52) (TEMP temp0)) -- move1
+		movq	-712(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -712(%rbp)
+		# (MOVE (TEMP temp_53) (ADD (TEMP temp_52) (CONST 8))) -- move1
+		movq	-720(%rbp), %r14
+		movq	-712(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -712(%rbp)
+		movq	%r14, -720(%rbp)
+		movq	-720(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -720(%rbp)
+		movq	-728(%rbp), %r14
+		movq	-720(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -720(%rbp)
+		movq	%r14, -728(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_53)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-728(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -728(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_54) (CONST 104)) -- move1
+		movq	-736(%rbp), %r13
+		movq	$104, %r13
+		movq	%r13, -736(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_54)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-736(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -736(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_55) (TEMP temp0)) -- move1
+		movq	-744(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -744(%rbp)
+		# (MOVE (TEMP temp_56) (ADD (TEMP temp_55) (CONST 8))) -- move1
+		movq	-752(%rbp), %r14
+		movq	-744(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -744(%rbp)
+		movq	%r14, -752(%rbp)
+		movq	-752(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -752(%rbp)
+		movq	-760(%rbp), %r14
+		movq	-752(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -752(%rbp)
+		movq	%r14, -760(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_56)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-760(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -760(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_57) (CONST 101)) -- move1
+		movq	-768(%rbp), %r13
+		movq	$101, %r13
+		movq	%r13, -768(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_57)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-768(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -768(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_58) (TEMP temp0)) -- move1
+		movq	-776(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -776(%rbp)
+		# (MOVE (TEMP temp_59) (ADD (TEMP temp_58) (CONST 8))) -- move1
+		movq	-784(%rbp), %r14
+		movq	-776(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -776(%rbp)
+		movq	%r14, -784(%rbp)
+		movq	-784(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -784(%rbp)
+		movq	-792(%rbp), %r14
+		movq	-784(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -784(%rbp)
+		movq	%r14, -792(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_59)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-792(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -792(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_60) (CONST 32)) -- move1
+		movq	-800(%rbp), %r13
+		movq	$32, %r13
+		movq	%r13, -800(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_60)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-800(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -800(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_61) (TEMP temp0)) -- move1
+		movq	-808(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -808(%rbp)
+		# (MOVE (TEMP temp_62) (ADD (TEMP temp_61) (CONST 8))) -- move1
+		movq	-816(%rbp), %r14
+		movq	-808(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -808(%rbp)
+		movq	%r14, -816(%rbp)
+		movq	-816(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -816(%rbp)
+		movq	-824(%rbp), %r14
+		movq	-816(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -816(%rbp)
+		movq	%r14, -824(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_62)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-824(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -824(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_63) (CONST 105)) -- move1
+		movq	-832(%rbp), %r13
+		movq	$105, %r13
+		movq	%r13, -832(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_63)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-832(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -832(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_64) (TEMP temp0)) -- move1
+		movq	-840(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -840(%rbp)
+		# (MOVE (TEMP temp_65) (ADD (TEMP temp_64) (CONST 8))) -- move1
+		movq	-848(%rbp), %r14
+		movq	-840(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -840(%rbp)
+		movq	%r14, -848(%rbp)
+		movq	-848(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -848(%rbp)
+		movq	-856(%rbp), %r14
+		movq	-848(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -848(%rbp)
+		movq	%r14, -856(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_65)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-856(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -856(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_66) (CONST 110)) -- move1
+		movq	-864(%rbp), %r13
+		movq	$110, %r13
+		movq	%r13, -864(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_66)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-864(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -864(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_67) (TEMP temp0)) -- move1
+		movq	-872(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -872(%rbp)
+		# (MOVE (TEMP temp_68) (ADD (TEMP temp_67) (CONST 8))) -- move1
+		movq	-880(%rbp), %r14
+		movq	-872(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -872(%rbp)
+		movq	%r14, -880(%rbp)
+		movq	-880(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -880(%rbp)
+		movq	-888(%rbp), %r14
+		movq	-880(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -880(%rbp)
+		movq	%r14, -888(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_68)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-888(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -888(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_69) (CONST 112)) -- move1
+		movq	-896(%rbp), %r13
+		movq	$112, %r13
+		movq	%r13, -896(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_69)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-896(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -896(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_70) (TEMP temp0)) -- move1
+		movq	-904(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -904(%rbp)
+		# (MOVE (TEMP temp_71) (ADD (TEMP temp_70) (CONST 8))) -- move1
+		movq	-912(%rbp), %r14
+		movq	-904(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -904(%rbp)
+		movq	%r14, -912(%rbp)
+		movq	-912(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -912(%rbp)
+		movq	-920(%rbp), %r14
+		movq	-912(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -912(%rbp)
+		movq	%r14, -920(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_71)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-920(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -920(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_72) (CONST 117)) -- move1
+		movq	-928(%rbp), %r13
+		movq	$117, %r13
+		movq	%r13, -928(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_72)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-928(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -928(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_73) (TEMP temp0)) -- move1
+		movq	-936(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -936(%rbp)
+		# (MOVE (TEMP temp_74) (ADD (TEMP temp_73) (CONST 8))) -- move1
+		movq	-944(%rbp), %r14
+		movq	-936(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -936(%rbp)
+		movq	%r14, -944(%rbp)
+		movq	-944(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -944(%rbp)
+		movq	-952(%rbp), %r14
+		movq	-944(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -944(%rbp)
+		movq	%r14, -952(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_74)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-952(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -952(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_75) (CONST 116)) -- move1
+		movq	-960(%rbp), %r13
+		movq	$116, %r13
+		movq	%r13, -960(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_75)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-960(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -960(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_76) (TEMP temp0)) -- move1
+		movq	-968(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -968(%rbp)
+		# (MOVE (TEMP temp_77) (ADD (TEMP temp_76) (CONST 8))) -- move1
+		movq	-976(%rbp), %r14
+		movq	-968(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -968(%rbp)
+		movq	%r14, -976(%rbp)
+		movq	-976(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -976(%rbp)
+		movq	-984(%rbp), %r14
+		movq	-976(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -976(%rbp)
+		movq	%r14, -984(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_77)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-984(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -984(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_78) (CONST 32)) -- move1
+		movq	-992(%rbp), %r13
+		movq	$32, %r13
+		movq	%r13, -992(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_78)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-992(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -992(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_79) (TEMP temp0)) -- move1
+		movq	-1000(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -1000(%rbp)
+		# (MOVE (TEMP temp_80) (ADD (TEMP temp_79) (CONST 8))) -- move1
+		movq	-1008(%rbp), %r14
+		movq	-1000(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1000(%rbp)
+		movq	%r14, -1008(%rbp)
+		movq	-1008(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -1008(%rbp)
+		movq	-1016(%rbp), %r14
+		movq	-1008(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1008(%rbp)
+		movq	%r14, -1016(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_80)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-1016(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1016(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_81) (CONST 115)) -- move1
+		movq	-1024(%rbp), %r13
+		movq	$115, %r13
+		movq	%r13, -1024(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_81)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-1024(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -1024(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_82) (TEMP temp0)) -- move1
+		movq	-1032(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -1032(%rbp)
+		# (MOVE (TEMP temp_83) (ADD (TEMP temp_82) (CONST 8))) -- move1
+		movq	-1040(%rbp), %r14
+		movq	-1032(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1032(%rbp)
+		movq	%r14, -1040(%rbp)
+		movq	-1040(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -1040(%rbp)
+		movq	-1048(%rbp), %r14
+		movq	-1040(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1040(%rbp)
+		movq	%r14, -1048(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_83)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-1048(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1048(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_84) (CONST 105)) -- move1
+		movq	-1056(%rbp), %r13
+		movq	$105, %r13
+		movq	%r13, -1056(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_84)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-1056(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -1056(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_85) (TEMP temp0)) -- move1
+		movq	-1064(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -1064(%rbp)
+		# (MOVE (TEMP temp_86) (ADD (TEMP temp_85) (CONST 8))) -- move1
+		movq	-1072(%rbp), %r14
+		movq	-1064(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1064(%rbp)
+		movq	%r14, -1072(%rbp)
+		movq	-1072(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -1072(%rbp)
+		movq	-1080(%rbp), %r14
+		movq	-1072(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1072(%rbp)
+		movq	%r14, -1080(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_86)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-1080(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1080(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_87) (CONST 122)) -- move1
+		movq	-1088(%rbp), %r13
+		movq	$122, %r13
+		movq	%r13, -1088(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_87)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-1088(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -1088(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_88) (TEMP temp0)) -- move1
+		movq	-1096(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -1096(%rbp)
+		# (MOVE (TEMP temp_89) (ADD (TEMP temp_88) (CONST 8))) -- move1
+		movq	-1104(%rbp), %r14
+		movq	-1096(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1096(%rbp)
+		movq	%r14, -1104(%rbp)
+		movq	-1104(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -1104(%rbp)
+		movq	-1112(%rbp), %r14
+		movq	-1104(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1104(%rbp)
+		movq	%r14, -1112(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_89)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-1112(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1112(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_90) (CONST 101)) -- move1
+		movq	-1120(%rbp), %r13
+		movq	$101, %r13
+		movq	%r13, -1120(%rbp)
+		# (MOVE (MEM (TEMP temp0)) (TEMP temp_90)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-1120(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -1120(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_91) (TEMP temp0)) -- move1
+		movq	-1128(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -1128(%rbp)
+		# (MOVE (TEMP temp_92) (ADD (TEMP temp_91) (CONST 8))) -- move1
+		movq	-1136(%rbp), %r14
+		movq	-1128(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1128(%rbp)
+		movq	%r14, -1136(%rbp)
+		movq	-1136(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -1136(%rbp)
+		movq	-1144(%rbp), %r14
+		movq	-1136(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1136(%rbp)
+		movq	%r14, -1144(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_92)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-1144(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1144(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_93) (TEMP temp0)) -- move1
+		movq	-1152(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -1152(%rbp)
+		# (MOVE (TEMP temp_94) (SUB (TEMP temp_93) (CONST 232))) -- move1
+		movq	-1160(%rbp), %r14
+		movq	-1152(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1152(%rbp)
+		movq	%r14, -1160(%rbp)
+		movq	-1160(%rbp), %r13
+		subq	$232, %r13
+		movq	%r13, -1160(%rbp)
+		movq	-1168(%rbp), %r14
+		movq	-1160(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1160(%rbp)
+		movq	%r14, -1168(%rbp)
+		# (MOVE (TEMP temp0) (TEMP temp_94)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-1168(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -1168(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_95) (TEMP temp0)) -- move1
+		movq	-1176(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -1176(%rbp)
+		# (MOVE (TEMP temp_96) (CALL (NAME _Iprintln_pai) (TEMP temp_95))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-1176(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -1176(%rbp)
+		callq	_Iprintln_pai
+		movq	-1184(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -1184(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (LABEL temp_97) -- label1
+temp_97:
+		# Function epilogue
+		# Restoring callee-save registers
+		movq	-8(%rbp), %rbx
+		movq	-16(%rbp), %rbp
+		movq	-24(%rbp), %r12
+		movq	-32(%rbp), %r13
+		movq	-40(%rbp), %r14
+		movq	-48(%rbp), %r15
+		# Restore old RBP and RSP
+		leave	
+		retq	
+
+		.globl	_Iprint_pai
+		.globl	_Iprintln_pai
+		.globl	_Ireadln_ai
+		.globl	_Igetchar_i
+		.globl	_Ieof_b
+		.globl	_IparseInt_t2ibai
+		.globl	_IunparseInt_aii
+		.globl	_Imain_paai
+		.align	4
+_Imain_paai:
+		# Starting function prologue
+		enter	$912, $0
+		# Save callee-save registers rbx rbp r12-r15
+		movq	%rbx, -8(%rbp)
+		movq	%rbp, -16(%rbp)
+		movq	%r12, -24(%rbp)
+		movq	%r13, -32(%rbp)
+		movq	%r14, -40(%rbp)
+		movq	%r15, -48(%rbp)
+		# (MOVE (TEMP temp_98) (TEMP _ARG0)) -- move1
+		movq	-160(%rbp), %r13
+		movq	%rdi, %r13
+		movq	%r13, -160(%rbp)
+		# (MOVE (TEMP args) (TEMP temp_98)) -- move1
+		movq	-168(%rbp), %r14
+		movq	-160(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -160(%rbp)
+		movq	%r14, -168(%rbp)
+		# (MOVE (TEMP temp_99) (CONST 5)) -- move1
+		movq	-176(%rbp), %r13
+		movq	$5, %r13
+		movq	%r13, -176(%rbp)
+		# (MOVE (TEMP n) (TEMP temp_99)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-176(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -176(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_100) (CONST 3)) -- move1
+		movq	-192(%rbp), %r13
+		movq	$3, %r13
+		movq	%r13, -192(%rbp)
+		# (MOVE (TEMP temp_101) (TEMP n)) -- move1
+		movq	-200(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -200(%rbp)
+		# (MOVE (TEMP temp_102) (CALL (NAME _IAck_iii) (TEMP temp_100) (TEMP temp_101))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-192(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -192(%rbp)
+		movq	-200(%rbp), %r13
+		movq	%r13, %rsi
+		movq	%r13, -200(%rbp)
+		callq	_IAck_iii
+		movq	-208(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -208(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_103) (TEMP temp_102)) -- move1
+		movq	-216(%rbp), %r14
+		movq	-208(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -208(%rbp)
+		movq	%r14, -216(%rbp)
+		# (MOVE (TEMP r) (TEMP temp_103)) -- move1
+		movq	-224(%rbp), %r14
+		movq	-216(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -216(%rbp)
+		movq	%r14, -224(%rbp)
+		# (MOVE (TEMP temp_104) (CONST 56)) -- move1
+		movq	-232(%rbp), %r13
+		movq	$56, %r13
+		movq	%r13, -232(%rbp)
+		# (MOVE (TEMP temp_105) (CALL (NAME _I_alloc_i) (TEMP temp_104))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-232(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -232(%rbp)
+		callq	_I_alloc_i
+		movq	-240(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -240(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_106) (TEMP temp_105)) -- move1
+		movq	-248(%rbp), %r14
+		movq	-240(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -240(%rbp)
+		movq	%r14, -248(%rbp)
+		# (MOVE (TEMP temp1) (TEMP temp_106)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-248(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -248(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_107) (CONST 6)) -- move1
+		movq	-264(%rbp), %r13
+		movq	$6, %r13
+		movq	%r13, -264(%rbp)
+		# (MOVE (MEM (TEMP temp1)) (TEMP temp_107)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-264(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -264(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_108) (TEMP temp1)) -- move1
+		movq	-272(%rbp), %r14
+		movq	-256(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -256(%rbp)
+		movq	%r14, -272(%rbp)
+		# (MOVE (TEMP temp_109) (ADD (TEMP temp_108) (CONST 8))) -- move1
+		movq	-280(%rbp), %r14
+		movq	-272(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -272(%rbp)
+		movq	%r14, -280(%rbp)
+		movq	-280(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -280(%rbp)
+		movq	-288(%rbp), %r14
+		movq	-280(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -280(%rbp)
+		movq	%r14, -288(%rbp)
+		# (MOVE (TEMP temp1) (TEMP temp_109)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-288(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -288(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_110) (CONST 65)) -- move1
+		movq	-296(%rbp), %r13
+		movq	$65, %r13
+		movq	%r13, -296(%rbp)
+		# (MOVE (MEM (TEMP temp1)) (TEMP temp_110)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-296(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -296(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_111) (TEMP temp1)) -- move1
+		movq	-304(%rbp), %r14
+		movq	-256(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -256(%rbp)
+		movq	%r14, -304(%rbp)
+		# (MOVE (TEMP temp_112) (ADD (TEMP temp_111) (CONST 8))) -- move1
+		movq	-312(%rbp), %r14
+		movq	-304(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -304(%rbp)
+		movq	%r14, -312(%rbp)
+		movq	-312(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -312(%rbp)
+		movq	-320(%rbp), %r14
+		movq	-312(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -312(%rbp)
+		movq	%r14, -320(%rbp)
+		# (MOVE (TEMP temp1) (TEMP temp_112)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-320(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -320(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_113) (CONST 99)) -- move1
+		movq	-328(%rbp), %r13
+		movq	$99, %r13
+		movq	%r13, -328(%rbp)
+		# (MOVE (MEM (TEMP temp1)) (TEMP temp_113)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-328(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -328(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_114) (TEMP temp1)) -- move1
+		movq	-336(%rbp), %r14
+		movq	-256(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -256(%rbp)
+		movq	%r14, -336(%rbp)
+		# (MOVE (TEMP temp_115) (ADD (TEMP temp_114) (CONST 8))) -- move1
+		movq	-344(%rbp), %r14
+		movq	-336(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -336(%rbp)
+		movq	%r14, -344(%rbp)
+		movq	-344(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -344(%rbp)
+		movq	-352(%rbp), %r14
+		movq	-344(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -344(%rbp)
+		movq	%r14, -352(%rbp)
+		# (MOVE (TEMP temp1) (TEMP temp_115)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-352(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -352(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_116) (CONST 107)) -- move1
+		movq	-360(%rbp), %r13
+		movq	$107, %r13
+		movq	%r13, -360(%rbp)
+		# (MOVE (MEM (TEMP temp1)) (TEMP temp_116)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-360(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -360(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_117) (TEMP temp1)) -- move1
+		movq	-368(%rbp), %r14
+		movq	-256(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -256(%rbp)
+		movq	%r14, -368(%rbp)
+		# (MOVE (TEMP temp_118) (ADD (TEMP temp_117) (CONST 8))) -- move1
+		movq	-376(%rbp), %r14
+		movq	-368(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -368(%rbp)
+		movq	%r14, -376(%rbp)
+		movq	-376(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -376(%rbp)
+		movq	-384(%rbp), %r14
+		movq	-376(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -376(%rbp)
+		movq	%r14, -384(%rbp)
+		# (MOVE (TEMP temp1) (TEMP temp_118)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-384(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -384(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_119) (CONST 40)) -- move1
+		movq	-392(%rbp), %r13
+		movq	$40, %r13
+		movq	%r13, -392(%rbp)
+		# (MOVE (MEM (TEMP temp1)) (TEMP temp_119)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-392(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -392(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_120) (TEMP temp1)) -- move1
+		movq	-400(%rbp), %r14
+		movq	-256(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -256(%rbp)
+		movq	%r14, -400(%rbp)
+		# (MOVE (TEMP temp_121) (ADD (TEMP temp_120) (CONST 8))) -- move1
+		movq	-408(%rbp), %r14
+		movq	-400(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -400(%rbp)
+		movq	%r14, -408(%rbp)
+		movq	-408(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -408(%rbp)
+		movq	-416(%rbp), %r14
+		movq	-408(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -408(%rbp)
+		movq	%r14, -416(%rbp)
+		# (MOVE (TEMP temp1) (TEMP temp_121)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-416(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -416(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_122) (CONST 51)) -- move1
+		movq	-424(%rbp), %r13
+		movq	$51, %r13
+		movq	%r13, -424(%rbp)
+		# (MOVE (MEM (TEMP temp1)) (TEMP temp_122)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-424(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -424(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_123) (TEMP temp1)) -- move1
+		movq	-432(%rbp), %r14
+		movq	-256(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -256(%rbp)
+		movq	%r14, -432(%rbp)
+		# (MOVE (TEMP temp_124) (ADD (TEMP temp_123) (CONST 8))) -- move1
+		movq	-440(%rbp), %r14
+		movq	-432(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -432(%rbp)
+		movq	%r14, -440(%rbp)
+		movq	-440(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -440(%rbp)
+		movq	-448(%rbp), %r14
+		movq	-440(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -440(%rbp)
+		movq	%r14, -448(%rbp)
+		# (MOVE (TEMP temp1) (TEMP temp_124)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-448(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -448(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_125) (CONST 44)) -- move1
+		movq	-456(%rbp), %r13
+		movq	$44, %r13
+		movq	%r13, -456(%rbp)
+		# (MOVE (MEM (TEMP temp1)) (TEMP temp_125)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-456(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -456(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_126) (TEMP temp1)) -- move1
+		movq	-464(%rbp), %r14
+		movq	-256(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -256(%rbp)
+		movq	%r14, -464(%rbp)
+		# (MOVE (TEMP temp_127) (ADD (TEMP temp_126) (CONST 8))) -- move1
+		movq	-472(%rbp), %r14
+		movq	-464(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -464(%rbp)
+		movq	%r14, -472(%rbp)
+		movq	-472(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -472(%rbp)
+		movq	-480(%rbp), %r14
+		movq	-472(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -472(%rbp)
+		movq	%r14, -480(%rbp)
+		# (MOVE (TEMP temp1) (TEMP temp_127)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-480(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -480(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_128) (TEMP temp1)) -- move1
+		movq	-488(%rbp), %r14
+		movq	-256(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -256(%rbp)
+		movq	%r14, -488(%rbp)
+		# (MOVE (TEMP temp_129) (SUB (TEMP temp_128) (CONST 48))) -- move1
+		movq	-496(%rbp), %r14
+		movq	-488(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -488(%rbp)
+		movq	%r14, -496(%rbp)
+		movq	-496(%rbp), %r13
+		subq	$48, %r13
+		movq	%r13, -496(%rbp)
+		movq	-504(%rbp), %r14
+		movq	-496(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -496(%rbp)
+		movq	%r14, -504(%rbp)
+		# (MOVE (TEMP temp1) (TEMP temp_129)) -- move1
+		movq	-256(%rbp), %r14
+		movq	-504(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -504(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_130) (TEMP temp1)) -- move1
+		movq	-512(%rbp), %r14
+		movq	-256(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -256(%rbp)
+		movq	%r14, -512(%rbp)
+		# (MOVE (TEMP temp_131) (CALL (NAME _Iprint_pai) (TEMP temp_130))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-512(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -512(%rbp)
+		callq	_Iprint_pai
+		movq	-520(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -520(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_132) (TEMP n)) -- move1
+		movq	-528(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -528(%rbp)
+		# (MOVE (TEMP temp_133) (CALL (NAME _IunparseInt_aii) (TEMP temp_132))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-528(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -528(%rbp)
+		callq	_IunparseInt_aii
+		movq	-536(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -536(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_134) (TEMP temp_133)) -- move1
+		movq	-544(%rbp), %r14
+		movq	-536(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -536(%rbp)
+		movq	%r14, -544(%rbp)
+		# (MOVE (TEMP temp_135) (CALL (NAME _Iprint_pai) (TEMP temp_134))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-544(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -544(%rbp)
+		callq	_Iprint_pai
+		movq	-552(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -552(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_136) (CONST 32)) -- move1
+		movq	-560(%rbp), %r13
+		movq	$32, %r13
+		movq	%r13, -560(%rbp)
+		# (MOVE (TEMP temp_137) (CALL (NAME _I_alloc_i) (TEMP temp_136))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-560(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -560(%rbp)
+		callq	_I_alloc_i
+		movq	-568(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -568(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_138) (TEMP temp_137)) -- move1
+		movq	-576(%rbp), %r14
+		movq	-568(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -568(%rbp)
+		movq	%r14, -576(%rbp)
+		# (MOVE (TEMP temp2) (TEMP temp_138)) -- move1
+		movq	-584(%rbp), %r14
+		movq	-576(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -576(%rbp)
+		movq	%r14, -584(%rbp)
+		# (MOVE (TEMP temp_139) (CONST 3)) -- move1
+		movq	-592(%rbp), %r13
+		movq	$3, %r13
+		movq	%r13, -592(%rbp)
+		# (MOVE (MEM (TEMP temp2)) (TEMP temp_139)) -- move1
+		movq	-584(%rbp), %r14
+		movq	-592(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -592(%rbp)
+		movq	%r14, -584(%rbp)
+		# (MOVE (TEMP temp_140) (TEMP temp2)) -- move1
+		movq	-600(%rbp), %r14
+		movq	-584(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -584(%rbp)
+		movq	%r14, -600(%rbp)
+		# (MOVE (TEMP temp_141) (ADD (TEMP temp_140) (CONST 8))) -- move1
+		movq	-608(%rbp), %r14
+		movq	-600(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -600(%rbp)
+		movq	%r14, -608(%rbp)
+		movq	-608(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -608(%rbp)
+		movq	-616(%rbp), %r14
+		movq	-608(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -608(%rbp)
+		movq	%r14, -616(%rbp)
+		# (MOVE (TEMP temp2) (TEMP temp_141)) -- move1
+		movq	-584(%rbp), %r14
+		movq	-616(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -616(%rbp)
+		movq	%r14, -584(%rbp)
+		# (MOVE (TEMP temp_142) (CONST 41)) -- move1
+		movq	-624(%rbp), %r13
+		movq	$41, %r13
+		movq	%r13, -624(%rbp)
+		# (MOVE (MEM (TEMP temp2)) (TEMP temp_142)) -- move1
+		movq	-584(%rbp), %r14
+		movq	-624(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -624(%rbp)
+		movq	%r14, -584(%rbp)
+		# (MOVE (TEMP temp_143) (TEMP temp2)) -- move1
+		movq	-632(%rbp), %r14
+		movq	-584(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -584(%rbp)
+		movq	%r14, -632(%rbp)
+		# (MOVE (TEMP temp_144) (ADD (TEMP temp_143) (CONST 8))) -- move1
+		movq	-640(%rbp), %r14
+		movq	-632(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -632(%rbp)
+		movq	%r14, -640(%rbp)
+		movq	-640(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -640(%rbp)
+		movq	-648(%rbp), %r14
+		movq	-640(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -640(%rbp)
+		movq	%r14, -648(%rbp)
+		# (MOVE (TEMP temp2) (TEMP temp_144)) -- move1
+		movq	-584(%rbp), %r14
+		movq	-648(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -648(%rbp)
+		movq	%r14, -584(%rbp)
+		# (MOVE (TEMP temp_145) (CONST 58)) -- move1
+		movq	-656(%rbp), %r13
+		movq	$58, %r13
+		movq	%r13, -656(%rbp)
+		# (MOVE (MEM (TEMP temp2)) (TEMP temp_145)) -- move1
+		movq	-584(%rbp), %r14
+		movq	-656(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -656(%rbp)
+		movq	%r14, -584(%rbp)
+		# (MOVE (TEMP temp_146) (TEMP temp2)) -- move1
+		movq	-664(%rbp), %r14
+		movq	-584(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -584(%rbp)
+		movq	%r14, -664(%rbp)
+		# (MOVE (TEMP temp_147) (ADD (TEMP temp_146) (CONST 8))) -- move1
+		movq	-672(%rbp), %r14
+		movq	-664(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -664(%rbp)
+		movq	%r14, -672(%rbp)
+		movq	-672(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -672(%rbp)
+		movq	-680(%rbp), %r14
+		movq	-672(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -672(%rbp)
+		movq	%r14, -680(%rbp)
+		# (MOVE (TEMP temp2) (TEMP temp_147)) -- move1
+		movq	-584(%rbp), %r14
+		movq	-680(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -680(%rbp)
+		movq	%r14, -584(%rbp)
+		# (MOVE (TEMP temp_148) (CONST 32)) -- move1
+		movq	-688(%rbp), %r13
+		movq	$32, %r13
+		movq	%r13, -688(%rbp)
+		# (MOVE (MEM (TEMP temp2)) (TEMP temp_148)) -- move1
+		movq	-584(%rbp), %r14
+		movq	-688(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -688(%rbp)
+		movq	%r14, -584(%rbp)
+		# (MOVE (TEMP temp_149) (TEMP temp2)) -- move1
+		movq	-696(%rbp), %r14
+		movq	-584(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -584(%rbp)
+		movq	%r14, -696(%rbp)
+		# (MOVE (TEMP temp_150) (ADD (TEMP temp_149) (CONST 8))) -- move1
+		movq	-704(%rbp), %r14
+		movq	-696(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -696(%rbp)
+		movq	%r14, -704(%rbp)
+		movq	-704(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -704(%rbp)
+		movq	-712(%rbp), %r14
+		movq	-704(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -704(%rbp)
+		movq	%r14, -712(%rbp)
+		# (MOVE (TEMP temp2) (TEMP temp_150)) -- move1
+		movq	-584(%rbp), %r14
+		movq	-712(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -712(%rbp)
+		movq	%r14, -584(%rbp)
+		# (MOVE (TEMP temp_151) (TEMP temp2)) -- move1
+		movq	-720(%rbp), %r14
+		movq	-584(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -584(%rbp)
+		movq	%r14, -720(%rbp)
+		# (MOVE (TEMP temp_152) (SUB (TEMP temp_151) (CONST 24))) -- move1
+		movq	-728(%rbp), %r14
+		movq	-720(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -720(%rbp)
+		movq	%r14, -728(%rbp)
+		movq	-728(%rbp), %r13
+		subq	$24, %r13
+		movq	%r13, -728(%rbp)
+		movq	-736(%rbp), %r14
+		movq	-728(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -728(%rbp)
+		movq	%r14, -736(%rbp)
+		# (MOVE (TEMP temp2) (TEMP temp_152)) -- move1
+		movq	-584(%rbp), %r14
+		movq	-736(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -736(%rbp)
+		movq	%r14, -584(%rbp)
+		# (MOVE (TEMP temp_153) (TEMP temp2)) -- move1
+		movq	-744(%rbp), %r14
+		movq	-584(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -584(%rbp)
+		movq	%r14, -744(%rbp)
+		# (MOVE (TEMP temp_154) (CALL (NAME _Iprint_pai) (TEMP temp_153))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-744(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -744(%rbp)
+		callq	_Iprint_pai
+		movq	-752(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -752(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_155) (TEMP r)) -- move1
+		movq	-760(%rbp), %r14
+		movq	-224(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -224(%rbp)
+		movq	%r14, -760(%rbp)
+		# (MOVE (TEMP temp_156) (CALL (NAME _IunparseInt_aii) (TEMP temp_155))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-760(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -760(%rbp)
+		callq	_IunparseInt_aii
+		movq	-768(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -768(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_157) (TEMP temp_156)) -- move1
+		movq	-776(%rbp), %r14
+		movq	-768(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -768(%rbp)
+		movq	%r14, -776(%rbp)
+		# (MOVE (TEMP temp_158) (CALL (NAME _Iprint_pai) (TEMP temp_157))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-776(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -776(%rbp)
+		callq	_Iprint_pai
+		movq	-784(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -784(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_159) (CONST 8)) -- move1
+		movq	-792(%rbp), %r13
+		movq	$8, %r13
+		movq	%r13, -792(%rbp)
+		# (MOVE (TEMP temp_160) (CALL (NAME _I_alloc_i) (TEMP temp_159))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-792(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -792(%rbp)
+		callq	_I_alloc_i
+		movq	-800(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -800(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_161) (TEMP temp_160)) -- move1
+		movq	-808(%rbp), %r14
+		movq	-800(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -800(%rbp)
+		movq	%r14, -808(%rbp)
+		# (MOVE (TEMP temp3) (TEMP temp_161)) -- move1
+		movq	-816(%rbp), %r14
+		movq	-808(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -808(%rbp)
+		movq	%r14, -816(%rbp)
+		# (MOVE (TEMP temp_162) (CONST 0)) -- move1
+		movq	-824(%rbp), %r13
+		movq	$0, %r13
+		movq	%r13, -824(%rbp)
+		# (MOVE (MEM (TEMP temp3)) (TEMP temp_162)) -- move1
+		movq	-816(%rbp), %r14
+		movq	-824(%rbp), %r13
+		movq	%r13, (%r14)
+		movq	%r13, -824(%rbp)
+		movq	%r14, -816(%rbp)
+		# (MOVE (TEMP temp_163) (TEMP temp3)) -- move1
+		movq	-832(%rbp), %r14
+		movq	-816(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -816(%rbp)
+		movq	%r14, -832(%rbp)
+		# (MOVE (TEMP temp_164) (ADD (TEMP temp_163) (CONST 8))) -- move1
+		movq	-840(%rbp), %r14
+		movq	-832(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -832(%rbp)
+		movq	%r14, -840(%rbp)
+		movq	-840(%rbp), %r13
+		addq	$8, %r13
+		movq	%r13, -840(%rbp)
+		movq	-848(%rbp), %r14
+		movq	-840(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -840(%rbp)
+		movq	%r14, -848(%rbp)
+		# (MOVE (TEMP temp3) (TEMP temp_164)) -- move1
+		movq	-816(%rbp), %r14
+		movq	-848(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -848(%rbp)
+		movq	%r14, -816(%rbp)
+		# (MOVE (TEMP temp_165) (TEMP temp3)) -- move1
+		movq	-856(%rbp), %r14
+		movq	-816(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -816(%rbp)
+		movq	%r14, -856(%rbp)
+		# (MOVE (TEMP temp_166) (SUB (TEMP temp_165) (CONST 0))) -- move1
+		movq	-864(%rbp), %r14
+		movq	-856(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -856(%rbp)
+		movq	%r14, -864(%rbp)
+		movq	-864(%rbp), %r13
+		subq	$0, %r13
+		movq	%r13, -864(%rbp)
+		movq	-872(%rbp), %r14
+		movq	-864(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -864(%rbp)
+		movq	%r14, -872(%rbp)
+		# (MOVE (TEMP temp3) (TEMP temp_166)) -- move1
+		movq	-816(%rbp), %r14
+		movq	-872(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -872(%rbp)
+		movq	%r14, -816(%rbp)
+		# (MOVE (TEMP temp_167) (TEMP temp3)) -- move1
+		movq	-880(%rbp), %r14
+		movq	-816(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -816(%rbp)
+		movq	%r14, -880(%rbp)
+		# (MOVE (TEMP temp_168) (CALL (NAME _Iprintln_pai) (TEMP temp_167))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-880(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -880(%rbp)
+		callq	_Iprintln_pai
+		movq	-888(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -888(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (LABEL temp_169) -- label1
+temp_169:
+		# Function epilogue
+		# Restoring callee-save registers
+		movq	-8(%rbp), %rbx
+		movq	-16(%rbp), %rbp
+		movq	-24(%rbp), %r12
+		movq	-32(%rbp), %r13
+		movq	-40(%rbp), %r14
+		movq	-48(%rbp), %r15
+		# Restore old RBP and RSP
+		leave	
+		retq	
+
+		.globl	_Iprint_pai
+		.globl	_Iprintln_pai
+		.globl	_Ireadln_ai
+		.globl	_Igetchar_i
+		.globl	_Ieof_b
+		.globl	_IparseInt_t2ibai
+		.globl	_IunparseInt_aii
+		.globl	_IAck_iii
+		.align	4
+_IAck_iii:
+		# Starting function prologue
+		enter	$464, $0
+		# Save callee-save registers rbx rbp r12-r15
+		movq	%rbx, -8(%rbp)
+		movq	%rbp, -16(%rbp)
+		movq	%r12, -24(%rbp)
+		movq	%r13, -32(%rbp)
+		movq	%r14, -40(%rbp)
+		movq	%r15, -48(%rbp)
+		# (MOVE (TEMP temp_170) (TEMP _ARG0)) -- move1
+		movq	-160(%rbp), %r13
+		movq	%rdi, %r13
+		movq	%r13, -160(%rbp)
+		# (MOVE (TEMP m) (TEMP temp_170)) -- move1
+		movq	-168(%rbp), %r14
+		movq	-160(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -160(%rbp)
+		movq	%r14, -168(%rbp)
+		# (MOVE (TEMP temp_171) (TEMP _ARG1)) -- move1
+		movq	-176(%rbp), %r13
+		movq	%rsi, %r13
+		movq	%r13, -176(%rbp)
+		# (MOVE (TEMP n) (TEMP temp_171)) -- move1
+		movq	-184(%rbp), %r14
+		movq	-176(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -176(%rbp)
+		movq	%r14, -184(%rbp)
+		# (MOVE (TEMP temp_172) (TEMP m)) -- move1
+		movq	-192(%rbp), %r14
+		movq	-168(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -168(%rbp)
+		movq	%r14, -192(%rbp)
+		# (CJUMP (EQ (TEMP temp_172) (CONST 0)) temp6) -- cjump1
+		movq	-208(%rbp), %r13
+		movq	$0, %r13
+		movq	%r13, -208(%rbp)
+		movq	%rax, -144(%rbp)
+		movq	-192(%rbp), %r14
+		movq	-208(%rbp), %r13
+		cmpq	%r13, %r14
+		movq	%r13, -208(%rbp)
+		movq	%r14, -192(%rbp)
+		setz	%al
+		movq	-200(%rbp), %r13
+		movzx	%al, %r13
+		movq	%r13, -200(%rbp)
+		movq	-144(%rbp), %rax
+		movq	-200(%rbp), %r13
+		cmpq	$0, %r13
+		movq	%r13, -200(%rbp)
+		jne	temp6
+		# (LABEL temp11) -- label1
+temp11:
+		# (MOVE (TEMP temp_176) (TEMP n)) -- move1
+		movq	-216(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -216(%rbp)
+		# (CJUMP (EQ (TEMP temp_176) (CONST 0)) temp14) -- cjump1
+		movq	-232(%rbp), %r13
+		movq	$0, %r13
+		movq	%r13, -232(%rbp)
+		movq	%rax, -144(%rbp)
+		movq	-216(%rbp), %r14
+		movq	-232(%rbp), %r13
+		cmpq	%r13, %r14
+		movq	%r13, -232(%rbp)
+		movq	%r14, -216(%rbp)
+		setz	%al
+		movq	-224(%rbp), %r13
+		movzx	%al, %r13
+		movq	%r13, -224(%rbp)
+		movq	-144(%rbp), %rax
+		movq	-224(%rbp), %r13
+		cmpq	$0, %r13
+		movq	%r13, -224(%rbp)
+		jne	temp14
+		# (LABEL temp19) -- label1
+temp19:
+		# (MOVE (TEMP temp_183) (TEMP m)) -- move1
+		movq	-240(%rbp), %r14
+		movq	-168(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -168(%rbp)
+		movq	%r14, -240(%rbp)
+		# (MOVE (TEMP temp_188) (SUB (TEMP temp_183) (CONST 1))) -- move1
+		movq	-248(%rbp), %r14
+		movq	-240(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -240(%rbp)
+		movq	%r14, -248(%rbp)
+		movq	-248(%rbp), %r13
+		subq	$1, %r13
+		movq	%r13, -248(%rbp)
+		movq	-256(%rbp), %r14
+		movq	-248(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -248(%rbp)
+		movq	%r14, -256(%rbp)
+		# (MOVE (TEMP temp_185) (TEMP m)) -- move1
+		movq	-264(%rbp), %r14
+		movq	-168(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -168(%rbp)
+		movq	%r14, -264(%rbp)
+		# (MOVE (TEMP temp_184) (TEMP n)) -- move1
+		movq	-272(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -272(%rbp)
+		# (MOVE (TEMP temp_186) (SUB (TEMP temp_184) (CONST 1))) -- move1
+		movq	-280(%rbp), %r14
+		movq	-272(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -272(%rbp)
+		movq	%r14, -280(%rbp)
+		movq	-280(%rbp), %r13
+		subq	$1, %r13
+		movq	%r13, -280(%rbp)
+		movq	-288(%rbp), %r14
+		movq	-280(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -280(%rbp)
+		movq	%r14, -288(%rbp)
+		# (MOVE (TEMP temp_187) (CALL (NAME _IAck_iii) (TEMP temp_185) (TEMP temp_186))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-264(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -264(%rbp)
+		movq	-288(%rbp), %r13
+		movq	%r13, %rsi
+		movq	%r13, -288(%rbp)
+		callq	_IAck_iii
+		movq	-296(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -296(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_189) (TEMP temp_187)) -- move1
+		movq	-304(%rbp), %r14
+		movq	-296(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -296(%rbp)
+		movq	%r14, -304(%rbp)
+		# (MOVE (TEMP temp_190) (CALL (NAME _IAck_iii) (TEMP temp_188) (TEMP temp_189))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-256(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -256(%rbp)
+		movq	-304(%rbp), %r13
+		movq	%r13, %rsi
+		movq	%r13, -304(%rbp)
+		callq	_IAck_iii
+		movq	-312(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -312(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_191) (TEMP temp_190)) -- move1
+		movq	-320(%rbp), %r14
+		movq	-312(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -312(%rbp)
+		movq	%r14, -320(%rbp)
+		# (MOVE (TEMP temp24) (TEMP temp_191)) -- move1
+		movq	-328(%rbp), %r14
+		movq	-320(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -320(%rbp)
+		movq	%r14, -328(%rbp)
+		# (MOVE (TEMP temp_192) (TEMP temp24)) -- move1
+		movq	-336(%rbp), %r14
+		movq	-328(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -328(%rbp)
+		movq	%r14, -336(%rbp)
+		# (MOVE (TEMP _RET0) (TEMP temp_192)) -- move1
+		movq	-336(%rbp), %r13
+		movq	%r13, %rax
+		movq	%r13, -336(%rbp)
+		# (JUMP (NAME temp_195)) -- jump1
+		jmp	temp_195
+		# (JUMP (NAME temp_193)) -- jump1
+		jmp	temp_193
+		# (LABEL temp14) -- label1
+temp14:
+		# (MOVE (TEMP temp_177) (TEMP m)) -- move1
+		movq	-344(%rbp), %r14
+		movq	-168(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -168(%rbp)
+		movq	%r14, -344(%rbp)
+		# (MOVE (TEMP temp_178) (SUB (TEMP temp_177) (CONST 1))) -- move1
+		movq	-352(%rbp), %r14
+		movq	-344(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -344(%rbp)
+		movq	%r14, -352(%rbp)
+		movq	-352(%rbp), %r13
+		subq	$1, %r13
+		movq	%r13, -352(%rbp)
+		movq	-360(%rbp), %r14
+		movq	-352(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -352(%rbp)
+		movq	%r14, -360(%rbp)
+		# (MOVE (TEMP temp_179) (CONST 1)) -- move1
+		movq	-368(%rbp), %r13
+		movq	$1, %r13
+		movq	%r13, -368(%rbp)
+		# (MOVE (TEMP temp_180) (CALL (NAME _IAck_iii) (TEMP temp_178) (TEMP temp_179))) -- move2
+		# Function call prologue
+		# Save all caller-saved registers
+		movq	%rax, -56(%rbp)
+		movq	%rcx, -64(%rbp)
+		movq	%rsi, -72(%rbp)
+		movq	%rdi, -80(%rbp)
+		movq	%rdx, -88(%rbp)
+		movq	%rsp, -96(%rbp)
+		movq	%r8, -104(%rbp)
+		movq	%r9, -112(%rbp)
+		movq	%r10, -120(%rbp)
+		movq	%r11, -128(%rbp)
+		# Pass pointer to return space
+		leaq	-136(%rbp), %r9
+		# Passing in arguments...
+		movq	-360(%rbp), %r13
+		movq	%r13, %rdi
+		movq	%r13, -360(%rbp)
+		movq	-368(%rbp), %r13
+		movq	%r13, %rsi
+		movq	%r13, -368(%rbp)
+		callq	_IAck_iii
+		movq	-376(%rbp), %r13
+		movq	%rax, %r13
+		movq	%r13, -376(%rbp)
+		# Function call epilogue
+		movq	-56(%rbp), %rax
+		movq	-64(%rbp), %rcx
+		movq	-72(%rbp), %rsi
+		movq	-80(%rbp), %rdi
+		movq	-88(%rbp), %rdx
+		movq	-96(%rbp), %rsp
+		movq	-104(%rbp), %r8
+		movq	-112(%rbp), %r9
+		movq	-120(%rbp), %r10
+		movq	-128(%rbp), %r11
+		# (MOVE (TEMP temp_181) (TEMP temp_180)) -- move1
+		movq	-384(%rbp), %r14
+		movq	-376(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -376(%rbp)
+		movq	%r14, -384(%rbp)
+		# (MOVE (TEMP temp17) (TEMP temp_181)) -- move1
+		movq	-392(%rbp), %r14
+		movq	-384(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -384(%rbp)
+		movq	%r14, -392(%rbp)
+		# (MOVE (TEMP temp_182) (TEMP temp17)) -- move1
+		movq	-400(%rbp), %r14
+		movq	-392(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -392(%rbp)
+		movq	%r14, -400(%rbp)
+		# (MOVE (TEMP _RET0) (TEMP temp_182)) -- move1
+		movq	-400(%rbp), %r13
+		movq	%r13, %rax
+		movq	%r13, -400(%rbp)
+		# (JUMP (NAME temp_195)) -- jump1
+		jmp	temp_195
+		# (LABEL temp_193) -- label1
+temp_193:
+		# (JUMP (NAME temp_194)) -- jump1
+		jmp	temp_194
+		# (LABEL temp6) -- label1
+temp6:
+		# (MOVE (TEMP temp_173) (TEMP n)) -- move1
+		movq	-408(%rbp), %r14
+		movq	-184(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -184(%rbp)
+		movq	%r14, -408(%rbp)
+		# (MOVE (TEMP temp_174) (ADD (TEMP temp_173) (CONST 1))) -- move1
+		movq	-416(%rbp), %r14
+		movq	-408(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -408(%rbp)
+		movq	%r14, -416(%rbp)
+		movq	-416(%rbp), %r13
+		addq	$1, %r13
+		movq	%r13, -416(%rbp)
+		movq	-424(%rbp), %r14
+		movq	-416(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -416(%rbp)
+		movq	%r14, -424(%rbp)
+		# (MOVE (TEMP temp9) (TEMP temp_174)) -- move1
+		movq	-432(%rbp), %r14
+		movq	-424(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -424(%rbp)
+		movq	%r14, -432(%rbp)
+		# (MOVE (TEMP temp_175) (TEMP temp9)) -- move1
+		movq	-440(%rbp), %r14
+		movq	-432(%rbp), %r13
+		movq	%r13, %r14
+		movq	%r13, -432(%rbp)
+		movq	%r14, -440(%rbp)
+		# (MOVE (TEMP _RET0) (TEMP temp_175)) -- move1
+		movq	-440(%rbp), %r13
+		movq	%r13, %rax
+		movq	%r13, -440(%rbp)
+		# (JUMP (NAME temp_195)) -- jump1
+		jmp	temp_195
+		# (LABEL temp_194) -- label1
+temp_194:
+		# (LABEL temp_195) -- label1
+temp_195:
+		# Function epilogue
+		# Restoring callee-save registers
+		movq	-8(%rbp), %rbx
+		movq	-16(%rbp), %rbp
+		movq	-24(%rbp), %r12
+		movq	-32(%rbp), %r13
+		movq	-40(%rbp), %r14
+		movq	-48(%rbp), %r15
+		# Restore old RBP and RSP
+		leave	
+		retq	
+
