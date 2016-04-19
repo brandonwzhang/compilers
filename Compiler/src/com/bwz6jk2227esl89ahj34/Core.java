@@ -325,6 +325,9 @@ public class Core {
         MIRLowerVisitor mirv = new MIRLowerVisitor();
         IRCompUnit lirRoot = (IRCompUnit) mirv.visit(mirRoot.get());
 
+        CheckCanonicalIRVisitor cv = new CheckCanonicalIRVisitor();
+        assert cv.visit(lirRoot);
+
         if (Main.optimizationsOn()) {
             IRVisitor mircfv = new IRConstantFoldingVisitor();
             lirRoot = (IRCompUnit) mircfv.visit(lirRoot);
@@ -375,10 +378,6 @@ public class Core {
 
         IRCompUnit root_ = result.value();
 
-        CheckCanonicalIRVisitor cv = new CheckCanonicalIRVisitor();
-        System.out.println(cv.visit(root_));
-
-        System.out.println("====================================");
         IRSimulator sim = new IRSimulator(root_);
         sim.call("_Imain_paai", 0);
     }
@@ -426,10 +425,9 @@ public class Core {
         Util.writeHelper(file, "s", assemblyPath, Collections.singletonList(program.toString()));
 
         // Link and run the assembly file
-        String fileName = file.replace(".xi", "");
-        String path = new File(Core.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getParentFile().getParentFile().getParentFile().getParent();
+        String fileName = file.substring(0, file.lastIndexOf('.'));
         ProcessBuilder pb =
-                new ProcessBuilder(path + "/runtime/linkxi.sh", "-o", fileName, fileName + ".s").inheritIO();
+                new ProcessBuilder(Util.rootPath + "/runtime/linkxi.sh", "-o", fileName, assemblyPath + "/" + fileName + ".s").inheritIO();
         try {
             Process linkProcess = pb.start();
             linkProcess.waitFor();

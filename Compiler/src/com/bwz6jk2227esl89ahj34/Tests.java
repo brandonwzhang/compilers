@@ -9,10 +9,9 @@ import com.bwz6jk2227esl89ahj34.AST.visit.PrintVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Tests {
 
@@ -21,6 +20,57 @@ public class Tests {
      * set do not contain a file extension.
      */
     public static Set<String> exclude = new HashSet<>();
+
+    /**
+     * Compares the output of executable to IR simulation
+     * Must be run from the directory containing the xi files
+     */
+    public static void regressionTest() {
+        // Get all files in test directory
+        List<String> files = Util.getDirectoryFiles("./").stream()
+                .filter(filename -> filename.contains(".xi"))
+                .filter(filename -> !excluded(filename))
+                .collect(Collectors.toList());
+
+        List<String> results = new LinkedList<>();
+        for (String file : files) {
+            String fileName = file.substring(0, file.lastIndexOf('.'));
+
+            String[] irCommand = {Util.rootPath + "/xic", "-libpath", Util.rootPath + "/lib", "--irrun", file};
+            Core.generateAssembly("./", "./", Util.rootPath + "/lib/", "./", file);
+            String[] assemblyCommand = {"./" + fileName};
+            // Run the IR and executable and print the outputs
+            System.out.println("***************" + file + "***************");
+            System.out.println("==================IR==================");
+            List<String> irResults = Util.runCommand(irCommand);
+            System.out.println("===============Assembly===============");
+            List<String> assemblyResults = Util.runCommand(assemblyCommand);
+
+            // Store results
+            if (irResults.equals(assemblyResults)) {
+                results.add(file + ": passed");
+            } else {
+                results.add(file + ": failed");
+            }
+
+            // Get rid of output files
+            try {
+                ProcessBuilder rmir = new ProcessBuilder("rm", fileName + ".ir");
+                rmir.inheritIO().start().waitFor();
+                ProcessBuilder rmassembly = new ProcessBuilder("rm", fileName + ".s");
+                rmassembly.inheritIO().start().waitFor();
+                ProcessBuilder rmexecutable = new ProcessBuilder("rm", fileName);
+                rmexecutable.inheritIO().start().waitFor();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Print out results
+        for (String result : results) {
+            System.out.println(result);
+        }
+    }
 
     /**
      * Returns true if the given file is excluded from testing. Assumes that
@@ -117,7 +167,6 @@ public class Tests {
      * Automated tests for typecheck.
      */
     public static void typeCheckTests() {
-
         System.out.println("\n================Typecheck Tests================");
 
         System.out.println("\n================Passed Tests================");

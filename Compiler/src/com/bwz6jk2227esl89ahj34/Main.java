@@ -1,5 +1,7 @@
 package com.bwz6jk2227esl89ahj34;
 
+import com.bwz6jk2227esl89ahj34.util.Util;
+
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -25,62 +27,62 @@ public class Main {
                       Main::turnDebugOn,
                       0);
         cli.addOption("--tests",
-                "Runs the test suite.",
-                Main::turnTestsOn,
-                0);
+                      "Runs the test suite.",
+                      Main::turnTestsOn,
+                      0);
         cli.addOption("-sourcepath",
-                "Set the path for source files. Takes one argument.",
-                Main::setSourcePath,
-                1);
+                      "Set the path for source files. Takes one argument.",
+                      path -> setSourcePath(path[0]),
+                      1);
         cli.addOption("-D",
-                "Set the path for diagnostic files. Takes one argument.",
-                Main::setDiagnosticPath,
-                1);
+                      "Set the path for diagnostic files. Takes one argument.",
+                      path -> setDiagnosticPath(path[0]),
+                      1);
         cli.addOption("-d",
-                "Specifies where to place the generated assembly files.",
-                Main::setAssemblyPath,
-                1);
+                      "Specifies where to place the generated assembly files.",
+                      path -> setAssemblyPath(path[0]),
+                      1);
         cli.addOption("-O",
-                "Turn off optimizations",
-                Main::turnOptimizationsOff,
-                0);
+                      "Turn off optimizations",
+                      Main::turnOptimizationsOff,
+                      0);
         cli.addOption("-libpath",
-                "Set the path for interface files. Takes one argument.",
-                Main::setLibPath,
-                1);
+                      "Set the path for interface files. Takes one argument.",
+                      path -> setLibPath(path[0]),
+                      1);
         cli.addOption("-target",
-                "Specify the operating system. Default is linux. " +
-                        "windows and macos are not allowed.",
-                Main::setTarget,
-                1);
+                      "Specify the operating system. Default is linux. " +
+                              "windows and macos are not allowed.",
+                      path -> setTarget(path[0]),
+                      1);
         cli.addOption("--lex",
-                "Lex the .xi source files to .lexed files.",
-                files -> Arrays.stream(files).forEach(file ->
-                        Core.lexFile(sourcePath, diagnosticPath,
-                                file)),
-                0);
+                      "Lex the .xi source files to .lexed files.",
+                      files -> Arrays.stream(files).forEach(file ->
+                              Core.lexFile(sourcePath, diagnosticPath,
+                                      file)),
+                      0);
         cli.addOption("--parse",
-                "Parse the .xi source files to .parsed files.",
-                files -> Arrays.stream(files).forEach(file ->
-                        Core.parseFile(sourcePath, diagnosticPath,
-                                file)),
-                0);
+                      "Parse the .xi source files to .parsed files.",
+                      files -> Arrays.stream(files).forEach(file ->
+                              Core.parseFile(sourcePath, diagnosticPath,
+                                      file)),
+                      0);
         cli.addOption("--typecheck",
-                "Typecheck the .xi source files",
-                files -> Arrays.stream(files).forEach(file ->
-                                Core.typeCheck(sourcePath, diagnosticPath,
-                                        libPath, file)),
-                0);
+                      "Typecheck the .xi source files",
+                      files -> Arrays.stream(files).forEach(file ->
+                                      Core.typeCheck(sourcePath, diagnosticPath,
+                                              libPath, file)),
+                      0);
         cli.addOption("--irgen",
-                "Generate intermediate code and write its S-expression representation.",
-                files -> Arrays.stream(files).forEach(file ->
-                        Core.irGen(sourcePath, diagnosticPath, libPath, file, true, false)),
-                0);
+                      "Generate intermediate code and write its S-expression representation.",
+                      files -> Arrays.stream(files).forEach(file ->
+                              Core.irGen(sourcePath, diagnosticPath, libPath, file, true, false)),
+                      0);
         cli.addOption("--irrun",
-                "Generate and interpret intermediate code",
-                files -> Arrays.stream(files).forEach(file ->
-                        Core.irRun(sourcePath, diagnosticPath, libPath, file)),
-                0);
+                      "Generate and interpret intermediate code",
+                      files -> Arrays.stream(files).forEach(file ->
+                              Core.irRun(sourcePath, diagnosticPath, libPath, file)),
+                      0);
 
         cli.execute(args);
 
@@ -100,60 +102,29 @@ public class Main {
             //Tests.constantFoldTests();
             //Tests.mirGenTests();
             //Tests.irGenTests();
-            Tests.irRunTests();
+            //Tests.irRunTests();
+            Tests.regressionTest();
         }
     }
 
-    /**
-     * Sets the path for source files
-     * @param args single element String array containing the path
-     */
-    public static void setSourcePath(String[] args) {
-        if (args.length == 0 || args[0] == null) {
-            System.out.println("Please provide source path");
-            return;
-        }
-        sourcePath = args[0] + "/";
+    public static void setSourcePath(String path) {
+        sourcePath = sourcePath + "/";
     }
 
-    /**
-     * Sets the path for diagnostic files
-     * @param args single element String array containing the path
-     */
-    public static void setDiagnosticPath(String[] args) {
-        if (args.length == 0 || args[0] == null) {
-            System.out.println("Please provide diagnostic path");
-            return;
-        }
-        diagnosticPath = args[0] + "/";
+    public static void setDiagnosticPath(String path) {
+        diagnosticPath = path + "/";
     }
 
-    /**
-     * Specifies where to place the generated assembly files.
-     * @param args single element String array containing the path
-     */
-    public static void setAssemblyPath(String[] args) {
-        if (args.length == 0 || args[0] == null) {
-            System.out.println("Please provide diagnostic path");
-            return;
-        }
-        assemblyPath = args[0] + "/";
+    public static void setAssemblyPath(String path) {
+        assemblyPath = path + "/";
     }
 
-    public static void setLibPath(String[] args) {
-        if (args.length == 0 || args[0] == null) {
-            System.out.println("Please provide lib path");
-            return;
-        }
-        libPath = args[0] + "/";
+    public static void setLibPath(String path) {
+        libPath = path + "/";
     }
 
-    public static void setTarget(String[] args) {
-        if (args.length == 0 || args[0] == null) {
-            System.out.println("Please provide target");
-            return;
-        }
-        target = args[0];
+    public static void setTarget(String path) {
+        target = path;
     }
 
     public static String sourcePath() {

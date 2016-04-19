@@ -22,6 +22,31 @@ import java.util.*;
  * A class containing static utility methods and variables.
  */
 public class Util {
+    public static String rootPath = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).
+            getParentFile().getParentFile().getParentFile().getParentFile().getParent();
+
+    public static List<String> runCommand(String[] command) {
+        ProcessBuilder pb = new ProcessBuilder(command);
+        Process process;
+        List<String> lines = new LinkedList<>();
+        try {
+            process = pb.start();
+            process.waitFor();
+            // Store the standard output of these processes in lines1 and lines2
+            BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String nextLine = outputReader.readLine();
+            while (nextLine != null) {
+                System.out.println(nextLine);
+                lines.add(nextLine);
+                nextLine = outputReader.readLine();
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Exception occurred reading stdout of processes");
+        }
+        return lines;
+    }
+
     /**
      * Translates symbol numbers into print-friendly strings. Used for lexer
      * and parser outputting.
@@ -126,7 +151,7 @@ public class Util {
                                    String diagnosticPath,
                                    List<String> lines) {
         String output = file.replace(".xi", "." + extension);
-        String writeFile = diagnosticPath + output;
+        String writeFile = diagnosticPath + '/' +  output;
         makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
         writeAndClose(writeFile, lines);
     }
