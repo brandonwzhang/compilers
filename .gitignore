@@ -9,5 +9,4 @@ vm/*
 *.swp
 *.o
 *~
-xifilt
-
+runtime/*
