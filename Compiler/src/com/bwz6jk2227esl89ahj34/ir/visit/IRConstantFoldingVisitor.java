@@ -5,6 +5,7 @@ import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
 import java.math.BigInteger;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 
 
 /**
@@ -121,6 +122,12 @@ public class IRConstantFoldingVisitor extends IRVisitor{
             IRBinOp child = (IRBinOp)n_;
             if(child.left() instanceof IRConst
                     && child.right() instanceof IRConst) {
+                // if divide by 0 do not constant fold
+                // so it can fail at run time
+                if (child.opType() == OpType.DIV
+                        && ((IRConst) child.right()).value() == 0)  {
+                    return n_;
+                }
                 IRConst result = computeBinOp(child);
                 return result;
             } else {
