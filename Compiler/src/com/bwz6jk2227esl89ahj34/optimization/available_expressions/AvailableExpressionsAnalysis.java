@@ -14,11 +14,13 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
     private CFGNode<IRNode> startNode;
 
 
-    public void transfer(LatticeElement element) {
+    public void transfer(CFGNode node) {
         // TODO
     }
 
     public AvailableExpressionSet meet(Set<LatticeElement> elements) {
+        assert elements.size() >= 2;
+
         // start with Top
         Set<IRExpr> intersect = new HashSet<>();
         boolean b = true;
