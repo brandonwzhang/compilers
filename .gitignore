@@ -7,4 +7,7 @@ vm/*
 *.parsed
 *.lexed
 *.swp
+*.o
 *~
+xifilt
+
