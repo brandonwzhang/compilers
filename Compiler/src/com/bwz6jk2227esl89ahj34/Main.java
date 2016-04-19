@@ -53,7 +53,7 @@ public class Main {
         cli.addOption("-target",
                       "Specify the operating system. Default is linux. " +
                               "windows and macos are not allowed.",
-                      path -> setTarget(path[0]),
+                      os -> setTarget(os[0]),
                       1);
         cli.addOption("--lex",
                       "Lex the .xi source files to .lexed files.",
@@ -123,8 +123,8 @@ public class Main {
         libPath = path + "/";
     }
 
-    public static void setTarget(String path) {
-        target = path;
+    public static void setTarget(String os) {
+        target = os;
     }
 
     public static String sourcePath() {
