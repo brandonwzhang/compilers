@@ -11,7 +11,7 @@ public class CFGNode<T> {
     Set<CFGNode> successors;
 
     T data;
-    LatticeElement latticeElement;
-    Set<LatticeElement> in;
-    Set<LatticeElement> out;
+
+    LatticeElement in;
+    LatticeElement out;
 }
