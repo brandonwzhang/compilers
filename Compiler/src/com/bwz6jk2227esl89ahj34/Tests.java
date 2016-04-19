@@ -26,6 +26,8 @@ public class Tests {
      * Must be run from the directory containing the xi files
      */
     public static void regressionTest() {
+        String target = "linux"; // TODO: change this
+
         // Get all files in test directory
         List<String> files = Util.getDirectoryFiles("./").stream()
                 .filter(filename -> filename.contains(".xi"))
@@ -37,7 +39,7 @@ public class Tests {
             String fileName = file.substring(0, file.lastIndexOf('.'));
 
             String[] irCommand = {Util.rootPath + "/xic", "-libpath", Util.rootPath + "/lib", "--irrun", file};
-            Core.generateAssembly("./", "./", Util.rootPath + "/lib/", "./", file);
+            Core.generateAssembly("./", "./", Util.rootPath + "/lib/", "./", target, file);
             String[] assemblyCommand = {"./" + fileName};
             // Run the IR and executable and print the outputs
             System.out.println("***************" + file + "***************");

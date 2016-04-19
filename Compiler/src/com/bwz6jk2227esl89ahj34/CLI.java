@@ -92,8 +92,8 @@ public class CLI {
             }
         }
 
-        if (!Main.target().equals("linux")) {
-            System.out.println("\nError: target operating system must be linux.");
+        if (!Main.target().equals("linux") || !Main.target().equals("osx")) {
+            System.out.println("\nError: target operating system must be linux or osx.");
             return;
         }
 
@@ -104,6 +104,7 @@ public class CLI {
                         Main.diagnosticPath(),
                         Main.libPath(),
                         Main.assemblyPath(),
+                        Main.target(),
                         file
                 )
         );

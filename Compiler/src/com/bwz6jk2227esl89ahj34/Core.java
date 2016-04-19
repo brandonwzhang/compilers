@@ -386,6 +386,7 @@ public class Core {
                                         String diagnosticPath,
                                         String libPath,
                                         String assemblyPath,
+                                        String target,
                                         String file) {
 
         // Read the file. If something went wrong (e.g. file not found), then
