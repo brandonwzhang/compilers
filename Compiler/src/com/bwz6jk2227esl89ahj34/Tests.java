@@ -1,11 +1,11 @@
 package com.bwz6jk2227esl89ahj34;
 
-import com.bwz6jk2227esl89ahj34.AST.Program;
-import com.bwz6jk2227esl89ahj34.AST.parse.Lexer;
-import com.bwz6jk2227esl89ahj34.AST.parse.Parser;
-import com.bwz6jk2227esl89ahj34.AST.visit.ConstantFoldingVisitor;
-import com.bwz6jk2227esl89ahj34.AST.visit.NodeVisitor;
-import com.bwz6jk2227esl89ahj34.AST.visit.PrintVisitor;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.Program;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse.Lexer;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse.Parser;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.visit.ConstantFoldingVisitor;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.visit.NodeVisitor;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.visit.PrintVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.Util;
 

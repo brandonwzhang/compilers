@@ -1,13 +1,12 @@
 package com.bwz6jk2227esl89ahj34;
 
-import com.bwz6jk2227esl89ahj34.AST.FunctionDeclaration;
-import com.bwz6jk2227esl89ahj34.AST.Program;
-import com.bwz6jk2227esl89ahj34.AST.UseStatement;
-import com.bwz6jk2227esl89ahj34.AST.parse.Lexer;
-import com.bwz6jk2227esl89ahj34.AST.parse.Parser;
-import com.bwz6jk2227esl89ahj34.AST.parse.ParserSym;
-import com.bwz6jk2227esl89ahj34.AST.type.TypeException;
-import com.bwz6jk2227esl89ahj34.AST.visit.*;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.FunctionDeclaration;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.Program;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse.Lexer;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse.Parser;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse.ParserSym;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.TypeException;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.visit.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyProgram;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
@@ -22,7 +21,6 @@ import com.bwz6jk2227esl89ahj34.util.Util;
 import java_cup.runtime.Symbol;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileReader;
 import java.util.*;
 
