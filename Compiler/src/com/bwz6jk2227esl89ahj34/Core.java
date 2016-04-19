@@ -422,7 +422,8 @@ public class Core {
         // Instantiate an AssemblyProgram, which processes the ir and prepares
         // the assembly code.
         AssemblyProgram program = new AssemblyProgram(irRoot.get(),
-                IRfunctionNamesFromUseStatements);
+                IRfunctionNamesFromUseStatements,
+                target);
         Util.writeHelper(file, "s", assemblyPath, Collections.singletonList(program.toString()));
 
         // Link and run the assembly file

@@ -16,7 +16,7 @@ public class AssemblyProgram {
      * @param root IRCompUnit of program
      * @return
      */
-    public AssemblyProgram(IRCompUnit root, List<String> global) {
+    public AssemblyProgram(IRCompUnit root, List<String> global, String target) {
 
         this.global = global;
 
