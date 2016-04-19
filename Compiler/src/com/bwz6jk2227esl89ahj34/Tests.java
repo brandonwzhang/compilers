@@ -34,9 +34,11 @@ public class Tests {
 
         List<String> results = new LinkedList<>();
         for (String file : files) {
+            String fileName = file.substring(0, file.lastIndexOf('.'));
+
             String[] irCommand = {Util.rootPath + "/xic", "-libpath", Util.rootPath + "/lib", "--irrun", file};
             Core.generateAssembly("./", "./", Util.rootPath + "/lib/", "./", file);
-            String[] assemblyCommand = {"./" + file.replace(".xi", "")};
+            String[] assemblyCommand = {"./" + fileName};
             // Run the IR and executable and print the outputs
             System.out.println("***************" + file + "***************");
             System.out.println("==================IR==================");
@@ -50,27 +52,23 @@ public class Tests {
             } else {
                 results.add(file + ": failed");
             }
+
+            // Get rid of output files
+            try {
+                ProcessBuilder rmir = new ProcessBuilder("rm", fileName + ".ir");
+                rmir.inheritIO().start().waitFor();
+                ProcessBuilder rmassembly = new ProcessBuilder("rm", fileName + ".s");
+                rmassembly.inheritIO().start().waitFor();
+                ProcessBuilder rmexecutable = new ProcessBuilder("rm", fileName);
+                rmexecutable.inheritIO().start().waitFor();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         // Print out results
         for (String result : results) {
             System.out.println(result);
-        }
-
-        // Get rid of output files
-        try {
-            ProcessBuilder mkdir = new ProcessBuilder("mkdir", "xifiles");
-            mkdir.inheritIO().start().waitFor();
-            ProcessBuilder mv = new ProcessBuilder("mv", "*.xi", "xifiles");
-            mv.inheritIO().start().waitFor();
-            ProcessBuilder rm = new ProcessBuilder("rm", "*");
-            rm.inheritIO().start().waitFor();
-            ProcessBuilder mvXiFiles = new ProcessBuilder("mv", "xifiles/*", ".");
-            mvXiFiles.inheritIO().start().waitFor();
-            ProcessBuilder rmdir = new ProcessBuilder("rm", "-r", "xifiles");
-            rmdir.inheritIO().start().waitFor();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
