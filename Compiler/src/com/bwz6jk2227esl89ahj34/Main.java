@@ -14,6 +14,11 @@ public class Main {
     private static boolean debug;
     private static boolean optimizations = true;
     private static boolean tests;
+    private static boolean lex;
+    private static boolean parse;
+    private static boolean typecheck;
+    private static boolean irgen;
+    private static boolean irrun;
 
     public static void main(String[] args) {
         CLI cli = new CLI();
@@ -172,6 +177,26 @@ public class Main {
 
     public static boolean optimizationsOn() {
         return optimizations;
+    }
+
+    public static boolean lex() {
+        return lex;
+    }
+
+    public static boolean parse() {
+        return parse;
+    }
+
+    public static boolean typecheck() {
+        return typecheck;
+    }
+
+    public static boolean irgen() {
+        return irgen;
+    }
+
+    public static boolean irrun() {
+        return irrun;
     }
 
 }
