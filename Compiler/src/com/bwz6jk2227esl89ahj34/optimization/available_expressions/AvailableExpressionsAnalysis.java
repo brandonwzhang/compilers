@@ -16,6 +16,8 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
 
     public void transfer(CFGNode node) {
         // TODO
+        node.setIn(meet(node.getPredecessors()));
+
     }
 
     public AvailableExpressionSet meet(Set<LatticeElement> elements) {

@@ -10,7 +10,7 @@ public abstract class DataflowAnalysis {
     private Direction direction;
     private CFGNode startNode;
 
-    public abstract void transfer(LatticeElement element);
+    public abstract void transfer(CFGNode node);
 
     public abstract LatticeElement meet(Set<LatticeElement> elements);
 }
