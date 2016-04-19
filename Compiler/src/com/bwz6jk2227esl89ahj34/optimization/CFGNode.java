@@ -6,11 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CFGNode<T, E> {
+public class CFGNode<T> {
     List<CFGNode> predecessors;
     List<CFGNode> successors;
 
     T data;
-    Set<E> in;
-    Set<E> out;
+    Set<LatticeElement> in;
+    Set<LatticeElement> out;
 }
