@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 public class CFGNode<T> {
-    List<CFGNode> predecessors;
-    List<CFGNode> successors;
+    Set<CFGNode> predecessors;
+    Set<CFGNode> successors;
 
     T data;
     Set<LatticeElement> in;
