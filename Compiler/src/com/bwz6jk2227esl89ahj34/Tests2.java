@@ -31,6 +31,63 @@ public class Tests2 {
     }
 
     /**
+     * Compares the output of executable to IR simulation
+     * Must be run from the directory containing the xi files
+     */
+    public static void regressionTest() {
+        String target = "linux"; // TODO: change this
+
+        // Get all files in test directory
+        List<String> files = Util.getDirectoryFiles(Util.rootPath + "/tests").stream()
+                .filter(filename -> filename.contains(".xi"))
+                .filter(filename -> !excluded(filename))
+                .collect(Collectors.toList());
+
+        Main.setSourcePath(".");
+        Main.setDiagnosticPath(".");
+        Main.setLibPath("./lib");
+        Main.setAssemblyPath(".");
+
+        List<String> results = new LinkedList<>();
+        for (String file : files) {
+            String fileName = file.substring(0, file.lastIndexOf('.'));
+
+            String[] irCommand = {Util.rootPath + "/xic", "-libpath", Util.rootPath + "/lib", "--irrun", "tests/" + file};
+            String[] assemblyCommand = {"./tests/" + fileName};
+            // Run the IR and executable and print the outputs
+            System.out.println("***************" + file + "***************");
+            System.out.println("==================IR==================");
+            List<String> irResults = Util.runCommand(irCommand);
+            System.out.println("===============Assembly===============");
+            List<String> assemblyResults = Util.runCommand(assemblyCommand);
+
+            // Store results
+            if (irResults.equals(assemblyResults)) {
+                results.add(file + ": passed");
+            } else {
+                results.add(file + ": failed");
+            }
+
+            // Get rid of output files
+            try {
+                ProcessBuilder rmir = new ProcessBuilder("rm", "tests/" + fileName + ".ir");
+                rmir.inheritIO().start().waitFor();
+                ProcessBuilder rmassembly = new ProcessBuilder("rm", "tests/" + fileName + ".s");
+                rmassembly.inheritIO().start().waitFor();
+                ProcessBuilder rmexecutable = new ProcessBuilder("rm", "tests/" + fileName);
+                rmexecutable.inheritIO().start().waitFor();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Print out results
+        for (String result : results) {
+            System.out.println(result);
+        }
+    }
+
+    /**
      * Automated tests for interpreted the generated IR.
      */
     public static void irRunTests() {
@@ -42,7 +99,7 @@ public class Tests2 {
 
         System.out.println("\n================IR RUN TESTS================");
 
-        Util.getDirectoryFiles("ir/irgen/").stream()
+        Util.getDirectoryFiles("ir/irrun/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
                 .forEach(filename -> {
@@ -114,49 +171,48 @@ public class Tests2 {
                 });
     }
 
-
-    public static void constantFoldTests() {
-        System.out.println("\n==CONSTANT FOLD TESTS==");
-
-        Util.getDirectoryFiles("constantfold/").stream()
-                .filter(filename -> filename.contains(".xi"))
-                .forEach(Tests::constantFoldHelper);
-    }
-
-    /**
-     * Prints the result of constant folding (before IR translation)
-     * on a single Xi program.
-     */
-    public static void constantFoldHelper(String filename) {
-
-        Optional<FileReader> reader = Util.getFileReader("constantfold/", filename);
-        if (!reader.isPresent()) {
-            return;
-        }
-
-        Lexer lexer = new Lexer(reader.get());
-        Parser parser = new Parser(lexer);
-        List<String> lines = new ArrayList<>();
-        Optional<Program> program = Core.typeCheckHelper(parser, "constantfold/", lines, false);
-        if (!program.isPresent()) {
-            return;
-        }
-
-        ConstantFoldingVisitor cfv = new ConstantFoldingVisitor();
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CodeWriterSExpPrinter printer =
-                new CodeWriterSExpPrinter(baos);
-        NodeVisitor pv = new PrintVisitor(printer);
-
-        program.get().accept(cfv);
-        program.get().accept(pv);
-        printer.flush();
-        System.out.println(baos.toString().replaceAll("\\s+", " ")
-                .replaceAll("\\(\\s?", "(")
-                .replaceAll("\\s?\\)", ")")
-                .trim());
-    }
+//    public static void constantFoldTests() {
+//        System.out.println("\n==CONSTANT FOLD TESTS==");
+//
+//        Util.getDirectoryFiles("constantfold/").stream()
+//                .filter(filename -> filename.contains(".xi"))
+//                .forEach(Tests::constantFoldHelper);
+//    }
+//
+//    /**
+//     * Prints the result of constant folding (before IR translation)
+//     * on a single Xi program.
+//     */
+//    public static void constantFoldHelper(String filename) {
+//
+//        Optional<FileReader> reader = Util.getFileReader("constantfold/", filename);
+//        if (!reader.isPresent()) {
+//            return;
+//        }
+//
+//        Lexer lexer = new Lexer(reader.get());
+//        Parser parser = new Parser(lexer);
+//        List<String> lines = new ArrayList<>();
+//        Optional<Program> program = Core.typeCheckHelper(parser, "constantfold/", lines, false);
+//        if (!program.isPresent()) {
+//            return;
+//        }
+//
+//        ConstantFoldingVisitor cfv = new ConstantFoldingVisitor();
+//
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        CodeWriterSExpPrinter printer =
+//                new CodeWriterSExpPrinter(baos);
+//        NodeVisitor pv = new PrintVisitor(printer);
+//
+//        program.get().accept(cfv);
+//        program.get().accept(pv);
+//        printer.flush();
+//        System.out.println(baos.toString().replaceAll("\\s+", " ")
+//                .replaceAll("\\(\\s?", "(")
+//                .replaceAll("\\s?\\)", ")")
+//                .trim());
+//    }
 
     /**
      * Automated tests for typecheck.
