@@ -6,6 +6,7 @@ import com.bwz6jk2227esl89ahj34.AST.parse.Parser;
 import com.bwz6jk2227esl89ahj34.AST.visit.ConstantFoldingVisitor;
 import com.bwz6jk2227esl89ahj34.AST.visit.NodeVisitor;
 import com.bwz6jk2227esl89ahj34.AST.visit.PrintVisitor;
+import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
@@ -33,39 +34,84 @@ public class Tests2 {
      * Automated tests for interpreted the generated IR.
      */
     public static void irRunTests() {
+
+        Main.setSourcePath("ir/irrun");
+        Main.setDiagnosticPath("ir/irrun/diagnostics");
+        Main.setLibPath("ir/lib");
+        Main.turnIRRunDiagnosticsOn(null);
+
         System.out.println("\n================IR RUN TESTS================");
 
-        Util.getDirectoryFiles("ir/irrun/").stream()
+        Util.getDirectoryFiles("ir/irgen/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
-                .forEach(filename -> Core.irRun("ir/irrun/",
-                        "ir/irrun/diagnostics/", "ir/lib/", filename));
+                .forEach(filename -> {
+                    Optional<Program> program = Khor.parseFile(filename);
+                    if (!program.isPresent()) {
+                        return;
+                    }
+                    program = Khor.typeCheck(filename, program.get());
+                    if (!program.isPresent()) {
+                        return;
+                    }
+                    IRCompUnit mirRoot = Khor.mirGen(filename, program.get());
+                    Khor.irGen(filename, mirRoot);
+                    Khor.irRun(filename);
+                });
     }
 
     /**
      * Automated tests for MIR generation.
      */
     public static void mirGenTests() {
+        Main.setSourcePath("ir/irgen");
+        Main.setDiagnosticPath("ir/irgen/diagnostics/mir");
+        Main.setLibPath("ir/lib");
+        Main.turnIRGenDiagnosticsOn(null);
         System.out.println("\n================MIR GEN TESTS================");
 
         Util.getDirectoryFiles("ir/irgen/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
-                .forEach(filename -> Core.mirGen("ir/irgen/",
-                        "ir/irgen/diagnostics/mir/", "ir/lib/", filename, false));
+                .forEach(filename -> {
+                    Optional<Program> program = Khor.parseFile(filename);
+                    if (!program.isPresent()) {
+                        return;
+                    }
+                    program = Khor.typeCheck(filename, program.get());
+                    if (!program.isPresent()) {
+                        return;
+                    }
+                    Khor.mirGen(filename, program.get());
+                });
     }
 
     /**
      * Automated tests for IR generation.
      */
     public static void irGenTests() {
+        Main.setSourcePath("ir/irgen");
+        Main.setDiagnosticPath("ir/irgen/diagnostics/ir");
+        Main.setLibPath("ir/lib");
+        Main.turnIRGenDiagnosticsOn(null);
+
         System.out.println("\n================IR GEN TESTS================");
 
         Util.getDirectoryFiles("ir/irgen/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
-                .forEach(filename -> Core.irGen("ir/irgen/",
-                        "ir/irgen/diagnostics/ir/", "ir/lib/", filename, true, false));
+                .forEach(filename -> {
+                    Optional<Program> program = Khor.parseFile(filename);
+                    if (!program.isPresent()) {
+                        return;
+                    }
+                    program = Khor.typeCheck(filename, program.get());
+                    if (!program.isPresent()) {
+                        return;
+                    }
+                    IRCompUnit mirRoot = Khor.mirGen(filename, program.get());
+                    Khor.irGen(filename, mirRoot);
+                });
     }
 
 

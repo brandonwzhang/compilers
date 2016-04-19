@@ -166,39 +166,6 @@ public class Khor {
     }
 
     /**
-     * Reads in a Xi source file, typechecks it, and translates it
-     * to an MIR (IR that has not been lowered).
-     *
-     * If the translation succeeds, the root of the MIR tree will be
-     * returned inside an Optional. If an error occurs (e.g. semantic
-     * error, syntax error), then an empty Optional is returned.
-     */
-    public static IRCompUnit translateToMIR(String file, Program program) {
-
-        if (Main.optimizationsOn()) {
-            // constant folding on the AST
-            NodeVisitor cfv = new ConstantFoldingVisitor();
-            program.accept(cfv);
-            // annotate the new nodes with types
-            NodeVisitor tcv = new TypeCheckVisitor(Main.libPath());
-            program.accept(tcv);
-        }
-
-        MIRGenerateVisitor mirgv =
-                new MIRGenerateVisitor(Util.extractFileName(file));
-        program.accept(mirgv);
-        IRCompUnit mirRoot = mirgv.getRoot();
-
-        if (Main.optimizationsOn()) {
-            // constant folding on the MIR tree
-            IRVisitor mircfv = new IRConstantFoldingVisitor();
-            mirRoot = (IRCompUnit) mircfv.visit(mirRoot);
-        }
-
-        return mirRoot;
-    }
-
-    /**
      * Intermediate method for ease of testing.
      *
      * Generates the MIR of the given Xi source file.
