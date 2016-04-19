@@ -115,6 +115,8 @@ public class Tests2 {
                     Khor.irGen(filename, mirRoot);
                     Khor.irRun(filename);
                 });
+
+        Main.turnIRRunDiagnosticsOff();
     }
 
     /**
@@ -141,6 +143,8 @@ public class Tests2 {
                     }
                     Khor.mirGen(filename, program.get());
                 });
+
+        Main.turnIRGenDiagnosticsOff();
     }
 
     /**
@@ -169,50 +173,9 @@ public class Tests2 {
                     IRCompUnit mirRoot = Khor.mirGen(filename, program.get());
                     Khor.irGen(filename, mirRoot);
                 });
-    }
 
-//    public static void constantFoldTests() {
-//        System.out.println("\n==CONSTANT FOLD TESTS==");
-//
-//        Util.getDirectoryFiles("constantfold/").stream()
-//                .filter(filename -> filename.contains(".xi"))
-//                .forEach(Tests::constantFoldHelper);
-//    }
-//
-//    /**
-//     * Prints the result of constant folding (before IR translation)
-//     * on a single Xi program.
-//     */
-//    public static void constantFoldHelper(String filename) {
-//
-//        Optional<FileReader> reader = Util.getFileReader("constantfold/", filename);
-//        if (!reader.isPresent()) {
-//            return;
-//        }
-//
-//        Lexer lexer = new Lexer(reader.get());
-//        Parser parser = new Parser(lexer);
-//        List<String> lines = new ArrayList<>();
-//        Optional<Program> program = Core.typeCheckHelper(parser, "constantfold/", lines, false);
-//        if (!program.isPresent()) {
-//            return;
-//        }
-//
-//        ConstantFoldingVisitor cfv = new ConstantFoldingVisitor();
-//
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        CodeWriterSExpPrinter printer =
-//                new CodeWriterSExpPrinter(baos);
-//        NodeVisitor pv = new PrintVisitor(printer);
-//
-//        program.get().accept(cfv);
-//        program.get().accept(pv);
-//        printer.flush();
-//        System.out.println(baos.toString().replaceAll("\\s+", " ")
-//                .replaceAll("\\(\\s?", "(")
-//                .replaceAll("\\s?\\)", ")")
-//                .trim());
-//    }
+        Main.turnIRGenDiagnosticsOff();
+    }
 
     /**
      * Automated tests for typecheck.
@@ -249,6 +212,8 @@ public class Tests2 {
                     }
                     Khor.typeCheck(filename, program.get());
                 });
+
+        Main.turnTypeCheckDiagnosticsOff();
     }
 
     /**
@@ -277,5 +242,7 @@ public class Tests2 {
             System.out.println();
             System.out.println(Util.compareSExpFiles(sExpFile1, sExpFile2));
         }
+
+        Main.turnParseDiagnosticsOff();
     }
 }

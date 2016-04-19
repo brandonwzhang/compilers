@@ -85,9 +85,9 @@ public class Main {
 
         if(tests) { // put debug mode behaviors here
 
-            String[] exclude = {"enigma", "medley01"};
-            Collections.addAll(Tests.exclude, exclude);
-            System.out.println("\nDEBUG: Excluding: " + Tests.exclude.toString());
+            String[] exclude = {"enigma", "medley01", "array_init", "constantfoldtest"};
+            Collections.addAll(Tests2.exclude, exclude);
+            System.out.println("\nDEBUG: Excluding: " + Tests2.exclude.toString());
 
             try {
                //Tests2.parseTests();
@@ -95,12 +95,12 @@ public class Main {
                 e.printStackTrace();
             }
 
-            Tests2.typeCheckTests();
-            //Tests.constantFoldTests();
-            //Tests.mirGenTests();
-            //Tests.irGenTests();
-            //Tests.irRunTests();
-            //Tests.regressionTest();
+            //Tests2.typeCheckTests();
+            //Tests2.constantFoldTests();
+            //Tests2.mirGenTests();
+            //Tests2.irGenTests();
+            //Tests2.irRunTests();
+            //Tests2.regressionTest();
         }
     }
 
@@ -159,10 +159,6 @@ public class Main {
         optimizations = false;
     }
 
-    public static void turnTestsOn(String[] args) {
-        tests = true;
-    }
-
     public static boolean debugOn() {
         return debug;
     }
@@ -211,4 +207,21 @@ public class Main {
         return irrun;
     }
 
+    public static void turnTestsOn(String[] args) {
+        tests = true;
+    }
+
+    // these are only used in Tests.java
+    public static void turnParseDiagnosticsOff() {
+        parse = false;
+    }
+    public static void turnTypeCheckDiagnosticsOff() {
+        typecheck = false;
+    }
+    public static void turnIRGenDiagnosticsOff() {
+        irgen = false;
+    }
+    public static void turnIRRunDiagnosticsOff() {
+        irrun = false;
+    }
 }
