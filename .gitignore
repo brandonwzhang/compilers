@@ -7,4 +7,6 @@ vm/*
 *.parsed
 *.lexed
 *.swp
+*.o
 *~
+runtime/*

@@ -2,3 +2,5 @@ DIR="$( cd "$( dirname "$0" )" && pwd )"
 chmod +x xic
 cd "$DIR"/Compiler
 ant
+cd ../runtime
+make
