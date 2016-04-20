@@ -1,15 +1,22 @@
 package com.bwz6jk2227esl89ahj34.optimization;
 
+import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction;
+import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.OpCode;
 import com.bwz6jk2227esl89ahj34.ir.*;
 
 import java.util.*;
 
-public class CFG {
+public class ControlFlowGraphIR {
     private static int indexOfLabel(String labelName, List<IRStmt> statements) {
         for (int i = 0; i < statements.size(); i++) {
             IRStmt statement = statements.get(i);
             if (statement instanceof IRLabel) {
                 if (((IRLabel) statement).name().equals(labelName)) {
+                    int next = i + 1;
+                    // Only return index of the instruction this label points to
+                    while (statements.get(next) instanceof IRLabel) {
+                        next++;
+                    }
                     return i;
                 }
             }
@@ -53,20 +60,40 @@ public class CFG {
             // statement
             List<Integer> successors = new LinkedList<>();
             if (i < statements.size() - 1) {
-                successors.add(i + 1);
+                int next = i + 1;
+                // Don't include IRLabels in this CFG
+                while (statements.get(next) instanceof IRLabel) {
+                    next++;
+                }
+                successors.add(next);
             }
             return successors;
         }
 
     }
 
-    public static Map<Integer, List<Integer>> construct(List<IRStmt> statements) {
+    public static CFGNode construct(List<IRStmt> statements) {
+        // First, add all CFG nodes and construct the graph
+        Map<Integer, CFGNode> nodes = new HashMap<>();
         Map<Integer, List<Integer>> graph = new HashMap<>();
         for (int i = 0; i < statements.size(); i++) {
-            graph.put(i, getSuccessors(i, statements));
+            IRStmt statement = statements.get(i);
+            // Don't include labels in the CFG
+            if (!(statement instanceof IRLabel)) {
+                nodes.put(i, new CFGNode(statement, i));
+                graph.put(i, getSuccessors(i, statements));
+            }
         }
-        return graph;
+        // Fill in the predecessors and successors for CFG nodes
+        for (int i : nodes.keySet()) {
+            CFGNode node = nodes.get(i);
+            List<Integer> successors = graph.get(i);
+            for (int successor : successors) {
+                CFGNode successorNode = nodes.get(successor);
+                node.addSuccessor(successorNode);
+                successorNode.addPredecessor(node);
+            }
+        }
+        return nodes.get(Collections.min(nodes.keySet()));
     }
-
-
 }
