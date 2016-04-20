@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class AvailableExpressionsAnalysis extends DataflowAnalysis{
     private Direction direction = Direction.FORWARD;
-    private CFGNode<IRNode> startNode;
+    private CFGNode startNode;
 
     public AvailableExpressionSet eval(CFGNode node) {
         // TODO
@@ -25,9 +25,14 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
     }
 
     public void transfer(CFGNode node) {
-        node.setIn(meet(node.getPredecessors()));
+        // in[n] = intersection over all out[n'], where n' is pred of n
+        Set<LatticeElement> pred_outs = new HashSet<>();
+        for (CFGNode pred : node.getPredecessors()) {
+            pred_outs.add(pred.getOut());
+        }
+        node.setIn(meet(pred_outs));
         // out[n] = in[n] U eval[n] - kill[n]
-        Set<IRExpr> out = new HashSet<>(node.getIn());
+        Set<IRExpr> out = new HashSet<IRExpr>(((AvailableExpressionSet)node.getIn()).getExprs());
         out.addAll(eval(node).getExprs());
         out.removeAll(kill(node).getExprs());
         node.setOut(new AvailableExpressionSet(out));
