@@ -17,7 +17,7 @@ public class ControlFlowGraphIR {
                     while (statements.get(next) instanceof IRLabel) {
                         next++;
                     }
-                    return i;
+                    return next;
                 }
             }
         }
