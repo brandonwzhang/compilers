@@ -20,7 +20,7 @@ public class CFGNode {
     private IRStmt irstmt;
     private NodeType nodeType;
 
-    private enum NodeType {
+    public enum NodeType {
         ASSEMBLY, IR
     }
 }
