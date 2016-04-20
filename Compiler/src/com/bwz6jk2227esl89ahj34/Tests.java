@@ -103,17 +103,17 @@ public class Tests {
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
                 .forEach(filename -> {
-                    Optional<Program> program = Khor.parseFile(filename);
+                    Optional<Program> program = Core.parseFile(filename);
                     if (!program.isPresent()) {
                         return;
                     }
-                    program = Khor.typeCheck(filename, program.get());
+                    program = Core.typeCheck(filename, program.get());
                     if (!program.isPresent()) {
                         return;
                     }
-                    IRCompUnit mirRoot = Khor.mirGen(filename, program.get());
-                    Khor.irGen(filename, mirRoot);
-                    Khor.irRun(filename);
+                    IRCompUnit mirRoot = Core.mirGen(filename, program.get());
+                    Core.irGen(filename, mirRoot);
+                    Core.irRun(filename);
                 });
 
         Main.turnIRRunDiagnosticsOff();
@@ -133,15 +133,15 @@ public class Tests {
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
                 .forEach(filename -> {
-                    Optional<Program> program = Khor.parseFile(filename);
+                    Optional<Program> program = Core.parseFile(filename);
                     if (!program.isPresent()) {
                         return;
                     }
-                    program = Khor.typeCheck(filename, program.get());
+                    program = Core.typeCheck(filename, program.get());
                     if (!program.isPresent()) {
                         return;
                     }
-                    Khor.mirGen(filename, program.get());
+                    Core.mirGen(filename, program.get());
                 });
 
         Main.turnIRGenDiagnosticsOff();
@@ -162,16 +162,16 @@ public class Tests {
                 .filter(filename -> filename.contains(".xi"))
                 .filter(filename -> !excluded(filename))
                 .forEach(filename -> {
-                    Optional<Program> program = Khor.parseFile(filename);
+                    Optional<Program> program = Core.parseFile(filename);
                     if (!program.isPresent()) {
                         return;
                     }
-                    program = Khor.typeCheck(filename, program.get());
+                    program = Core.typeCheck(filename, program.get());
                     if (!program.isPresent()) {
                         return;
                     }
-                    IRCompUnit mirRoot = Khor.mirGen(filename, program.get());
-                    Khor.irGen(filename, mirRoot);
+                    IRCompUnit mirRoot = Core.mirGen(filename, program.get());
+                    Core.irGen(filename, mirRoot);
                 });
 
         Main.turnIRGenDiagnosticsOff();
@@ -193,11 +193,11 @@ public class Tests {
         Util.getDirectoryFiles("typecheck/passtests/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .forEach(filename -> {
-                    Optional<Program> program = Khor.parseFile(filename);
+                    Optional<Program> program = Core.parseFile(filename);
                     if (!program.isPresent()) {
                         return;
                     }
-                    Khor.typeCheck(filename, program.get());
+                    Core.typeCheck(filename, program.get());
                 });
 
         Main.setSourcePath("typecheck/failtests");
@@ -206,11 +206,11 @@ public class Tests {
         Util.getDirectoryFiles("typecheck/failtests/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .forEach(filename -> {
-                    Optional<Program> program = Khor.parseFile(filename);
+                    Optional<Program> program = Core.parseFile(filename);
                     if (!program.isPresent()) {
                         return;
                     }
-                    Khor.typeCheck(filename, program.get());
+                    Core.typeCheck(filename, program.get());
                 });
 
         Main.turnTypeCheckDiagnosticsOff();
@@ -231,7 +231,7 @@ public class Tests {
 
         for (int i = 0; i < testFileNames.length; i++) {
             testFileNames[i] = testFileNames[i] + ".xi";
-            Khor.parseFile(testFileNames[i]);
+            Core.parseFile(testFileNames[i]);
         }
 
         for (String file : testFileNames) {
