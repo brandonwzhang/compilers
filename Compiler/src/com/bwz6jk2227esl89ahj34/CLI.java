@@ -98,16 +98,7 @@ public class CLI {
         }
 
         // assembly generation
-        Arrays.stream(filesArray)
-                .forEach(file -> Core.generateAssembly(
-                        Main.sourcePath(),
-                        Main.diagnosticPath(),
-                        Main.libPath(),
-                        Main.assemblyPath(),
-                        Main.target(),
-                        file
-                )
-        );
+        Arrays.stream(filesArray).forEach(Core::generateAssembly);
     }
 
     /**
