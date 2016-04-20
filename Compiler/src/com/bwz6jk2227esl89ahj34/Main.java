@@ -14,6 +14,11 @@ public class Main {
     private static boolean debug;
     private static boolean optimizations = true;
     private static boolean tests;
+    private static boolean lex;
+    private static boolean parse;
+    private static boolean typecheck;
+    private static boolean irgen;
+    private static boolean irrun;
 
     public static void main(String[] args) {
         CLI cli = new CLI();
@@ -57,43 +62,35 @@ public class Main {
                       1);
         cli.addOption("--lex",
                       "Lex the .xi source files to .lexed files.",
-                      files -> Arrays.stream(files).forEach(file ->
-                              Core.lexFile(sourcePath, diagnosticPath,
-                                      file)),
+                      Main::turnLexDiagnosticsOn,
                       0);
         cli.addOption("--parse",
                       "Parse the .xi source files to .parsed files.",
-                      files -> Arrays.stream(files).forEach(file ->
-                              Core.parseFile(sourcePath, diagnosticPath,
-                                      file)),
+                      Main::turnParseDiagnosticsOn,
                       0);
         cli.addOption("--typecheck",
                       "Typecheck the .xi source files",
-                      files -> Arrays.stream(files).forEach(file ->
-                                      Core.typeCheck(sourcePath, diagnosticPath,
-                                              libPath, file)),
+                      Main::turnTypeCheckDiagnosticsOn,
                       0);
         cli.addOption("--irgen",
                       "Generate intermediate code and write its S-expression representation.",
-                      files -> Arrays.stream(files).forEach(file ->
-                              Core.irGen(sourcePath, diagnosticPath, libPath, file, true, false)),
+                      Main::turnIRGenDiagnosticsOn,
                       0);
         cli.addOption("--irrun",
                       "Generate and interpret intermediate code",
-                      files -> Arrays.stream(files).forEach(file ->
-                              Core.irRun(sourcePath, diagnosticPath, libPath, file)),
+                      Main::turnIRRunDiagnosticsOn,
                       0);
 
         cli.execute(args);
 
         if(tests) { // put debug mode behaviors here
 
-            String[] exclude = {"enigma", "medley01"};
+            String[] exclude = {"enigma", "medley01", "array_init", "constantfoldtest"};
             Collections.addAll(Tests.exclude, exclude);
             System.out.println("\nDEBUG: Excluding: " + Tests.exclude.toString());
 
             try {
-               // Tests.parseTests();
+               //Tests2.parseTests();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -103,12 +100,12 @@ public class Main {
             //Tests.mirGenTests();
             //Tests.irGenTests();
             //Tests.irRunTests();
-            Tests.regressionTest();
+            //Tests.regressionTest();
         }
     }
 
     public static void setSourcePath(String path) {
-        sourcePath = sourcePath + "/";
+        sourcePath = path + "/";
     }
 
     public static void setDiagnosticPath(String path) {
@@ -162,10 +159,6 @@ public class Main {
         optimizations = false;
     }
 
-    public static void turnTestsOn(String[] args) {
-        tests = true;
-    }
-
     public static boolean debugOn() {
         return debug;
     }
@@ -174,4 +167,61 @@ public class Main {
         return optimizations;
     }
 
+    public static void turnLexDiagnosticsOn(String[] args) {
+        lex = true;
+    }
+
+    public static void turnParseDiagnosticsOn(String[] args) {
+        parse = true;
+    }
+
+    public static void turnTypeCheckDiagnosticsOn(String[] args) {
+        typecheck = true;
+    }
+
+    public static void turnIRGenDiagnosticsOn(String[] args) {
+        irgen = true;
+    }
+
+    public static void turnIRRunDiagnosticsOn(String[] args) {
+        irrun = true;
+    }
+
+    public static boolean lex() {
+        return lex;
+    }
+
+    public static boolean parse() {
+        return parse;
+    }
+
+    public static boolean typecheck() {
+        return typecheck;
+    }
+
+    public static boolean irgen() {
+        return irgen;
+    }
+
+    public static boolean irrun() {
+        return irrun;
+    }
+
+    public static void turnTestsOn(String[] args) {
+        tests = true;
+    }
+
+    // these are only used in Tests
+    public static void turnParseDiagnosticsOff() {
+        parse = false;
+    }
+    public static void turnTypeCheckDiagnosticsOff() {
+        typecheck = false;
+    }
+    public static void turnIRGenDiagnosticsOff() {
+        irgen = false;
+    }
+    public static void turnIRRunDiagnosticsOff() {
+        irrun = false;
+    }
 }
