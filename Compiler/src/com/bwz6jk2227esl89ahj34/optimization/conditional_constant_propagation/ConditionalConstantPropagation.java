@@ -15,24 +15,34 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
 
 
     // assumption: ins will always be defined appropriately
-    public void transfer(CFGNode element) {
-        assert element.getNodeType() == NodeType.IR;
+    public void transfer(CFGNode node) {
+        // we are performing the analysis on the IR level so
+        // make sure that we are at the right place
+        assert node.getNodeType() == NodeType.IR;
 
-        IRStmt node = element.getIrstmt();
+        // unwrap the IR stmt contained by node
+        IRStmt stmt = node.getIrstmt();
+
+        // the "in" is filled in as a precondition
         UnreachableValueTuplesPair in =
-                (UnreachableValueTuplesPair) element.getIn();
+                (UnreachableValueTuplesPair) node.getIn();
+
+        // we will update the newMap as we perform the analysis
+        // if no updates are made then we are basically passing the map given
+        // by the "in"
         Map<IRTemp, LatticeElement> newMap = new HashMap<>(in.getValueTuples());
 
-        if (node instanceof IRCJump) { // if (...)
-            IRCJump castedNode = (IRCJump) node;
-            IRExpr guard = castedNode.expr();
-            if (guard instanceof IRTemp) {
+        if (stmt instanceof IRCJump) { // if (...)
+            IRCJump castedStmt = (IRCJump) stmt;
+            IRExpr guard = castedStmt.expr();
+            if (guard instanceof IRTemp) { // if (x)
                 IRTemp castedGuard = (IRTemp) guard;
                 LatticeElement value = newMap.get(castedGuard);
-                if (value instanceof Value) {
+                if (value instanceof Value) { // x = an actual value
                     guard = ((Value) value).getValue();
+                    // this will trigger a if statement later in the code
                 }
-            } else if (guard instanceof IRBinOp) {
+            } else if (guard instanceof IRBinOp) { // if (x binop y)
                 IRBinOp castedGuard = (IRBinOp) guard;
                 IRExpr left = castedGuard.left();
                 IRExpr right = castedGuard.right();
@@ -54,15 +64,18 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                         guard = computeBinOp(
                                 new IRBinOp(castedGuard.opType(), left, right)
                         );
+                        // this will trigger the if statement later in the code
                     }
                 }
             }
 
+            // if the guard is a const we can make one of the branches
+            // "unreachable"
             if (guard instanceof IRConst) {
                 IRConst castedGuard = (IRConst) guard;
                 UnreachableValueTuplesPair leftPair;
                 UnreachableValueTuplesPair rightPair;
-                assert element.getSuccessors().size() == 2;
+                assert node.getSuccessors().size() == 2;
                 if (castedGuard.value() == 1) { // if (...) always goes to true
                     // then we have to kill the false branch by sending
                     // (true, (T,..,T))
@@ -84,53 +97,59 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 // now we set the ins of the successor
                 // however, we do a null check; if the in is not null, then
                 // we meet it with whatever is already present at the in
-                int count = 0; // count = 0 -> left/true branch
-                              // otherwise right/false branch
-                for (CFGNode successor : element.getSuccessors()) {
-                    setIn(successor, count == 0 ? leftPair : rightPair);
+                int count = 0; // count = 0 -> right/false branch
+                              // otherwise left/true branch
+                for (CFGNode successor : node.getSuccessors()) {
+                    setIn(successor, count == 0 ? rightPair : leftPair);
                     count++;
                 }
-            } else {
-                for (CFGNode successor : element.getSuccessors()) {
+            } else { // otherwise we can't make any of the branches "unreachable"
+                    // so we pass down the same information to all the branches
+                for (CFGNode successor : node.getSuccessors()) {
                     setIn(successor, new UnreachableValueTuplesPair(false, newMap));
                 }
             }
-        } else if (node instanceof IRMove) {
-            IRMove castedNode = (IRMove) node;
-            if (castedNode.target() instanceof IRTemp) {
+        } else if (stmt instanceof IRMove) { //  ... = ...
+            IRMove castedNode = (IRMove) stmt;
+            if (castedNode.target() instanceof IRTemp) { // x = ...
                 IRTemp castedTarget = (IRTemp) castedNode.target();
                 String variable = castedTarget.label();
-                if (castedNode.expr() instanceof IRConst) {
+                if (castedNode.expr() instanceof IRConst) { // x = const
+                    // update the newMap so that x = const
                     Value val = new Value((IRConst) castedNode.expr());
                     newMap.put(castedTarget, valueMeet(newMap.get(variable), val));
                 } else if (castedNode.expr() instanceof IRCall) {
+                    // a function call can return anything so variable becomes
+                    // "overloaded"
                     newMap.put(castedTarget, new LatticeBottom());
                 } else if (castedNode.expr() instanceof IRTemp) {
+                    // x = y then we update x so that it takes the value of y
                     newMap.put(castedTarget, newMap.get((IRTemp) castedNode.expr()));
-                } else {
+                } else { // shouldn't reach here
                     throw new RuntimeException("Please contact jk2227@cornell.edu");
                 }
             }
-            for (CFGNode successor : element.getSuccessors()) {
+            for (CFGNode successor : node.getSuccessors()) {
                 setIn(successor, new UnreachableValueTuplesPair(false, newMap));
             }
         } else {
-            for (CFGNode successor : element.getSuccessors()) {
+            for (CFGNode successor : node.getSuccessors()) {
                 setIn(successor, new UnreachableValueTuplesPair(false, newMap));
             }
         }
     }
 
+    // we set the successor's in as newIn
     public void setIn(CFGNode successor, UnreachableValueTuplesPair newIn) {
-        if (successor.getIn() == null) {
-            successor.setIn(newIn);
-        } else {
+        if (successor.getIn() == null) { // if in is null prior, then
+            successor.setIn(newIn);  // in = newIn
+        } else { // otherwise we "meet" it
             Set<LatticeElement> ins = new HashSet<>(Arrays.asList(successor.getIn(), newIn));
             successor.setIn(meet(ins));
         }
     }
 
-    //TODO: add assert statements and spec
+    // meet operator for CCP
     public UnreachableValueTuplesPair meet(Set<LatticeElement> elements) {
         assert elements.size() >= 2;
         Iterator<LatticeElement> iterator = elements.iterator();
@@ -138,10 +157,10 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         while(iterator.hasNext()) {
             UnreachableValueTuplesPair next = (UnreachableValueTuplesPair) iterator.next();
             accumulator.setUnreachable(accumulator.isUnreachable()
-                    && next.isUnreachable());
+                    && next.isUnreachable()); // AND the unreachable boolean values
             Map<IRTemp, LatticeElement> accumulatorMap = accumulator.getValueTuples();
             Map<IRTemp, LatticeElement> nextMap = accumulator.getValueTuples();
-            for (IRTemp key : accumulatorMap.keySet()) {
+            for (IRTemp key : accumulatorMap.keySet()) { // update values accordingly
                 accumulatorMap.put(key,
                         valueMeet(accumulatorMap.get(key), nextMap.get(key)));
             }
@@ -150,6 +169,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         return accumulator;
     }
 
+    // 2 + top = 2 ; 2 + 3 = bottom; 2 + 2 = 2; bottom + anything = bottom
     public LatticeElement valueMeet(LatticeElement e1, LatticeElement e2) {
         if(e1 instanceof LatticeBottom || e2 instanceof LatticeBottom) {
             return new LatticeBottom();
@@ -166,7 +186,10 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
             }
         }
     }
-private IRConst computeBinOp(IRBinOp bop) {
+
+    // precondition: left and right are both IRConst
+    // computes binop expression to const
+    private IRConst computeBinOp(IRBinOp bop) {
         BigInteger left = new BigInteger(""+((IRConst)(bop.left())).value());
         BigInteger right = new BigInteger(""+((IRConst)(bop.right())).value());
         switch(bop.opType()) {
