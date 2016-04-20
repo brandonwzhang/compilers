@@ -1,5 +1,6 @@
 main(args:int[][]) {
   jihun:int = 1
+  divideByZero()
 }
 
 arryLiteralIndexTest() {
@@ -28,9 +29,9 @@ andyTest() {
   g:bool = !!!!c
 }
 
-//divideByZero() {
-//  x:int = 10/0
-//}
+divideByZero() {
+  x:int = 10/0
+}
 
 overFlow() {
   x:int = -(-9223372036854775808)
