@@ -37,7 +37,12 @@ public class ControlFlowGraphIR {
                 // If we have no false label, we could fall through to the next
                 // statement
                 if (i < statements.size() - 1)  {
-                    successors.add(i + 1);
+                    int next = i + 1;
+                    // Don't include IRLabels in this CFG
+                    while (statements.get(next) instanceof IRLabel) {
+                        next++;
+                    }
+                    successors.add(next);
                 }
 
             }

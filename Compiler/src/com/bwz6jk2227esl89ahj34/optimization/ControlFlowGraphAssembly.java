@@ -30,7 +30,12 @@ public class ControlFlowGraphAssembly {
         if (instruction.getOpCode() == OpCode.JE || instruction.getOpCode() == OpCode.JNE) {
             // We could fall through the false block
             if (i < lines.size() - 1)  {
-                successors.add(i + 1);
+                int next = i + 1;
+                // Only include instructions in the CFG
+                while (!(lines.get(next) instanceof AssemblyInstruction)) {
+                    next++;
+                }
+                successors.add(next);
             }
 
             String labelName = ((AssemblyName)instruction.getArgs().get(0)).getName();
