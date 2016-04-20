@@ -33,32 +33,18 @@ import java.util.*;
 public class Core {
     /**
      * Lexes the Xi file located at sourcePath + file.
-     * Writes the output to diagnosticPath + file.
+     * Diagnostics are written to diagnosticPath + file.
      */
-    public static void lexFile(String sourcePath,
-                               String diagnosticPath,
-                               String file) {
+    public static void lexFile(String file) {
 
-        Optional<FileReader> reader = Util.getFileReader(sourcePath, file);
+        Optional<FileReader> reader = Util.getFileReader(Main.sourcePath(), file);
         if (!reader.isPresent()) {
             return;
         }
 
         Lexer lexer = new Lexer(reader.get());
-
         List<String> lines = new ArrayList<>();
-        lexHelper(lexer, lines);
-        Util.writeHelper(file, "lexed", diagnosticPath, lines);
-    }
 
-    /**
-     * A helper function for lexing. Lexes with the given lexer.
-     * Mutates the given list by adding the lines of the output.
-     *
-     * @param lexer a Lexer object
-     * @param lines a List<String> for storing the output
-     */
-    public static void lexHelper(Lexer lexer, List<String> lines) {
         try {
             Symbol next = lexer.next_token();
             while (next.sym != ParserSym.EOF) {
@@ -77,8 +63,13 @@ public class Core {
                 next = lexer.next_token();
             }
         } catch (Exception e) {
-            // something is wrong with the lexer
             e.printStackTrace();
+            System.out.println("Something is wrong with the lexer. " +
+                    "Not necessarily a lex error in the source file.");
+        }
+
+        if (Main.lex()) {
+            Util.writeHelper(file, "lexed", Main.diagnosticPath(), lines);
         }
     }
 
@@ -87,46 +78,24 @@ public class Core {
      * Writes the output to diagnosticPath + file.
      * The output is an S-expression representing the AST of the given program.
      */
-    public static void parseFile(String sourcePath,
-                                 String diagnosticPath,
-                                 String file) {
+    public static Optional<Program> parseFile(String file) {
 
-        Optional<FileReader> reader = Util.getFileReader(sourcePath, file);
+        Optional<FileReader> reader = Util.getFileReader(Main.sourcePath(), file);
         if (!reader.isPresent()) {
-            return;
+            return Optional.empty();
         }
 
         Lexer lexer = new Lexer(reader.get());
         Parser parser = new Parser(lexer);
-
         List<String> lines = new ArrayList<>();
-        parseHelper(parser, lines, false);
-        Util.writeHelper(file, "parsed", diagnosticPath, lines);
-    }
 
-    /**
-     * A helper function for parsing. Parses with the given parser.
-     * Mutates the given list by adding the lines of the output.
-     * If there is a syntax error, the given list is cleared and a
-     * single String containing the parser's error message is added.
-     *
-     * If an exception is thrown during parsing or if there is a syntax
-     * error, an empty Optional is returned. If the parsing is successful,
-     * an Optional containing the result is returned.
-     *
-     * @param parser a Parser object
-     * @param lines a List<String> for storing the output
-     * @return an Optional that might contain the result of the parsing
-     */
-    public static Optional<Symbol> parseHelper(Parser parser,
-                                               List<String> lines,
-                                               boolean printError) {
         Symbol result;
         try {
             result = parser.parse();
         } catch (Exception e) {
             e.printStackTrace();
-            // something is wrong with the parser
+            System.out.println("Something is wrong with the parser. " +
+                    "Or maybe there's a lex error.");
             return Optional.empty();
         }
 
@@ -136,27 +105,29 @@ public class Core {
             String errMessage = parser.syntaxErrMessage;
             parser.hasSyntaxError = false;
             parser.syntaxErrMessage = "";
-            lines.clear();
             lines.add(errMessage);
 
-            if (printError || Main.debugOn()) {
-                Util.printError("Syntax", lines.get(0));
-            }
+            Util.printError("Syntax", lines.get(0));
 
             return Optional.empty();
         }
 
-        // print the AST, update lines, and return the result
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(baos);
-        NodeVisitor visitor = new PrintVisitor(printer);
+        Program program = (Program) result.value;
 
-        ((Program)(result.value)).accept(visitor);
+        if (Main.parse()) {
+            // print the AST
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            CodeWriterSExpPrinter printer = new CodeWriterSExpPrinter(baos);
+            NodeVisitor visitor = new PrintVisitor(printer);
+            program.accept(visitor);
 
-        printer.flush();
-        lines.add(baos.toString());
+            printer.flush();
+            lines.clear();
+            lines.add(baos.toString());
+            Util.writeHelper(file, "parsed", Main.diagnosticPath(), lines);
+        }
 
-        return Optional.of(result);
+        return Optional.of(program);
     }
 
     /**
@@ -166,119 +137,32 @@ public class Core {
      * libPath is the path where the interface files (.ixi)
      * are found.
      */
-    public static void typeCheck(String sourcePath,
-                                 String diagnosticPath,
-                                 String libPath,
-                                 String file) {
-        Optional<FileReader> reader = Util.getFileReader(sourcePath, file);
-        if (!reader.isPresent()) {
-            return;
-        }
+    public static Optional<Program> typeCheck(String file, Program program) {
 
-        Lexer lexer = new Lexer(reader.get());
-        Parser parser = new Parser(lexer);
         List<String> lines = new ArrayList<>();
-        Optional<Program> program = typeCheckHelper(parser, libPath, lines, false);
-        Util.writeHelper(file, "typed", diagnosticPath, lines);
-
-        if (program.isPresent()) {
-            if (Main.debugOn()) {
-                System.out.println("DEBUG: typed");
-            }
-        }
-    }
-
-    /**
-     * A helper function for typechecking.
-     *
-     * Parses with the given parser. If there is a syntax error,
-     * an error message will be stored in the given list.
-     *
-     * If the program types, then it will be returned inside an Optional.
-     * If there is a semantic error, an empty Optional will be returned
-     * and an error message will be stored in the given list.
-     *
-     * @param parser a Parser object
-     * @param lines a List<String> for storing the output. Any strings that
-     *              are in here before the method call will be lost.
-     * @return an Optional that might contain the result of the parsing
-     */
-    public static Optional<Program> typeCheckHelper(Parser parser,
-                                                    String libPath,
-                                                    List<String> lines,
-                                                    boolean printError) {
-        lines.clear();
-
-        Optional<Symbol> result = parseHelper(parser, lines, printError);
-        if (!result.isPresent()) {
-            return Optional.empty();
-        }
-        lines.clear();
-
-        Program program = (Program) result.get().value;
-        NodeVisitor visitor = new TypeCheckVisitor(libPath);
+        NodeVisitor visitor = new TypeCheckVisitor(Main.libPath());
+        boolean typed = false;
         try {
             program.accept(visitor);
             lines.add("Valid Xi Program");
-            return Optional.of(program);
-        } catch (TypeException e) {
-            if (printError || Main.debugOn()) {
-                Util.printError("Semantic", e.toString());
+            if (Main.debugOn()) {
+                System.out.println("DEBUG: typed");
             }
+            typed = true;
+        } catch (TypeException e) {
+            Util.printError("Semantic", e.toString());
             lines.add(e.toString());
+        }
+
+        if (Main.typecheck()) {
+            Util.writeHelper(file, "typed", Main.diagnosticPath(), lines);
+        }
+
+        if (typed) {
+            return Optional.of(program);
+        } else {
             return Optional.empty();
         }
-    }
-
-    /**
-     * Reads in a Xi source file, typechecks it, and translates it
-     * to an MIR (IR that has not been lowered).
-     *
-     * If the translation succeeds, the root of the MIR tree will be
-     * returned inside an Optional. If an error occurs (e.g. semantic
-     * error, syntax error), then an empty Optional is returned.
-     */
-    public static Optional<IRCompUnit> translateToMIR(
-            String sourcePath,
-            String libPath,
-            String file,
-            boolean printError) {
-
-        Optional<FileReader> reader = Util.getFileReader(sourcePath, file);
-        if (!reader.isPresent()) {
-            return Optional.empty();
-        }
-
-        Lexer lexer = new Lexer(reader.get());
-        Parser parser = new Parser(lexer);
-        List<String> lines = new ArrayList<>();
-        Optional<Program> program = typeCheckHelper(parser, libPath, lines, printError);
-        if (!program.isPresent()) {
-            return Optional.empty();
-        }
-
-        if (Main.optimizationsOn()) {
-            // constant folding on the AST
-            NodeVisitor cfv = new ConstantFoldingVisitor();
-            program.get().accept(cfv);
-            // annotate the new nodes with types
-            NodeVisitor tcv = new TypeCheckVisitor(libPath);
-            program.get().accept(tcv);
-        }
-
-
-        MIRGenerateVisitor mirgv =
-                new MIRGenerateVisitor(Util.extractFileName(file));
-        program.get().accept(mirgv);
-        IRCompUnit mirRoot = mirgv.getRoot();
-
-        if (Main.optimizationsOn()) {
-            // constant folding on the MIR tree
-            IRVisitor mircfv = new IRConstantFoldingVisitor();
-            mirRoot = (IRCompUnit) mircfv.visit(mirRoot);
-        }
-
-        return Optional.of(mirRoot);
     }
 
     /**
@@ -288,43 +172,44 @@ public class Core {
      * If debug mode is one, the S-Expression representation will
      * be written to a .mir file.
      */
-    public static Optional<IRCompUnit> mirGen(String sourcePath,
-                                              String diagnosticPath,
-                                              String libPath,
-                                              String file,
-                                              boolean printError) {
-        Optional<IRCompUnit> root =
-                translateToMIR(sourcePath, libPath, file, printError);
-        if (!root.isPresent()) {
-            return Optional.empty();
+    public static IRCompUnit mirGen(String file, Program program) {
+
+        if (Main.optimizationsOn()) {
+            // constant folding on the AST
+            NodeVisitor cfv = new ConstantFoldingVisitor();
+            program.accept(cfv);
+            // annotate the new nodes with types
+            NodeVisitor tcv = new TypeCheckVisitor(Main.libPath());
+            program.accept(tcv);
         }
 
-        if (Main.debugOn()) {
-            Util.writeIRTree(root.get(), diagnosticPath, file, "mir");
+        MIRGenerateVisitor mirgv =
+                new MIRGenerateVisitor(Util.extractFileName(file));
+        program.accept(mirgv);
+        IRCompUnit mirRoot = mirgv.getRoot();
+
+        if (Main.optimizationsOn()) {
+            // constant folding on the MIR tree
+            IRVisitor mircfv = new IRConstantFoldingVisitor();
+            mirRoot = (IRCompUnit) mircfv.visit(mirRoot);
         }
 
-        return Optional.of(root.get());
+        if (Main.irgen() && Main.debugOn()) {
+            Util.writeIRTree(mirRoot, Main.diagnosticPath(), file, "mir");
+        }
+
+        return mirRoot;
     }
 
     /**
      * Generates and writes the IR of the given Xi source file.
      */
-    public static Optional<IRCompUnit> irGen(
-            String sourcePath,
-            String diagnosticPath,
-            String libPath,
-            String file,
-            boolean write,
-            boolean printError) {
-        Optional<IRCompUnit> mirRoot =
-                mirGen(sourcePath, diagnosticPath, libPath, file, printError);
-        if (!mirRoot.isPresent()) {
-            return Optional.empty();
-        }
+    public static IRCompUnit irGen(String file, IRCompUnit mirRoot) {
 
         MIRLowerVisitor mirv = new MIRLowerVisitor();
-        IRCompUnit lirRoot = (IRCompUnit) mirv.visit(mirRoot.get());
+        IRCompUnit lirRoot = (IRCompUnit) mirv.visit(mirRoot);
 
+        // check that the IR is canonical
         CheckCanonicalIRVisitor cv = new CheckCanonicalIRVisitor();
         assert cv.visit(lirRoot);
 
@@ -333,33 +218,22 @@ public class Core {
             lirRoot = (IRCompUnit) mircfv.visit(lirRoot);
         }
 
-        if (write) {
-            Util.writeIRTree(lirRoot, diagnosticPath, file, "ir");
+        if (Main.irgen() || Main.irrun()) {
+            Util.writeIRTree(lirRoot, Main.diagnosticPath(), file, "ir");
         }
 
-        return Optional.of(lirRoot);
+        return lirRoot;
     }
 
     /**
-     * Generates and writes the IR of the given Xi source file.
      * Runs the Xi program by interpreting the IR.
      */
-    public static void irRun(String sourcePath,
-                             String diagnosticPath,
-                             String libPath,
-                             String file) {
+    public static void irRun(String file) {
         // TODO: lower the IR (use irGen instead of mirGen)
-
-        // reads Xi source file and writes an .mir file
-        Optional<IRCompUnit> root =
-                irGen(sourcePath, diagnosticPath, libPath, file, true, false);
-        if (!root.isPresent()) {
-            return;
-        }
 
         Optional<FileReader> reader =
                 Util.getFileReader(
-                        diagnosticPath,
+                        Main.diagnosticPath(),
                         file.substring(0, file.length() - 2) + "ir"
                 );
         if (!reader.isPresent()) {
@@ -376,60 +250,61 @@ public class Core {
             throw new RuntimeException("IR parsing failed");
         }
 
-        IRCompUnit root_ = result.value();
-
-        IRSimulator sim = new IRSimulator(root_);
+        IRCompUnit root = result.value();
+        IRSimulator sim = new IRSimulator(root);
         sim.call("_Imain_paai", 0);
     }
 
-    public static void generateAssembly(String sourcePath,
-                                        String diagnosticPath,
-                                        String libPath,
-                                        String assemblyPath,
-                                        String target,
-                                        String file) {
+    public static void generateAssembly(String file) {
 
-        // Read the file. If something went wrong (e.g. file not found), then
-        // return without doing anything.
-        Optional<FileReader> reader = Util.getFileReader(sourcePath, file);
-        if (!reader.isPresent()) {
+        lexFile(file);
+
+        Optional<Program> program = parseFile(file);
+        if (!program.isPresent()) {
             return;
         }
 
-        // Lex, parse, and typecheck the xi source file.
-        Lexer lexer = new Lexer(reader.get());
-        Parser parser = new Parser(lexer);
-        List<String> lines = new LinkedList<>();
-        Optional<Program> programASTOptional = typeCheckHelper(parser, libPath, lines, false);
+        program = typeCheck(file, program.get());
+        if (!program.isPresent()) {
+            return;
+        }
+
+        IRCompUnit mirRoot = mirGen(file, program.get());
+        IRCompUnit lirRoot = irGen(file, mirRoot);
+
+        if (Main.irrun()) {
+            irRun(file);
+        }
 
         // Get the names of functions defined in files that are imported.
         List<String> IRfunctionNamesFromUseStatements = new LinkedList<>();
-        if (programASTOptional.isPresent()) {
-            Program programAST = programASTOptional.get();
+        if (program.isPresent()) {
             List<FunctionDeclaration> useFunctionDeclarations =
-                    programAST.getFunctionsFromUseStatement(libPath);
+                    program.get().getFunctionsFromUseStatement(Main.libPath());
             for(FunctionDeclaration useFunctionDeclaration : useFunctionDeclarations) {
                 IRfunctionNamesFromUseStatements.add(Util.getIRFunctionName(useFunctionDeclaration));
             }
         }
 
-        // Generate the IR. Does not write a .ir file.
-        Optional<IRCompUnit> irRoot = irGen(sourcePath, diagnosticPath, libPath, file, false, true);
-        if (!irRoot.isPresent()) {
-            return;
-        }
-
         // Instantiate an AssemblyProgram, which processes the ir and prepares
         // the assembly code.
-        AssemblyProgram program = new AssemblyProgram(irRoot.get(),
-                IRfunctionNamesFromUseStatements,
-                target);
-        Util.writeHelper(file, "s", assemblyPath, Collections.singletonList(program.toString()));
+        AssemblyProgram assemblyProgram =
+                new AssemblyProgram(
+                        lirRoot,
+                        IRfunctionNamesFromUseStatements,
+                        Main.target()
+                );
+        Util.writeHelper(
+                file,
+                "s",
+                Main.assemblyPath(),
+                Collections.singletonList(assemblyProgram.toString())
+        );
 
         // Link and run the assembly file
         String fileName = file.substring(0, file.lastIndexOf('.'));
         ProcessBuilder pb =
-                new ProcessBuilder(Util.rootPath + "/runtime/linkxi.sh", "-o", fileName, assemblyPath + "/" + fileName + ".s").inheritIO();
+                new ProcessBuilder(Util.rootPath + "/runtime/linkxi.sh", "-o", fileName, Main.assemblyPath() + "/" + fileName + ".s").inheritIO();
         try {
             Process linkProcess = pb.start();
             linkProcess.waitFor();

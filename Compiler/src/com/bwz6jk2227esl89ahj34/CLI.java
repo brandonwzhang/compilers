@@ -98,7 +98,7 @@ public class CLI {
         }
 
         // assembly generation
-        Arrays.stream(filesArray).forEach(Khor::generateAssembly);
+        Arrays.stream(filesArray).forEach(Core::generateAssembly);
     }
 
     /**

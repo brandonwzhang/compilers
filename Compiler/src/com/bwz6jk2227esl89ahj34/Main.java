@@ -86,8 +86,8 @@ public class Main {
         if(tests) { // put debug mode behaviors here
 
             String[] exclude = {"enigma", "medley01", "array_init", "constantfoldtest"};
-            Collections.addAll(Tests2.exclude, exclude);
-            System.out.println("\nDEBUG: Excluding: " + Tests2.exclude.toString());
+            Collections.addAll(Tests.exclude, exclude);
+            System.out.println("\nDEBUG: Excluding: " + Tests.exclude.toString());
 
             try {
                //Tests2.parseTests();
@@ -95,12 +95,12 @@ public class Main {
                 e.printStackTrace();
             }
 
-            //Tests2.typeCheckTests();
-            //Tests2.constantFoldTests();
-            //Tests2.mirGenTests();
-            //Tests2.irGenTests();
-            //Tests2.irRunTests();
-            //Tests2.regressionTest();
+            //Tests.typeCheckTests();
+            //Tests.constantFoldTests();
+            //Tests.mirGenTests();
+            //Tests.irGenTests();
+            //Tests.irRunTests();
+            //Tests.regressionTest();
         }
     }
 
@@ -211,7 +211,7 @@ public class Main {
         tests = true;
     }
 
-    // these are only used in Tests.java
+    // these are only used in Tests
     public static void turnParseDiagnosticsOff() {
         parse = false;
     }
