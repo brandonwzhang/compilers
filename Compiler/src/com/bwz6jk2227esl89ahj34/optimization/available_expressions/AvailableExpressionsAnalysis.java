@@ -13,11 +13,24 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
     private Direction direction = Direction.FORWARD;
     private CFGNode<IRNode> startNode;
 
+    public AvailableExpressionSet eval(CFGNode node) {
+        // TODO
+
+        return null;
+
+    }
+    public AvailableExpressionSet kill(CFGNode node) {
+        // TODO
+        return null;
+    }
 
     public void transfer(CFGNode node) {
-        // TODO
         node.setIn(meet(node.getPredecessors()));
-
+        // out[n] = in[n] U eval[n] - kill[n]
+        Set<IRExpr> out = new HashSet<>(node.getIn());
+        out.addAll(eval(node).getExprs());
+        out.removeAll(kill(node).getExprs());
+        node.setOut(new AvailableExpressionSet(out));
     }
 
     public AvailableExpressionSet meet(Set<LatticeElement> elements) {

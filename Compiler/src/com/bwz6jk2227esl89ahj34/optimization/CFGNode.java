@@ -1,20 +1,26 @@
 package com.bwz6jk2227esl89ahj34.optimization;
 
-import com.bwz6jk2227esl89ahj34.ir.IRNode;
+import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction;
+import com.bwz6jk2227esl89ahj34.ir.IRStmt;
 import lombok.Data;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 @Data
 
-public class CFGNode<T> {
-    private Set<CFGNode> predecessors;
-    private Set<CFGNode> successors;
+public class CFGNode {
+    private Set<CFGNode> predecessors = new HashSet<>();
+    private Set<CFGNode> successors = new HashSet<>();
 
-    private T data;
 
     private LatticeElement in;
     private LatticeElement out;
 
+    private AssemblyInstruction assemblyInstruction;
+    private IRStmt irstmt;
+    private NodeType nodeType;
+
+    private enum NodeType {
+        ASSEMBLY, IR
+    }
 }
