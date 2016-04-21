@@ -1,10 +1,10 @@
-package com.bwz6jk2227esl89ahj34.optimization.available_copies;
+package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies;
 
 import com.bwz6jk2227esl89ahj34.ir.IRStmt;
-import com.bwz6jk2227esl89ahj34.optimization.CFGNode;
-import com.bwz6jk2227esl89ahj34.optimization.CFGNodeIR;
-import com.bwz6jk2227esl89ahj34.optimization.DataflowAnalysis;
-import com.bwz6jk2227esl89ahj34.optimization.LatticeElement;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeIR;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.DataflowAnalysis;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 
 import java.util.HashSet;
 import java.util.Set;

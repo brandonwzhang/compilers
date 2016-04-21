@@ -1,10 +1,9 @@
-package com.bwz6jk2227esl89ahj34.optimization.live_vars;
+package com.bwz6jk2227esl89ahj34.dataflow_analysis.live_vars;
 
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyAbstractRegister;
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction;
-import com.bwz6jk2227esl89ahj34.optimization.CFGNode;
-import com.bwz6jk2227esl89ahj34.optimization.DataflowAnalysis;
-import com.bwz6jk2227esl89ahj34.optimization.LatticeElement;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.DataflowAnalysis;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,8 +1,7 @@
-package com.bwz6jk2227esl89ahj34.optimization.available_expressions;
+package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
-import com.bwz6jk2227esl89ahj34.optimization.*;
-import com.bwz6jk2227esl89ahj34.optimization.CFGNode.*;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
 
 import java.util.HashSet;
 import java.util.Iterator;

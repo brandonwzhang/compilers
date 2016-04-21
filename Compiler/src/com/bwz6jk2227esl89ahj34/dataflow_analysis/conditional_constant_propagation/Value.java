@@ -1,7 +1,7 @@
-package com.bwz6jk2227esl89ahj34.optimization.conditional_constant_propagation;
+package com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation;
 
 import com.bwz6jk2227esl89ahj34.ir.IRConst;
-import com.bwz6jk2227esl89ahj34.optimization.LatticeElement;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

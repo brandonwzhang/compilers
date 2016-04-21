@@ -1,7 +1,7 @@
-package com.bwz6jk2227esl89ahj34.optimization.available_expressions;
+package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions;
 
 import com.bwz6jk2227esl89ahj34.ir.IRExpr;
-import com.bwz6jk2227esl89ahj34.optimization.LatticeElement;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import lombok.Data;
 
 import java.util.HashSet;

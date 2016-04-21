@@ -17,7 +17,7 @@ import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRConstantFoldingVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
-import com.bwz6jk2227esl89ahj34.optimization.ControlFlowGraphIR;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.ControlFlowGraphIR;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import java_cup.runtime.Symbol;

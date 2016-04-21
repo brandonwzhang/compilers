@@ -1,7 +1,7 @@
-package com.bwz6jk2227esl89ahj34.optimization.conditional_constant_propagation;
+package com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
-import com.bwz6jk2227esl89ahj34.optimization.*;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 
 import java.math.BigInteger;

@@ -1,9 +1,9 @@
-package com.bwz6jk2227esl89ahj34.optimization.available_copies;
+package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies;
 
 import com.bwz6jk2227esl89ahj34.ir.IRTemp;
-import com.bwz6jk2227esl89ahj34.optimization.LatticeBottom;
-import com.bwz6jk2227esl89ahj34.optimization.LatticeElement;
-import com.bwz6jk2227esl89ahj34.optimization.LatticeTop;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
