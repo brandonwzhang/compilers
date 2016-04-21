@@ -5,7 +5,7 @@ import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.OpCode;
 
 import java.util.*;
 
-public class ControlFlowGraphAssembly {
+public class ControlFlowGraphAssembly extends ControlFlowGraph {
     private static int indexOfLabel(String labelName, List<AssemblyLine> lines) {
         for (int i = 0; i < lines.size(); i++) {
             AssemblyLine instruction = lines.get(i);
@@ -67,13 +67,11 @@ public class ControlFlowGraphAssembly {
 
     }
 
-    public static CFGNode construct(List<AssemblyLine> lines) {
-        Map<Integer, CFGNode> nodes = new HashMap<>();
-        Map<Integer, List<Integer>> graph = new HashMap<>();
+    public ControlFlowGraphAssembly(List<AssemblyLine> lines) {
         for (int i = 0; i < lines.size(); i++) {
             AssemblyLine line = lines.get(i);
             if (line instanceof AssemblyInstruction) {
-                nodes.put(i, new CFGNode((AssemblyInstruction) line, i));
+                nodes.put(i, new CFGNodeAssembly((AssemblyInstruction) line));
                 graph.put(i, getSuccessors(i, lines));
             }
         }
@@ -87,7 +85,6 @@ public class ControlFlowGraphAssembly {
                 successorNode.addPredecessor(node);
             }
         }
-        return nodes.get(Collections.min(nodes.keySet()));
     }
 
 }

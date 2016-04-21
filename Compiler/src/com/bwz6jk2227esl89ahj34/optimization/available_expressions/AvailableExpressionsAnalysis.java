@@ -20,8 +20,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
     }
 
     public AvailableExpressionSet eval(CFGNode node) {
-        assert node.getNodeType() == NodeType.IR;
-        IRStmt stmt = node.getIrstmt();
+        IRStmt stmt = ((CFGNodeIR) node).getStatement();
         assert stmt != null;
 
         Set<IRExpr> set = new HashSet<>();
@@ -60,8 +59,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
 
     public void kill(CFGNode node, Set<IRExpr> out) {
         // destructively modify out to remove kill[node]
-        assert node.getNodeType() == NodeType.IR;
-        IRStmt stmt = node.getIrstmt();
+        IRStmt stmt = ((CFGNodeIR)node).getStatement();
         assert stmt != null;
 
         if (stmt instanceof IRMove) {

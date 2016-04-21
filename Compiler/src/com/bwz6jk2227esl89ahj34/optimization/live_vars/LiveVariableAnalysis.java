@@ -12,13 +12,10 @@ import java.util.Set;
 public class LiveVariableAnalysis extends DataflowAnalysis{
 
     private Direction direction = Direction.BACKWARD;
-    private CFGNode<AssemblyInstruction> startNode;
+    private CFGNode startNode;
 
-    public 
-
-    public LatticeElement transfer(LatticeElement element) {
+    public void transfer(CFGNode node) {
         // TODO
-        return null;
     }
 
     public LiveVariableSet meet(Set<LatticeElement> elements) {

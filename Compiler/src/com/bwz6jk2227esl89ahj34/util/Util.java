@@ -149,7 +149,13 @@ public class Util {
                                    String extension,
                                    String diagnosticPath,
                                    List<String> lines) {
-        String output = file.replace(".xi", "." + extension);
+        int extensionIndex = file.lastIndexOf('.');
+        String output;
+        if (extensionIndex == -1) {
+            output = file + "." + extension;
+        } else {
+            output = file.substring(0, extensionIndex) + "." + extension;
+        }
         String writeFile = diagnosticPath + '/' +  output;
         makePath(writeFile.substring(0, writeFile.lastIndexOf('/') + 1));
         writeAndClose(writeFile, lines);

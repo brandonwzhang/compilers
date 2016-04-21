@@ -6,7 +6,7 @@ import com.bwz6jk2227esl89ahj34.ir.*;
 
 import java.util.*;
 
-public class ControlFlowGraphIR {
+public class ControlFlowGraphIR extends ControlFlowGraph {
     private static int indexOfLabel(String labelName, List<IRStmt> statements) {
         for (int i = 0; i < statements.size(); i++) {
             IRStmt statement = statements.get(i);
@@ -77,15 +77,13 @@ public class ControlFlowGraphIR {
 
     }
 
-    public static CFGNode construct(List<IRStmt> statements) {
+    public ControlFlowGraphIR(List<IRStmt> statements) {
         // First, add all CFG nodes and construct the graph
-        Map<Integer, CFGNode> nodes = new HashMap<>();
-        Map<Integer, List<Integer>> graph = new HashMap<>();
         for (int i = 0; i < statements.size(); i++) {
             IRStmt statement = statements.get(i);
             // Don't include labels in the CFG
             if (!(statement instanceof IRLabel)) {
-                nodes.put(i, new CFGNode(statement, i));
+                nodes.put(i, new CFGNodeIR(statement));
                 graph.put(i, getSuccessors(i, statements));
             }
         }
@@ -99,6 +97,5 @@ public class ControlFlowGraphIR {
                 successorNode.addPredecessor(node);
             }
         }
-        return nodes.get(Collections.min(nodes.keySet()));
     }
 }

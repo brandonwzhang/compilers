@@ -9,6 +9,7 @@ import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.TypeException;
 import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.visit.*;
 import com.bwz6jk2227esl89ahj34.code_generation.AssemblyProgram;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
+import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRLexer;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRParser;
@@ -16,6 +17,7 @@ import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRConstantFoldingVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
+import com.bwz6jk2227esl89ahj34.optimization.ControlFlowGraphIR;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import java_cup.runtime.Symbol;
@@ -269,6 +271,17 @@ public class Core {
 
         IRCompUnit mirRoot = mirGen(file, program.get());
         IRCompUnit lirRoot = irGen(file, mirRoot);
+
+        for (String functionName : lirRoot.functions().keySet()) {
+            ControlFlowGraphIR graph =
+                    new ControlFlowGraphIR(((IRSeq)lirRoot.functions().get(functionName).body()).stmts());
+            Util.writeHelper(
+                    "IR_dotfile_" + functionName,
+                    "dot",
+                    "./",
+                    Collections.singletonList(graph.toString())
+            );
+        }
 
         if (Main.irrun()) {
             irRun(file);
