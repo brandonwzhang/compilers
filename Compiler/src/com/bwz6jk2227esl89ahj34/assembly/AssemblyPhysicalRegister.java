@@ -1,8 +1,8 @@
 package com.bwz6jk2227esl89ahj34.assembly;
 
+import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
 import java.util.List;
 

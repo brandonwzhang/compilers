@@ -6,6 +6,7 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeIR;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.DataflowAnalysis;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.Pair;
+import com.bwz6jk2227esl89ahj34.ir.IRStmt;
 
 import java.util.*;
 
@@ -86,6 +87,7 @@ public class AvailableCopies extends DataflowAnalysis {
             }
 
         }
+        return null ;
      }
 
      public AvailableCopiesSet kill(CFGNode node) {

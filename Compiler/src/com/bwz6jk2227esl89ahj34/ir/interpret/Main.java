@@ -1,17 +1,17 @@
 package com.bwz6jk2227esl89ahj34.ir.interpret;
 
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-
-import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRLexer;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRParser;
 import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.CheckConstFoldedIRVisitor;
-import com.bwz6jk2227esl89ahj34.ir.IRBinOp.*;
+import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
+
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 
 public class Main {

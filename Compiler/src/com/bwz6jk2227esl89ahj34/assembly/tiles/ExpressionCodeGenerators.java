@@ -1,9 +1,8 @@
 package com.bwz6jk2227esl89ahj34.assembly.tiles;
 
 import com.bwz6jk2227esl89ahj34.assembly.*;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
 import com.bwz6jk2227esl89ahj34.ir.*;
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.*;
-
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 
 import java.util.List;

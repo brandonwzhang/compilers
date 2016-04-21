@@ -1,6 +1,12 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis;
 
-import java.util.*;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
+import com.bwz6jk2227esl89ahj34.ir.IRSeq;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class DataflowAnalysis {
     public enum Direction {
@@ -8,15 +14,30 @@ public abstract class DataflowAnalysis {
     }
 
     private Direction direction;
-    private Map<Integer, CFGNode> nodes;
+    private ControlFlowGraph graph;
+
+    public DataflowAnalysis(List<AssemblyLine> lines, Direction direction) {
+        this.graph = new ControlFlowGraphAssembly(lines);
+        this.direction = direction;
+    }
+
+    public DataflowAnalysis(IRSeq seq, Direction direction) {
+        this.graph = new ControlFlowGraphIR(seq);
+        this.direction = direction;
+    }
 
     public abstract void transfer(CFGNode node);
 
     public abstract LatticeElement meet(Set<LatticeElement> elements);
 
     public void fixpoint() {
+        Map<Integer, CFGNode> nodes = graph.getNodes();
         LinkedList<CFGNode> worklist = new LinkedList<>();
+        // Initialize the in and out of each node and add it to the worklist
         for (CFGNode node : nodes.values()) {
+            // Initialize all in and out to be top
+            node.setIn(new LatticeTop());
+            node.setOut(new LatticeTop());
             worklist.add(node);
         }
         while (!worklist.isEmpty()) {

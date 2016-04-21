@@ -1,9 +1,14 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Data
+@EqualsAndHashCode(callSuper = false)
 public abstract class ControlFlowGraph {
     protected Map<Integer, CFGNode> nodes = new HashMap<>();
     protected Map<Integer, List<Integer>> graph = new HashMap<>();
@@ -21,10 +26,6 @@ public abstract class ControlFlowGraph {
                 label = "" + ((CFGNodeIR) node).getStatement();
             }
             s += "\t" + index + " [label=\"" + label + "\"];\n";
-
-//            for (CFGNode successor : node.getSuccessors()) {
-//                s += node.getIndex() + " -> " + successor.getIndex() + ";\n";
-//            }
 
             for (int successor : graph.get(index)) {
                 s += "\t" + index + " -> " + successor + ";\n";

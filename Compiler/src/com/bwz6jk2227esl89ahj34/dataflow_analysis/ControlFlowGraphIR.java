@@ -2,7 +2,8 @@ package com.bwz6jk2227esl89ahj34.dataflow_analysis;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ControlFlowGraphIR extends ControlFlowGraph {
     private static int indexOfLabel(String labelName, List<IRStmt> statements) {
@@ -75,7 +76,8 @@ public class ControlFlowGraphIR extends ControlFlowGraph {
 
     }
 
-    public ControlFlowGraphIR(List<IRStmt> statements) {
+    public ControlFlowGraphIR(IRSeq seq) {
+        List<IRStmt> statements = seq.stmts();
         // First, add all CFG nodes and construct the graph
         for (int i = 0; i < statements.size(); i++) {
             IRStmt statement = statements.get(i);

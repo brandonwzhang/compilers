@@ -5,7 +5,9 @@
 
 package com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse;
 
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.*;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.FunctionDeclaration;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.FunctionType;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.Identifier;
 import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.PrimitiveType;
 import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.VariableType;
 import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.VariableTypeList;
@@ -13,8 +15,9 @@ import com.bwz6jk2227esl89ahj34.util.Util;
 import java_cup.runtime.Symbol;
 
 import java.io.FileReader;
-import java.util.*;
-import java.util.AbstractMap.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.LinkedList;
+import java.util.List;
 
 /** CUP v0.11b 20150326 generated parser.
   */

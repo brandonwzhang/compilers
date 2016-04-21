@@ -1,9 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ir.visit;
 
-import com.bwz6jk2227esl89ahj34.ir.*;
-import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
-
-import java.util.*;
+import com.bwz6jk2227esl89ahj34.ir.IRNode;
 
 public class MIRLowerVisitor extends IRVisitor{
     // Counter to append to label strings.

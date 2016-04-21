@@ -1,10 +1,10 @@
 package com.bwz6jk2227esl89ahj34.util;
 
+import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.FunctionDeclaration;
 import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.FunctionType;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.VariableType;
-import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse.ParserSym;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.VariableType;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyComment;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
