@@ -1,8 +1,14 @@
 package com.bwz6jk2227esl89ahj34;
 
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyAbstractRegister;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyPhysicalRegister.Register;
 import com.bwz6jk2227esl89ahj34.command_line_interface.CommandLineInterface;
 
 import java.util.Collections;
+
+import com.bwz6jk2227esl89ahj34.assembly.register_allocation.GraphColorer2;
+
+import java.util.*;
 
 public class Main {
     private static String sourcePath = "./";
@@ -80,18 +86,90 @@ public class Main {
                       Main::turnIRRunDiagnosticsOn,
                       0);
 
-        cli.execute(args);
+        //cli.execute(args);
+
+        // test for first GraphColorer
+//        Node a = new Node();
+//        Node b = new Node();
+//        Node c = new Node();
+//
+//        a.addNeighbor(b);
+//        b.addNeighbor(a);
+//
+//        b.addNeighbor(c);
+//        c.addNeighbor(b);
+//
+//        a.addNeighbor(c);
+//        c.addNeighbor(a);
+//
+//        List<Node> graph = new ArrayList<>();
+//        graph.add(a);
+//        graph.add(b);
+//        graph.add(c);
+//
+//        System.out.println("coloring");
+//        GraphColorer gc = new GraphColorer(graph);
+//        boolean colored = gc.colorGraph();
+//        System.out.println(colored);
+//        System.out.println(a.color);
+//        System.out.println(b.color);
+//        System.out.println(c.color);
+
+        // test for GraphColorer2
+//        AssemblyAbstractRegister a = new AssemblyAbstractRegister();
+//        AssemblyAbstractRegister b = new AssemblyAbstractRegister();
+//        AssemblyAbstractRegister c = new AssemblyAbstractRegister();
+//
+//        Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph = new HashMap<>();
+//        List<AssemblyAbstractRegister> an = new ArrayList<>();
+//        an.add(b);
+//        List<AssemblyAbstractRegister> bn = new ArrayList<>();
+//        bn.add(a);
+//        bn.add(c);
+//        List<AssemblyAbstractRegister> cn = new ArrayList<>();
+//        cn.add(b);
+//        graph.put(a, an);
+//        graph.put(b, bn);
+//        graph.put(c, cn);
+
+        // test for GraphColorer2
+//        AssemblyAbstractRegister a = new AssemblyAbstractRegister();
+//        AssemblyAbstractRegister b = new AssemblyAbstractRegister();
+//        AssemblyAbstractRegister c = new AssemblyAbstractRegister();
+//        AssemblyAbstractRegister d = new AssemblyAbstractRegister();
+//        AssemblyAbstractRegister e = new AssemblyAbstractRegister();
+//
+//        Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph = new HashMap<>();
+//        List<AssemblyAbstractRegister> an = new ArrayList<>(); an.add(b); an.add(c); an.add(d); an.add(e);
+//        List<AssemblyAbstractRegister> bn = new ArrayList<>(); bn.add(a); bn.add(c); bn.add(d); bn.add(e);
+//        List<AssemblyAbstractRegister> cn = new ArrayList<>(); cn.add(a); cn.add(b); cn.add(d); cn.add(e);
+//        List<AssemblyAbstractRegister> dn = new ArrayList<>(); dn.add(a); dn.add(b); dn.add(c); dn.add(e);
+//        List<AssemblyAbstractRegister> en = new ArrayList<>(); en.add(a); en.add(b); en.add(c); en.add(d);
+//        graph.put(a, an); graph.put(b, bn); graph.put(c, cn); graph.put(d, dn); graph.put(e, en);
+//
+//        System.out.println("coloring");
+//        GraphColorer2 gc = new GraphColorer2(graph);
+//        //gc.addColoring(a, AssemblyPhysicalRegister.Register.RBX);
+//        boolean colored = gc.colorGraph();
+//        Map<AssemblyAbstractRegister, Register> coloring = gc.getColoring();
+//
+//        System.out.println(colored);
+//        System.out.println(coloring.get(a));
+//        System.out.println(coloring.get(b));
+//        System.out.println(coloring.get(c));
+//        System.out.println(coloring.get(d));
+//        System.out.println(coloring.get(e));
 
         if(tests) { // put debug mode behaviors here
 
-            String[] exclude = {"enigma", "medley01", "array_init", "constantfoldtest"};
+            String[] exclude = {"enigma", "medley01", "array_init"};
             Collections.addAll(Tests.exclude, exclude);
             System.out.println("\nDEBUG: Excluding: " + Tests.exclude.toString());
 
             try {
                //Tests2.parseTests();
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ef) {
+                ef.printStackTrace();
             }
 
             //Tests.typeCheckTests();
