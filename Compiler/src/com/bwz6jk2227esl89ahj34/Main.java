@@ -1,8 +1,7 @@
 package com.bwz6jk2227esl89ahj34;
 
-import com.bwz6jk2227esl89ahj34.util.Util;
+import com.bwz6jk2227esl89ahj34.command_line_interface.CommandLineInterface;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 public class Main {
@@ -21,7 +20,7 @@ public class Main {
     private static boolean irrun;
 
     public static void main(String[] args) {
-        CLI cli = new CLI();
+        CommandLineInterface cli = new CommandLineInterface();
         /*
             The order in which these options are added is the same as which
             they will be executed (but options can be provided in any order

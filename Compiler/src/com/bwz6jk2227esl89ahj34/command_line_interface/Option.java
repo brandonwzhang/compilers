@@ -1,4 +1,4 @@
-package com.bwz6jk2227esl89ahj34;
+package com.bwz6jk2227esl89ahj34.command_line_interface;
 
 public class Option {
     public String description;

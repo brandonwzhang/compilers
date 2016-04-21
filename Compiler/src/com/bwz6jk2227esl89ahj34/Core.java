@@ -7,7 +7,7 @@ import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse.Parser;
 import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse.ParserSym;
 import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.TypeException;
 import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.visit.*;
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyProgram;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyProgram;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;

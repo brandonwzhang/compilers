@@ -1,6 +1,6 @@
-package com.bwz6jk2227esl89ahj34.code_generation.tiles;
+package com.bwz6jk2227esl89ahj34.assembly.tiles;
 
-import com.bwz6jk2227esl89ahj34.code_generation.*;
+import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 
@@ -8,7 +8,7 @@ import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.*;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.*;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
 public class StatementCodeGenerators {

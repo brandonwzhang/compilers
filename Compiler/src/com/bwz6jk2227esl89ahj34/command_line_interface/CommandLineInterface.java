@@ -1,4 +1,7 @@
-package com.bwz6jk2227esl89ahj34;
+package com.bwz6jk2227esl89ahj34.command_line_interface;
+
+import com.bwz6jk2227esl89ahj34.Core;
+import com.bwz6jk2227esl89ahj34.Main;
 
 import java.util.*;
 
@@ -23,11 +26,11 @@ import java.util.*;
  * first regardless of what order the options are passed in to
  * the script.
  */
-public class CLI {
+public class CommandLineInterface {
     private Map<String, Option> options;
     private ArrayList<String> files;
 
-    public CLI() {
+    public CommandLineInterface() {
         // we use a LinkedHashMap because we want to preserve the order
         // in which the options were added
         options = new LinkedHashMap<>();

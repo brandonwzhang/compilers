@@ -1,7 +1,7 @@
-package com.bwz6jk2227esl89ahj34.code_generation;
+package com.bwz6jk2227esl89ahj34.assembly;
 
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.OpCode;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
 
 import java.util.HashMap;
 import java.util.LinkedList;

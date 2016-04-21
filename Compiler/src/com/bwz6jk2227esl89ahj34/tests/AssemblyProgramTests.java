@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34.tests;
 
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyProgram;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyProgram;
 import org.junit.Assert;
 import org.junit.Test;
 

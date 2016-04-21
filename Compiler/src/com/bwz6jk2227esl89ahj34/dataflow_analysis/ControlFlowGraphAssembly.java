@@ -1,7 +1,7 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis;
 
-import com.bwz6jk2227esl89ahj34.code_generation.*;
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyInstruction.OpCode;
+import com.bwz6jk2227esl89ahj34.assembly.*;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
 
 import java.util.*;
 

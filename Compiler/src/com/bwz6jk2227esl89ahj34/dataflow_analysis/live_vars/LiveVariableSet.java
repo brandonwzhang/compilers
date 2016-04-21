@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis.live_vars;
 
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyAbstractRegister;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyAbstractRegister;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import lombok.Data;
 

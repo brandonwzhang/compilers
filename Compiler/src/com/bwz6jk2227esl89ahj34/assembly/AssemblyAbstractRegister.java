@@ -1,7 +1,6 @@
-package com.bwz6jk2227esl89ahj34.code_generation;
+package com.bwz6jk2227esl89ahj34.assembly;
 
 import com.bwz6jk2227esl89ahj34.ir.IRTemp;
-import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

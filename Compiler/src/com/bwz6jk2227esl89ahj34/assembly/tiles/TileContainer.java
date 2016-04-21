@@ -1,7 +1,7 @@
-package com.bwz6jk2227esl89ahj34.code_generation.tiles;
+package com.bwz6jk2227esl89ahj34.assembly.tiles;
 
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyExpression;
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyLine;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyExpression;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
 import com.bwz6jk2227esl89ahj34.ir.*;
 
 import java.util.Comparator;
@@ -61,7 +61,7 @@ public class TileContainer {
             }
         }
 
-        throw new RuntimeException("No code_generation matched! Please email jk2227@cornell.edu");
+        throw new RuntimeException("No assembly matched! Please email jk2227@cornell.edu");
     }
 
     public static AssemblyExpression matchExpression(IRNode root, List<AssemblyLine> lines) {
@@ -73,7 +73,7 @@ public class TileContainer {
             }
         }
 
-        throw new RuntimeException("No code_generation matched! Please email bwz6@cornell.edu");
+        throw new RuntimeException("No assembly matched! Please email bwz6@cornell.edu");
     }
 
 

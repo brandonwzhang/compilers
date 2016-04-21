@@ -1,4 +1,4 @@
-package com.bwz6jk2227esl89ahj34.code_generation.tiles;
+package com.bwz6jk2227esl89ahj34.assembly.tiles;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
