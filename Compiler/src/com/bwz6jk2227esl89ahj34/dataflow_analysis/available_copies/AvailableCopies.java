@@ -1,13 +1,13 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies;
 
-import com.bwz6jk2227esl89ahj34.ir.IRStmt;
+import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeIR;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.DataflowAnalysis;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.util.prettyprint.Pair;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by jihunkim on 4/20/16.
@@ -63,8 +63,33 @@ public class AvailableCopies extends DataflowAnalysis {
                 .union(gen(node));
      }
 
+     // extracts temps used in the move stmt
+     // given something like LHS = RHS,
+     // the LHS will be the first of the pair,
+     // and the list of IRTemps will contain all of the IRTemps used
+     // on the RHS of the move stmt
+     //
+     // postcondition: if move is not a move to a IRTemp, this will
+     // return an empty optional
+     public Optional<Pair<IRTemp, List<IRTemp>>> extractTemps(IRMove move) {
+        if (move.target() instanceof IRTemp) {
+            return Optional.empty();
+        } else {
+            Pair<IRTemp, List<IRTemp>> pair;
+            IRTemp tempLHS = (IRTemp) move.target();
+            List<IRTemp> tempsRHS = new LinkedList<>();
+            IRExpr RHS = move.expr();
+            if (RHS instanceof IRTemp) {
+                tempsRHS.add((IRTemp)RHS);
+            } else if (RHS instanceof IRBinOp) {
+                //tempRHS.add(())
+            }
+
+        }
+     }
+
      public AvailableCopiesSet kill(CFGNode node) {
-         
+
          return null;
      }
 
