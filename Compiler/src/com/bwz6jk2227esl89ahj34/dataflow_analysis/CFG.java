@@ -19,13 +19,7 @@ public abstract class CFG {
         s += "digraph CFG {\n";
         for (int index : nodes.keySet()) {
             CFGNode node = nodes.get(index);
-            String label;
-            if (node instanceof CFGNodeAssembly) {
-                label = "" + ((CFGNodeAssembly) node).getInstruction();
-            } else {
-                label = "" + ((CFGNodeIR) node).getStatement();
-            }
-            s += "\t" + index + " [label=\"" + label + "\"];\n";
+            s += "\t" + index + " [label=\"" + node + "\"];\n";
 
             for (int successor : graph.get(index)) {
                 s += "\t" + index + " -> " + successor + ";\n";

@@ -12,5 +12,5 @@ public class LatticeBottom extends LatticeElement {
         return element instanceof LatticeBottom;
     }
 
-    public String toString() { return "Bottom"; }
+    public String toString() { return "BOTTOM"; }
 }

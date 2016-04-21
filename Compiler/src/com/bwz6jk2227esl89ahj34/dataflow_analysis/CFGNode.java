@@ -19,4 +19,12 @@ public abstract class CFGNode {
     public void addSuccessor(CFGNode node) {
         successors.add(node);
     }
+
+    @Override
+    public String toString() {
+        String s = "";
+        s += "in: " + in + "\\n";
+        s += "out: " + out + "\\n";
+        return s;
+    }
 }

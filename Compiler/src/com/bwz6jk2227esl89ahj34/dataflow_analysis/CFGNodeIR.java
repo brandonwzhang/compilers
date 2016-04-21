@@ -15,6 +15,7 @@ public class CFGNodeIR extends CFGNode {
 
     @Override
     public String toString() {
-        return statement.toString().substring(0, statement.toString().length() - 1);
+        String label = "" + statement + "\\n";
+        return label + super.toString();
     }
 }

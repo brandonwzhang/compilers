@@ -15,6 +15,7 @@ public class CFGNodeAssembly extends CFGNode {
 
     @Override
     public String toString() {
-        return "" + instruction;
+        String label = "" + instruction + "\\n";
+        return label + super.toString();
     }
 }

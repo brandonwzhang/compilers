@@ -13,24 +13,22 @@ public abstract class DataflowAnalysis {
         FORWARD, BACKWARD
     }
 
-    private Direction direction;
     private CFG graph;
 
     public DataflowAnalysis(List<AssemblyLine> lines, Direction direction) {
         this.graph = new CFGAssembly(lines);
-        this.direction = direction;
+        fixpoint(direction);
     }
 
     public DataflowAnalysis(IRSeq seq, Direction direction) {
         this.graph = new CFGIR(seq);
-        this.direction = direction;
     }
 
     public abstract void transfer(CFGNode node);
 
     public abstract LatticeElement meet(Set<LatticeElement> elements);
 
-    public void fixpoint() {
+    public void fixpoint(Direction direction) {
         Map<Integer, CFGNode> nodes = graph.getNodes();
         LinkedList<CFGNode> worklist = new LinkedList<>();
         // Initialize the in and out of each node and add it to the worklist
