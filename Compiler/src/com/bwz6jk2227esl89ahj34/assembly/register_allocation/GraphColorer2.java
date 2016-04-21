@@ -8,7 +8,7 @@ import java.util.*;
 
 public class GraphColorer2 {
 
-    private static Register[] colors = {Register.RAX, Register.RBX, Register.RCX, Register.R8};
+    public static Register[] colors = {Register.RAX, Register.RBX, Register.RCX, Register.R8};
 
     private Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph;
     private Stack<AssemblyAbstractRegister> removedNodes;

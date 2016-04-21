@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34.assembly.register_allocation;
 
-import com.bwz6jk2227esl89ahj34.code_generation.AssemblyPhysicalRegister.Register;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyPhysicalRegister.Register;
 
 import java.util.*;
 
