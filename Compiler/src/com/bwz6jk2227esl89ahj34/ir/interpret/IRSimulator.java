@@ -1,21 +1,15 @@
 package com.bwz6jk2227esl89ahj34.ir.interpret;
 
+import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
+import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
+import com.bwz6jk2227esl89ahj34.util.SerialVersionUID;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.Stack;
-
-import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
-import com.bwz6jk2227esl89ahj34.ir.*;
-import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
-import com.bwz6jk2227esl89ahj34.util.SerialVersionUID;
+import java.util.*;
 
 /**
  * A simple IR interpreter

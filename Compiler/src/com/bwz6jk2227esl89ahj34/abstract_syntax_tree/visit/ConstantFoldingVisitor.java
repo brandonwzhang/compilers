@@ -4,7 +4,10 @@ import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.*;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Stack;
 
 //TODO: remove the exceptions for over/underflow
 public class ConstantFoldingVisitor implements NodeVisitor {

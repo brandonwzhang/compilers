@@ -1,15 +1,15 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
+import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
+import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
-import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
-import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
-import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
-import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 
 /**
  * An intermediate representation for a function call

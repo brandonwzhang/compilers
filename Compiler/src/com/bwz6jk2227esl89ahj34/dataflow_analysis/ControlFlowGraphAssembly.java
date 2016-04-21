@@ -1,9 +1,13 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis;
 
-import com.bwz6jk2227esl89ahj34.assembly.*;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyLabel;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyName;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ControlFlowGraphAssembly extends ControlFlowGraph {
     private static int indexOfLabel(String labelName, List<AssemblyLine> lines) {

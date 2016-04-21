@@ -28,16 +28,8 @@ package com.bwz6jk2227esl89ahj34.util.prettyprint;
 
 import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 /**
  * The pretty-printing algorithm is loosely based on the Modula-3

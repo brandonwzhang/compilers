@@ -2,12 +2,7 @@ package com.bwz6jk2227esl89ahj34.abstract_syntax_tree.visit;
 
 import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.*;
 import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse.InterfaceParser;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.PrimitiveType;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.Type;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.VariableType;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.VariableTypeList;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.Context;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.TypeException;
+import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.*;
 
 import java.util.*;
 

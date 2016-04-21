@@ -1,13 +1,14 @@
 package com.bwz6jk2227esl89ahj34.assembly;
 
-import com.bwz6jk2227esl89ahj34.assembly.tiles.TileContainer;
-import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
-
-
+import com.bwz6jk2227esl89ahj34.assembly.tiles.TileContainer;
+import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
+import com.bwz6jk2227esl89ahj34.ir.IRSeq;
+import com.bwz6jk2227esl89ahj34.ir.IRStmt;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class AssemblyFunction {
     public static int maxNumReturnValues;
