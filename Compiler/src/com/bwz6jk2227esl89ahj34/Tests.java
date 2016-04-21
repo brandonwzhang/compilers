@@ -39,7 +39,7 @@ public class Tests {
 
         Main.setSourcePath(".");
         Main.setDiagnosticPath(".");
-        Main.setLibPath("./lib");
+        Main.setLibPath(Util.rootPath + "/lib");
         Main.setAssemblyPath(".");
 
         List<String> results = new LinkedList<>();
