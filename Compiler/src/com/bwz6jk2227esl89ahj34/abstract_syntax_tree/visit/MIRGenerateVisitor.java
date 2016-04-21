@@ -645,13 +645,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
             statements.add(new IRJump(new IRName(endLabelName)));
         } else {
             String falseLabelName = getFreshVariable();
-            IRLabel falseLabel = new IRLabel(falseLabelName);
-            IRCJump cjump = new IRCJump(guard, trueLabelName, falseLabelName);
+            IRCJump cjump = new IRCJump(guard, trueLabelName);
             statements.add(cjump);
             statements.add(trueLabel);
             statements.add(trueBlock);
-            statements.add(new IRJump(new IRName(endLabelName)));
-            statements.add(falseLabel);
             statements.add(new IRJump(new IRName(endLabelName)));
         }
         statements.add(endLabel);

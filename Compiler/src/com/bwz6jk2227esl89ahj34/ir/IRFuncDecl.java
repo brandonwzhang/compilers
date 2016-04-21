@@ -43,7 +43,7 @@ public class IRFuncDecl extends IRNode {
     @Override
     public IRNode visitChildren(IRVisitor v) {
         IRStmt stmt = (IRStmt) v.visit(this, body);
-        
+
         if (stmt != body) return new IRFuncDecl(name, stmt);
 
         return this;
@@ -132,15 +132,6 @@ public class IRFuncDecl extends IRNode {
         return graph;
     }
 
-    private int firstUnvisited(boolean[] visited) {
-        for (int i = 0; i < visited.length; i++) {
-            if (!visited[i]) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     private List<IRStmt> reorderBlocks(int curNode, Map<Integer, List<Integer>> graph,
                                        List<List<IRStmt>> blocks, boolean[] visited) {
         visited[curNode] = true;
@@ -148,7 +139,8 @@ public class IRFuncDecl extends IRNode {
         List<Integer> successors = graph.get(curNode);
         if (successors.size() == 0) {
             return block;
-        } else if (successors.size() == 1) {
+        }
+        if (successors.size() == 1) {
             int successor = successors.get(0);
             if (visited[successor]) {
                 return block;
@@ -156,45 +148,46 @@ public class IRFuncDecl extends IRNode {
             List<IRStmt> retBlock = new LinkedList<>(block);
             retBlock.addAll(reorderBlocks(successors.get(0), graph, blocks, visited));
             return retBlock;
-        } else {
-            IRStmt lastStatement = block.get(block.size() - 1);
-            // We have a CJump to handle
-            assert lastStatement instanceof IRCJump;
-            // Lower the CJump
-            IRCJump mirCJump = (IRCJump) lastStatement;
-            IRCJump canonicalCJump = new IRCJump(mirCJump.expr(), mirCJump.trueLabel());
-            block.remove(block.size() - 1);
-            block.add(canonicalCJump);
+        }
 
-            assert successors.size() == 2;
-            int falseNode = successors.get(0);
-            int trueNode = successors.get(1);
-            if (visited[falseNode] && visited[trueNode]) {
-                return block;
-            } else if (visited[falseNode]) {
-                // Only add true statements
-                List<IRStmt> retBlock = new LinkedList<>(block);
-                retBlock.addAll(reorderBlocks(trueNode, graph, blocks, visited));
-                return retBlock;
-            } else if (visited[trueNode]) {
-                // Only add false statements
-                List<IRStmt> retBlock = new LinkedList<>(block);
-                retBlock.addAll(reorderBlocks(falseNode, graph, blocks, visited));
-                return retBlock;
-            }
-            List<IRStmt> falseBlock = reorderBlocks(falseNode, graph, blocks, visited);
-            List<IRStmt> trueBlock = reorderBlocks(trueNode, graph, blocks, visited);
-            IRStmt lastFalseStatement = falseBlock.get(falseBlock.size() - 1);
-            if (!(lastFalseStatement instanceof IRJump)) {
-                String exitLabelName = MIRLowerVisitor.getFreshVariable();
-                falseBlock.add(new IRJump(new IRName(exitLabelName)));
-                trueBlock.add(new IRLabel(exitLabelName));
-            }
+        IRStmt lastStatement = block.get(block.size() - 1);
+        // We have a CJump to handle
+        assert lastStatement instanceof IRCJump;
+        // Lower the CJump
+        IRCJump mirCJump = (IRCJump) lastStatement;
+        IRCJump canonicalCJump = new IRCJump(mirCJump.expr(), mirCJump.trueLabel());
+        block.remove(block.size() - 1);
+        block.add(canonicalCJump);
+
+        assert successors.size() == 2;
+        int falseNode = successors.get(0);
+        int trueNode = successors.get(1);
+        if (visited[falseNode] && visited[trueNode]) {
+            return block;
+        } else if (visited[falseNode]) {
+            // Only add true statements
             List<IRStmt> retBlock = new LinkedList<>(block);
-            retBlock.addAll(falseBlock);
-            retBlock.addAll(trueBlock);
+            retBlock.addAll(reorderBlocks(trueNode, graph, blocks, visited));
+            return retBlock;
+        } else if (visited[trueNode]) {
+            // Only add false statements
+            List<IRStmt> retBlock = new LinkedList<>(block);
+            retBlock.addAll(reorderBlocks(falseNode, graph, blocks, visited));
             return retBlock;
         }
+        List<IRStmt> falseBlock = reorderBlocks(falseNode, graph, blocks, visited);
+        List<IRStmt> trueBlock = reorderBlocks(trueNode, graph, blocks, visited);
+        IRStmt lastFalseStatement = falseBlock.get(falseBlock.size() - 1);
+        // If last statement in false block doesn't jump or break, we need to add a jump in
+        if (!(lastFalseStatement instanceof IRJump || lastFalseStatement instanceof IRReturn)) {
+            String exitLabelName = MIRLowerVisitor.getFreshVariable();
+            falseBlock.add(new IRJump(new IRName(exitLabelName)));
+            trueBlock.add(new IRLabel(exitLabelName));
+        }
+        List<IRStmt> retBlock = new LinkedList<>(block);
+        retBlock.addAll(falseBlock);
+        retBlock.addAll(trueBlock);
+        return retBlock;
     }
 
     @Override

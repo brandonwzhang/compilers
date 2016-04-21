@@ -2,15 +2,11 @@ package com.bwz6jk2227esl89ahj34.optimization.conditional_constant_propagation;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.optimization.*;
-import com.bwz6jk2227esl89ahj34.optimization.CFGNode.NodeType;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 
 import java.math.BigInteger;
 import java.util.*;
 
-/**
- * Created by jihunkim on 4/19/16.
- */
 public class ConditionalConstantPropagation extends DataflowAnalysis {
 
 
@@ -18,10 +14,9 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
     public void transfer(CFGNode node) {
         // we are performing the analysis on the IR level so
         // make sure that we are at the right place
-        assert node.getNodeType() == NodeType.IR;
 
         // unwrap the IR stmt contained by node
-        IRStmt stmt = node.getIrstmt();
+        IRStmt stmt = ((CFGNodeIR)node).getStatement();
 
         // the "in" is filled in as a precondition
         UnreachableValueTuplesPair in =

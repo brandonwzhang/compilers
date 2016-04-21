@@ -100,7 +100,7 @@ public class Main {
             //Tests.mirGenTests();
             //Tests.irGenTests();
             //Tests.irRunTests();
-            //Tests.regressionTest();
+            Tests.regressionTest();
         }
     }
 
