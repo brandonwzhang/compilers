@@ -1,14 +1,8 @@
 package com.bwz6jk2227esl89ahj34;
 
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyAbstractRegister;
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyPhysicalRegister.Register;
-import com.bwz6jk2227esl89ahj34.command_line_interface.CommandLineInterface;
+import com.bwz6jk2227esl89ahj34.cli.CLI;
 
 import java.util.Collections;
-
-import com.bwz6jk2227esl89ahj34.assembly.register_allocation.GraphColorer2;
-
-import java.util.*;
 
 public class Main {
     private static String sourcePath = "./";
@@ -26,7 +20,7 @@ public class Main {
     private static boolean irrun;
 
     public static void main(String[] args) {
-        CommandLineInterface cli = new CommandLineInterface();
+        CLI cli = new CLI();
         /*
             The order in which these options are added is the same as which
             they will be executed (but options can be provided in any order

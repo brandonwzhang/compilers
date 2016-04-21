@@ -1,14 +1,14 @@
 package com.bwz6jk2227esl89ahj34;
 
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.FunctionDeclaration;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.Program;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse.Lexer;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse.Parser;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.parse.ParserSym;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.type.TypeException;
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.visit.*;
+import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
+import com.bwz6jk2227esl89ahj34.ast.Program;
+import com.bwz6jk2227esl89ahj34.ast.parse.Lexer;
+import com.bwz6jk2227esl89ahj34.ast.parse.Parser;
+import com.bwz6jk2227esl89ahj34.ast.parse.ParserSym;
+import com.bwz6jk2227esl89ahj34.ast.type.TypeException;
+import com.bwz6jk2227esl89ahj34.ast.visit.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyProgram;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.ControlFlowGraphIR;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGIR;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
@@ -273,8 +273,8 @@ public class Core {
         IRCompUnit lirRoot = irGen(file, mirRoot);
 
         for (String functionName : lirRoot.functions().keySet()) {
-            ControlFlowGraphIR graph =
-                    new ControlFlowGraphIR((IRSeq)lirRoot.functions().get(functionName).body());
+            CFGIR graph =
+                    new CFGIR((IRSeq)lirRoot.functions().get(functionName).body());
             Util.writeHelper(
                     "IR_dotfile_" + functionName,
                     "dot",

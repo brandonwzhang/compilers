@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34;
 
-import com.bwz6jk2227esl89ahj34.abstract_syntax_tree.Program;
+import com.bwz6jk2227esl89ahj34.ast.Program;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.util.Util;
 

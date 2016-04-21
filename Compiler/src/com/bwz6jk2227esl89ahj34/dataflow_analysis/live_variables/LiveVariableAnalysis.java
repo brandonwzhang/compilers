@@ -13,6 +13,7 @@ public class LiveVariableAnalysis extends DataflowAnalysis{
     public LiveVariableAnalysis(List<AssemblyLine> lines) {
         super(lines, Direction.BACKWARD);
     }
+
     /**
      * Returns the set of temps in this expression
      */

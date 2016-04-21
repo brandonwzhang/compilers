@@ -14,15 +14,15 @@ public abstract class DataflowAnalysis {
     }
 
     private Direction direction;
-    private ControlFlowGraph graph;
+    private CFG graph;
 
     public DataflowAnalysis(List<AssemblyLine> lines, Direction direction) {
-        this.graph = new ControlFlowGraphAssembly(lines);
+        this.graph = new CFGAssembly(lines);
         this.direction = direction;
     }
 
     public DataflowAnalysis(IRSeq seq, Direction direction) {
-        this.graph = new ControlFlowGraphIR(seq);
+        this.graph = new CFGIR(seq);
         this.direction = direction;
     }
 

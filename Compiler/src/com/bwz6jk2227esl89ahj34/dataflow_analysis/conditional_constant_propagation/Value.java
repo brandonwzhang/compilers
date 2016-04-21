@@ -5,10 +5,8 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.ir.IRConst;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-/**
- * Created by jihunkim on 4/19/16.
- */
 @Data
 @AllArgsConstructor
 public class Value extends LatticeElement {

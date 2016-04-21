@@ -6,13 +6,11 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
 import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by jihunkim on 4/20/16.
- */
 @Data
 @AllArgsConstructor
 public class AvailableCopiesSet extends LatticeElement {

@@ -6,16 +6,15 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
 import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by jihunkim on 4/19/16.
- */
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class UnreachableValueTuplesPair extends LatticeElement {
     private boolean unreachable;
     private Map<IRTemp, LatticeElement>  valueTuples;
