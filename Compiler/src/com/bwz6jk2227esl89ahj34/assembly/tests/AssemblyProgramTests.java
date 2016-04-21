@@ -1,4 +1,4 @@
-package com.bwz6jk2227esl89ahj34.tests;
+package com.bwz6jk2227esl89ahj34.assembly.tests;
 
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyProgram;
 import org.junit.Assert;

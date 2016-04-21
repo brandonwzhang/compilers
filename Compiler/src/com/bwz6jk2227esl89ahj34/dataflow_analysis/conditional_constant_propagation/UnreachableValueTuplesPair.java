@@ -26,4 +26,26 @@ public class UnreachableValueTuplesPair extends LatticeElement {
         unreachable = true;
     }
 
+    @Override
+    public LatticeElement copy() {
+        Map<IRTemp, LatticeElement> valueTuplesCopy = new HashMap<>();
+        for (IRTemp key : valueTuples.keySet()) {
+            valueTuplesCopy.put(key, valueTuples.get(key));
+        }
+        UnreachableValueTuplesPair copy =
+                new UnreachableValueTuplesPair(unreachable, valueTuplesCopy);
+        return copy;
+    }
+
+    @Override
+    public boolean equals(LatticeElement element) {
+        if (!(element instanceof UnreachableValueTuplesPair)) {
+            return false;
+        } else {
+            UnreachableValueTuplesPair castedElement =
+                    (UnreachableValueTuplesPair) element;
+            return !(unreachable != castedElement.isUnreachable()) &&
+                    !(castedElement.getValueTuples().equals(valueTuples));
+        }
+    }
 }

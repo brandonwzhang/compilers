@@ -18,6 +18,16 @@ import java.util.Map;
 public class AvailableCopiesSet extends LatticeElement {
     private Map<IRTemp, IRTemp> map;
 
+    @Override
+    public LatticeElement copy() {
+        Map<IRTemp, IRTemp> newMap = new HashMap<>();
+        for (IRTemp key : map.keySet()) {
+            newMap.put(key, map.get(key));
+        }
+        return new AvailableCopiesSet(newMap);
+    }
+
+    @Override
     public boolean equals(LatticeElement set) {
         if (!(set instanceof AvailableCopiesSet)) {
             return false;
