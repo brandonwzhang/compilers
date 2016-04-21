@@ -16,7 +16,11 @@ public abstract class DataflowAnalysis {
 
     public void fixpoint() {
         LinkedList<CFGNode> worklist = new LinkedList<>();
+        // Initialize the in and out of each node and add it to the worklist
         for (CFGNode node : nodes.values()) {
+            // Initialize all in and out to be top
+            node.setIn(new LatticeTop());
+            node.setOut(new LatticeTop());
             worklist.add(node);
         }
         while (!worklist.isEmpty()) {

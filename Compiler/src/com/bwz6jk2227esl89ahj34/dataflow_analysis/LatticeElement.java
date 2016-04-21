@@ -10,4 +10,10 @@ public abstract class LatticeElement {
      * Returns a deep copy of this LatticeElement
      */
     public abstract LatticeElement copy();
+
+    /**
+     * Returns a string describing the lattice element
+     */
+    @Override
+    public abstract String toString();
 }
