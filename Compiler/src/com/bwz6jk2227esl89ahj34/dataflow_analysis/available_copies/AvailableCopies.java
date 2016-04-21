@@ -51,17 +51,20 @@ public class AvailableCopies extends DataflowAnalysis {
                  accumulator = (AvailableCopiesSet) pred;
              } else {
                  AvailableCopiesSet castedPred = (AvailableCopiesSet) pred;
-
+                 accumulator.intersect(castedPred);
              }
          }
-         return null;
+         return accumulator;
      }
 
+     // out[n] = (in[n] - kill[n]) union gen[n]
      public AvailableCopiesSet out(CFGNode node) {
-        return null;
+        return (((AvailableCopiesSet) node.getIn()).subtract(kill(node)))
+                .union(gen(node));
      }
 
      public AvailableCopiesSet kill(CFGNode node) {
+         
          return null;
      }
 

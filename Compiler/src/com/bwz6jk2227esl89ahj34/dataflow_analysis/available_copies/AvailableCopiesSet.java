@@ -21,9 +21,7 @@ public class AvailableCopiesSet extends LatticeElement {
     @Override
     public LatticeElement copy() {
         Map<IRTemp, IRTemp> newMap = new HashMap<>();
-        for (IRTemp key : map.keySet()) {
-            newMap.put(key, map.get(key));
-        }
+        newMap.putAll(map);
         return new AvailableCopiesSet(newMap);
     }
 
@@ -57,5 +55,22 @@ public class AvailableCopiesSet extends LatticeElement {
         }
     }
 
+    public AvailableCopiesSet subtract(AvailableCopiesSet subtrahend) {
+        AvailableCopiesSet copy = (AvailableCopiesSet) this.copy();
+        Map<IRTemp, IRTemp> subtrahendMap = subtrahend.getMap();
+        for (IRTemp key : subtrahendMap.keySet()) {
+            if (copy.getMap().containsKey(key) &&
+                    copy.getMap().get(key).name().equals(subtrahendMap.get(key).name())) {
+                  copy.getMap().remove(key);
+            }
+        }
+        return copy;
+    }
 
+    public AvailableCopiesSet union(AvailableCopiesSet set) {
+        Map<IRTemp, IRTemp> union = new HashMap<>();
+        union.putAll(map);
+        union.putAll(set.getMap());
+        return new AvailableCopiesSet(union);
+    }
 }
