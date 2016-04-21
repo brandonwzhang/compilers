@@ -4,11 +4,18 @@ import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class LiveVariableAnalysis extends DataflowAnalysis{
+    private static Set<OpCode> defOpCodes;
+
+    static {
+        OpCode[] defOpCodesArr = {OpCode.MOVQ, OpCode.MOVZX};
+        defOpCodes = new HashSet<>(Arrays.asList(defOpCodesArr));
+    }
 
     public LiveVariableAnalysis(List<AssemblyLine> lines) {
         super(lines, Direction.BACKWARD);
@@ -40,19 +47,25 @@ public class LiveVariableAnalysis extends DataflowAnalysis{
      */
     private static Set<AssemblyAbstractRegister> use(AssemblyInstruction instruction) {
         Set<AssemblyAbstractRegister> temps = new HashSet<>();
-        if (instruction.getArgs().size() == 0) {
-            // No arguments, so return the empty set
+        List<AssemblyExpression> args = instruction.getArgs();
+        if (args.size() == 0) {
             return temps;
         }
-        temps.addAll(tempsInExpression(instruction.getArgs().get(0)));
-        if (instruction.getArgs().size() > 1) {
-            // If we have more than one argument, it must be 2 arguments
-            assert instruction.getArgs().size() == 2;
-            if (instruction.opCode != OpCode.MOVQ) {
-                // If it's a move, the dst expression is being defined, not used
-                temps.addAll(tempsInExpression(instruction.getArgs().get(1)));
+        // Add all temps in args except the last one
+        for (int i = 0; i < args.size() - 1; i++) {
+            temps.addAll(tempsInExpression(args.get(i)));
+        }
+        AssemblyExpression lastArg = args.get(args.size() - 1);
+        if (defOpCodes.contains(instruction.opCode)) {
+            if (lastArg instanceof AssemblyAbstractRegister) {
+                // If we have a def instruction and the dst is a temp,
+                // don't add it to the use set
+                return temps;
             }
         }
+        // If this instruction does not set any temps, we add the last arg
+        // to the use set
+        temps.addAll(tempsInExpression(args.get(args.size() - 1)));
         return temps;
     }
 
@@ -61,16 +74,16 @@ public class LiveVariableAnalysis extends DataflowAnalysis{
      */
     private static Set<AssemblyAbstractRegister> def(AssemblyInstruction instruction) {
         Set<AssemblyAbstractRegister> temps = new HashSet<>();
-        // We only have defs in the case of a move
-        if (instruction.opCode != OpCode.MOVQ) {
+        // We only have defs in the case of an instruction that defines a temp
+        if (!defOpCodes.contains(instruction.opCode)) {
             return temps;
         }
-        assert instruction.getArgs().size() == 2;
-        AssemblyExpression dst = instruction.getArgs().get(0);
+        assert instruction.getArgs().size() > 0;
+        AssemblyExpression dst =
+                instruction.getArgs().get(instruction.getArgs().size() - 1);
         if (dst instanceof AssemblyAbstractRegister) {
             temps.add((AssemblyAbstractRegister) dst);
         }
-        System.out.println(temps);
         return temps;
     }
 

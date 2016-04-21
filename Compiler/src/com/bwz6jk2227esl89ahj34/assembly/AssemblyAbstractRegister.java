@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import java.util.HashMap;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
 public class AssemblyAbstractRegister extends AssemblyRegister {
     // Maintains the number of temps that aren't return or argument temps
     public static int counter = 0;
@@ -47,8 +46,22 @@ public class AssemblyAbstractRegister extends AssemblyRegister {
     }
 
     @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof AssemblyAbstractRegister)) {
+            return false;
+        }
+        AssemblyAbstractRegister register = (AssemblyAbstractRegister) object;
+        return this.id == register.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    @Override
     public String toString() {
-        String s = "%@";
+        String s = "%";
         return s + id;
     }
 }
