@@ -69,6 +69,27 @@ public class GraphColorer2 {
         return color;
     }
 
+    public void combineNodes(AssemblyAbstractRegister t1, AssemblyAbstractRegister t2) {
+        if (!graph.containsKey(t1) || !graph.containsKey(t2)) {
+            // one or both nodes do not exist in the graph
+            return;
+        }
+        if (graph.get(t1).contains(t2) || graph.get(t2).contains(t1)) {
+            // these two nodes are connected by an edge
+            return;
+        }
+
+        for (AssemblyAbstractRegister node : graph.get(t2)) {
+            if (!graph.get(t1).contains(node)) {
+                graph.get(node).remove(t2);
+                graph.get(node).add(t1);
+                graph.get(t1).add(node);
+            }
+        }
+
+        graph.remove(t2);
+    }
+
     public void addColoring(AssemblyAbstractRegister node, Register color) {
         coloring.put(node, color);
     }
