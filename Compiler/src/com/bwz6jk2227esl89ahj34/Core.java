@@ -274,7 +274,7 @@ public class Core {
 
         for (String functionName : lirRoot.functions().keySet()) {
             ControlFlowGraphIR graph =
-                    new ControlFlowGraphIR(((IRSeq)lirRoot.functions().get(functionName).body()).stmts());
+                    new ControlFlowGraphIR((IRSeq)lirRoot.functions().get(functionName).body());
             Util.writeHelper(
                     "IR_dotfile_" + functionName,
                     "dot",
