@@ -24,6 +24,42 @@ public class GraphColorer2 {
         this.coloring = new HashMap<>();
     }
 
+    public static Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>>
+        constructInterferenceGraph(List<Set<AssemblyAbstractRegister>> liveVariableSets) {
+
+        Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph = new HashMap<>();
+
+        for (Set<AssemblyAbstractRegister> set : liveVariableSets) {
+
+            List<AssemblyAbstractRegister> list = new ArrayList<>(set);
+
+            for (int i = 0; i < list.size() - 1; i++) {
+                for (int j = i + 1; j < list.size(); j++) {
+                    AssemblyAbstractRegister t1 = list.get(i);
+                    AssemblyAbstractRegister t2 = list.get(j);
+
+                    // add nodes if they don't exist
+                    if (!graph.keySet().contains(t1)) {
+                        graph.put(t1, new ArrayList<>());
+                    }
+                    if (!graph.keySet().contains(t2)) {
+                        graph.put(t2, new ArrayList<>());
+                    }
+
+                    // add edges if they don't exist
+                    if (!graph.get(t1).contains(t2)) {
+                        graph.get(t1).add(t2);
+                    }
+                    if (!graph.get(t2).contains(t1)) {
+                        graph.get(t2).add(t1);
+                    }
+                }
+            }
+        }
+
+        return graph;
+    }
+
     public static Register assignColor(Set<Register> exclude) {
         // case where there is no available color
         Register color = colors[(int) Math.floor(Math.random() * colors.length)];
