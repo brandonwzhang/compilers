@@ -15,6 +15,10 @@ import java.util.*;
  */
 public class AvailableCopies extends DataflowAnalysis {
 
+     public AvailableCopies(IRSeq seq) {
+         super(seq, Direction.FORWARD);
+     }
+
      public void transfer(CFGNode node) {
          // perform the analysis on the IR level
          assert node instanceof CFGNodeIR;
@@ -64,38 +68,37 @@ public class AvailableCopies extends DataflowAnalysis {
                 .union(gen(node));
      }
 
-     // extracts temps used in the move stmt
-     // given something like LHS = RHS,
-     // the LHS will be the first of the pair,
-     // and the list of IRTemps will contain all of the IRTemps used
-     // on the RHS of the move stmt
-     //
-     // postcondition: if move is not a move to a IRTemp, this will
-     // return an empty optional
-     public Optional<Pair<IRTemp, List<IRTemp>>> extractTemps(IRMove move) {
-        if (move.target() instanceof IRTemp) {
-            return Optional.empty();
-        } else {
-            Pair<IRTemp, List<IRTemp>> pair;
-            IRTemp tempLHS = (IRTemp) move.target();
-            List<IRTemp> tempsRHS = new LinkedList<>();
-            IRExpr RHS = move.expr();
-            if (RHS instanceof IRTemp) {
-                tempsRHS.add((IRTemp)RHS);
-            } else if (RHS instanceof IRBinOp) {
-                //tempRHS.add(())
-            }
-
-        }
-        return null ;
+     public AvailableCopiesSet gen(CFGNode node) {
+         assert node instanceof CFGNodeIR;
+         CFGNodeIR castedNode = (CFGNodeIR) node;
+         Map<IRTemp, IRTemp> genMap = new HashMap<>();
+         IRStmt castedNodeStmt = castedNode.getStatement();
+         if (castedNodeStmt instanceof IRMove
+                 && ((IRMove)castedNodeStmt).target() instanceof IRTemp
+                 && ((IRMove)castedNodeStmt).expr() instanceof IRTemp) {
+                 genMap.put((IRTemp)((IRMove)castedNodeStmt).target()
+                         , (IRTemp)((IRMove)castedNodeStmt).expr());
+         }
+         return new AvailableCopiesSet(genMap);
      }
 
      public AvailableCopiesSet kill(CFGNode node) {
+         assert node instanceof CFGNodeIR;
+         CFGNodeIR castedNode = (CFGNodeIR) node;
+         Map<IRTemp, IRTemp> killMap = new HashMap<>();
+         Map<IRTemp, IRTemp> in = ((AvailableCopiesSet)node.getIn()).getMap();
 
-         return null;
-     }
-
-     public AvailableCopiesSet gen(CFGNode node) {
-        return null;
+         IRStmt castedNodeStmt = castedNode.getStatement();
+         if(castedNodeStmt instanceof IRMove
+                 && ((IRMove)castedNodeStmt).target() instanceof IRTemp ) {
+             IRTemp dest = (IRTemp) ((IRMove)castedNodeStmt).target();
+             for (IRTemp key : in.keySet()) {
+                 if (in.get(key).name().equals(dest.name())
+                         || key.name().equals(dest.name())) {
+                     killMap.put(key, in.get(key));
+                 }
+             }
+         }
+         return new AvailableCopiesSet(killMap);
      }
 }

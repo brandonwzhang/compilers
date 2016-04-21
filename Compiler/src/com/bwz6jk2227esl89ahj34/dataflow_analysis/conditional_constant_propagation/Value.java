@@ -20,4 +20,16 @@ public class Value extends LatticeElement {
         Value castedO = (Value)o;
         return this.getValue().value() == castedO.getValue().value();
     }
+
+    @Override
+    public boolean equals(LatticeElement e) {
+        return this.equals(e);
+    }
+
+    @Override
+    public LatticeElement copy() {
+        return new Value(new IRConst(value.value()));
+    }
+
+
 }

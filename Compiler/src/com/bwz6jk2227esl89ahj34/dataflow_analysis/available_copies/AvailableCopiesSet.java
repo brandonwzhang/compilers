@@ -30,6 +30,7 @@ public class AvailableCopiesSet extends LatticeElement {
         if (!(set instanceof AvailableCopiesSet)) {
             return false;
         } else {
+           // System.out.println("wat");
             return map.equals(((AvailableCopiesSet)set).getMap());
         }
     }

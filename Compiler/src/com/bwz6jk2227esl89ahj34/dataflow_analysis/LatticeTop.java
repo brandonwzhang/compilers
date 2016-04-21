@@ -11,4 +11,7 @@ public class LatticeTop extends LatticeElement {
     public boolean equals(LatticeElement element) {
         return element instanceof LatticeTop;
     }
+
+    @Override
+    public String toString() { return "TOP"; }
 }

@@ -1,16 +1,18 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables;
 
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyAbstractRegister;
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyExpression;
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction;
+import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyMemoryLocation;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class LiveVariableAnalysis extends DataflowAnalysis{
+
+    public LiveVariableAnalysis(List<AssemblyLine> lines) {
+        super(lines, Direction.BACKWARD);
+    }
     /**
      * Returns the set of temps in this expression
      */

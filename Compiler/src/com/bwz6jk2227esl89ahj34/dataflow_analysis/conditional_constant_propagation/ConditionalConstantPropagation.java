@@ -10,6 +10,10 @@ import java.util.*;
 
 public class ConditionalConstantPropagation extends DataflowAnalysis {
 
+    public ConditionalConstantPropagation(IRSeq seq) {
+        super(seq, Direction.FORWARD);
+    }
+
 
     // assumption: ins will always be defined appropriately
     public void transfer(CFGNode node) {

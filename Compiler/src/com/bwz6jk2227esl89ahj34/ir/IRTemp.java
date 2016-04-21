@@ -50,4 +50,15 @@ public class IRTemp extends IRExpr {
         return new IRESeq(new IRSeq(new LinkedList<>()),
                 new IRTemp(((IRTemp)n).name()));
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof IRTemp)) { return false; }
+        else { return ((IRTemp)o).name().equals(name); }
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }
