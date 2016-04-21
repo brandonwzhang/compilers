@@ -78,5 +78,51 @@ public class AvailableCopiesSetTest {
         Assert.assertTrue(castedCopy.getMap().get(new IRTemp("x")).equals(new IRTemp("y")));
     }
 
+    @Test
+    public void unionTest() {
+        Map<IRTemp, IRTemp> dummyMap = new HashMap<>();
+        dummyMap.put(new IRTemp("c"), new IRTemp("d"));
+
+        AvailableCopiesSet castedCopy = (AvailableCopiesSet) set.copy();
+        AvailableCopiesSet union = castedCopy.union(new AvailableCopiesSet(dummyMap));
+
+        Assert.assertTrue(union.getMap().containsKey(new IRTemp("c")));
+        Assert.assertTrue(union.getMap().get(new IRTemp("c")).equals(new IRTemp("d")));
+        Assert.assertTrue(union.getMap().containsKey(new IRTemp("a")));
+        Assert.assertTrue(union.getMap().containsKey(new IRTemp("x")));
+
+        Assert.assertEquals(union.getMap().keySet().size(), 3);
+        Assert.assertEquals(castedCopy.getMap().keySet().size(), 2);
+        Assert.assertFalse(castedCopy.getMap().containsKey(new IRTemp("c")));
+
+        dummyMap = new HashMap<>();
+
+        // sanity check to see resetting dummy map does not screw up anything
+        Assert.assertTrue(union.getMap().containsKey(new IRTemp("c")));
+        Assert.assertTrue(union.getMap().get(new IRTemp("c")).equals(new IRTemp("d")));
+        Assert.assertTrue(union.getMap().containsKey(new IRTemp("a")));
+        Assert.assertTrue(union.getMap().containsKey(new IRTemp("x")));
+
+        Assert.assertEquals(union.getMap().keySet().size(), 3);
+        Assert.assertEquals(castedCopy.getMap().keySet().size(), 2);
+        Assert.assertFalse(castedCopy.getMap().containsKey(new IRTemp("c")));
+
+        dummyMap = castedCopy.getMap();
+        union = castedCopy.union(new AvailableCopiesSet(dummyMap));
+        Assert.assertEquals(union.getMap().keySet().size(), 2);
+        Assert.assertFalse(union.getMap().containsKey(new IRTemp("c")));
+
+        // with empty map
+        // this also tests equals method in conjunction
+        union = castedCopy.union(new AvailableCopiesSet(new HashMap<>()));
+        Assert.assertTrue(union.equals(castedCopy));
+        Assert.assertEquals(union.getMap().keySet().size(), 2);
+        Assert.assertFalse(union.getMap().containsKey(new IRTemp("c")));
+    }
+
+    @Test
+    public void subtractTest() {
+        // TODO
+    }
 
 }
