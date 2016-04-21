@@ -48,7 +48,7 @@ public class AssemblyAbstractRegister extends AssemblyRegister {
 
     @Override
     public String toString() {
-        String s = "%r";
+        String s = "%@";
         return s + id;
     }
 }

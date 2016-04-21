@@ -12,11 +12,11 @@ import java.util.List;
 public class CFGAssembly extends CFG {
     private static int indexOfLabel(String labelName, List<AssemblyLine> lines) {
         for (int i = 0; i < lines.size(); i++) {
-            AssemblyLine instruction = lines.get(i);
-            if (instruction instanceof AssemblyLabel) {
-                if (((AssemblyLabel) instruction).getName().equals(labelName)) {
+            AssemblyLine line = lines.get(i);
+            if (line instanceof AssemblyLabel) {
+                if (((AssemblyLabel) line).getName().getName().equals(labelName)) {
                     int next = i + 1;
-                    // Only return index of the instruction this label points to
+                    // Only return index of the line this label points to
                     while (!(lines.get(next) instanceof AssemblyInstruction)) {
                         next++;
                     }
@@ -24,7 +24,7 @@ public class CFGAssembly extends CFG {
                 }
             }
         }
-        return -1;
+        throw new RuntimeException("Jump to non-existent label: " + labelName);
     }
 
     private static List<Integer> getSuccessors(int i, List<AssemblyLine> lines) {

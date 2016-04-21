@@ -85,7 +85,7 @@ public class IRFuncDecl extends IRNode {
                 return i;
             }
         }
-        return -1;
+        throw new RuntimeException("Jump to non-existent label: " + labelName);
     }
 
     public List<Integer> getSuccessors(int i, List<List<IRStmt>> blocks) {

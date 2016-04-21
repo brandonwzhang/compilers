@@ -12,8 +12,8 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
     private Direction direction = Direction.FORWARD;
     private CFGNode startNode;
 
-    public AvailableExpressionsAnalysis(IRSeq stmt) {
-        super(stmt, Direction.FORWARD); //temp; fix if needed -- jihun
+    public AvailableExpressionsAnalysis(IRSeq seq) {
+        super(seq, Direction.FORWARD); //temp; fix if needed -- jihun
     }
     private Set<IRExpr> subexprs(IRExpr expr) {
         // TODO

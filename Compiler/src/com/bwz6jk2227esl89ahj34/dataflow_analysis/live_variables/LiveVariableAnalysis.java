@@ -21,7 +21,7 @@ public class LiveVariableAnalysis extends DataflowAnalysis{
         Set<AssemblyAbstractRegister> temps = new HashSet<>();
         if (expression instanceof AssemblyAbstractRegister) {
             // We just need to add it to the set
-            temps.add((AssemblyAbstractRegister)expression);
+            temps.add((AssemblyAbstractRegister) expression);
         } else if (expression instanceof AssemblyMemoryLocation) {
             // We need to check if either the base or offset registers are abstract
             AssemblyMemoryLocation location = (AssemblyMemoryLocation) expression;
@@ -70,6 +70,7 @@ public class LiveVariableAnalysis extends DataflowAnalysis{
         if (dst instanceof AssemblyAbstractRegister) {
             temps.add((AssemblyAbstractRegister) dst);
         }
+        System.out.println(temps);
         return temps;
     }
 

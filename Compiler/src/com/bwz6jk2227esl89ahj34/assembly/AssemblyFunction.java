@@ -2,14 +2,20 @@ package com.bwz6jk2227esl89ahj34.assembly;
 
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
 import com.bwz6jk2227esl89ahj34.assembly.tiles.TileContainer;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
+        .LiveVariableAnalysis;
 import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import com.bwz6jk2227esl89ahj34.ir.IRStmt;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
+import com.bwz6jk2227esl89ahj34.util.Util;
+import lombok.Data;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+@Data
 public class AssemblyFunction {
     public static int maxNumReturnValues;
     public static int maxNumArguments;
@@ -41,6 +47,20 @@ public class AssemblyFunction {
 
         // generateFunctionPrologue needs to be called after the body has been
         // generated to know the number of spilled temps that need to be allocated
+
+        // Testing live variable analysis
+        List<AssemblyLine> liveVarsLines = new LinkedList<>();
+        liveVarsLines.addAll(generateFunctionPrologue());
+        liveVarsLines.addAll(functionBody);
+        liveVarsLines.addAll(generateFunctionEpilogue());
+        LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(liveVarsLines);
+        Util.writeHelper(
+                "live_variables_" + name,
+                "dot",
+                "./",
+                Collections.singletonList(liveVariables.toString())
+        );
+        // End live variable analysis
 
         lines.addAll(generateFunctionPrologue());
         lines.addAll(RegisterAllocator.translate(functionBody));

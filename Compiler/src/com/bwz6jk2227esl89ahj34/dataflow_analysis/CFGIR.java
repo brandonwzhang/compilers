@@ -20,7 +20,7 @@ public class CFGIR extends CFG {
                 }
             }
         }
-        return -1;
+        throw new RuntimeException("Jump to non-existent label: " + labelName);
     }
 
     private static List<Integer> getSuccessors(int i, List<IRStmt> statements) {

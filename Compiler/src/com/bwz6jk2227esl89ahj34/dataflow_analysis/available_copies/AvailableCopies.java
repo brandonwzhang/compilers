@@ -10,9 +10,6 @@ import com.bwz6jk2227esl89ahj34.ir.IRStmt;
 
 import java.util.*;
 
-/**
- * Created by jihunkim on 4/20/16.
- */
 public class AvailableCopies extends DataflowAnalysis {
 
      public AvailableCopies(IRSeq seq) {

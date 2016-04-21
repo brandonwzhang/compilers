@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34;
 
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyFunction;
 import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
 import com.bwz6jk2227esl89ahj34.ast.Program;
 import com.bwz6jk2227esl89ahj34.ast.parse.Lexer;
@@ -9,6 +10,8 @@ import com.bwz6jk2227esl89ahj34.ast.type.TypeException;
 import com.bwz6jk2227esl89ahj34.ast.visit.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyProgram;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGIR;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
+        .LiveVariableAnalysis;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
@@ -272,6 +275,7 @@ public class Core {
         IRCompUnit mirRoot = mirGen(file, program.get());
         IRCompUnit lirRoot = irGen(file, mirRoot);
 
+        // Testing IR CFG
         for (String functionName : lirRoot.functions().keySet()) {
             CFGIR graph =
                     new CFGIR((IRSeq)lirRoot.functions().get(functionName).body());
@@ -311,6 +315,7 @@ public class Core {
                 Main.assemblyPath(),
                 Collections.singletonList(assemblyProgram.toString())
         );
+
 
         // Link and run the assembly file
         String fileName = file.substring(0, file.lastIndexOf('.'));

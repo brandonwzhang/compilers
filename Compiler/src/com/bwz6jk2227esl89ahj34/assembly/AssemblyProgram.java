@@ -2,10 +2,12 @@ package com.bwz6jk2227esl89ahj34.assembly;
 
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 public class AssemblyProgram {
     private List<AssemblyFunction> functions = new ArrayList<>();
     // Holds the names of functions in the interfaces used by this program
