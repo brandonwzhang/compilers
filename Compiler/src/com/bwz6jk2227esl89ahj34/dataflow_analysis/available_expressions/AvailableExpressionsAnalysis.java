@@ -15,8 +15,12 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
     public AvailableExpressionsAnalysis(IRSeq seq) {
         super(seq, Direction.FORWARD); //temp; fix if needed -- jihun
     }
+
+    // Returns a set of expressions that are subexpressions of expr
+    // Analogous to powerset
     private Set<IRExpr> subexprs(IRExpr expr) {
         // TODO
+
         return null;
     }
 
@@ -66,17 +70,10 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         if (stmt instanceof IRMove) {
             IRMove move = (IRMove) stmt;
 
-            // x = f(e...)
-            if (move.expr() instanceof IRCall) {
-                // TODO
-                // PANIC MODE: Kill everything
-
-                // normal mode: remove [e'] that can be changed by call to f
-            }
             // x = e
             if (move.target() instanceof IRTemp){
                 IRTemp x = (IRTemp)move.expr();
-                for(Iterator<IRExpr> i = out.iterator(); i.hasNext();) {
+                for (Iterator<IRExpr> i = out.iterator(); i.hasNext();) {
                     IRExpr expr = i.next();
                     // remove if expr contains any usage of x
                     if (containsCondition(expr, e -> (e instanceof IRTemp) ? ((IRTemp)e).name().equals(x.name()) : false)) {
@@ -85,14 +82,35 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
                 }
             }
 
-            // [e1] = [e2]
-            if (move.target() instanceof IRMem) {
-                // TODO
+            // [e1] = e or x = f(e...)
+            // Idea: Remove any expression with an [e'] where e' can alias e1
+            // Idea: Remove any expression with an [e'] where f can affect [e']
+            if (move.target() instanceof IRMem || move.expr() instanceof IRCall) {
                 // PANIC MODE: Kill everything
+
+                // normal mode: kill any expression with [e'] where e' can alias e1
+                for (Iterator<IRExpr> i = out.iterator(); i.hasNext();) {
+                    IRExpr expr = i.next();
+                    // remove if expr contains potential alias
+
+                    // For the project's sake, we will remove any expression
+                    // that has an IRMem at all
+                    if (containsCondition(expr, e -> e instanceof IRMem)) {
+                        i.remove();
+                    }
+                }
+
             }
         }
     }
 
+    /**
+     * Takes in an IRExpr tree (lowered), and searches for a node that passes the predicate
+     * specified by filter.
+     * @param expr
+     * @param filter
+     * @return
+     */
     private boolean containsCondition(IRExpr expr, Predicate filter) {
         if (expr instanceof IRCall) {
             for (IRExpr e : ((IRCall)expr).args()) {
@@ -100,14 +118,14 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
                     return true;
                 }
             }
-            return false;
+            return filter.test(expr);
         }
         if (expr instanceof IRMem) {
-            return containsCondition(((IRMem)expr).expr(), filter);
+            return containsCondition(((IRMem)expr).expr(), filter) || filter.test(expr);
         }
         if (expr instanceof IRBinOp) {
             IRBinOp binop = (IRBinOp)expr;
-            return containsCondition(binop.left(), filter) || containsCondition(binop.right(), filter);
+            return containsCondition(binop.left(), filter) || containsCondition(binop.right(), filter) || filter.test(expr);
         }
         return filter.test(expr);
     }
