@@ -22,6 +22,7 @@ public abstract class DataflowAnalysis {
 
     public DataflowAnalysis(IRSeq seq, Direction direction) {
         this.graph = new CFGIR(seq);
+        fixpoint(direction);
     }
 
     public abstract void transfer(CFGNode node);
