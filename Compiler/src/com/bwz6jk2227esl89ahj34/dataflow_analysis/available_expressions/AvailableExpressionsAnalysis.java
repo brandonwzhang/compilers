@@ -47,6 +47,9 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
      * @return
      */
     public LatticeElement meet(Set<LatticeElement> elements) {
+        if (elements.isEmpty()) {
+            return new AvailableExpressionSet(new HashSet<IRExpr>());
+        }
 
         AvailableExpressionSet meet = (AvailableExpressionSet)top.copy();
         Set<IRExpr> exprs = meet.getExprs();
