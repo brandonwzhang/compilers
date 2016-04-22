@@ -23,9 +23,9 @@ public class AvailableCopiesSetTest {
     // runs before every test invocation
     @Before
     public void setUp() {
-        Map<IRTemp, IRTemp> map = new HashMap<>();
-        map.put(new IRTemp("x"), new IRTemp("y"));
-        map.put(new IRTemp("a"), new IRTemp("b"));
+        Map<String, String> map = new HashMap<>();
+        map.put("x", "y");
+        map.put("a", "b");
         set = new AvailableCopiesSet(map);
     }
 
@@ -34,9 +34,9 @@ public class AvailableCopiesSetTest {
         LatticeElement copy = set.copy();
         AvailableCopiesSet castedCopy = (AvailableCopiesSet) copy;
 
-        IRTemp temp = new IRTemp("x");
-        IRTemp q = set.getMap().get(temp);
-        IRTemp qq = castedCopy.getMap().get(temp);
+        String temp = "x";
+        String q = set.getMap().get(temp);
+        String qq = castedCopy.getMap().get(temp);
         Assert.assertEquals(castedCopy.getMap().get(temp), set.getMap().get(temp));
 
         // should not be equal anymore if deep copied
@@ -70,61 +70,61 @@ public class AvailableCopiesSetTest {
         copy = set.copy();
         castedCopy = (AvailableCopiesSet) copy;
 
-        Map<IRTemp, IRTemp> dummyMap = new HashMap<>();
-        dummyMap.put(new IRTemp("x"), new IRTemp("y"));
+        Map<String, String> dummyMap = new HashMap<>();
+        dummyMap.put("x", "y");
 
         castedCopy.intersect(new AvailableCopiesSet(dummyMap));
-        Assert.assertFalse(castedCopy.getMap().containsKey(new IRTemp("a")));
-        Assert.assertTrue(castedCopy.getMap().containsKey(new IRTemp("x")));
-        Assert.assertTrue(castedCopy.getMap().get(new IRTemp("x")).equals(new IRTemp("y")));
+        Assert.assertFalse(castedCopy.getMap().containsKey("a"));
+        Assert.assertTrue(castedCopy.getMap().containsKey("x"));
+        Assert.assertTrue(castedCopy.getMap().get("x").equals("y"));
     }
 
     @Test
     public void unionTest() {
-        Map<IRTemp, IRTemp> dummyMap = new HashMap<>();
-        dummyMap.put(new IRTemp("c"), new IRTemp("d"));
+        Map<String, String> dummyMap = new HashMap<>();
+        dummyMap.put("c", "d");
 
         AvailableCopiesSet castedCopy = (AvailableCopiesSet) set.copy();
         AvailableCopiesSet union = castedCopy.union(new AvailableCopiesSet(dummyMap));
 
-        Assert.assertTrue(union.getMap().containsKey(new IRTemp("c")));
-        Assert.assertTrue(union.getMap().get(new IRTemp("c")).equals(new IRTemp("d")));
-        Assert.assertTrue(union.getMap().containsKey(new IRTemp("a")));
-        Assert.assertTrue(union.getMap().containsKey(new IRTemp("x")));
+        Assert.assertTrue(union.getMap().containsKey("c"));
+        Assert.assertTrue(union.getMap().get("c").equals("d"));
+        Assert.assertTrue(union.getMap().containsKey("a"));
+        Assert.assertTrue(union.getMap().containsKey("x"));
 
         Assert.assertEquals(union.getMap().keySet().size(), 3);
         Assert.assertEquals(castedCopy.getMap().keySet().size(), 2);
-        Assert.assertFalse(castedCopy.getMap().containsKey(new IRTemp("c")));
+        Assert.assertFalse(castedCopy.getMap().containsKey("c"));
 
         dummyMap = new HashMap<>();
 
         // sanity check to see resetting dummy map does not screw up anything
-        Assert.assertTrue(union.getMap().containsKey(new IRTemp("c")));
-        Assert.assertTrue(union.getMap().get(new IRTemp("c")).equals(new IRTemp("d")));
-        Assert.assertTrue(union.getMap().containsKey(new IRTemp("a")));
-        Assert.assertTrue(union.getMap().containsKey(new IRTemp("x")));
+        Assert.assertTrue(union.getMap().containsKey("c"));
+        Assert.assertTrue(union.getMap().get("c").equals("d"));
+        Assert.assertTrue(union.getMap().containsKey("a"));
+        Assert.assertTrue(union.getMap().containsKey("x"));
 
         Assert.assertEquals(union.getMap().keySet().size(), 3);
         Assert.assertEquals(castedCopy.getMap().keySet().size(), 2);
-        Assert.assertFalse(castedCopy.getMap().containsKey(new IRTemp("c")));
+        Assert.assertFalse(castedCopy.getMap().containsKey("c"));
 
         dummyMap = castedCopy.getMap();
         union = castedCopy.union(new AvailableCopiesSet(dummyMap));
         Assert.assertEquals(union.getMap().keySet().size(), 2);
-        Assert.assertFalse(union.getMap().containsKey(new IRTemp("c")));
+        Assert.assertFalse(union.getMap().containsKey("c"));
 
         // with empty map
         // this also tests equals method in conjunction
         union = castedCopy.union(new AvailableCopiesSet(new HashMap<>()));
         Assert.assertTrue(union.equals(castedCopy));
         Assert.assertEquals(union.getMap().keySet().size(), 2);
-        Assert.assertFalse(union.getMap().containsKey(new IRTemp("c")));
+        Assert.assertFalse(union.getMap().containsKey("c"));
     }
 
     @Test
     public void subtractTest() {
-        Map<IRTemp, IRTemp> dummyMap = new HashMap<>();
-        dummyMap.put(new IRTemp("c"), new IRTemp("d"));
+        Map<String, String> dummyMap = new HashMap<>();
+        dummyMap.put("c", "d");
 
         AvailableCopiesSet castedCopy = (AvailableCopiesSet) set.copy();
         AvailableCopiesSet difference = castedCopy.subtract(new AvailableCopiesSet(dummyMap));
@@ -137,18 +137,18 @@ public class AvailableCopiesSetTest {
         Assert.assertTrue(difference.equals(new AvailableCopiesSet(new HashMap<>())));
 
         dummyMap = new HashMap<>();
-        dummyMap.put(new IRTemp("a"), new IRTemp("b"));
+        dummyMap.put("a", "b");
         difference = castedCopy.subtract(new AvailableCopiesSet(dummyMap));
 
-        Assert.assertTrue(difference.getMap().containsKey(new IRTemp("x")));
-        Assert.assertFalse(difference.getMap().containsKey(new IRTemp("a")));
+        Assert.assertTrue(difference.getMap().containsKey("x"));
+        Assert.assertFalse(difference.getMap().containsKey("a"));
 
         castedCopy = (AvailableCopiesSet) set.copy();
         dummyMap = new HashMap<>();
-        dummyMap.put(new IRTemp("a"), new IRTemp("jihun"));
+        dummyMap.put("a", "jihun");
         difference = castedCopy.subtract(new AvailableCopiesSet(dummyMap));
 
-        Assert.assertTrue(difference.getMap().containsKey(new IRTemp("a")));
+        Assert.assertTrue(difference.getMap().containsKey("a"));
     }
 
 }

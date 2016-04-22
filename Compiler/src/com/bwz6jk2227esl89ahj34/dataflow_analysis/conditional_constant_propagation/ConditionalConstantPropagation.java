@@ -16,7 +16,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
     }
 
     public static List<IRTemp> findAllTemps(IRSeq seq) {
-        List<IRStmt> stmts = seq.getStmts();
+        List<IRStmt> stmts = seq.stmts();
         Set<IRTemp> temps = new HashSet<>();
         for (IRStmt stmt : stmts) {
             if (stmt instanceof IRMove) {

@@ -2,7 +2,6 @@ package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies;
 
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
-import com.bwz6jk2227esl89ahj34.util.prettyprint.Pair;
 import com.bwz6jk2227esl89ahj34.ir.IRStmt;
 
 import java.util.*;
@@ -68,13 +67,13 @@ public class AvailableCopies extends DataflowAnalysis {
      public AvailableCopiesSet gen(CFGNode node) {
          assert node instanceof CFGNodeIR;
          CFGNodeIR castedNode = (CFGNodeIR) node;
-         Map<IRTemp, IRTemp> genMap = new HashMap<>();
+         Map<String, String> genMap = new HashMap<>();
          IRStmt castedNodeStmt = castedNode.getStatement();
          if (castedNodeStmt instanceof IRMove
                  && ((IRMove)castedNodeStmt).target() instanceof IRTemp
                  && ((IRMove)castedNodeStmt).expr() instanceof IRTemp) {
-                 genMap.put((IRTemp)((IRMove)castedNodeStmt).target()
-                         , (IRTemp)((IRMove)castedNodeStmt).expr());
+                 genMap.put(((IRTemp)((IRMove)castedNodeStmt).target()).name()
+                         , ((IRTemp)((IRMove)castedNodeStmt).expr()).name());
          }
          return new AvailableCopiesSet(genMap);
      }
@@ -82,8 +81,8 @@ public class AvailableCopies extends DataflowAnalysis {
      public AvailableCopiesSet kill(CFGNode node) {
          assert node instanceof CFGNodeIR;
          CFGNodeIR castedNode = (CFGNodeIR) node;
-         Map<IRTemp, IRTemp> killMap = new HashMap<>();
-         Map<IRTemp, IRTemp> in = node.getIn() instanceof LatticeTop
+         Map<String, String> killMap = new HashMap<>();
+         Map<String, String> in = node.getIn() instanceof LatticeTop
                  ? new HashMap<>()
                  : ((AvailableCopiesSet)node.getIn()).getMap();
 
@@ -91,9 +90,9 @@ public class AvailableCopies extends DataflowAnalysis {
          if(castedNodeStmt instanceof IRMove
                  && ((IRMove)castedNodeStmt).target() instanceof IRTemp ) {
              IRTemp dest = (IRTemp) ((IRMove)castedNodeStmt).target();
-             for (IRTemp key : in.keySet()) {
-                 if (in.get(key).name().equals(dest.name())
-                         || key.name().equals(dest.name())) {
+             for (String key : in.keySet()) {
+                 if (in.get(key).equals(dest.name())
+                         || key.equals(dest.name())) {
                      killMap.put(key, in.get(key));
                  }
              }

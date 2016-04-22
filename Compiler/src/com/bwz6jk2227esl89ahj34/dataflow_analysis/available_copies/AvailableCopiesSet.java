@@ -14,20 +14,20 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public class AvailableCopiesSet extends LatticeElement {
-    private Map<IRTemp, IRTemp> map;
+    private Map<String, String> map;
 
     @Override
     public String toString() {
         String s = "";
-        for (IRTemp key : map.keySet()) {
-            s += key.name() + "->" + map.get(key).name()+"\n";
+        for (String key : map.keySet()) {
+            s += key + "->" + map.get(key)+"\n";
         }
         return s;
     }
 
     @Override
     public LatticeElement copy() {
-        Map<IRTemp, IRTemp> newMap = new HashMap<>();
+        Map<String, String> newMap = new HashMap<>();
         newMap.putAll(map);
         return new AvailableCopiesSet(newMap);
     }
@@ -51,11 +51,11 @@ public class AvailableCopiesSet extends LatticeElement {
         } else if (set instanceof AvailableCopiesSet) {
             // then we take information that is common in both
             AvailableCopiesSet castedSet = (AvailableCopiesSet) set;
-            Map<IRTemp, IRTemp> castedSetMap = castedSet.getMap();
-            Map<IRTemp, IRTemp> newMap = new HashMap<>();
-            for (IRTemp key : map.keySet()) {
+            Map<String, String> castedSetMap = castedSet.getMap();
+            Map<String, String> newMap = new HashMap<>();
+            for (String key : map.keySet()) {
                 if (castedSetMap.containsKey(key) &&
-                        castedSetMap.get(key).name().equals(map.get(key).name())) {
+                        castedSetMap.get(key).equals(map.get(key))) {
                     newMap.put(key, map.get(key));
                 }
             }
@@ -65,10 +65,10 @@ public class AvailableCopiesSet extends LatticeElement {
 
     public AvailableCopiesSet subtract(AvailableCopiesSet subtrahend) {
         AvailableCopiesSet copy = (AvailableCopiesSet) this.copy();
-        Map<IRTemp, IRTemp> subtrahendMap = subtrahend.getMap();
-        for (IRTemp key : subtrahendMap.keySet()) {
+        Map<String, String> subtrahendMap = subtrahend.getMap();
+        for (String key : subtrahendMap.keySet()) {
             if (copy.getMap().containsKey(key) &&
-                    copy.getMap().get(key).name().equals(subtrahendMap.get(key).name())) {
+                    copy.getMap().get(key).equals(subtrahendMap.get(key))) {
                   copy.getMap().remove(key);
             }
         }
@@ -76,7 +76,7 @@ public class AvailableCopiesSet extends LatticeElement {
     }
 
     public AvailableCopiesSet union(AvailableCopiesSet set) {
-        Map<IRTemp, IRTemp> union = new HashMap<>();
+        Map<String, String> union = new HashMap<>();
         union.putAll(map);
         union.putAll(set.getMap());
         return new AvailableCopiesSet(union);
