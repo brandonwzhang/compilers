@@ -19,9 +19,31 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
     // Returns a set of expressions that are subexpressions of expr
     // Analogous to powerset
     private Set<IRExpr> subexprs(IRExpr expr) {
-        // TODO
+        HashSet<IRExpr> set = new HashSet<>();
+        addSubexprs(expr, set);
+        return set;
+    }
 
-        return null;
+    // recursive helper function
+    // precondition: IR is lowered
+    private void addSubexprs(IRExpr expr, Set<IRExpr> set) {
+        set.add(expr);
+
+        if (expr instanceof IRBinOp) {
+            IRBinOp binop = (IRBinOp)expr;
+            addSubexprs(binop.left(), set);
+            addSubexprs(binop.right(), set);
+        }
+        if (expr instanceof IRCall) {
+            IRCall call = (IRCall)expr;
+            for (IRExpr e : call.args()) {
+                addSubexprs(e, set);
+            }
+        }
+        if (expr instanceof IRMem) {
+            IRMem mem = (IRMem)expr;
+            addSubexprs(mem.expr(), set);
+        }
     }
 
     public AvailableExpressionSet eval(CFGNode node) {
