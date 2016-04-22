@@ -16,8 +16,6 @@ import java.util.List;
  * An intermediate representation for a sequence of statements
  * SEQ(s1,...,sn)
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRSeq extends IRStmt {
     private List<IRStmt> stmts;
 

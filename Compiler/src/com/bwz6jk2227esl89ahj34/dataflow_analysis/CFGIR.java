@@ -31,7 +31,7 @@ public class CFGIR extends CFG {
             int next = i + 1;
             // Don't include IRLabels in this CFG
             while (statements.get(next) instanceof IRLabel) {
-                if (next < statements.size()) {
+                if (next >= statements.size()) {
                     return -1;
                 }
                 next++;

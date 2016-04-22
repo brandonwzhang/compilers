@@ -17,8 +17,6 @@ import java.util.List;
  * An intermediate representation for a function call
  * CALL(e_target, e_1, ..., e_n)
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRCall extends IRExpr {
     private IRExpr target;
     private List<IRExpr> args;

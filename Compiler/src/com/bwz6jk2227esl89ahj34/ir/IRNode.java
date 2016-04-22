@@ -14,8 +14,6 @@ import java.util.List;
 /**
  * A node in an intermediate-representation abstract syntax tree.
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public abstract class IRNode {
 
     /**

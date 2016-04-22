@@ -12,8 +12,6 @@ import java.util.Map;
 /**
  * An intermediate representation for a compilation unit
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRCompUnit extends IRNode {
     private String name;
     private Map<String, IRFuncDecl> functions;

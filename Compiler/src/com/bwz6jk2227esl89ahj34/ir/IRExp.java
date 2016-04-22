@@ -11,8 +11,6 @@ import lombok.EqualsAndHashCode;
  * discarding the result
  * EXP(e)
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRExp extends IRStmt {
     private IRExpr expr;
 

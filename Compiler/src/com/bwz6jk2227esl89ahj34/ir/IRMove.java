@@ -14,8 +14,6 @@ import java.util.List;
  * An intermediate representation for a move statement
  * MOVE(target, expr)
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRMove extends IRStmt {
     private IRExpr target;
     private IRExpr expr;

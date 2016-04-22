@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /** RETURN statement */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRReturn extends IRStmt {
 
     @Override

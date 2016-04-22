@@ -14,8 +14,6 @@ import java.util.List;
  * An intermediate representation for a conditional transfer of control
  * CJUMP(expr, trueLabel, falseLabel)
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRCJump extends IRStmt {
     private IRExpr expr;
     private String trueLabel, falseLabel;

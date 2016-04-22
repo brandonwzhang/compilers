@@ -35,7 +35,7 @@ public class CFGAssembly extends CFG {
             int next = i + 1;
             // Only include instructions in the CFG
             while (!(lines.get(next) instanceof AssemblyInstruction)) {
-                if (next < lines.size()) {
+                if (next >= lines.size()) {
                     return -1;
                 }
                 next++;

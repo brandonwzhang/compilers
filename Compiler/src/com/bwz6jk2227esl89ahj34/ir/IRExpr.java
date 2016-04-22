@@ -7,8 +7,6 @@ import lombok.EqualsAndHashCode;
 /**
  * An intermediate representation for expressions
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public abstract class IRExpr extends IRNode {
 
     @Override

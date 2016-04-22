@@ -11,8 +11,6 @@ import java.util.LinkedList;
  * An intermediate representation for a 64-bit integer constant.
  * CONST(n)
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRConst extends IRExpr {
     private long value;
 

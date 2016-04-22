@@ -11,8 +11,6 @@ import lombok.EqualsAndHashCode;
 import java.util.*;
 
 /** An IR function declaration */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRFuncDecl extends IRNode {
     private String name;
     private IRStmt body;
