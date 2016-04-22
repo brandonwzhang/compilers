@@ -2,8 +2,7 @@ package com.bwz6jk2227esl89ahj34.assembly.tests;
 
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyAbstractRegister;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyPhysicalRegister;
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyPhysicalRegister.Register;
-import com.bwz6jk2227esl89ahj34.assembly.register_allocation.GraphColorer2;
+import com.bwz6jk2227esl89ahj34.assembly.register_allocation.GraphColorer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +29,7 @@ public class GraphColorerTests {
          */
 
         AssemblyPhysicalRegister[] colors = {AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RBX};
-        GraphColorer2.colors = colors;
+        GraphColorer.colors = colors;
 
         AssemblyAbstractRegister a = new AssemblyAbstractRegister();
         AssemblyAbstractRegister b = new AssemblyAbstractRegister();
@@ -42,8 +41,8 @@ public class GraphColorerTests {
         List<AssemblyAbstractRegister> cn = new ArrayList<>(); cn.add(b);
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn);
 
-        GraphColorer2 gc = new GraphColorer2(graph);
-        boolean colored = gc.colorGraph2();
+        GraphColorer gc = new GraphColorer(graph);
+        boolean colored = gc.colorGraph();
         Assert.assertTrue(colored);
 
         Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> coloring = gc.getColoring();
@@ -63,7 +62,7 @@ public class GraphColorerTests {
                 AssemblyPhysicalRegister.R8,
                 AssemblyPhysicalRegister.R9
         };
-        GraphColorer2.colors = colors;
+        GraphColorer.colors = colors;
 
         AssemblyAbstractRegister a = new AssemblyAbstractRegister();
         AssemblyAbstractRegister b = new AssemblyAbstractRegister();
@@ -79,7 +78,7 @@ public class GraphColorerTests {
         List<AssemblyAbstractRegister> en = new ArrayList<>(); en.add(a); en.add(b); en.add(c); en.add(d);
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn); graph.put(d, dn); graph.put(e, en);
 
-        GraphColorer2 gc = new GraphColorer2(graph);
+        GraphColorer gc = new GraphColorer(graph);
         boolean colored = gc.colorGraph();
         Assert.assertTrue(colored);
 
