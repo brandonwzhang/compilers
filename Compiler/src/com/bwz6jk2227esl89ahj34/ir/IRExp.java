@@ -3,12 +3,16 @@ package com.bwz6jk2227esl89ahj34.ir;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * An intermediate representation for evaluating an expression for side effects,
  * discarding the result
  * EXP(e)
  */
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class IRExp extends IRStmt {
     private IRExpr expr;
 

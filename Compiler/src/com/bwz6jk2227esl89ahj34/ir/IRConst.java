@@ -2,6 +2,8 @@ package com.bwz6jk2227esl89ahj34.ir;
 
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.LinkedList;
 
@@ -9,6 +11,8 @@ import java.util.LinkedList;
  * An intermediate representation for a 64-bit integer constant.
  * CONST(n)
  */
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class IRConst extends IRExpr {
     private long value;
 

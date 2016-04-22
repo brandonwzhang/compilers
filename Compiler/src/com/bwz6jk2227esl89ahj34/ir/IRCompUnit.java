@@ -3,6 +3,8 @@ package com.bwz6jk2227esl89ahj34.ir;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,6 +12,8 @@ import java.util.Map;
 /**
  * An intermediate representation for a compilation unit
  */
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class IRCompUnit extends IRNode {
     private String name;
     private Map<String, IRFuncDecl> functions;

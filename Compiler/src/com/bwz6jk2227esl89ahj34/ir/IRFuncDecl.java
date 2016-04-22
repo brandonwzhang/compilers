@@ -5,10 +5,14 @@ import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.*;
 
 /** An IR function declaration */
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class IRFuncDecl extends IRNode {
     private String name;
     private IRStmt body;

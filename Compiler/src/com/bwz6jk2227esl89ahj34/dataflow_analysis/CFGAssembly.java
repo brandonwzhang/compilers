@@ -56,7 +56,7 @@ public class CFGAssembly extends CFG {
             successors.add(index);
             return successors;
         }
-        else if (instruction.getOpCode() == OpCode.RETQ){
+        else if (instruction.getOpCode() == OpCode.RETQ) {
             return successors;
         } else {
             // Add the next instruction as a successor unless we are at the last
@@ -74,7 +74,6 @@ public class CFGAssembly extends CFG {
             }
             return successors;
         }
-
     }
 
     public CFGAssembly(List<AssemblyLine> lines) {

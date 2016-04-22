@@ -4,6 +4,8 @@ import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +16,8 @@ import java.util.List;
  * An intermediate representation for a sequence of statements
  * SEQ(s1,...,sn)
  */
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class IRSeq extends IRStmt {
     private List<IRStmt> stmts;
 
