@@ -136,7 +136,7 @@ public class RegisterAllocator {
                     mapping instanceof AssemblyMemoryLocation;
             return mapping;
         }
-        // Naive register allocation: we assign each temp a location on the stack corresponding to its id
+        // If there's no mapping we spill the temp onto the stack
         int stackOffset = AssemblyFunction.getTempSpaceOffset() + Configuration.WORD_SIZE * numSpilledTemps++;
         AssemblyMemoryLocation spillLocation = AssemblyMemoryLocation.stackOffset(stackOffset);
         registerMap.put(register, spillLocation);
