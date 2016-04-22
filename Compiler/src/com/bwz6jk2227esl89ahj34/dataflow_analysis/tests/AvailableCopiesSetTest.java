@@ -3,6 +3,7 @@ package com.bwz6jk2227esl89ahj34.dataflow_analysis.tests;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies.AvailableCopies;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
         .AvailableCopiesSet;
 import com.bwz6jk2227esl89ahj34.ir.IRTemp;
@@ -122,7 +123,32 @@ public class AvailableCopiesSetTest {
 
     @Test
     public void subtractTest() {
-        // TODO
+        Map<IRTemp, IRTemp> dummyMap = new HashMap<>();
+        dummyMap.put(new IRTemp("c"), new IRTemp("d"));
+
+        AvailableCopiesSet castedCopy = (AvailableCopiesSet) set.copy();
+        AvailableCopiesSet difference = castedCopy.subtract(new AvailableCopiesSet(dummyMap));
+
+        Assert.assertTrue(set.equals(difference));
+
+        castedCopy = (AvailableCopiesSet) set.copy();
+        difference = castedCopy.subtract((AvailableCopiesSet)(set.copy())) ;
+
+        Assert.assertTrue(difference.equals(new AvailableCopiesSet(new HashMap<>())));
+
+        dummyMap = new HashMap<>();
+        dummyMap.put(new IRTemp("a"), new IRTemp("b"));
+        difference = castedCopy.subtract(new AvailableCopiesSet(dummyMap));
+
+        Assert.assertTrue(difference.getMap().containsKey(new IRTemp("x")));
+        Assert.assertFalse(difference.getMap().containsKey(new IRTemp("a")));
+
+        castedCopy = (AvailableCopiesSet) set.copy();
+        dummyMap = new HashMap<>();
+        dummyMap.put(new IRTemp("a"), new IRTemp("jihun"));
+        difference = castedCopy.subtract(new AvailableCopiesSet(dummyMap));
+
+        Assert.assertTrue(difference.getMap().containsKey(new IRTemp("a")));
     }
 
 }
