@@ -10,23 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CFGAssembly extends CFG {
-    private static int indexOfLabel(String labelName, List<AssemblyLine> lines) {
-        for (int i = 0; i < lines.size(); i++) {
-            AssemblyLine line = lines.get(i);
-            if (line instanceof AssemblyLabel) {
-                if (((AssemblyLabel) line).getName().getName().equals(labelName)) {
-                    int next = i + 1;
-                    // Only return index of the line this label points to
-                    while (!(lines.get(next) instanceof AssemblyInstruction)) {
-                        next++;
-                    }
-                    return next;
-                }
-            }
-        }
-        throw new RuntimeException("Jump to non-existent label: " + labelName);
-    }
-
     /**
      * Returns the index of the first instruction after index i
      */
@@ -35,14 +18,30 @@ public class CFGAssembly extends CFG {
             int next = i + 1;
             // Only include instructions in the CFG
             while (!(lines.get(next) instanceof AssemblyInstruction)) {
+                next++;
                 if (next >= lines.size()) {
                     return -1;
                 }
-                next++;
             }
             return next;
         }
         return -1;
+    }
+
+    private static int indexOfLabel(String labelName, List<AssemblyLine> lines) {
+        for (int i = 0; i < lines.size(); i++) {
+            AssemblyLine line = lines.get(i);
+            if (line instanceof AssemblyLabel) {
+                if (((AssemblyLabel) line).getName().getName().equals(labelName)) {
+                    int nextInstructionIndex = nextInstructionIndex(i, lines);
+                    if (nextInstructionIndex < 0) {
+                        throw new RuntimeException("Jump to non-existent label: " + labelName);
+                    }
+                    return nextInstructionIndex;
+                }
+            }
+        }
+        throw new RuntimeException("Jump to non-existent label: " + labelName);
     }
 
     private static List<Integer> getSuccessors(int i, List<AssemblyLine> lines) {
@@ -98,5 +97,4 @@ public class CFGAssembly extends CFG {
             }
         }
     }
-
 }

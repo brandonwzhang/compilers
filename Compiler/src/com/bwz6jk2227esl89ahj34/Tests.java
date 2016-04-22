@@ -76,6 +76,7 @@ public class Tests {
         }
 
         // Print out results
+        System.out.println("===============RESULTS===============");
         for (String result : results) {
             System.out.println(result);
         }

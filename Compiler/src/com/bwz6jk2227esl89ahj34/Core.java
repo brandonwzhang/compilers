@@ -321,14 +321,14 @@ public class Core {
 
 
         // Link and run the assembly file
-//        String fileName = file.substring(0, file.lastIndexOf('.'));
-//        ProcessBuilder pb =
-//                new ProcessBuilder(Util.rootPath + "/runtime/linkxi.sh", "-o", fileName, Main.assemblyPath() + "/" + fileName + ".s").inheritIO();
-//        try {
-//            Process linkProcess = pb.start();
-//            linkProcess.waitFor();
-//        } catch(Exception e) {
-//            e.printStackTrace();
-//        }
+        String fileName = file.substring(0, file.lastIndexOf('.'));
+        ProcessBuilder pb =
+                new ProcessBuilder(Util.rootPath + "/runtime/linkxi.sh", "-o", fileName, Main.assemblyPath() + "/" + fileName + ".s").inheritIO();
+        try {
+            Process linkProcess = pb.start();
+            linkProcess.waitFor();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 }

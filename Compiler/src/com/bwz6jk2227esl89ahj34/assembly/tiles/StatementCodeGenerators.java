@@ -113,7 +113,7 @@ public class StatementCodeGenerators {
     public static StatementTile.CodeGenerator return1 = (root) -> {
         /* RETURN() */
         // Handled in AssemblyFunction.generateFunctionEpilogue
-        return new LinkedList<>();
+        return AssemblyFunction.generateFunctionEpilogue();
     };
 
     public static StatementTile.CodeGenerator cjump1 = (root) -> {
