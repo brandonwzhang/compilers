@@ -54,7 +54,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         // we will update the newMap as we perform the analysis
         // if no updates are made then we are basically passing the map given
         // by the "in"
-        Map<IRTemp, LatticeElement> newMap = new HashMap<>(in.getValueTuples());
+        Map<String, LatticeElement> newMap = new HashMap<>(in.getValueTuples());
 
         if (stmt instanceof IRCJump) { // if (...)
             IRCJump castedStmt = (IRCJump) stmt;
@@ -105,15 +105,15 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                     // (true, (T,..,T))
                     // and send down appropriate info to true branch
                     leftPair = new UnreachableValueTuplesPair(false, newMap);
-                    Map<IRTemp, LatticeElement> tops = new HashMap<>();
-                    for (IRTemp temp : newMap.keySet()) {
+                    Map<String, LatticeElement> tops = new HashMap<>();
+                    for (String temp : newMap.keySet()) {
                         tops.put(temp, new LatticeTop());
                     }
                     rightPair = new UnreachableValueTuplesPair(true, tops);
                 } else { // if (...) always goes to false
                     rightPair = new UnreachableValueTuplesPair(false, newMap);
-                    Map<IRTemp, LatticeElement> tops = new HashMap<>();
-                    for (IRTemp temp : newMap.keySet()) {
+                    Map<String, LatticeElement> tops = new HashMap<>();
+                    for (String temp : newMap.keySet()) {
                         tops.put(temp, new LatticeTop());
                     }
                     leftPair = new UnreachableValueTuplesPair(true, tops);
@@ -136,7 +136,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         } else if (stmt instanceof IRMove) { //  ... = ...
             IRMove castedNode = (IRMove) stmt;
             if (castedNode.target() instanceof IRTemp) { // x = ...
-                IRTemp castedTarget = (IRTemp) castedNode.target();
+                String castedTarget = ((IRTemp) castedNode.target()).name();
                 if (castedNode.expr() instanceof IRConst) { // x = const
                     // update the newMap so that x = const
                     Value val = new Value((IRConst) castedNode.expr());
@@ -182,9 +182,9 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
             UnreachableValueTuplesPair next = (UnreachableValueTuplesPair) iterator.next();
             accumulator.setUnreachable(accumulator.isUnreachable()
                     && next.isUnreachable()); // AND the unreachable boolean values
-            Map<IRTemp, LatticeElement> accumulatorMap = accumulator.getValueTuples();
-            Map<IRTemp, LatticeElement> nextMap = accumulator.getValueTuples();
-            for (IRTemp key : accumulatorMap.keySet()) { // update values accordingly
+            Map<String, LatticeElement> accumulatorMap = accumulator.getValueTuples();
+            Map<String, LatticeElement> nextMap = accumulator.getValueTuples();
+            for (String key : accumulatorMap.keySet()) { // update values accordingly
                 accumulatorMap.put(key,
                         valueMeet(accumulatorMap.get(key), nextMap.get(key)));
             }
