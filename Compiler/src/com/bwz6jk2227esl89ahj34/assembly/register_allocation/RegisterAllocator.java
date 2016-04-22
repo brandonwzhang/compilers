@@ -8,6 +8,7 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
         .LiveVariableAnalysis;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
         .LiveVariableSet;
+import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
 import java.util.*;
 
@@ -34,13 +35,6 @@ public class RegisterAllocator {
         }
         // Use Kempe's algorithm to allocate physical locations to abstract registers
         registerMap = new HashMap<>();// TODO: Call Andy's code on interferenceSets
-        // Count the number of spilled temps we have
-        numSpilledTemps = 0;
-        for (AssemblyExpression expression : registerMap.values()) {
-            if (expression instanceof AssemblyMemoryLocation) {
-                numSpilledTemps++;
-            }
-        }
 
         // Translate all the instructions
         List<AssemblyLine> translatedLines = new LinkedList<>();
@@ -142,6 +136,10 @@ public class RegisterAllocator {
                     mapping instanceof AssemblyMemoryLocation;
             return mapping;
         }
-        throw new RuntimeException("Abstract Register " + register + " is not mapped");
+        // Naive register allocation: we assign each temp a location on the stack corresponding to its id
+        int stackOffset = AssemblyFunction.getTempSpaceOffset() + Configuration.WORD_SIZE * numSpilledTemps++;
+        AssemblyMemoryLocation spillLocation = AssemblyMemoryLocation.stackOffset(stackOffset);
+        registerMap.put(register, spillLocation);
+        return spillLocation;
     }
 }
