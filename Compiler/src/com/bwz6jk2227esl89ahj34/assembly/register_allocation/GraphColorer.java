@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34.assembly.register_allocation;
 
 import com.bwz6jk2227esl89ahj34.assembly.*;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
 
 import java.util.*;
 
@@ -54,7 +55,7 @@ public class GraphColorer {
 
     private List<AssemblyLine> lines;
 
-    public GraphColorer(Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph) {
+    public GraphColorer(Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph, List<AssemblyLine> lines) {
 
         this.removedNodes = new Stack<>();
         this.removed = new HashSet<>();
@@ -62,7 +63,7 @@ public class GraphColorer {
         this.movePairs = new HashSet<>();
         this.coalesced = new HashSet<>();
         this.coloring = new HashMap<>();
-        this.lines = new ArrayList<>();
+        this.lines = lines;
 
         this.graph = graph;
 
@@ -128,7 +129,7 @@ public class GraphColorer {
                 continue;
             }
             AssemblyInstruction instruction = (AssemblyInstruction) line;
-            if (!(instruction.getOpCode() == AssemblyInstruction.OpCode.MOVQ)) {
+            if (!(instruction.getOpCode() == OpCode.MOVQ)) {
                 continue;
             }
             List<AssemblyExpression> args = instruction.args;
@@ -154,6 +155,40 @@ public class GraphColorer {
         movePairs.removeAll(removeSet);
     }
 
+    public void updateLines() {
+        int i = 0;
+        while (i < lines.size()) {
+            if (!(lines.get(i) instanceof AssemblyInstruction)) {
+                i++;
+                continue;
+            }
+            AssemblyInstruction instruction = (AssemblyInstruction) lines.get(i);
+            if (!(instruction.getOpCode() == OpCode.MOVQ)) {
+                i++;
+                continue;
+            }
+
+            List<AssemblyExpression> args = instruction.args;
+            boolean isMovePair = args.get(0) instanceof AssemblyAbstractRegister &&
+                    args.get(1) instanceof AssemblyAbstractRegister;
+            if (!isMovePair) {
+                i++;
+                continue;
+            }
+
+            AssemblyAbstractRegister t1 = (AssemblyAbstractRegister) args.get(0);
+            AssemblyAbstractRegister t2 = (AssemblyAbstractRegister) args.get(1);
+            for (MovePair pair : coalesced) {
+                if (pair.left == t1 && pair.right == t2) {
+                    lines.remove(i);
+                    i--;
+                    break;
+                }
+            }
+            i++;
+        }
+    }
+
     public static AssemblyPhysicalRegister assignColor(Set<AssemblyPhysicalRegister> exclude) {
         // case where there is no available color
         AssemblyPhysicalRegister color = colors[(int) Math.floor(Math.random() * colors.length)];
@@ -166,8 +201,8 @@ public class GraphColorer {
     public void combineNodes(AssemblyAbstractRegister t1, AssemblyAbstractRegister t2) {
 
         for (AssemblyAbstractRegister node : graph.get(t2)) {
+            graph.get(node).remove(t2);
             if (!graph.get(t1).contains(node)) {
-                graph.get(node).remove(t2);
                 graph.get(node).add(t1);
                 graph.get(t1).add(node);
             }
@@ -373,6 +408,8 @@ public class GraphColorer {
             coloring.put(colorable, color);
             spillNodes.remove(colorable);
         }
+
+        updateLines();
 
         return spillNodes.size() == 0;
     }
