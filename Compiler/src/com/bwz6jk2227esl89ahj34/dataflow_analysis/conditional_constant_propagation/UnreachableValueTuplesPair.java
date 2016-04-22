@@ -1,9 +1,11 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation;
 
 
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
 import com.bwz6jk2227esl89ahj34.ir.IRTemp;
+import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,7 +32,11 @@ public class UnreachableValueTuplesPair extends LatticeElement {
     public UnreachableValueTuplesPair(List<IRTemp> temps) {
         this.valueTuples = new HashMap<>();
         for(IRTemp temp : temps) {
-            this.valueTuples.put(temp.name(), new LatticeTop());
+            if (temp.name().contains(Configuration.ABSTRACT_ARG_PREFIX)) {
+                this.valueTuples.put(temp.name(), new LatticeBottom());
+            } else {
+                this.valueTuples.put(temp.name(), new LatticeTop());
+            }
         }
         unreachable = true;
     }
