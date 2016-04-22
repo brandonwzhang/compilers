@@ -38,6 +38,9 @@ public class CFGAssembly extends CFG {
                 // Only include instructions in the CFG
                 while (!(lines.get(next) instanceof AssemblyInstruction)) {
                     next++;
+                    if (next < lines.size()) {
+                        return successors;
+                    }
                 }
                 successors.add(next);
             }
@@ -63,6 +66,9 @@ public class CFGAssembly extends CFG {
                 // Only include instructions in the CFG
                 while (!(lines.get(next) instanceof AssemblyInstruction)) {
                     next++;
+                    if (next < lines.size()) {
+                        return successors;
+                    }
                 }
                 successors.add(next);
             }

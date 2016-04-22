@@ -40,6 +40,9 @@ public class CFGIR extends CFG {
                     // Don't include IRLabels in this CFG
                     while (statements.get(next) instanceof IRLabel) {
                         next++;
+                        if (next < statements.size()) {
+                            return successors;
+                        }
                     }
                     successors.add(next);
                 }
@@ -68,6 +71,9 @@ public class CFGIR extends CFG {
                 // Don't include IRLabels in this CFG
                 while (statements.get(next) instanceof IRLabel) {
                     next++;
+                    if (next < statements.size()) {
+                        return successors;
+                    }
                 }
                 successors.add(next);
             }

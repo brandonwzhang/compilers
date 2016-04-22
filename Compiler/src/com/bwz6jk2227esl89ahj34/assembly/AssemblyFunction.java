@@ -55,7 +55,7 @@ public class AssemblyFunction {
                 Collections.singletonList(liveVariables.toString())
         );
 
-        functionBody = RegisterAllocator.translate(functionBody);
+        //TODO: functionBody = RegisterAllocator.translate(functionBody);
 
         // generateFunctionPrologue() needs to be called after the registers
         // have been allocated to know how many spilled temps there are
