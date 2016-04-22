@@ -18,8 +18,8 @@ public abstract class DataflowAnalysis {
     }
 
     private CFG graph;
-    private LatticeElement top;
-    private LatticeElement bottom;
+    protected LatticeElement top;
+    protected LatticeElement bottom;
 
     public DataflowAnalysis(List<AssemblyLine> lines, Direction direction) {
         this.graph = new CFGAssembly(lines);
