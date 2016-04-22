@@ -33,16 +33,9 @@ public class CFGAssembly extends CFG {
         AssemblyInstruction instruction = (AssemblyInstruction) lines.get(i);
         if (instruction.getOpCode() == OpCode.JE || instruction.getOpCode() == OpCode.JNE) {
             // We could fall through the false block
-            if (i < lines.size() - 1)  {
-                int next = i + 1;
-                // Only include instructions in the CFG
-                while (!(lines.get(next) instanceof AssemblyInstruction)) {
-                    next++;
-                    if (next < lines.size()) {
-                        return successors;
-                    }
-                }
-                successors.add(next);
+            int nextInstructionIndex = nextInstructionIndex(i, lines);
+            if (nextInstructionIndex >= 0) {
+                successors.add(nextInstructionIndex);
             }
 
             String labelName = ((AssemblyName)instruction.getArgs().get(0)).getName();
@@ -61,19 +54,30 @@ public class CFGAssembly extends CFG {
         } else {
             // Add the next instruction as a successor unless we are at the last
             // instruction
-            if (i < lines.size() - 1) {
-                int next = i + 1;
-                // Only include instructions in the CFG
-                while (!(lines.get(next) instanceof AssemblyInstruction)) {
-                    next++;
-                    if (next < lines.size()) {
-                        return successors;
-                    }
-                }
-                successors.add(next);
+            int nextInstructionIndex = nextInstructionIndex(i, lines);
+            if (nextInstructionIndex >= 0) {
+                successors.add(nextInstructionIndex);
             }
             return successors;
         }
+    }
+
+    /**
+     * Returns the index of the first instruction after index i
+     */
+    private static int nextInstructionIndex(int i, List<AssemblyLine> lines) {
+        if (i < lines.size() - 1) {
+            int next = i + 1;
+            // Only include instructions in the CFG
+            while (!(lines.get(next) instanceof AssemblyInstruction)) {
+                next++;
+                if (next < lines.size()) {
+                    return -1;
+                }
+            }
+            return next;
+        }
+        return -1;
     }
 
     public CFGAssembly(List<AssemblyLine> lines) {
