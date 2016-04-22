@@ -232,7 +232,7 @@ public class GraphColorer {
         }
         return color;
     }
-
+    
     public void combineNodes(AssemblyAbstractRegister t1, AssemblyAbstractRegister t2) {
 
         for (AssemblyAbstractRegister node : graph.get(t2)) {
@@ -315,6 +315,12 @@ public class GraphColorer {
         return changed;
     }
 
+    /**
+     * Returns the degree of the node that would result if the two given
+     * nodes were coalesced.
+     *
+     * Requires: the given nodes are in the graph
+     */
     public int coalescedDegree(AssemblyAbstractRegister t1, AssemblyAbstractRegister t2) {
         int result = graph.get(t1).size() + graph.get(t2).size();
 
@@ -395,13 +401,17 @@ public class GraphColorer {
 
     /**
      * Repeat simplify and coalesce until no changes occur.
+     *
      * Freeze a move-related node and continue simplfiying and coalescing.
+     *
      * If no nodes can be frozen, then remove a node of significant degree and
      * mark it as a potential spill node. Continue simplify-coalesce-freeze.
+     *
      * Once the graph is empty, begin adding nodes back and coloring as we go.
      * Potential spill nodes are added at the appropriate time, but are colored
      * last. If they cannot be colored, then they become actual spill nodes,
      * and the graph coloring fails.
+     *
      * @return True if the graph was successfully colored. False otherwise.
      */
     public boolean colorGraph() {
@@ -493,10 +503,18 @@ public class GraphColorer {
         return spillNodes.size() == 0;
     }
 
+    /**
+     * @return a mapping from abstract registers to physical registers
+     */
     public Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> getColoring() {
         return coloring;
     }
 
+    /**
+     * Use this to define precolored nodes in the graph.
+     * @param node a node in the interference graph
+     * @param color the node's color assignment
+     */
     public void addColoring(AssemblyAbstractRegister node, AssemblyPhysicalRegister color) {
         coloring.put(node, color);
     }
