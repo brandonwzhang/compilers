@@ -12,35 +12,10 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
     private Direction direction = Direction.FORWARD;
     private CFGNode startNode;
 
-    public AvailableExpressionsAnalysis(IRSeq seq) {
-        super(seq, Direction.FORWARD); //temp; fix if needed -- jihun
+    public AvailableExpressionsAnalysis(IRSeq seq, LatticeElement top, LatticeElement bottom) {
+        super(seq, Direction.FORWARD, top, bottom); //temp; fix if needed -- jihun
     }
 
-    // given a seq, return the "top"
-    public AvailableExpressionSet allExprs(IRSeq seq) {
-        Set<IRExpr> set = new HashSet<>();
-        for (IRStmt s : seq.stmts()) {
-            if (s instanceof IRCJump) {
-                IRCJump cjump = (IRCJump)s;
-                addSubexprs(cjump.expr(), set);
-            }
-            if (s instanceof IRExp) {
-                IRExp exp = (IRExp)s;
-                addSubexprs(exp.expr(), set);
-            }
-            if (s instanceof IRJump) {
-                IRJump jump = (IRJump)s;
-                addSubexprs(jump.target(), set);
-            }
-            if (s instanceof IRMove) {
-                IRMove move = (IRMove)s;
-                addSubexprs(move.target(), set); // TODO: should we have this?
-                addSubexprs(move.expr(), set);
-            }
-        }
-
-        return new AvailableExpressionSet(set);
-    }
 
     /**
      * Updates the node's equations as detailed below in comments.
@@ -57,15 +32,8 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         node.setIn(meet(pred_outs));
 
         // out[n] = in[n] U eval[n] - kill[n]
-        Set<IRExpr> out;
-        // TODO FIX
-        if (node.getIn() instanceof LatticeTop) {
-            out = eval(node).getExprs();
-        }
-        else {
-            out = new HashSet<IRExpr>(((AvailableExpressionSet)node.getIn()).getExprs());
-            out.addAll(eval(node).getExprs());
-        }
+        Set<IRExpr> out = new HashSet<IRExpr>(((AvailableExpressionSet)node.getIn()).getExprs());
+        out.addAll(eval(node).getExprs());
         kill(node, out); // removes kill[n]
         node.setOut(new AvailableExpressionSet(out));
     }
@@ -194,10 +162,36 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         }
     }
 
+    // given a seq, return the "top"
+    public static AvailableExpressionSet allExprs(IRSeq seq) {
+        Set<IRExpr> set = new HashSet<>();
+        for (IRStmt s : seq.stmts()) {
+            if (s instanceof IRCJump) {
+                IRCJump cjump = (IRCJump)s;
+                addSubexprs(cjump.expr(), set);
+            }
+            if (s instanceof IRExp) {
+                IRExp exp = (IRExp)s;
+                addSubexprs(exp.expr(), set);
+            }
+            if (s instanceof IRJump) {
+                IRJump jump = (IRJump)s;
+                addSubexprs(jump.target(), set);
+            }
+            if (s instanceof IRMove) {
+                IRMove move = (IRMove)s;
+                addSubexprs(move.target(), set); // TODO: should we have this?
+                addSubexprs(move.expr(), set);
+            }
+        }
+
+        return new AvailableExpressionSet(set);
+    }
+
 
     // Returns a set of expressions that are subexpressions of expr
     // Analogous to powerset
-    private Set<IRExpr> subexprs(IRExpr expr) {
+    private static Set<IRExpr> subexprs(IRExpr expr) {
         HashSet<IRExpr> set = new HashSet<>();
         addSubexprs(expr, set);
         return set;
@@ -205,7 +199,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
 
     // recursive helper function
     // precondition: IR is lowered
-    private void addSubexprs(IRExpr expr, Set<IRExpr> set) {
+    private static void addSubexprs(IRExpr expr, Set<IRExpr> set) {
         set.add(expr);
 
         if (expr instanceof IRBinOp) {
