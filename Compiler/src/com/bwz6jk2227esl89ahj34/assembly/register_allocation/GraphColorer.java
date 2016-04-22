@@ -5,6 +5,10 @@ import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
 
 import java.util.*;
 
+/**
+ * A class for representing a pair of abstract registers that appear together
+ * in a mov instrcution.
+ */
 class MovePair {
     final AssemblyAbstractRegister left;
     final AssemblyAbstractRegister right;
@@ -15,7 +19,11 @@ class MovePair {
     }
 }
 
-// TODO: check if node interfere before coalescing
+/**
+ * You must first perform live variable analysis on your program before using
+ * this class. An instance of this class can used to allocate physical
+ * registers to your program's abstract registers.
+ */
 public class GraphColorer {
 
     // the available colors for the graph
@@ -53,6 +61,7 @@ public class GraphColorer {
 
     private List<AssemblyLine> lines;
 
+    // a constructor for testing purposes
     public GraphColorer(Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph, List<AssemblyLine> lines) {
 
         this.removedNodes = new Stack<>();
@@ -69,6 +78,10 @@ public class GraphColorer {
         removeImpossibleMovePairs();
     }
 
+    /**
+     * @param liveVariableSets the live variable sets from every program point in the program
+     * @param lines the lines of assembly for which we are allocating registers
+     */
     public GraphColorer(List<Set<AssemblyAbstractRegister>> liveVariableSets, List<AssemblyLine> lines) {
 
         this.removedNodes = new Stack<>();
@@ -85,6 +98,12 @@ public class GraphColorer {
         removeImpossibleMovePairs();
     }
 
+    /**
+     * Takes all of the live variable sets from the program.
+     * Returns an interference graph.
+     * Nodes are temps (abstract registers). Two nodes are connected by an edge
+     * if their temps interfere with each other at any point in the program.
+     */
     public static Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>>
         constructInterferenceGraph(List<Set<AssemblyAbstractRegister>> liveVariableSets) {
 
@@ -121,6 +140,10 @@ public class GraphColorer {
         return graph;
     }
 
+    /**
+     * Finds all of the [mov t1 t2] pairs in the given assembly code.
+     * Keeps track of them so move coalescing can be done later.
+     */
     public void addMovePairs() {
         for (AssemblyLine line : lines) {
             if (!(line instanceof AssemblyInstruction)) {
@@ -143,6 +166,10 @@ public class GraphColorer {
         }
     }
 
+    /**
+     * Call this after addMovePairs(). Removes any move pairs made up of temps
+     * that interfere with each other.
+     */
     public void removeImpossibleMovePairs() {
         Set<MovePair> removeSet = new HashSet<>();
         for (MovePair pair : movePairs) {
@@ -153,6 +180,11 @@ public class GraphColorer {
         movePairs.removeAll(removeSet);
     }
 
+    /**
+     * Call this after graph coloring and move coalescing.
+     * Removes any move instructions that were coasleced.
+     * Mutates the given List of assembly lines.
+     */
     public void updateLines() {
         int i = 0;
         while (i < lines.size()) {
@@ -187,6 +219,11 @@ public class GraphColorer {
         }
     }
 
+    /**
+     * A method for selecting a random valid color.
+     * @param exclude registers that should be excluded from the selection
+     * @return a random valid register
+     */
     public static AssemblyPhysicalRegister assignColor(Set<AssemblyPhysicalRegister> exclude) {
         // case where there is no available color
         AssemblyPhysicalRegister color = colors[(int) Math.floor(Math.random() * colors.length)];
@@ -212,6 +249,14 @@ public class GraphColorer {
         graph.remove(t2);
     }
 
+    /**
+     * A node is move-related if it is part of a mov instruction that has a
+     * chance of being coalesced. i.e., it came from a mov with two temps,
+     * and those temps do not interfere.
+     *
+     * @param node a node in the interference graph
+     * @return true if the given node is move-related
+     */
     public boolean isMoveRelated(AssemblyAbstractRegister node) {
         for (MovePair pair : movePairs) {
             if (pair.left == node || pair.right == node) {
@@ -231,6 +276,10 @@ public class GraphColorer {
         return Optional.empty();
     }
 
+    /**
+     * @param n a node in the interference graph
+     * @return the number of adjacent nodes that are already colored
+     */
     public int numAdjacentColors(AssemblyAbstractRegister n) {
         int result = 0;
         for (AssemblyAbstractRegister neighbor : graph.get(n)) {
@@ -344,6 +393,17 @@ public class GraphColorer {
         return frozeNode;
     }
 
+    /**
+     * Repeat simplify and coalesce until no changes occur.
+     * Freeze a move-related node and continue simplfiying and coalescing.
+     * If no nodes can be frozen, then remove a node of significant degree and
+     * mark it as a potential spill node. Continue simplify-coalesce-freeze.
+     * Once the graph is empty, begin adding nodes back and coloring as we go.
+     * Potential spill nodes are added at the appropriate time, but are colored
+     * last. If they cannot be colored, then they become actual spill nodes,
+     * and the graph coloring fails.
+     * @return True if the graph was successfully colored. False otherwise.
+     */
     public boolean colorGraph() {
 
         while (true) {
