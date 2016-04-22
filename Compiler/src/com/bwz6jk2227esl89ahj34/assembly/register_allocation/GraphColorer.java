@@ -26,8 +26,6 @@ public class GraphColorer {
             AssemblyPhysicalRegister.R8
     };
 
-    private static int K = colors.length;
-
     // the interference graph
     private Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph;
 
@@ -201,11 +199,14 @@ public class GraphColorer {
     public void combineNodes(AssemblyAbstractRegister t1, AssemblyAbstractRegister t2) {
 
         for (AssemblyAbstractRegister node : graph.get(t2)) {
-            graph.get(node).remove(t2);
             if (!graph.get(t1).contains(node)) {
                 graph.get(node).add(t1);
                 graph.get(t1).add(node);
             }
+        }
+
+        for (AssemblyAbstractRegister node : graph.keySet()) {
+            graph.get(node).remove(t2);
         }
 
         graph.remove(t2);
@@ -275,7 +276,7 @@ public class GraphColorer {
             for (MovePair pair : movePairs) {
                 AssemblyAbstractRegister t1 = pair.left;
                 AssemblyAbstractRegister t2 = pair.right;
-                if (graph.get(t1).size() + graph.get(t2).size() < K) {
+                if (graph.get(t1).size() + graph.get(t2).size() <= colors.length) {
                     coalesced.add(pair);
                     combineNodes(t1, t2);
                     movePairs.remove(pair);
@@ -309,9 +310,9 @@ public class GraphColorer {
         AssemblyAbstractRegister frozen = null;
         for (MovePair pair : movePairs) {
 
-            if (graph.get(pair.left).size() < K) {
+            if (graph.get(pair.left).size() < colors.length) {
                 frozen = pair.left;
-            } else if (graph.get(pair.right).size() < K) {
+            } else if (graph.get(pair.right).size() < colors.length) {
                 frozen = pair.right;
             }
 
@@ -347,7 +348,6 @@ public class GraphColorer {
                 frozeNode = freeze();
             } while(frozeNode);
 
-            // reduced graph where all nodes are of significant degree
             if (graph.size() == removed.size()) {
                 break;
             }
@@ -361,6 +361,13 @@ public class GraphColorer {
             removedNodes.push(spillNode);
             removed.add(spillNode);
             spillNodes.add(spillNode);
+            Set<MovePair> removeSet = new HashSet<>();
+            for (MovePair pair : movePairs) {
+                if (pair.left == spillNode || pair.right == spillNode) {
+                    removeSet.add(pair);
+                }
+            }
+            movePairs.removeAll(removeSet);
         }
 
         System.out.println("begin coloring");
@@ -389,7 +396,7 @@ public class GraphColorer {
         while (spillNodes.size() > 0) {
             AssemblyAbstractRegister colorable = null;
             for (AssemblyAbstractRegister sn : spillNodes) {
-                if (numAdjacentColors(sn) < K) {
+                if (numAdjacentColors(sn) < colors.length) {
                     colorable = sn;
                     break;
                 }

@@ -60,6 +60,47 @@ public class GraphColorerTests {
     }
 
     @Test
+    public void moveCoalesceFourNode() {
+        /*
+         *     b
+         *    / \
+         *   a   c
+         *    \ /
+         *     d
+         */
+
+        AssemblyPhysicalRegister[] colors = {AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RBX};
+        GraphColorer.colors = colors;
+
+        AssemblyAbstractRegister a = new AssemblyAbstractRegister();
+        AssemblyAbstractRegister b = new AssemblyAbstractRegister();
+        AssemblyAbstractRegister c = new AssemblyAbstractRegister();
+        AssemblyAbstractRegister d = new AssemblyAbstractRegister();
+
+        Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph = new HashMap<>();
+        List<AssemblyAbstractRegister> an = new ArrayList<>(); an.add(b); an.add(d);
+        List<AssemblyAbstractRegister> bn = new ArrayList<>(); bn.add(a); bn.add(c);
+        List<AssemblyAbstractRegister> cn = new ArrayList<>(); cn.add(b); cn.add(d);
+        List<AssemblyAbstractRegister> dn = new ArrayList<>(); dn.add(a); dn.add(c);
+        graph.put(a, an); graph.put(b, bn); graph.put(c, cn); graph.put(d, dn);
+
+        List<AssemblyLine> lines = new ArrayList<>();
+        lines.add(new AssemblyInstruction(OpCode.MOVQ, a, c));
+        lines.add(new AssemblyInstruction(OpCode.MOVQ, b, d));
+
+        GraphColorer gc = new GraphColorer(graph, lines);
+        boolean colored = gc.colorGraph();
+        Assert.assertTrue(colored);
+
+        Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> coloring = gc.getColoring();
+        System.out.println(coloring.get(a));
+        System.out.println(coloring.get(b));
+        System.out.println(coloring.get(c));
+        System.out.println(coloring.get(d));
+        System.out.println(lines);
+    }
+
+    @Test
     public void threeNodeTest() {
         /*
          *     b
