@@ -19,6 +19,14 @@ public class UnreachableValueTuplesPair extends LatticeElement {
     private boolean unreachable;
     private Map<IRTemp, LatticeElement>  valueTuples;
 
+    @Override
+    public String toString() {
+        String s = "Unreachable ->"+unreachable+"\n";
+        for (IRTemp temp : valueTuples.keySet()) {
+            s += temp.name() + " -> "+ valueTuples.get(temp).toString()+"\n";
+        }
+        return s;
+    }
     public UnreachableValueTuplesPair(List<IRTemp> temps) {
         this.valueTuples = new HashMap<>();
         for(IRTemp temp : temps) {

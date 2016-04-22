@@ -21,7 +21,7 @@ public class Value extends LatticeElement {
 
     @Override
     public boolean equals(LatticeElement e) {
-        return this.equals(e);
+        return this.equals((Object)e);
     }
 
     @Override

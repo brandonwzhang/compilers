@@ -17,6 +17,15 @@ public class AvailableCopiesSet extends LatticeElement {
     private Map<IRTemp, IRTemp> map;
 
     @Override
+    public String toString() {
+        String s = "";
+        for (IRTemp key : map.keySet()) {
+            s += key.name() + "->" + map.get(key).name()+"\n";
+        }
+        return s;
+    }
+
+    @Override
     public LatticeElement copy() {
         Map<IRTemp, IRTemp> newMap = new HashMap<>();
         newMap.putAll(map);

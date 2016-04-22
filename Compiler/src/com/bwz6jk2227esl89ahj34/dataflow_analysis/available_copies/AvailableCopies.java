@@ -1,10 +1,7 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies;
 
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeIR;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.DataflowAnalysis;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.Pair;
 import com.bwz6jk2227esl89ahj34.ir.IRStmt;
 
@@ -27,18 +24,21 @@ public class AvailableCopies extends DataflowAnalysis {
          // assumption: out of predecessor is filled in
          AvailableCopiesSet in;
          Set<CFGNode> predecessors = node.getPredecessors();
-         if (predecessors.size() > 1) { // if multiple predecessors...
-             Set<LatticeElement> preds = new HashSet<>();
-             for (CFGNode predNode : predecessors) {
-                 preds.add(predNode.getOut());
-             }                 // we meet the out of the predecessors
-             in = meet(preds); // and set it as the in
-         } else { // if single predecessor, set the out as the in
-             in = (AvailableCopiesSet) predecessors.iterator().next().getOut();
+         if (predecessors.size() == 0) { // root node with no in[n]
+             node.setOut(kill(node).union(gen(node)));
+         } else {
+             if (predecessors.size() > 1) { // if multiple predecessors...
+                 Set<LatticeElement> preds = new HashSet<>();
+                 for (CFGNode predNode : predecessors) {
+                     preds.add(predNode.getOut());
+                 }                 // we meet the out of the predecessors
+                 in = meet(preds); // and set it as the in
+             } else { // if single predecessor, set the out as the in
+                 in = (AvailableCopiesSet) predecessors.iterator().next().getOut();
+             }
+             node.setIn(in); // set in of node to in
+             node.setOut(out(node));  // set out of node to result of out method
          }
-
-         node.setIn(in); // set in of node to in
-         node.setOut(out(node));  // set out of node to result of out method
 
      }
 
@@ -83,7 +83,9 @@ public class AvailableCopies extends DataflowAnalysis {
          assert node instanceof CFGNodeIR;
          CFGNodeIR castedNode = (CFGNodeIR) node;
          Map<IRTemp, IRTemp> killMap = new HashMap<>();
-         Map<IRTemp, IRTemp> in = ((AvailableCopiesSet)node.getIn()).getMap();
+         Map<IRTemp, IRTemp> in = node.getIn() instanceof LatticeTop
+                 ? new HashMap<>()
+                 : ((AvailableCopiesSet)node.getIn()).getMap();
 
          IRStmt castedNodeStmt = castedNode.getStatement();
          if(castedNodeStmt instanceof IRMove

@@ -11,9 +11,28 @@ import java.util.*;
 public class ConditionalConstantPropagation extends DataflowAnalysis {
 
     public ConditionalConstantPropagation(IRSeq seq) {
-        super(seq, Direction.FORWARD);
+        super(seq, Direction.FORWARD,
+                new UnreachableValueTuplesPair(findAllTemps(seq)), null);
     }
 
+    public static List<IRTemp> findAllTemps(IRSeq seq) {
+        List<IRStmt> stmts = seq.getStmts();
+        Set<IRTemp> temps = new HashSet<>();
+        for (IRStmt stmt : stmts) {
+            if (stmt instanceof IRMove) {
+                IRMove castedStmt = (IRMove) stmt;
+                IRExpr target = castedStmt.target();
+                if (target instanceof IRTemp) {
+                    temps.add((IRTemp) target);
+                }
+                IRExpr expr = castedStmt.expr();
+                if (expr instanceof IRTemp) {
+                    temps.add((IRTemp) expr);
+                }
+            }
+        }
+        return new LinkedList<>(temps);
+    }
 
     // assumption: ins will always be defined appropriately
     public void transfer(CFGNode node) {
@@ -26,6 +45,11 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         // the "in" is filled in as a precondition
         UnreachableValueTuplesPair in =
                 (UnreachableValueTuplesPair) node.getIn();
+
+        // root is always reachable
+        if (node.getPredecessors().isEmpty()) {
+            in.setUnreachable(false);
+        }
 
         // we will update the newMap as we perform the analysis
         // if no updates are made then we are basically passing the map given
@@ -113,12 +137,12 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
             IRMove castedNode = (IRMove) stmt;
             if (castedNode.target() instanceof IRTemp) { // x = ...
                 IRTemp castedTarget = (IRTemp) castedNode.target();
-                String variable = castedTarget.label();
                 if (castedNode.expr() instanceof IRConst) { // x = const
                     // update the newMap so that x = const
                     Value val = new Value((IRConst) castedNode.expr());
-                    newMap.put(castedTarget, valueMeet(newMap.get(variable), val));
-                } else if (castedNode.expr() instanceof IRCall) {
+                    newMap.put(castedTarget, valueMeet(newMap.get(castedTarget), val));
+                } else if (castedNode.expr() instanceof IRCall
+                        || castedNode.expr() instanceof IRBinOp) {
                     // a function call can return anything so variable becomes
                     // "overloaded"
                     newMap.put(castedTarget, new LatticeBottom());
