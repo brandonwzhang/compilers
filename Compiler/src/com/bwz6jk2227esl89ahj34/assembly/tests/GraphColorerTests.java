@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34.assembly.tests;
 
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyAbstractRegister;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyPhysicalRegister;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyPhysicalRegister.Register;
 import com.bwz6jk2227esl89ahj34.assembly.register_allocation.GraphColorer2;
 import org.junit.Assert;
@@ -28,7 +29,7 @@ public class GraphColorerTests {
          *   a   c
          */
 
-        Register[] colors = {Register.RAX, Register.RBX};
+        AssemblyPhysicalRegister[] colors = {AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RBX};
         GraphColorer2.colors = colors;
 
         AssemblyAbstractRegister a = new AssemblyAbstractRegister();
@@ -42,10 +43,10 @@ public class GraphColorerTests {
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn);
 
         GraphColorer2 gc = new GraphColorer2(graph);
-        boolean colored = gc.colorGraph();
+        boolean colored = gc.colorGraph2();
         Assert.assertTrue(colored);
 
-        Map<AssemblyAbstractRegister, Register> coloring = gc.getColoring();
+        Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> coloring = gc.getColoring();
         System.out.println(coloring.get(a));
         System.out.println(coloring.get(b));
         System.out.println(coloring.get(c));
@@ -55,7 +56,13 @@ public class GraphColorerTests {
     public void fiveNodeTest() {
         // a 5-node perfect graph with 5 available colors
 
-        Register[] colors = {Register.RAX, Register.RBX, Register.RCX, Register.R8, Register.R9};
+        AssemblyPhysicalRegister[] colors = {
+                AssemblyPhysicalRegister.RAX,
+                AssemblyPhysicalRegister.RBX,
+                AssemblyPhysicalRegister.RCX,
+                AssemblyPhysicalRegister.R8,
+                AssemblyPhysicalRegister.R9
+        };
         GraphColorer2.colors = colors;
 
         AssemblyAbstractRegister a = new AssemblyAbstractRegister();
@@ -76,7 +83,7 @@ public class GraphColorerTests {
         boolean colored = gc.colorGraph();
         Assert.assertTrue(colored);
 
-        Map<AssemblyAbstractRegister, Register> coloring = gc.getColoring();
+        Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> coloring = gc.getColoring();
         System.out.println(coloring.get(a));
         System.out.println(coloring.get(b));
         System.out.println(coloring.get(c));
