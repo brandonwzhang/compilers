@@ -266,6 +266,18 @@ public class GraphColorer {
         return changed;
     }
 
+    public int coalescedDegree(AssemblyAbstractRegister t1, AssemblyAbstractRegister t2) {
+        int result = graph.get(t1).size() + graph.get(t2).size();
+
+        for (AssemblyAbstractRegister n : graph.get(t1)) {
+            if (graph.get(t2).contains(n)) {
+                result--;
+            }
+        }
+
+        return result;
+    }
+
     public boolean coalesce() {
 
         boolean coalescingOccurred = false;
@@ -276,7 +288,7 @@ public class GraphColorer {
             for (MovePair pair : movePairs) {
                 AssemblyAbstractRegister t1 = pair.left;
                 AssemblyAbstractRegister t2 = pair.right;
-                if (graph.get(t1).size() + graph.get(t2).size() <= colors.length) {
+                if (coalescedDegree(t1, t2) <= colors.length) {
                     coalesced.add(pair);
                     combineNodes(t1, t2);
                     movePairs.remove(pair);
