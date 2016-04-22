@@ -9,11 +9,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 public class AvailableExpressionsAnalysis extends DataflowAnalysis{
-    private Direction direction = Direction.FORWARD;
-    private CFGNode startNode;
-
     public AvailableExpressionsAnalysis(IRSeq seq) {
-        super(seq, Direction.FORWARD, allExprs(seq), new AvailableExpressionSet(new HashSet<IRExpr>()));
+        super(seq, Direction.FORWARD, allExprs(seq), new AvailableExpressionSet(new HashSet<>()));
         // top = {all exprs}
         // bottom = {}
     }
@@ -48,7 +45,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
      */
     public LatticeElement meet(Set<LatticeElement> elements) {
         if (elements.isEmpty()) {
-            return new AvailableExpressionSet(new HashSet<IRExpr>());
+            return new AvailableExpressionSet(new HashSet<>());
         }
 
         AvailableExpressionSet meet = (AvailableExpressionSet)top.copy();
@@ -208,8 +205,6 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
             addSubexprs(mem.expr(), set);
         }
     }
-
-
 
     /**
      * Takes in an IRExpr tree (lowered), and searches for a node that passes the predicate

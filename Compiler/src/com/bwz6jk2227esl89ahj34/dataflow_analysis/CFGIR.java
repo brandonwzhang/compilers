@@ -6,23 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CFGIR extends CFG {
-    private static int indexOfLabel(String labelName, List<IRStmt> statements) {
-        for (int i = 0; i < statements.size(); i++) {
-            IRStmt statement = statements.get(i);
-            if (statement instanceof IRLabel) {
-                if (((IRLabel) statement).name().equals(labelName)) {
-                    int next = i + 1;
-                    // Only return index of the instruction this label points to
-                    while (statements.get(next) instanceof IRLabel) {
-                        next++;
-                    }
-                    return next;
-                }
-            }
-        }
-        throw new RuntimeException("Jump to non-existent label: " + labelName);
-    }
-
     /**
      * Returns the index of the first non label after index i
      */
@@ -31,14 +14,31 @@ public class CFGIR extends CFG {
             int next = i + 1;
             // Don't include IRLabels in this CFG
             while (statements.get(next) instanceof IRLabel) {
+                next++;
                 if (next >= statements.size()) {
                     return -1;
                 }
-                next++;
             }
             return next;
         }
         return -1;
+    }
+
+    private static int indexOfLabel(String labelName, List<IRStmt> statements) {
+        for (int i = 0; i < statements.size(); i++) {
+            IRStmt statement = statements.get(i);
+            if (statement instanceof IRLabel) {
+                if (((IRLabel) statement).name().equals(labelName)) {
+                    int nextNonLabelIndex = nextNonLabelIndex(i, statements);
+                    if (nextNonLabelIndex < 0) {
+                        throw new RuntimeException("Jump to non-existent label: " + labelName);
+                    }
+                    return nextNonLabelIndex;
+
+                }
+            }
+        }
+        throw new RuntimeException("Jump to non-existent label: " + labelName);
     }
 
     private static List<Integer> getSuccessors(int i, List<IRStmt> statements) {

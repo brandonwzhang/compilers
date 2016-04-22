@@ -55,13 +55,14 @@ public class AssemblyFunction {
                 Collections.singletonList(liveVariables.toString())
         );
 
-        //TODO: functionBody = RegisterAllocator.translate(functionBody);
+        functionBody = RegisterAllocator.translate(functionBody);
 
         // generateFunctionPrologue() needs to be called after the registers
         // have been allocated to know how many spilled temps there are
         lines.addAll(generateFunctionPrologue());
         lines.addAll(functionBody);
-        lines.addAll(generateFunctionEpilogue());
+        // Function epilogue (restoring callee save registers and returning) is
+        // done in the translation of the return statement
     }
 
     private static List<AssemblyLine> generateFunctionPrologue() {
@@ -134,7 +135,7 @@ public class AssemblyFunction {
         return lines;
     }
 
-    private static List<AssemblyLine> generateFunctionEpilogue() {
+    public static List<AssemblyLine> generateFunctionEpilogue() {
         List<AssemblyLine> lines = new LinkedList<>();
         lines.add(new AssemblyComment("Function epilogue"));
 
