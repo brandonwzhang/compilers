@@ -17,17 +17,20 @@ import java.util.Map;
 
 public class GraphColorerTests {
 
-    AssemblyAbstractRegister a;
-    AssemblyAbstractRegister b;
-    AssemblyAbstractRegister c;
-    AssemblyAbstractRegister d;
-    AssemblyAbstractRegister e;
+    AssemblyAbstractRegister a; // %0
+    AssemblyAbstractRegister b; // %1
+    AssemblyAbstractRegister c; // %2
+    AssemblyAbstractRegister d; // %3
+    AssemblyAbstractRegister e; // %4
 
     List<AssemblyAbstractRegister> an;
     List<AssemblyAbstractRegister> bn;
     List<AssemblyAbstractRegister> cn;
     List<AssemblyAbstractRegister> dn;
     List<AssemblyAbstractRegister> en;
+
+    Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph;
+    List<AssemblyLine> lines;
 
     // runs before every test invocation
     @Before
@@ -43,6 +46,72 @@ public class GraphColorerTests {
         cn = new ArrayList<>();
         dn = new ArrayList<>();
         en = new ArrayList<>();
+
+        graph = new HashMap<>();
+        lines = new ArrayList<>();
+    }
+
+    @Test
+    public void overlappingCoalesce() {
+        /*    b+d and b+e are move pairs
+         *
+         *     b   e         b
+         *    / \ /         / \
+         *   a   c    ->   a   c
+         *    \ /
+         *     d
+         */
+
+        GraphColorer.colors = new AssemblyPhysicalRegister[]{
+                AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RBX
+        };
+
+        an.add(b); an.add(d);
+        bn.add(a); bn.add(c);
+        cn.add(b); cn.add(d); cn.add(e);
+        dn.add(a); dn.add(c);
+        en.add(c);
+        graph.put(a, an); graph.put(b, bn); graph.put(c, cn); graph.put(d, dn); graph.put(e, en);
+
+        lines.add(new AssemblyInstruction(OpCode.MOVQ, b, d));
+        lines.add(new AssemblyInstruction(OpCode.MOVQ, b, e));
+
+        GraphColorer gc = new GraphColorer(graph, lines);
+        boolean colored = gc.colorGraph();
+        Assert.assertTrue(colored);
+
+        printColoring(gc.getColoring());
+    }
+
+    @Test
+    public void actualSpill() {
+        /*  Either one or two nodes become actual spill nodes.
+         *
+         *     b
+         *    / \
+         *   a   c
+         *    \ / \
+         *     e - d
+         */
+
+        GraphColorer.colors = new AssemblyPhysicalRegister[]{
+                AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RBX
+        };
+
+        an.add(b); an.add(e);
+        bn.add(a); bn.add(c);
+        cn.add(b); cn.add(d); cn.add(e);
+        dn.add(c); dn.add(e);
+        en.add(a); en.add(c); en.add(d);
+        graph.put(a, an); graph.put(b, bn); graph.put(c, cn); graph.put(d, dn); graph.put(e, en);
+
+        lines.add(new AssemblyInstruction(OpCode.MOVQ, a, c));
+
+        GraphColorer gc = new GraphColorer(graph, lines);
+        boolean colored = gc.colorGraph();
+        Assert.assertFalse(colored);
+
+        printColoring(gc.getColoring());
     }
 
     @Test
@@ -53,16 +122,15 @@ public class GraphColorerTests {
          *   a   c
          */
 
-        AssemblyPhysicalRegister[] colors = {AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RBX};
-        GraphColorer.colors = colors;
+        GraphColorer.colors = new AssemblyPhysicalRegister[]{
+                AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RBX
+        };
 
-        Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph = new HashMap<>();
         an.add(b);
         bn.add(a); bn.add(c);
         cn.add(b);
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn);
 
-        List<AssemblyLine> lines = new ArrayList<>();
         lines.add(new AssemblyInstruction(OpCode.MOVQ, a, c));
 
         GraphColorer gc = new GraphColorer(graph, lines);
@@ -84,17 +152,16 @@ public class GraphColorerTests {
          *     d
          */
 
-        AssemblyPhysicalRegister[] colors = {AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RBX};
-        GraphColorer.colors = colors;
+        GraphColorer.colors = new AssemblyPhysicalRegister[]{
+                AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RBX
+        };
 
-        Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph = new HashMap<>();
         an.add(b); an.add(d);
         bn.add(a); bn.add(c);
         cn.add(b); cn.add(d);
         dn.add(a); dn.add(c);
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn); graph.put(d, dn);
 
-        List<AssemblyLine> lines = new ArrayList<>();
         lines.add(new AssemblyInstruction(OpCode.MOVQ, a, c));
         lines.add(new AssemblyInstruction(OpCode.MOVQ, b, d));
 
@@ -114,16 +181,15 @@ public class GraphColorerTests {
          *   a   c
          */
 
-        AssemblyPhysicalRegister[] colors = {AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RBX};
-        GraphColorer.colors = colors;
+        GraphColorer.colors =
+                new AssemblyPhysicalRegister[]{AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RBX};
 
-        Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph = new HashMap<>();
         an.add(b);
         bn.add(a); bn.add(c);
         cn.add(b);
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn);
 
-        GraphColorer gc = new GraphColorer(graph, new ArrayList<>());
+        GraphColorer gc = new GraphColorer(graph, lines);
         boolean colored = gc.colorGraph();
         Assert.assertTrue(colored);
 
@@ -134,16 +200,14 @@ public class GraphColorerTests {
     public void fiveNodeTest() {
         // a 5-node perfect graph with 5 available colors
 
-        AssemblyPhysicalRegister[] colors = {
+        GraphColorer.colors = new AssemblyPhysicalRegister[]{
                 AssemblyPhysicalRegister.RAX,
                 AssemblyPhysicalRegister.RBX,
                 AssemblyPhysicalRegister.RCX,
                 AssemblyPhysicalRegister.R8,
                 AssemblyPhysicalRegister.R9
         };
-        GraphColorer.colors = colors;
 
-        Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph = new HashMap<>();
         an.add(b); an.add(c); an.add(d); an.add(e);
         bn.add(a); bn.add(c); bn.add(d); bn.add(e);
         cn.add(a); cn.add(b); cn.add(d); cn.add(e);
@@ -151,16 +215,18 @@ public class GraphColorerTests {
         en.add(a); en.add(b); en.add(c); en.add(d);
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn); graph.put(d, dn); graph.put(e, en);
 
-        GraphColorer gc = new GraphColorer(graph, new ArrayList<>());
+        GraphColorer gc = new GraphColorer(graph, lines);
         boolean colored = gc.colorGraph();
         Assert.assertTrue(colored);
 
         printColoring(gc.getColoring());
     }
 
-    public static void printColoring(Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> coloring) {
+    public void printColoring(Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> coloring) {
+        System.out.println("\n" + GraphColorer.colors.length + " available colors");
+        System.out.println(graph.size() + " nodes in the graph");
         for (AssemblyAbstractRegister n : coloring.keySet()) {
-            System.out.println(coloring.get(n));
+            System.out.println(n + " -> " + coloring.get(n));
         }
     }
 }
