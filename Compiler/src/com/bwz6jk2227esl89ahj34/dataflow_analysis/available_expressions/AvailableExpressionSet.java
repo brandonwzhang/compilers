@@ -16,12 +16,21 @@ public class AvailableExpressionSet extends LatticeElement {
         this.exprs = new HashSet<IRExpr>(set);
     }
 
+    // TODO
+    /*
+        Keep a hashset of known exprs
+        When creating one, see if it's used in the hashset (structural equality)
+        If it is, use that reference in the hashset (discarding newly created expr)
+        If not, put it in
+     */
+
     public LatticeElement copy() {
         Set<IRExpr> newExprs = new HashSet<>();
         newExprs.addAll(exprs);
         return new AvailableExpressionSet(newExprs);
     }
 
+    // checks structural equality
     public boolean equals(LatticeElement element) {
         if (!(element instanceof AvailableExpressionSet)) {
             return false;

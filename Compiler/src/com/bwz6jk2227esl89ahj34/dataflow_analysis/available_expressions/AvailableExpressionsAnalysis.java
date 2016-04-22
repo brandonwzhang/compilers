@@ -155,20 +155,19 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         for (IRStmt s : seq.stmts()) {
             if (s instanceof IRCJump) {
                 IRCJump cjump = (IRCJump)s;
-                set.add(cjump.expr());
+                addSubexprs(cjump.expr(), set);
             }
             if (s instanceof IRExp) {
                 IRExp exp = (IRExp)s;
-                set.add(exp.expr());
+                addSubexprs(exp.expr(), set);
             }
             if (s instanceof IRJump) {
                 IRJump jump = (IRJump)s;
-                set.add(jump.target());
+                addSubexprs(jump.target(), set);
             }
             if (s instanceof IRMove) {
                 IRMove move = (IRMove)s;
-                set.add(move.expr());
-                set.add(move.target()); // TODO do we need this?
+                addSubexprs(move.expr(), set);
             }
         }
 
