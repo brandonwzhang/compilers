@@ -14,8 +14,6 @@ import java.util.List;
  * An intermediate representation for an expression evaluated under side effects
  * ESEQ(stmt, expr)
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRESeq extends IRExpr {
     private IRStmt stmt;
     private IRExpr expr;

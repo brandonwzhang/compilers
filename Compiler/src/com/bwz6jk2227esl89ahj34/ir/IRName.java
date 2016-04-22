@@ -11,8 +11,6 @@ import java.util.LinkedList;
  * An intermediate representation for named memory address
  * NAME(n)
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRName extends IRExpr {
     private String name;
 

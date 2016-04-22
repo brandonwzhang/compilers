@@ -12,8 +12,6 @@ import java.util.List;
 /**
  * An intermediate representation for a transfer of control
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRJump extends IRStmt {
     private IRExpr target;
 

@@ -23,6 +23,24 @@ public class CFGIR extends CFG {
         throw new RuntimeException("Jump to non-existent label: " + labelName);
     }
 
+    /**
+     * Returns the index of the first non label after index i
+     */
+    private static int nextNonLabelIndex(int i, List<IRStmt> statements) {
+        if (i < statements.size() - 1) {
+            int next = i + 1;
+            // Don't include IRLabels in this CFG
+            while (statements.get(next) instanceof IRLabel) {
+                if (next >= statements.size()) {
+                    return -1;
+                }
+                next++;
+            }
+            return next;
+        }
+        return -1;
+    }
+
     private static List<Integer> getSuccessors(int i, List<IRStmt> statements) {
         IRStmt statement = statements.get(i);
         if (statement instanceof IRCJump) {
@@ -35,18 +53,10 @@ public class CFGIR extends CFG {
             } else {
                 // If we have no false label, we could fall through to the next
                 // statement
-                if (i < statements.size() - 1) {
-                    int next = i + 1;
-                    // Don't include IRLabels in this CFG
-                    while (statements.get(next) instanceof IRLabel) {
-                        next++;
-                        if (next < statements.size()) {
-                            return successors;
-                        }
-                    }
-                    successors.add(next);
+                int nextInstructionIndex = nextNonLabelIndex(i, statements);
+                if (nextInstructionIndex >= 0) {
+                    successors.add(nextInstructionIndex);
                 }
-
             }
             int trueIndex = indexOfLabel(cjump.trueLabel(), statements);
             successors.add(trueIndex);
@@ -59,27 +69,18 @@ public class CFGIR extends CFG {
             int index = indexOfLabel(labelName, statements);
             successors.add(index);
             return successors;
-        }
-        else if (statement instanceof IRReturn) {
+        } else if (statement instanceof IRReturn) {
             return new LinkedList<>();
         } else {
             // Add the next statement as a successor unless we are at the last
             // statement
             List<Integer> successors = new LinkedList<>();
-            if (i < statements.size() - 1) {
-                int next = i + 1;
-                // Don't include IRLabels in this CFG
-                while (statements.get(next) instanceof IRLabel) {
-                    next++;
-                    if (next < statements.size()) {
-                        return successors;
-                    }
-                }
-                successors.add(next);
+            int nextInstructionIndex = nextNonLabelIndex(i, statements);
+            if (nextInstructionIndex >= 0) {
+                successors.add(nextInstructionIndex);
             }
             return successors;
         }
-
     }
 
     public CFGIR(IRSeq seq) {

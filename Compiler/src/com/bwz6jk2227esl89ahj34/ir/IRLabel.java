@@ -8,8 +8,6 @@ import lombok.EqualsAndHashCode;
 /**
  * An intermediate representation for naming a memory address
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRLabel extends IRStmt {
     private String name;
 

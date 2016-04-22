@@ -16,8 +16,6 @@ import java.util.List;
  * An intermediate representation for a binary operation
  * OP(left, right)
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRBinOp extends IRExpr {
 
     /**

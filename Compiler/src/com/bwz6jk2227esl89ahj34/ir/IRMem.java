@@ -11,8 +11,6 @@ import lombok.EqualsAndHashCode;
  * An intermediate representation for a memory location
  * MEM(e)
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRMem extends IRExpr {
     public enum MemType {
         NORMAL, IMMUTABLE;

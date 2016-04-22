@@ -9,4 +9,5 @@ vm/*
 *.swp
 *.o
 *.dot
+*.png
 *~

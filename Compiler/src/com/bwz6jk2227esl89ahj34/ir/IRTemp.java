@@ -11,8 +11,6 @@ import java.util.LinkedList;
  * An intermediate representation for a temporary register
  * TEMP(name)
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
 public class IRTemp extends IRExpr {
     private String name;
 
@@ -53,16 +51,5 @@ public class IRTemp extends IRExpr {
     public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
         return new IRESeq(new IRSeq(new LinkedList<>()),
                 new IRTemp(((IRTemp)n).name()));
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof IRTemp)) { return false; }
-        else { return ((IRTemp)o).name().equals(name); }
-    }
-
-    @Override
-    public int hashCode() {
-        return name.hashCode();
     }
 }
