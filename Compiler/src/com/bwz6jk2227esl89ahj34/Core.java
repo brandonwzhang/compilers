@@ -10,6 +10,7 @@ import com.bwz6jk2227esl89ahj34.ast.type.TypeException;
 import com.bwz6jk2227esl89ahj34.ast.visit.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyProgram;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGIR;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions.AvailableExpressionsAnalysis;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
         .LiveVariableAnalysis;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
@@ -277,13 +278,14 @@ public class Core {
 
         // Testing IR CFG
         for (String functionName : lirRoot.functions().keySet()) {
-            CFGIR graph =
-                    new CFGIR((IRSeq)lirRoot.functions().get(functionName).body());
+            IRSeq seq = (IRSeq) lirRoot.functions().get(functionName).body();
+            AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(seq);
+
             Util.writeHelper(
-                    "IR_dotfile_" + functionName,
+                    "analysis" + functionName,
                     "dot",
                     "./",
-                    Collections.singletonList(graph.toString())
+                    Collections.singletonList(analysis.toString())
             );
         }
 

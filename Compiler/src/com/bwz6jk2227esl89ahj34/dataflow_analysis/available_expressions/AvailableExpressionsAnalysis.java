@@ -16,74 +16,142 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         super(seq, Direction.FORWARD); //temp; fix if needed -- jihun
     }
 
-    // Returns a set of expressions that are subexpressions of expr
-    // Analogous to powerset
-    private Set<IRExpr> subexprs(IRExpr expr) {
-        HashSet<IRExpr> set = new HashSet<>();
-        addSubexprs(expr, set);
-        return set;
-    }
-
-    // recursive helper function
-    // precondition: IR is lowered
-    private void addSubexprs(IRExpr expr, Set<IRExpr> set) {
-        set.add(expr);
-
-        if (expr instanceof IRBinOp) {
-            IRBinOp binop = (IRBinOp)expr;
-            addSubexprs(binop.left(), set);
-            addSubexprs(binop.right(), set);
-        }
-        if (expr instanceof IRCall) {
-            IRCall call = (IRCall)expr;
-            for (IRExpr e : call.args()) {
-                addSubexprs(e, set);
-            }
-        }
-        if (expr instanceof IRMem) {
-            IRMem mem = (IRMem)expr;
-            addSubexprs(mem.expr(), set);
-        }
-    }
-
-    public AvailableExpressionSet eval(CFGNode node) {
-        IRStmt stmt = ((CFGNodeIR) node).getStatement();
-        assert stmt != null;
-
+    // given a seq, return the "top"
+    public AvailableExpressionSet allExprs(IRSeq seq) {
         Set<IRExpr> set = new HashSet<>();
-        // Always lowered IR
-        if (stmt instanceof IRMove) {
-            IRMove move = (IRMove)stmt;
-
-            // x = f(e....)
-            if (move.expr() instanceof IRCall) {
-                for (IRExpr e : ((IRCall)move.expr()).args()) {
-                    set.add(e);
-                    set.addAll(subexprs(e));
-                }
-            } else { // x = e
-                set.add(move.expr());
-                set.addAll(subexprs(move.expr()));
+        for (IRStmt s : seq.stmts()) {
+            if (s instanceof IRCJump) {
+                IRCJump cjump = (IRCJump)s;
+                addSubexprs(cjump.expr(), set);
             }
-
-            // [e1] = [e2]
-            if (move.target() instanceof IRMem) {
-                set.add(move.target());
-                set.addAll(subexprs(move.target()));
+            if (s instanceof IRExp) {
+                IRExp exp = (IRExp)s;
+                addSubexprs(exp.expr(), set);
             }
-        }
-        if (stmt instanceof IRCJump) {
-            IRCJump cjump = (IRCJump) stmt;
-
-            // if (e)
-            set.add(cjump.expr());
-            set.addAll(subexprs(cjump.expr()));
+            if (s instanceof IRJump) {
+                IRJump jump = (IRJump)s;
+                addSubexprs(jump.target(), set);
+            }
+            if (s instanceof IRMove) {
+                IRMove move = (IRMove)s;
+                addSubexprs(move.target(), set); // TODO: should we have this?
+                addSubexprs(move.expr(), set);
+            }
         }
 
         return new AvailableExpressionSet(set);
-
     }
 
+    /**
+     * Updates the node's equations as detailed below in comments.
+     * @param node
+     */
+    public void transfer(CFGNode node) {
+        assert node instanceof CFGNodeIR;
+
+        // in[n] = intersection over all out[n'], where n' is pred of n
+        Set<LatticeElement> pred_outs = new HashSet<>();
+        for (CFGNode pred : node.getPredecessors()) {
+            pred_outs.add(pred.getOut());
+        }
+        node.setIn(meet(pred_outs));
+
+        // out[n] = in[n] U eval[n] - kill[n]
+        Set<IRExpr> out;
+        // TODO FIX
+        if (node.getIn() instanceof LatticeTop) {
+            out = eval(node).getExprs();
+        }
+        else {
+            out = new HashSet<IRExpr>(((AvailableExpressionSet)node.getIn()).getExprs());
+            out.addAll(eval(node).getExprs());
+        }
+        kill(node, out); // removes kill[n]
+        node.setOut(new AvailableExpressionSet(out));
+    }
+
+
+    /**
+     * Applies the meet operator (intersection)
+     * @param elements
+     * @return
+     */
+    public LatticeElement meet(Set<LatticeElement> elements) {
+
+        // start with Top
+        LatticeElement meet = new LatticeTop();
+
+        // intersect over all elements
+        for (LatticeElement element : elements) {
+            if (element instanceof LatticeBottom) {
+                return element; // return bottom, can't get less informative
+            }
+            if (element instanceof LatticeTop) {
+                continue; // Top = {all exprs}
+            }
+
+            // now element must be type AvailableExpressionSet
+            if (meet instanceof LatticeTop) {
+                meet = new AvailableExpressionSet(((AvailableExpressionSet)element).getExprs());
+            }
+            else {
+                // intersect
+                ((AvailableExpressionSet)meet).getExprs().retainAll(((AvailableExpressionSet)element).getExprs());
+            }
+        }
+
+        return meet;
+    }
+
+    /**
+     * Returns the LatticeElement of eval[node]
+     * @param node
+     * @return
+     */
+     public AvailableExpressionSet eval(CFGNode node) {
+         assert node instanceof CFGNodeIR;
+         IRStmt stmt = ((CFGNodeIR) node).getStatement();
+         assert stmt != null;
+
+         Set<IRExpr> set = new HashSet<>();
+         // Always lowered IR
+         if (stmt instanceof IRMove) {
+             IRMove move = (IRMove)stmt;
+
+             // x = f(e....)
+             if (move.expr() instanceof IRCall) {
+                 for (IRExpr e : ((IRCall)move.expr()).args()) {
+                     set.add(e);
+                     set.addAll(subexprs(e));
+                 }
+             } else { // x = e
+                 set.add(move.expr());
+                 set.addAll(subexprs(move.expr()));
+             }
+
+             // [e1] = [e2]
+             if (move.target() instanceof IRMem) {
+                 set.add(move.target());
+                 set.addAll(subexprs(move.target()));
+             }
+         }
+         if (stmt instanceof IRCJump) {
+             IRCJump cjump = (IRCJump) stmt;
+
+             // if (e)
+             set.add(cjump.expr());
+             set.addAll(subexprs(cjump.expr()));
+         }
+
+         return new AvailableExpressionSet(set);
+
+     }
+
+    /**
+     * Removes kill[node] from the set out
+     * @param node
+     * @param out
+     */
     public void kill(CFGNode node, Set<IRExpr> out) {
         // destructively modify out to remove kill[node]
         IRStmt stmt = ((CFGNodeIR)node).getStatement();
@@ -94,7 +162,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
 
             // x = e
             if (move.target() instanceof IRTemp){
-                IRTemp x = (IRTemp)move.expr();
+                IRTemp x = (IRTemp)move.target();
                 for (Iterator<IRExpr> i = out.iterator(); i.hasNext();) {
                     IRExpr expr = i.next();
                     // remove if expr contains any usage of x
@@ -126,6 +194,39 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         }
     }
 
+
+    // Returns a set of expressions that are subexpressions of expr
+    // Analogous to powerset
+    private Set<IRExpr> subexprs(IRExpr expr) {
+        HashSet<IRExpr> set = new HashSet<>();
+        addSubexprs(expr, set);
+        return set;
+    }
+
+    // recursive helper function
+    // precondition: IR is lowered
+    private void addSubexprs(IRExpr expr, Set<IRExpr> set) {
+        set.add(expr);
+
+        if (expr instanceof IRBinOp) {
+            IRBinOp binop = (IRBinOp)expr;
+            addSubexprs(binop.left(), set);
+            addSubexprs(binop.right(), set);
+        }
+        if (expr instanceof IRCall) {
+            IRCall call = (IRCall)expr;
+            for (IRExpr e : call.args()) {
+                addSubexprs(e, set);
+            }
+        }
+        if (expr instanceof IRMem) {
+            IRMem mem = (IRMem)expr;
+            addSubexprs(mem.expr(), set);
+        }
+    }
+
+
+
     /**
      * Takes in an IRExpr tree (lowered), and searches for a node that passes the predicate
      * specified by filter.
@@ -152,50 +253,5 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         return filter.test(expr);
     }
 
-
-    public void transfer(CFGNode node) {
-        // in[n] = intersection over all out[n'], where n' is pred of n
-        Set<LatticeElement> pred_outs = new HashSet<>();
-        for (CFGNode pred : node.getPredecessors()) {
-            pred_outs.add(pred.getOut());
-        }
-        node.setIn(meet(pred_outs));
-
-        // out[n] = in[n] U eval[n] - kill[n]
-        Set<IRExpr> out = new HashSet<IRExpr>(((AvailableExpressionSet)node.getIn()).getExprs());
-        out.addAll(eval(node).getExprs());
-        //out.removeAll(kill(node).getExprs());
-        kill(node, out);
-        node.setOut(new AvailableExpressionSet(out));
-    }
-
-
-    public LatticeElement meet(Set<LatticeElement> elements) {
-        assert elements.size() >= 2;
-
-        // start with Top
-        LatticeElement meet = new LatticeTop();
-
-        // intersect over all elements
-        for (LatticeElement element : elements) {
-            if (element instanceof LatticeBottom) {
-                return element; // return bottom, can't get less informative
-            }
-            if (element instanceof LatticeTop) {
-                continue; // Top = {all exprs}
-            }
-
-            // now element must be type AvailableExpressionSet
-            if (meet instanceof LatticeTop) {
-                meet = new AvailableExpressionSet(((AvailableExpressionSet)element).getExprs());
-            }
-            else {
-                // intersect
-                ((AvailableExpressionSet)meet).getExprs().retainAll(((AvailableExpressionSet)element).getExprs());
-            }
-        }
-
-        return meet;
-    }
 
 }

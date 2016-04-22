@@ -30,4 +30,8 @@ public class AvailableExpressionSet extends LatticeElement {
         }
     }
 
+    public String toString() {
+        return exprs.toString().replace('\n', ' ');
+    }
+
 }
