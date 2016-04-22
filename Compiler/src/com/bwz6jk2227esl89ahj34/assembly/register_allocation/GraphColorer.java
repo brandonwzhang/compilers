@@ -40,7 +40,7 @@ public class GraphColorer {
     // nodes are added to this stack as we remove them
     private Stack<AssemblyAbstractRegister> removedNodes;
 
-    // nodes that are removed are added here and retained in 'graph'
+    // nodes that are removed are added here and are retained in 'graph'
     private Set<AssemblyAbstractRegister> removed;
 
     // nodes that are potentially spill nodes
@@ -220,11 +220,18 @@ public class GraphColorer {
     }
 
     /**
-     * A method for selecting a random valid color.
+     * A method for selecting a random valid color. Returns null if all of
+     * the valid registers are excluded.
+     *
      * @param exclude registers that should be excluded from the selection
      * @return a random valid register
      */
     public static AssemblyPhysicalRegister assignColor(Set<AssemblyPhysicalRegister> exclude) {
+
+        if (exclude.containsAll(Arrays.asList(colors))) {
+            return null;
+        }
+
         // case where there is no available color
         AssemblyPhysicalRegister color = colors[(int) Math.floor(Math.random() * colors.length)];
         while (exclude.contains(color)) {
@@ -232,7 +239,17 @@ public class GraphColorer {
         }
         return color;
     }
-    
+
+    /**
+     * Merges two nodes in the interference graph. Should not be called
+     * if an edge exists between the two nodes.
+     *
+     * t1 gains edges to all of t2's neighbors (if t1 already has an edge to
+     * a neighbor of t2, a second edge is not added). t2 and all edges
+     * connected to it are removed.
+     *
+     * Requires: both nodes must be in the graph
+     */
     public void combineNodes(AssemblyAbstractRegister t1, AssemblyAbstractRegister t2) {
 
         for (AssemblyAbstractRegister node : graph.get(t2)) {
@@ -267,6 +284,14 @@ public class GraphColorer {
         return false;
     }
 
+    /**
+     * Returns a node in that can be removed at the simplify stage.
+     *
+     * A node is removable if:
+     *      (1) it has less neighbors than the number of colors
+     *      (2) it is not a pre-colored node
+     *      (3) it is not a move-related node
+     */
     public Optional<AssemblyAbstractRegister> getRemovableNode() {
         for (AssemblyAbstractRegister node : graph.keySet()) {
             if (graph.get(node).size() < colors.length && !removed.contains(node) && !coloring.containsKey(node) && !isMoveRelated(node)) {
@@ -290,6 +315,17 @@ public class GraphColorer {
         return result;
     }
 
+    /**
+     * Simplifying a graph means removing nodes of insignificant degree.
+     * A call to simplify will remove nodes until all of the nodes left
+     * are move-related or have significant degree.
+     *
+     * Let K be the number of available colors.
+     * Significant: K or more neighbors
+     * Insignificant: less than K neighbors
+     *
+     * @return True if any nodes were removed. False otherwise.
+     */
     public boolean simplify() {
 
         boolean changed = false;
@@ -297,7 +333,7 @@ public class GraphColorer {
         while (true) {
             Optional<AssemblyAbstractRegister> removable = getRemovableNode();
             if (!removable.isPresent()) {
-                break;
+                break;  // cannot simplify further
             }
 
             AssemblyAbstractRegister removedNode = removable.get();
@@ -306,6 +342,7 @@ public class GraphColorer {
             removed.add(removedNode);
 
             for (AssemblyAbstractRegister neighbor : graph.get(removedNode)) {
+                // remove removedNode from the adjacency lists of its neighbors
                 graph.get(neighbor).remove(removedNode);
             }
 
@@ -333,6 +370,10 @@ public class GraphColorer {
         return result;
     }
 
+    /**
+     * @return True if at least one pair of nodes was coalesced.
+     *         False otherwise.
+     */
     public boolean coalesce() {
 
         boolean coalescingOccurred = false;
@@ -377,12 +418,14 @@ public class GraphColorer {
         AssemblyAbstractRegister frozen = null;
         for (MovePair pair : movePairs) {
 
+            // pick a move-related node of insignificant degree to freeze
             if (graph.get(pair.left).size() < colors.length) {
                 frozen = pair.left;
             } else if (graph.get(pair.right).size() < colors.length) {
                 frozen = pair.right;
             }
 
+            // give up on all move pairs that contain the node we are freezing
             if (frozen != null) {
                 Set<MovePair> removeSet = new HashSet<>();
                 for (MovePair pair_ : movePairs) {
@@ -408,9 +451,9 @@ public class GraphColorer {
      * mark it as a potential spill node. Continue simplify-coalesce-freeze.
      *
      * Once the graph is empty, begin adding nodes back and coloring as we go.
-     * Potential spill nodes are added at the appropriate time, but are colored
-     * last. If they cannot be colored, then they become actual spill nodes,
-     * and the graph coloring fails.
+     * Potential spill nodes are added back at the appropriate time, but they
+     * are colored last. If they cannot be colored, then they become actual
+     * spill nodes, and the graph coloring fails.
      *
      * @return True if the graph was successfully colored. False otherwise.
      */
