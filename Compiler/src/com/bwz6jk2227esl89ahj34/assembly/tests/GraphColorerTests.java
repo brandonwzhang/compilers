@@ -1,6 +1,9 @@
 package com.bwz6jk2227esl89ahj34.assembly.tests;
 
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyAbstractRegister;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyPhysicalRegister;
 import com.bwz6jk2227esl89ahj34.assembly.register_allocation.GraphColorer;
 import org.junit.Assert;
@@ -18,6 +21,42 @@ public class GraphColorerTests {
     @Before
     public void setUp() {
 
+    }
+
+    @Test
+    public void moveCoalesceThreeNode() {
+        /*
+         *     b
+         *    / \
+         *   a   c
+         */
+
+        AssemblyPhysicalRegister[] colors = {AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RBX};
+        GraphColorer.colors = colors;
+
+        AssemblyAbstractRegister a = new AssemblyAbstractRegister();
+        AssemblyAbstractRegister b = new AssemblyAbstractRegister();
+        AssemblyAbstractRegister c = new AssemblyAbstractRegister();
+
+        Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph = new HashMap<>();
+        List<AssemblyAbstractRegister> an = new ArrayList<>(); an.add(b);
+        List<AssemblyAbstractRegister> bn = new ArrayList<>(); bn.add(a); bn.add(c);
+        List<AssemblyAbstractRegister> cn = new ArrayList<>(); cn.add(b);
+        graph.put(a, an); graph.put(b, bn); graph.put(c, cn);
+
+        List<AssemblyLine> lines = new ArrayList<>();
+        lines.add(new AssemblyInstruction(OpCode.MOVQ, a, c));
+
+        GraphColorer gc = new GraphColorer(graph, lines);
+        boolean colored = gc.colorGraph();
+        Assert.assertTrue(colored);
+        Assert.assertEquals(0, lines.size());
+
+        Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> coloring = gc.getColoring();
+        System.out.println(coloring.get(a));
+        System.out.println(coloring.get(b));
+        System.out.println(coloring.get(c));
+        System.out.println(lines.size());
     }
 
     @Test
@@ -41,7 +80,7 @@ public class GraphColorerTests {
         List<AssemblyAbstractRegister> cn = new ArrayList<>(); cn.add(b);
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn);
 
-        GraphColorer gc = new GraphColorer(graph);
+        GraphColorer gc = new GraphColorer(graph, new ArrayList<>());
         boolean colored = gc.colorGraph();
         Assert.assertTrue(colored);
 
@@ -78,7 +117,7 @@ public class GraphColorerTests {
         List<AssemblyAbstractRegister> en = new ArrayList<>(); en.add(a); en.add(b); en.add(c); en.add(d);
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn); graph.put(d, dn); graph.put(e, en);
 
-        GraphColorer gc = new GraphColorer(graph);
+        GraphColorer gc = new GraphColorer(graph, new ArrayList<>());
         boolean colored = gc.colorGraph();
         Assert.assertTrue(colored);
 
