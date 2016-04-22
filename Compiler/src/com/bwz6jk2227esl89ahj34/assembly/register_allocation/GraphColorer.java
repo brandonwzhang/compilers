@@ -372,6 +372,24 @@ public class GraphColorer {
     }
 
     /**
+     * Returns true if the two given nodes can be coalesced.
+     *
+     * Requires: t1 and t2 do not have an edge between them
+     */
+    public boolean canCoalesce(AssemblyAbstractRegister a, AssemblyAbstractRegister b) {
+        List<AssemblyAbstractRegister> a_neighbors = graph.get(a);
+        List<AssemblyAbstractRegister> b_neighbors = graph.get(b);
+        for (AssemblyAbstractRegister neighbor : a_neighbors) {
+            // George's conservative coalescing
+            if (!b_neighbors.contains(neighbor) && graph.get(neighbor).size() >= colors.length) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @return True if at least one pair of nodes was coalesced.
      *         False otherwise.
      */
@@ -385,7 +403,7 @@ public class GraphColorer {
             for (MovePair pair : movePairs) {
                 AssemblyAbstractRegister t1 = pair.left;
                 AssemblyAbstractRegister t2 = pair.right;
-                if (coalescedDegree(t1, t2) <= colors.length) {
+                if (canCoalesce(t1, t2)) {
                     System.out.println("--coalescing: " + t1 + " and " + t2);
                     coalesced.add(pair);
                     combineNodes(t1, t2);
