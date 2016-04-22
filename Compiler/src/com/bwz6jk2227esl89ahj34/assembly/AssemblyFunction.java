@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34.assembly;
 
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
+import com.bwz6jk2227esl89ahj34.assembly.register_allocation.RegisterAllocator;
 import com.bwz6jk2227esl89ahj34.assembly.tiles.TileContainer;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
         .LiveVariableAnalysis;
@@ -45,25 +46,21 @@ public class AssemblyFunction {
             functionBody.addAll(TileContainer.matchStatement(statement));
         }
 
-        // generateFunctionPrologue needs to be called after the body has been
-        // generated to know the number of spilled temps that need to be allocated
-
         // Testing live variable analysis
-        List<AssemblyLine> liveVarsLines = new LinkedList<>();
-        liveVarsLines.addAll(generateFunctionPrologue());
-        liveVarsLines.addAll(functionBody);
-        liveVarsLines.addAll(generateFunctionEpilogue());
-        LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(liveVarsLines);
+        LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(lines);
         Util.writeHelper(
                 "live_variables_" + name,
                 "dot",
                 "./",
                 Collections.singletonList(liveVariables.toString())
         );
-        // End live variable analysis
 
+        functionBody = RegisterAllocator.translate(functionBody);
+
+        // generateFunctionPrologue() needs to be called after the registers
+        // have been allocated to know how many spilled temps there are
         lines.addAll(generateFunctionPrologue());
-        lines.addAll(RegisterAllocator.translate(functionBody));
+        lines.addAll(functionBody);
         lines.addAll(generateFunctionEpilogue());
     }
 
@@ -97,8 +94,8 @@ public class AssemblyFunction {
         // Make space for scratch registers
         stackFrameSize += Configuration.WORD_SIZE * numScratchRegisters; // RAX, RDX;
 
-        // Make space for temps
-        stackFrameSize += Configuration.WORD_SIZE * AssemblyAbstractRegister.counter;
+        // Make space for spilled temps
+        stackFrameSize += Configuration.WORD_SIZE * RegisterAllocator.numSpilledTemps;
 
         // Make space for arguments
         stackFrameSize += Configuration.WORD_SIZE * maxNumArguments;
@@ -200,7 +197,7 @@ public class AssemblyFunction {
      * Returns lowest memory address in the argument space
      */
     public static int getArgumentsOffset() {
-        return getTempSpaceOffset() + Configuration.WORD_SIZE * AssemblyAbstractRegister.counter +
+        return getTempSpaceOffset() + Configuration.WORD_SIZE * RegisterAllocator.numSpilledTemps +
                 padding + Configuration.WORD_SIZE * (maxNumArguments - 1);
     }
 

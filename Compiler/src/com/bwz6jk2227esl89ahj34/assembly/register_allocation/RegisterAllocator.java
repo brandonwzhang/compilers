@@ -1,23 +1,48 @@
-package com.bwz6jk2227esl89ahj34.assembly;
+package com.bwz6jk2227esl89ahj34.assembly.register_allocation;
 
+import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
-import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
+        .LiveVariableAnalysis;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
+        .LiveVariableSet;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RegisterAllocator {
-    private static Map<AssemblyAbstractRegister, AssemblyExpression> registerMap = new HashMap<>();
+    public static final AssemblyPhysicalRegister[] shuttleRegisters = {AssemblyPhysicalRegister.R13,
+            AssemblyPhysicalRegister.R14, AssemblyPhysicalRegister.R15};
+    private static Map<AssemblyAbstractRegister, AssemblyExpression> registerMap;
     // Counts the number of spilled temps that have been encountered in an instruction
     // For each instruction, this should be reset to 0
-    private static int numSpilledTemps = 0;
+    private static int shuttleRegisterIndex;
+    // Number of spilled temps we need for this function
+    public static int numSpilledTemps;
 
     /**
      * Returns a list of instructions with all abstract registers with physical locations
      */
     public static List<AssemblyLine> translate(List<AssemblyLine> lines) {
+        // Perform live variable analysis to construct interference sets
+        LiveVariableAnalysis liveVars = new LiveVariableAnalysis(lines);
+        List<Set<AssemblyAbstractRegister>> interferenceSets = new LinkedList<>();
+        for (CFGNode node : liveVars.getGraph().getNodes().values()) {
+            LatticeElement element = node.getIn();
+            interferenceSets.add(((LiveVariableSet) element).getLiveVars());
+        }
+        // Use Kempe's algorithm to allocate physical locations to abstract registers
+        registerMap = new HashMap<>();// TODO: Call Andy's code on interferenceSets
+        // Count the number of spilled temps we have
+        numSpilledTemps = 0;
+        for (AssemblyExpression expression : registerMap.values()) {
+            if (expression instanceof AssemblyMemoryLocation) {
+                numSpilledTemps++;
+            }
+        }
+
+        // Translate all the instructions
         List<AssemblyLine> translatedLines = new LinkedList<>();
         for (AssemblyLine line : lines) {
             // For each instruction we may need to shuttle temps in and out if
@@ -41,7 +66,7 @@ public class RegisterAllocator {
         lines.add(instruction);
 
         List<AssemblyExpression> args = instruction.args;
-        numSpilledTemps = 0;
+        shuttleRegisterIndex = 0;
         // Translate every argument and add any extra lines needed for shuttling
         for (int i = 0; i < args.size(); i++) {
             AssemblyExpression arg = args.get(i);
@@ -96,16 +121,14 @@ public class RegisterAllocator {
      */
     private static AssemblyPhysicalRegister shuttleRegister(AssemblyMemoryLocation location,
                                                             List<AssemblyLine> lines) {
-        AssemblyPhysicalRegister[] shuttleRegisters = {AssemblyPhysicalRegister.R13,
-                AssemblyPhysicalRegister.R14, AssemblyPhysicalRegister.R15};
-        AssemblyPhysicalRegister shuttleRegister = shuttleRegisters[numSpilledTemps];
+        AssemblyPhysicalRegister shuttleRegister = shuttleRegisters[shuttleRegisterIndex];
         // Shuttle temp in by adding a move instruction to the beginning
         lines.add(0, new AssemblyInstruction(OpCode.MOVQ,
                 location, shuttleRegister));
         // Shuttle temp out by adding a move instruction to the end
         lines.add(new AssemblyInstruction(OpCode.MOVQ,
                 shuttleRegister, location));
-        numSpilledTemps++;
+        shuttleRegisterIndex++;
         return shuttleRegister;
     }
 
@@ -119,10 +142,6 @@ public class RegisterAllocator {
                     mapping instanceof AssemblyMemoryLocation;
             return mapping;
         }
-        // Naive register allocation: we assign each temp a location on the stack corresponding to its id
-        int stackOffset = AssemblyFunction.getTempSpaceOffset() + Configuration.WORD_SIZE * register.id;
-        AssemblyMemoryLocation spillLocation = AssemblyMemoryLocation.stackOffset(stackOffset);
-        registerMap.put(register, spillLocation);
-        return spillLocation;
+        throw new RuntimeException("Abstract Register " + register + " is not mapped");
     }
 }

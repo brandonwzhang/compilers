@@ -4,27 +4,55 @@ import com.bwz6jk2227esl89ahj34.assembly.AssemblyFunction;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
 import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;
+import lombok.Data;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Data
 public abstract class DataflowAnalysis {
     public enum Direction {
         FORWARD, BACKWARD
     }
 
     private CFG graph;
+    private LatticeElement top;
+    private LatticeElement bottom;
 
     public DataflowAnalysis(List<AssemblyLine> lines, Direction direction) {
         this.graph = new CFGAssembly(lines);
         fixpoint(direction);
+        top = new LatticeTop();
+        bottom = new LatticeBottom();
+    }
+
+    public DataflowAnalysis(List<AssemblyLine> lines,
+                            Direction direction,
+                            LatticeElement top,
+                            LatticeElement bottom) {
+        this.graph = new CFGAssembly(lines);
+        fixpoint(direction);
+        this.top = top;
+        this.bottom = bottom;
     }
 
     public DataflowAnalysis(IRSeq seq, Direction direction) {
         this.graph = new CFGIR(seq);
         fixpoint(direction);
+        top = new LatticeTop();
+        bottom = new LatticeBottom();
+    }
+
+    public DataflowAnalysis(IRSeq seq,
+                            Direction direction,
+                            LatticeElement top,
+                            LatticeElement bottom) {
+        this.graph = new CFGIR(seq);
+        fixpoint(direction);
+        this.top = top;
+        this.bottom = bottom;
     }
 
     public abstract void transfer(CFGNode node);
@@ -37,8 +65,8 @@ public abstract class DataflowAnalysis {
         // Initialize the in and out of each node and add it to the worklist
         for (CFGNode node : nodes.values()) {
             // Initialize all in and out to be top
-            node.setIn(new LatticeTop());
-            node.setOut(new LatticeTop());
+            node.setIn(top.copy());
+            node.setOut(top.copy());
             worklist.add(node);
         }
         while (!worklist.isEmpty()) {
