@@ -3,6 +3,8 @@ package com.bwz6jk2227esl89ahj34.ir;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.List;
 /**
  * An intermediate representation for a transfer of control
  */
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class IRJump extends IRStmt {
     private IRExpr target;
 

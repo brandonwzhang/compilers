@@ -35,7 +35,7 @@ public class CFGIR extends CFG {
             } else {
                 // If we have no false label, we could fall through to the next
                 // statement
-                if (i < statements.size() - 1)  {
+                if (i < statements.size() - 1) {
                     int next = i + 1;
                     // Don't include IRLabels in this CFG
                     while (statements.get(next) instanceof IRLabel) {
@@ -60,7 +60,7 @@ public class CFGIR extends CFG {
             successors.add(index);
             return successors;
         }
-        else if (statement instanceof IRReturn){
+        else if (statement instanceof IRReturn) {
             return new LinkedList<>();
         } else {
             // Add the next statement as a successor unless we are at the last

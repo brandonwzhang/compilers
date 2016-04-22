@@ -5,6 +5,8 @@ import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +17,8 @@ import java.util.List;
  * An intermediate representation for a function call
  * CALL(e_target, e_1, ..., e_n)
  */
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class IRCall extends IRExpr {
     private IRExpr target;
     private List<IRExpr> args;
