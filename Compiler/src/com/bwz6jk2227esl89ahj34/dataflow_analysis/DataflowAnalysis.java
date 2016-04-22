@@ -23,9 +23,9 @@ public abstract class DataflowAnalysis {
 
     public DataflowAnalysis(List<AssemblyLine> lines, Direction direction) {
         this.graph = new CFGAssembly(lines);
-        fixpoint(direction);
         top = new LatticeTop();
         bottom = new LatticeBottom();
+        fixpoint(direction);
     }
 
     public DataflowAnalysis(List<AssemblyLine> lines,
@@ -33,16 +33,16 @@ public abstract class DataflowAnalysis {
                             LatticeElement top,
                             LatticeElement bottom) {
         this.graph = new CFGAssembly(lines);
-        fixpoint(direction);
         this.top = top;
         this.bottom = bottom;
+        fixpoint(direction);
     }
 
     public DataflowAnalysis(IRSeq seq, Direction direction) {
         this.graph = new CFGIR(seq);
-        fixpoint(direction);
         top = new LatticeTop();
         bottom = new LatticeBottom();
+        fixpoint(direction);
     }
 
     public DataflowAnalysis(IRSeq seq,
@@ -50,9 +50,9 @@ public abstract class DataflowAnalysis {
                             LatticeElement top,
                             LatticeElement bottom) {
         this.graph = new CFGIR(seq);
-        fixpoint(direction);
         this.top = top;
         this.bottom = bottom;
+        fixpoint(direction);
     }
 
     public abstract void transfer(CFGNode node);
