@@ -280,7 +280,7 @@ public class Core {
         // Testing IR CFG
         for (String functionName : lirRoot.functions().keySet()) {
             IRSeq seq = (IRSeq) lirRoot.functions().get(functionName).body();
-            AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(seq, AvailableExpressionsAnalysis.allExprs(seq), new LatticeBottom());
+            AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(seq);
 
             Util.writeHelper(
                     "analysis" + functionName,

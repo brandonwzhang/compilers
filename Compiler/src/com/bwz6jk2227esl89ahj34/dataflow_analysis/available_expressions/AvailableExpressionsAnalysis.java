@@ -12,8 +12,10 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
     private Direction direction = Direction.FORWARD;
     private CFGNode startNode;
 
-    public AvailableExpressionsAnalysis(IRSeq seq, LatticeElement top, LatticeElement bottom) {
-        super(seq, Direction.FORWARD, top, bottom); //temp; fix if needed -- jihun
+    public AvailableExpressionsAnalysis(IRSeq seq) {
+        super(seq, Direction.FORWARD, allExprs(seq), new AvailableExpressionSet(new HashSet<IRExpr>()));
+        // top = {all exprs}
+        // bottom = {}
     }
 
 
@@ -46,26 +48,11 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
      */
     public LatticeElement meet(Set<LatticeElement> elements) {
 
-        // start with Top
-        LatticeElement meet = new LatticeTop();
-
-        // intersect over all elements
-        for (LatticeElement element : elements) {
-            if (element instanceof LatticeBottom) {
-                return element; // return bottom, can't get less informative
-            }
-            if (element instanceof LatticeTop) {
-                continue; // Top = {all exprs}
-            }
-
-            // now element must be type AvailableExpressionSet
-            if (meet instanceof LatticeTop) {
-                meet = new AvailableExpressionSet(((AvailableExpressionSet)element).getExprs());
-            }
-            else {
-                // intersect
-                ((AvailableExpressionSet)meet).getExprs().retainAll(((AvailableExpressionSet)element).getExprs());
-            }
+        AvailableExpressionSet meet = (AvailableExpressionSet)top.copy();
+        Set<IRExpr> exprs = meet.getExprs();
+        for (LatticeElement e : elements) {
+            AvailableExpressionSet set = (AvailableExpressionSet)e;
+            exprs.retainAll(set.getExprs());
         }
 
         return meet;
