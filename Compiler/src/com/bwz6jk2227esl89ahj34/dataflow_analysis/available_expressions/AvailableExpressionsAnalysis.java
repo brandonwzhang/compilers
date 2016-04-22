@@ -47,6 +47,9 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
      * @return
      */
     public LatticeElement meet(Set<LatticeElement> elements) {
+        if (elements.isEmpty()) {
+            return new AvailableExpressionSet(new HashSet<IRExpr>());
+        }
 
         AvailableExpressionSet meet = (AvailableExpressionSet)top.copy();
         Set<IRExpr> exprs = meet.getExprs();
@@ -155,20 +158,20 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         for (IRStmt s : seq.stmts()) {
             if (s instanceof IRCJump) {
                 IRCJump cjump = (IRCJump)s;
-                addSubexprs(cjump.expr(), set);
+                set.add(cjump.expr());
             }
             if (s instanceof IRExp) {
                 IRExp exp = (IRExp)s;
-                addSubexprs(exp.expr(), set);
+                set.add(exp.expr());
             }
             if (s instanceof IRJump) {
                 IRJump jump = (IRJump)s;
-                addSubexprs(jump.target(), set);
+                set.add(jump.target());
             }
             if (s instanceof IRMove) {
                 IRMove move = (IRMove)s;
-                addSubexprs(move.target(), set); // TODO: should we have this?
-                addSubexprs(move.expr(), set);
+                set.add(move.expr());
+                set.add(move.target()); // TODO do we need this?
             }
         }
 

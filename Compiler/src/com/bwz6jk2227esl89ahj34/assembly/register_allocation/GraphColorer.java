@@ -1,22 +1,23 @@
 package com.bwz6jk2227esl89ahj34.assembly.register_allocation;
 
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyAbstractRegister;
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyPhysicalRegister;
+import com.bwz6jk2227esl89ahj34.assembly.*;
 
 import java.util.*;
 
 class MovePair {
-    public final AssemblyAbstractRegister left;
-    public final AssemblyAbstractRegister right;
+    final AssemblyAbstractRegister left;
+    final AssemblyAbstractRegister right;
 
-    public MovePair(AssemblyAbstractRegister left, AssemblyAbstractRegister right) {
+    MovePair(AssemblyAbstractRegister left, AssemblyAbstractRegister right) {
         this.left = left;
         this.right = right;
     }
 }
 
+// TODO: check if node interfere before coalescing
 public class GraphColorer {
 
+    // the available colors for the graph
     public static AssemblyPhysicalRegister[] colors = {
             AssemblyPhysicalRegister.RAX,
             AssemblyPhysicalRegister.RBX,
@@ -26,23 +27,63 @@ public class GraphColorer {
 
     private static int K = colors.length;
 
+    // the interference graph
     private Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph;
-    private Stack<AssemblyAbstractRegister> removedNodes;
-    private Set<AssemblyAbstractRegister> removed;
-    private Set<AssemblyAbstractRegister> spillNodes;
-    private Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> coloring;
 
+    // nodes are added to this stack as we remove them
+    private Stack<AssemblyAbstractRegister> removedNodes;
+
+    // nodes that are removed are added here and retained in 'graph'
+    private Set<AssemblyAbstractRegister> removed;
+
+    // nodes that are potentially spill nodes
+    // note that we must re-add nodes in the same order that we removed them,
+    // but we should try to color potential spill nodes after all other nodes
+    // are colored
+    private Set<AssemblyAbstractRegister> spillNodes;
+
+    // the set of node pairs that appear in a mov instruction together
     private Set<MovePair> movePairs;
+
+    // the set of node pairs that were successfully coalesced
     private Set<MovePair> coalesced;
 
+    // a mapping from abstract registers to physical registers
+    // the "coloring" of our interference graph
+    private Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> coloring;
+
+    private List<AssemblyLine> lines;
+
     public GraphColorer(Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph) {
-        this.graph = graph;
+
         this.removedNodes = new Stack<>();
         this.removed = new HashSet<>();
         this.spillNodes = new HashSet<>();
-        this.coloring = new HashMap<>();
         this.movePairs = new HashSet<>();
         this.coalesced = new HashSet<>();
+        this.coloring = new HashMap<>();
+        this.lines = new ArrayList<>();
+
+        this.graph = graph;
+
+        addMovePairs();
+        removeImpossibleMovePairs();
+    }
+
+    public GraphColorer(List<Set<AssemblyAbstractRegister>> liveVariableSets, List<AssemblyLine> lines) {
+
+        this.removedNodes = new Stack<>();
+        this.removed = new HashSet<>();
+        this.spillNodes = new HashSet<>();
+        this.movePairs = new HashSet<>();
+        this.coalesced = new HashSet<>();
+        this.coloring = new HashMap<>();
+        this.lines = lines;
+
+        this.graph = constructInterferenceGraph(liveVariableSets);
+
+        addMovePairs();
+        removeImpossibleMovePairs();
     }
 
     public static Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>>
@@ -81,6 +122,38 @@ public class GraphColorer {
         return graph;
     }
 
+    public void addMovePairs() {
+        for (AssemblyLine line : lines) {
+            if (!(line instanceof AssemblyInstruction)) {
+                continue;
+            }
+            AssemblyInstruction instruction = (AssemblyInstruction) line;
+            if (!(instruction.getOpCode() == AssemblyInstruction.OpCode.MOVQ)) {
+                continue;
+            }
+            List<AssemblyExpression> args = instruction.args;
+
+            boolean isMovePair = args.get(0) instanceof AssemblyAbstractRegister &&
+                    args.get(1) instanceof AssemblyAbstractRegister;
+            if (!isMovePair) {
+                continue;
+            }
+            AssemblyAbstractRegister t1 = (AssemblyAbstractRegister) args.get(0);
+            AssemblyAbstractRegister t2 = (AssemblyAbstractRegister) args.get(1);
+            movePairs.add(new MovePair(t1, t2));
+        }
+    }
+
+    public void removeImpossibleMovePairs() {
+        Set<MovePair> removeSet = new HashSet<>();
+        for (MovePair pair : movePairs) {
+            if (graph.get(pair.left).contains(pair.right) || graph.get(pair.right).contains(pair.left)) {
+                removeSet.add(pair);
+            }
+        }
+        movePairs.removeAll(removeSet);
+    }
+
     public static AssemblyPhysicalRegister assignColor(Set<AssemblyPhysicalRegister> exclude) {
         // case where there is no available color
         AssemblyPhysicalRegister color = colors[(int) Math.floor(Math.random() * colors.length)];
@@ -91,14 +164,6 @@ public class GraphColorer {
     }
 
     public void combineNodes(AssemblyAbstractRegister t1, AssemblyAbstractRegister t2) {
-        if (!graph.containsKey(t1) || !graph.containsKey(t2)) {
-            // one or both nodes do not exist in the graph
-            return;
-        }
-        if (graph.get(t1).contains(t2) || graph.get(t2).contains(t1)) {
-            // these two nodes are connected by an edge
-            return;
-        }
 
         for (AssemblyAbstractRegister node : graph.get(t2)) {
             if (!graph.get(t1).contains(node)) {
