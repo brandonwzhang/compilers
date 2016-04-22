@@ -432,7 +432,7 @@ public class GraphColorer {
                 System.out.println("--freezing " + frozen);
                 Set<MovePair> removeSet = new HashSet<>();
                 for (MovePair pair_ : movePairs) {
-                    if (graph.get(pair_.left) == frozen || graph.get(pair_.right) == frozen) {
+                    if (pair_.left == frozen || pair_.right == frozen) {
                         removeSet.add(pair_);
                     }
                 }
