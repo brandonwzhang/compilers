@@ -27,6 +27,24 @@ public class CFGAssembly extends CFG {
         throw new RuntimeException("Jump to non-existent label: " + labelName);
     }
 
+    /**
+     * Returns the index of the first instruction after index i
+     */
+    private static int nextInstructionIndex(int i, List<AssemblyLine> lines) {
+        if (i < lines.size() - 1) {
+            int next = i + 1;
+            // Only include instructions in the CFG
+            while (!(lines.get(next) instanceof AssemblyInstruction)) {
+                if (next < lines.size()) {
+                    return -1;
+                }
+                next++;
+            }
+            return next;
+        }
+        return -1;
+    }
+
     private static List<Integer> getSuccessors(int i, List<AssemblyLine> lines) {
         List<Integer> successors = new LinkedList<>();
         // We only construct this CFG for lines
@@ -48,8 +66,7 @@ public class CFGAssembly extends CFG {
             int index = indexOfLabel(labelName, lines);
             successors.add(index);
             return successors;
-        }
-        else if (instruction.getOpCode() == OpCode.RETQ) {
+        } else if (instruction.getOpCode() == OpCode.RETQ) {
             return successors;
         } else {
             // Add the next instruction as a successor unless we are at the last
@@ -60,24 +77,6 @@ public class CFGAssembly extends CFG {
             }
             return successors;
         }
-    }
-
-    /**
-     * Returns the index of the first instruction after index i
-     */
-    private static int nextInstructionIndex(int i, List<AssemblyLine> lines) {
-        if (i < lines.size() - 1) {
-            int next = i + 1;
-            // Only include instructions in the CFG
-            while (!(lines.get(next) instanceof AssemblyInstruction)) {
-                next++;
-                if (next < lines.size()) {
-                    return -1;
-                }
-            }
-            return next;
-        }
-        return -1;
     }
 
     public CFGAssembly(List<AssemblyLine> lines) {
