@@ -57,10 +57,10 @@ public class GraphColorer {
     private Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph;
 
     // Nodes are added to this stack as we *temporarily* remove them
-    private Stack<AssemblyAbstractRegister> removedNodes;
+    private Deque<AssemblyAbstractRegister> removedNodes;
 
-    // Nodes that are removed are added here and are retained in 'graph'
-    private Set<AssemblyAbstractRegister> removed;
+    // Nodes that have not been removed yet are members of this set
+    private Set<AssemblyAbstractRegister> activeNodes;
 
     /*
         While the algorithm runs, potential spill nodes are stored here.
@@ -92,14 +92,15 @@ public class GraphColorer {
     public GraphColorer(List<Set<AssemblyAbstractRegister>> liveVariableSets, List<AssemblyLine> lines) {
 
         this.coloring = new HashMap<>();
-        this.removedNodes = new Stack<>();
-        this.removed = new HashSet<>();
+        this.removedNodes = new ArrayDeque<>();
+        this.activeNodes = new HashSet<>();
         this.spillNodes = new HashSet<>();
         this.movePairs = new HashSet<>();
         this.replacementMap = new HashMap<>();
         this.lines = lines;
 
         this.graph = constructInterferenceGraph(liveVariableSets);
+        this.activeNodes.addAll(graph.keySet());
 
         addMovePairs();
         removeAbsentMovePairs();
@@ -333,7 +334,7 @@ public class GraphColorer {
      */
     public void combineNodes(AssemblyAbstractRegister a, AssemblyAbstractRegister b) {
 
-        assert !removed.contains(a) && !removed.contains(b);
+        assert activeNodes.contains(a) && activeNodes.contains(b);
         assert !graph.get(a).contains(b) && !graph.get(b).contains(a);
 
         for (AssemblyAbstractRegister node : graph.get(b)) {
@@ -347,7 +348,7 @@ public class GraphColorer {
             graph.get(node).remove(b);
         }
 
-        for (AssemblyAbstractRegister node : removed) {
+        for (AssemblyAbstractRegister node : removedNodes) {
             if (graph.get(node).remove(b)) {
                 if (!graph.get(node).contains(a)) {
                     graph.get(node).add(a);
@@ -356,6 +357,7 @@ public class GraphColorer {
         }
 
         graph.remove(b);
+        activeNodes.remove(b);
     }
 
     /**
@@ -387,10 +389,9 @@ public class GraphColorer {
      */
     public Optional<AssemblyAbstractRegister> getRemovableNode() {
 
-        for (AssemblyAbstractRegister node : graph.keySet()) {
+        for (AssemblyAbstractRegister node : activeNodes) {
             if (
                         graph.get(node).size() < colors.length // insignificant
-                    && !removed.contains(node)                 // has not been removed yet
                     && !coloring.containsKey(node)             // is not pre-colored
                     && !isMoveRelated(node)                    // is not move-related
                     ) {
@@ -440,7 +441,7 @@ public class GraphColorer {
             AssemblyAbstractRegister removedNode = removable.get();
 
             removedNodes.push(removedNode);
-            removed.add(removedNode);
+            activeNodes.remove(removedNode);
             //System.out.println("--" + "removing " + removedNode);
 
             for (AssemblyAbstractRegister neighbor : graph.get(removedNode)) {
@@ -500,6 +501,8 @@ public class GraphColorer {
 
         do {
             changed = false;
+            Set<MovePair> addSet = new HashSet<>();
+            Set<MovePair> removeSet = new HashSet<>();
             for (MovePair pair : movePairs) {
                 AssemblyAbstractRegister t1 = pair.left;
                 AssemblyAbstractRegister t2 = pair.right;
@@ -507,27 +510,28 @@ public class GraphColorer {
                     //System.out.println("--coalescing: " + t1 + " and " + t2);
                     combineNodes(t1, t2);
                     replacementMap.put(t2, t1);
-                    movePairs.remove(pair);
-                    Set<MovePair> removeSet = new HashSet<>();
-                    Set<MovePair> addSet = new HashSet<>();
+                    removeSet.add(pair);
                     for (MovePair originalPair : movePairs) {
 
                         if (originalPair.left.equals(t2)) {
-                            removeSet.add(originalPair);
                             addSet.add(new MovePair(t1, originalPair.right));
+                            removeSet.add(originalPair);
 
                         } else if(originalPair.right.equals(t2)) {
-                            removeSet.add(originalPair);
                             addSet.add(new MovePair(originalPair.left, t1));
+                            removeSet.add(originalPair);
                         }
                     }
-                    movePairs.removeAll(removeSet);
-                    movePairs.addAll(addSet);
+                    // The previous code added a (t1, t1) pair that needs
+                    // to be removed.
+                    removeSet.add(new MovePair(t1, t1));
                     coalescingOccurred = true;
                     changed = true;
                     break;
                 }
             }
+            movePairs.addAll(addSet);       // must be called in this order
+            movePairs.removeAll(removeSet);
         } while (changed);
 
         return coalescingOccurred;
@@ -600,24 +604,20 @@ public class GraphColorer {
                 frozeNode = freeze();
             } while(frozeNode);
 
-            if (graph.size() == removed.size() + numPrecolored) {
+            if (activeNodes.size() == numPrecolored) {
                 // TODO: test precolored nodes
                 break;
             }
 
             // potential spill node
-            AssemblyAbstractRegister spillNode;
-            Iterator<AssemblyAbstractRegister> iterator = graph.keySet().iterator();
-            do {
-                spillNode = iterator.next();
-            } while (removed.contains(spillNode));
+            AssemblyAbstractRegister spillNode = activeNodes.iterator().next();
 
             //System.out.println("potential spill " + spillNode);
             for (AssemblyAbstractRegister neighbor : graph.get(spillNode)) {
                 graph.get(neighbor).remove(spillNode);
             }
             removedNodes.push(spillNode);
-            removed.add(spillNode);
+            activeNodes.remove(spillNode);
             spillNodes.add(spillNode);
             Set<MovePair> removeSet = new HashSet<>();
             for (MovePair pair : movePairs) {
@@ -632,7 +632,7 @@ public class GraphColorer {
         AssemblyAbstractRegister currentNode;
         while (!removedNodes.isEmpty()) {
             currentNode = removedNodes.pop();
-            removed.remove(currentNode);
+            activeNodes.add(currentNode);
             Set<AssemblyPhysicalRegister> neighborColors = new HashSet<>();
             // readd currentNode to the adjacency lists of its neighbors
             for (AssemblyAbstractRegister neighbor : graph.get(currentNode)) {
@@ -691,8 +691,8 @@ public class GraphColorer {
     // a constructor for testing purposes
     public GraphColorer(Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph, List<AssemblyLine> lines) {
 
-        this.removedNodes = new Stack<>();
-        this.removed = new HashSet<>();
+        this.removedNodes = new ArrayDeque<>();
+        this.activeNodes = new HashSet<>();
         this.spillNodes = new HashSet<>();
         this.movePairs = new HashSet<>();
         this.coloring = new HashMap<>();
