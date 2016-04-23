@@ -14,7 +14,7 @@ public class GraphColorer {
 
     /**
      * A class for representing a pair of abstract registers that appear together
-     * in a mov instruction.
+     * in a mov instruction. Instances are immutable.
      */
     class MovePair {
         final AssemblyAbstractRegister left;
@@ -84,8 +84,6 @@ public class GraphColorer {
 
     // The lines of assembly code that we are allocating registers for
     private List<AssemblyLine> lines;
-
-
 
     /**
      * @param liveVariableSets the live variable sets from every program point in the program
@@ -225,8 +223,6 @@ public class GraphColorer {
         movePairs.removeAll(removeSet);
     }
 
-
-
     public void allocateCoalescedRegisters() {
         for (AssemblyAbstractRegister register : replacementMap.keySet()) {
 
@@ -332,32 +328,34 @@ public class GraphColorer {
      * a neighbor of t2, a second edge is not added). t2 and all edges
      * connected to it are removed.
      *
-     * Requires: both nodes must be in the graph
+     * Requires: Both nodes must be in the graph. Both nodes are not connected
+     * by an edge
      */
-    public void combineNodes(AssemblyAbstractRegister t1, AssemblyAbstractRegister t2) {
+    public void combineNodes(AssemblyAbstractRegister a, AssemblyAbstractRegister b) {
 
-        assert !graph.get(t1).contains(t2) && !graph.get(t2).contains(t1);
+        assert !removed.contains(a) && !removed.contains(b);
+        assert !graph.get(a).contains(b) && !graph.get(b).contains(a);
 
-        for (AssemblyAbstractRegister node : graph.get(t2)) {
-            assert !removed.contains(node);
-            if (!graph.get(t1).contains(node)) {
-                graph.get(t1).add(node);
+        for (AssemblyAbstractRegister node : graph.get(b)) {
+
+            if (!graph.get(a).contains(node)) {
+                graph.get(a).add(node);
             }
-            if (!graph.get(node).contains(t1)) {
-                graph.get(node).add(t1);
+            if (!graph.get(node).contains(a)) {
+                graph.get(node).add(a);
             }
-            graph.get(node).remove(t2);
+            graph.get(node).remove(b);
         }
 
         for (AssemblyAbstractRegister node : removed) {
-            if (graph.get(node).remove(t2)) {
-                if (!graph.get(node).contains(t1)) {
-                    graph.get(node).add(t1);
+            if (graph.get(node).remove(b)) {
+                if (!graph.get(node).contains(a)) {
+                    graph.get(node).add(a);
                 }
             }
         }
 
-        graph.remove(t2);
+        graph.remove(b);
     }
 
     /**
@@ -388,8 +386,14 @@ public class GraphColorer {
      *      (3) it is not a move-related node
      */
     public Optional<AssemblyAbstractRegister> getRemovableNode() {
+
         for (AssemblyAbstractRegister node : graph.keySet()) {
-            if (graph.get(node).size() < colors.length && !removed.contains(node) && !coloring.containsKey(node) && !isMoveRelated(node)) {
+            if (
+                        graph.get(node).size() < colors.length // insignificant
+                    && !removed.contains(node)                 // has not been removed yet
+                    && !coloring.containsKey(node)             // is not pre-colored
+                    && !isMoveRelated(node)                    // is not move-related
+                    ) {
                 return Optional.of(node);
             }
         }
@@ -401,12 +405,14 @@ public class GraphColorer {
      * @return the number of adjacent nodes that are already colored
      */
     public int numAdjacentColors(AssemblyAbstractRegister n) {
+
         Set<AssemblyPhysicalRegister> neighborColors = new HashSet<>();
         for (AssemblyAbstractRegister neighbor : graph.get(n)) {
             if (coloring.containsKey(neighbor)) {
                 neighborColors.add(coloring.get(neighbor));
             }
         }
+
         return neighborColors.size();
     }
 
@@ -451,7 +457,7 @@ public class GraphColorer {
     /**
      * Returns true if the two given nodes can be coalesced.
      *
-     * Requires: t1 and t2 do not have an edge between them
+     * Requires: a and b do not have an edge between them
      */
     public boolean canCoalesce(AssemblyAbstractRegister a, AssemblyAbstractRegister b) {
         assert !graph.get(a).contains(b) && !graph.get(b).contains(a);
@@ -578,6 +584,8 @@ public class GraphColorer {
 
         //System.out.println("\n========= colorGraph() called =========");
 
+        int numPrecolored = coloring.size();
+
         while (true) {
             boolean frozeNode;
             do {
@@ -592,8 +600,8 @@ public class GraphColorer {
                 frozeNode = freeze();
             } while(frozeNode);
 
-            if (graph.size() == removed.size()) {
-                // TODO: precolored nodes
+            if (graph.size() == removed.size() + numPrecolored) {
+                // TODO: test precolored nodes
                 break;
             }
 
