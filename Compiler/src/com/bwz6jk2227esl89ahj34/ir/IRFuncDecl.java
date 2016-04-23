@@ -265,9 +265,9 @@ public class IRFuncDecl extends IRNode {
         IRFuncDecl fd = (IRFuncDecl) n_;
         List<IRStmt> stmts = ((IRSeq) (fd.body())).stmts();
         List<IRStmt> reordered = reorderBlocks(stmts);
-        IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reordered));
-        return new IRFuncDecl(fd.name(), ccp_optimized);
-        //return new IRFuncDecl(fd.name(), new IRSeq(reorderBlocks(stmts)));
+        //IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reordered));
+        //return new IRFuncDecl(fd.name(), ccp_optimized);
+        return new IRFuncDecl(fd.name(), new IRSeq(reorderBlocks(stmts)));
     }
 
     public IRSeq condtionalConstantPropagation(IRSeq seq) {

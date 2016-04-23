@@ -159,7 +159,11 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 } else if (castedNode.expr() instanceof IRTemp) {
                     // x = y then we update x so that it takes the value of y
                     newMap.put(castedTarget, newMap.get(((IRTemp) castedNode.expr()).name()));
+                } else if (castedNode.expr() instanceof IRMem) {
+                    // MEM is hard
+                    newMap.put(castedTarget, new LatticeBottom());
                 } else { // shouldn't reach here
+                    System.out.println(castedNode.expr());
                     throw new RuntimeException("Please contact jk2227@cornell.edu");
                 }
             }

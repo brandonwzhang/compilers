@@ -280,8 +280,8 @@ public class Core {
 
         for (String functionName : lirRoot.functions().keySet()) {
             IRSeq seq = (IRSeq) lirRoot.functions().get(functionName).body();
-            //AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(seq);
-            ConditionalConstantPropagation analysis = new ConditionalConstantPropagation(seq);
+            AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(seq);
+            //ConditionalConstantPropagation analysis = new ConditionalConstantPropagation(seq);
             Util.writeHelper(
                     "analysis" + functionName,
                     "dot",
