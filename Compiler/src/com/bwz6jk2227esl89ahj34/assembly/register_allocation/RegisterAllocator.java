@@ -52,6 +52,29 @@ public class RegisterAllocator {
             // they spilled onto the stack
             translatedLines.addAll(translateInstruction(line));
         }
+
+        // Remove duplicate lines
+        // Does another optimization do this for us?
+        int i = 0;
+        while (i < translatedLines.size()) {
+            if (!(translatedLines.get(i) instanceof AssemblyInstruction)) {
+                i++;
+                continue;
+            }
+            AssemblyInstruction instruction = (AssemblyInstruction) translatedLines.get(i);
+            if (!(instruction.getOpCode() == OpCode.MOVQ)) {
+                i++;
+                continue;
+            }
+
+            List<AssemblyExpression> args = instruction.args;
+            if (args.get(0).equals(args.get(1))){
+                translatedLines.remove(i);
+            } else {
+                i++;
+            }
+        }
+
         return translatedLines;
     }
 
@@ -145,6 +168,7 @@ public class RegisterAllocator {
                     mapping instanceof AssemblyMemoryLocation;
             return mapping;
         }
+
         // If there's no mapping we spill the temp onto the stack
         int stackOffset = AssemblyFunction.getTempSpaceOffset() + Configuration.WORD_SIZE * numSpilledTemps++;
         AssemblyMemoryLocation spillLocation = AssemblyMemoryLocation.stackOffset(stackOffset);

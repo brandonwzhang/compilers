@@ -27,7 +27,7 @@ public class GraphColorer {
 
         @Override
         public String toString() {
-            return this.left.toString() + ", " + this.right.toString();
+            return "[" + this.left.toString() + ", " + this.right.toString() + "]";
         }
 
         @Override
@@ -73,13 +73,6 @@ public class GraphColorer {
 
     private List<AssemblyLine> lines;
 
-    // the set of node pairs that were successfully coalesced
-    private Set<MovePair> coalesced;
-
-    // when a movePair gets changed after a coalesce, we keep track of the
-    // change here so we can backtrack later
-    private Map<MovePair, MovePair> movePairTransformations;
-
     /**
      * @param liveVariableSets the live variable sets from every program point in the program
      * @param lines the lines of assembly for which we are allocating registers
@@ -90,9 +83,7 @@ public class GraphColorer {
         this.removed = new HashSet<>();
         this.spillNodes = new HashSet<>();
         this.movePairs = new HashSet<>();
-        this.coalesced = new HashSet<>();
         this.coloring = new HashMap<>();
-        this.movePairTransformations = new HashMap<>();
         this.replacementMap = new HashMap<>();
         this.lines = lines;
 
@@ -101,7 +92,6 @@ public class GraphColorer {
         addMovePairs();
         removeAbsentMovePairs();
         removeImpossibleMovePairs();
-        //movePairs.clear();
         colorGraph();
     }
 
@@ -205,9 +195,7 @@ public class GraphColorer {
     public void removeImpossibleMovePairs() {
         Set<MovePair> removeSet = new HashSet<>();
         for (MovePair pair : movePairs) {
-            if (graph.get(pair.left) != null && graph.get(pair.left).contains(pair.right)) {
-                removeSet.add(pair);
-            } else if (graph.get(pair.right) != null && graph.get(pair.right).contains(pair.left)) {
+            if (graph.get(pair.left).contains(pair.right) || graph.get(pair.right).contains(pair.left)) {
                 removeSet.add(pair);
             }
         }
@@ -231,6 +219,16 @@ public class GraphColorer {
         return register;
     }
 
+    public void allocateCoalescedRegisters() {
+        for (AssemblyAbstractRegister register : replacementMap.keySet()) { // why does graph work
+            AssemblyAbstractRegister replacement = register;
+            while (replacementMap.containsKey(replacement)) {
+                replacement = replacementMap.get(replacement);
+            }
+            coloring.put(register, coloring.get(replacement));
+        }
+    }
+
     /**
      * Call this after graph coloring and move coalescing.
      * Removes any move instructions that were coasleced.
@@ -238,34 +236,34 @@ public class GraphColorer {
      */
     public void updateLines() {
         //backtrackTransformedMovePairs();
-        for (AssemblyLine line : lines) {
-            if (!(line instanceof AssemblyInstruction)) {
-                continue;
-            }
-            AssemblyInstruction instruction = (AssemblyInstruction) line;
-            List<AssemblyExpression> args = instruction.args;
-
-            for (int i = 0; i < args.size(); i++) {
-                AssemblyAbstractRegister register;
-
-                if (args.get(i) instanceof AssemblyAbstractRegister) {
-                    register = (AssemblyAbstractRegister) args.get(i);
-                    args.set(i, getReplacement(register));
-
-                } else if (args.get(i) instanceof AssemblyMemoryLocation) {
-                    AssemblyMemoryLocation mem = (AssemblyMemoryLocation) args.get(i);
-                    if (mem.offsetRegister instanceof AssemblyAbstractRegister) {
-                        register = (AssemblyAbstractRegister) mem.offsetRegister;
-                        mem.setOffsetRegister(getReplacement(register));
-
-                    } else if (mem.baseRegister instanceof AssemblyAbstractRegister) {
-                        register = (AssemblyAbstractRegister) mem.baseRegister;
-                        mem.setBaseRegister(getReplacement(register));
-
-                    }
-                }
-            }
-        }
+//        for (AssemblyLine line : lines) {
+//            if (!(line instanceof AssemblyInstruction)) {
+//                continue;
+//            }
+//            AssemblyInstruction instruction = (AssemblyInstruction) line;
+//            List<AssemblyExpression> args = instruction.args;
+//
+//            for (int i = 0; i < args.size(); i++) {
+//                AssemblyAbstractRegister register;
+//
+//                if (args.get(i) instanceof AssemblyAbstractRegister) {
+//                    register = (AssemblyAbstractRegister) args.get(i);
+//                    args.set(i, getReplacement(register));
+//
+//                } else if (args.get(i) instanceof AssemblyMemoryLocation) {
+//                    AssemblyMemoryLocation mem = (AssemblyMemoryLocation) args.get(i);
+//                    if (mem.offsetRegister instanceof AssemblyAbstractRegister) {
+//                        register = (AssemblyAbstractRegister) mem.offsetRegister;
+//                        mem.setOffsetRegister(getReplacement(register));
+//
+//                    } else if (mem.baseRegister instanceof AssemblyAbstractRegister) {
+//                        register = (AssemblyAbstractRegister) mem.baseRegister;
+//                        mem.setBaseRegister(getReplacement(register));
+//
+//                    }
+//                }
+//            }
+//        }
 
         int i = 0;
         while (i < lines.size()) {
@@ -321,15 +319,25 @@ public class GraphColorer {
      */
     public void combineNodes(AssemblyAbstractRegister t1, AssemblyAbstractRegister t2) {
 
+        assert !graph.get(t1).contains(t2) && !graph.get(t2).contains(t1);
+
         for (AssemblyAbstractRegister node : graph.get(t2)) {
+            assert !removed.contains(node);
             if (!graph.get(t1).contains(node)) {
-                graph.get(node).add(t1);
                 graph.get(t1).add(node);
             }
+            if (!graph.get(node).contains(t1)) {
+                graph.get(node).add(t1);
+            }
+            graph.get(node).remove(t2);
         }
 
-        for (AssemblyAbstractRegister node : graph.keySet()) {
-            graph.get(node).remove(t2);
+        for (AssemblyAbstractRegister node : removed) {
+            if (graph.get(node).remove(t2)) {
+                if (!graph.get(node).contains(t1)) {
+                    graph.get(node).add(t1);
+                }
+            }
         }
 
         graph.remove(t2);
@@ -409,7 +417,7 @@ public class GraphColorer {
 
             removedNodes.push(removedNode);
             removed.add(removedNode);
-            System.out.println("--" + "removing " + removedNode);
+            //System.out.println("--" + "removing " + removedNode);
 
             for (AssemblyAbstractRegister neighbor : graph.get(removedNode)) {
                 // remove removedNode from the adjacency lists of its neighbors
@@ -423,39 +431,36 @@ public class GraphColorer {
     }
 
     /**
-     * Returns the degree of the node that would result if the two given
-     * nodes were coalesced.
-     *
-     * Requires: the given nodes are in the graph
-     */
-    public int coalescedDegree(AssemblyAbstractRegister t1, AssemblyAbstractRegister t2) {
-        int result = graph.get(t1).size() + graph.get(t2).size();
-
-        for (AssemblyAbstractRegister n : graph.get(t1)) {
-            if (graph.get(t2).contains(n)) {
-                result--;
-            }
-        }
-
-        return result;
-    }
-
-    /**
      * Returns true if the two given nodes can be coalesced.
      *
      * Requires: t1 and t2 do not have an edge between them
      */
     public boolean canCoalesce(AssemblyAbstractRegister a, AssemblyAbstractRegister b) {
-        List<AssemblyAbstractRegister> a_neighbors = graph.get(a);
-        List<AssemblyAbstractRegister> b_neighbors = graph.get(b);
-        for (AssemblyAbstractRegister neighbor : a_neighbors) {
-            // George's conservative coalescing
-            if (!b_neighbors.contains(neighbor) && graph.get(neighbor).size() >= colors.length) {
-                return false;
+        assert !graph.get(a).contains(b) && !graph.get(b).contains(a);
+//        List<AssemblyAbstractRegister> a_neighbors = graph.get(a);
+//        List<AssemblyAbstractRegister> b_neighbors = graph.get(b);
+//        assert !a_neighbors.contains(b);
+//        for (AssemblyAbstractRegister neighbor : a_neighbors) {
+//            // George's conservative coalescing
+//            if (!b_neighbors.contains(neighbor) && graph.get(neighbor).size() >= colors.length) {
+//                return false;
+//            }
+//        }
+//
+//        return true;
+
+        // Brigg's
+        Set<AssemblyAbstractRegister> ab_neighbors = new HashSet<>();
+        ab_neighbors.addAll(graph.get(a));
+        ab_neighbors.addAll(graph.get(b));
+        int significantNeighbors = 0;
+        for (AssemblyAbstractRegister neighbor : ab_neighbors) {
+            if (graph.get(neighbor).size() >= colors.length) {
+                significantNeighbors++;
             }
         }
 
-        return true;
+        return significantNeighbors < colors.length;
     }
 
     /**
@@ -473,8 +478,7 @@ public class GraphColorer {
                 AssemblyAbstractRegister t1 = pair.left;
                 AssemblyAbstractRegister t2 = pair.right;
                 if (canCoalesce(t1, t2)) {
-                    System.out.println("--coalescing: " + t1 + " and " + t2);
-                    coalesced.add(pair);
+                    //System.out.println("--coalescing: " + t1 + " and " + t2);
                     combineNodes(t1, t2);
                     replacementMap.put(t2, t1);
                     movePairs.remove(pair);
@@ -483,16 +487,12 @@ public class GraphColorer {
                     for (MovePair originalPair : movePairs) {
 
                         if (originalPair.left.equals(t2)) {
-                            MovePair transformedPair = new MovePair(t1, originalPair.right);
                             removeSet.add(originalPair);
-                            addSet.add(transformedPair);
-                            movePairTransformations.put(transformedPair, originalPair);
+                            addSet.add(new MovePair(t1, originalPair.right));
 
                         } else if(originalPair.right.equals(t2)) {
-                            MovePair transformedPair = new MovePair(originalPair.left, t1);
                             removeSet.add(originalPair);
                             addSet.add(new MovePair(originalPair.left, t1));
-                            movePairTransformations.put(transformedPair, originalPair);
                         }
                     }
                     movePairs.removeAll(removeSet);
@@ -523,7 +523,7 @@ public class GraphColorer {
 
             // give up on all move pairs that contain the node we are freezing
             if (frozen != null) {
-                System.out.println("--freezing " + frozen);
+                //System.out.println("--freezing " + frozen);
                 Set<MovePair> removeSet = new HashSet<>();
                 for (MovePair pair_ : movePairs) {
                     if (pair_.left.equals(frozen) || pair_.right.equals(frozen)) {
@@ -556,23 +556,24 @@ public class GraphColorer {
      */
     public void colorGraph() {
 
-        System.out.println("\n========= colorGraph() called =========");
+        //System.out.println("\n========= colorGraph() called =========");
 
         while (true) {
             boolean frozeNode;
             do {
                 boolean changed;
                 do {
-                    System.out.println("simplify");
+                    //System.out.println("simplify");
                     changed = simplify();
-                    System.out.println("coalesce");
+                    //System.out.println("coalesce");
                     changed = coalesce() || changed;
                 } while (changed);
-                System.out.println("freeze");
+                //System.out.println("freeze");
                 frozeNode = freeze();
             } while(frozeNode);
 
             if (graph.size() == removed.size()) {
+                // TODO: precolored nodes
                 break;
             }
 
@@ -583,7 +584,7 @@ public class GraphColorer {
                 spillNode = iterator.next();
             } while (removed.contains(spillNode));
 
-            System.out.println("potential spill " + spillNode);
+            //System.out.println("potential spill " + spillNode);
             for (AssemblyAbstractRegister neighbor : graph.get(spillNode)) {
                 graph.get(neighbor).remove(spillNode);
             }
@@ -599,7 +600,7 @@ public class GraphColorer {
             movePairs.removeAll(removeSet);
         }
 
-        System.out.println("begin coloring");
+        //System.out.println("begin coloring");
         AssemblyAbstractRegister currentNode;
         while (!removedNodes.isEmpty()) {
             currentNode = removedNodes.pop();
@@ -617,12 +618,12 @@ public class GraphColorer {
                 if (!coloring.containsKey(currentNode)) {
                     AssemblyPhysicalRegister color = assignColor(neighborColors);
                     coloring.put(currentNode, color);
-                    System.out.println("--assigned " + color + " to " + currentNode);
+                    //System.out.println("--assigned " + color + " to " + currentNode);
                 }
             }
         }
 
-        System.out.println("color the spill nodes");
+        //System.out.println("color the spill nodes");
         while (spillNodes.size() > 0) {
             AssemblyAbstractRegister colorable = null;
             for (AssemblyAbstractRegister sn : spillNodes) {
@@ -644,11 +645,12 @@ public class GraphColorer {
             AssemblyPhysicalRegister color = assignColor(neighborColors);
             coloring.put(colorable, color);
             spillNodes.remove(colorable);
-            System.out.println("colored potential spill node " + colorable);
+            //System.out.println("colored potential spill node " + colorable);
         }
 
-        System.out.println("spill nodes: " + spillNodes.size());
-        updateLines();
+        //System.out.println("spill nodes: " + spillNodes.size());
+        allocateCoalescedRegisters();
+        //updateLines();
     }
 
     /**
@@ -665,9 +667,8 @@ public class GraphColorer {
         this.removed = new HashSet<>();
         this.spillNodes = new HashSet<>();
         this.movePairs = new HashSet<>();
-        this.coalesced = new HashSet<>();
         this.coloring = new HashMap<>();
-        this.movePairTransformations = new HashMap<>();
+        this.replacementMap = new HashMap<>();
         this.lines = lines;
 
         this.graph = graph;
@@ -677,18 +678,4 @@ public class GraphColorer {
         removeImpossibleMovePairs();
         colorGraph();
     }
-
-    //    public void backtrackTransformedMovePairs() {
-//        Set<MovePair> coalesced_ = new HashSet<>();
-//        for (MovePair pair : coalesced) {
-//            MovePair pair_ = pair;
-//            while (movePairTransformations.containsKey(pair_)) {
-//                pair_ = movePairTransformations.get(pair_);
-//            }
-//            assert pair_ != null;
-//            coalesced_.add(pair_);
-//        }
-//        assert coalesced_.size() == coalesced.size();
-//        coalesced = coalesced_;
-//    }
 }
