@@ -76,6 +76,7 @@ public class GraphColorer {
 
         addMovePairs();
         removeImpossibleMovePairs();
+        colorGraph();
     }
 
     /**
@@ -579,8 +580,10 @@ public class GraphColorer {
     /**
      * @return a mapping from abstract registers to physical registers
      */
-    public Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> getColoring() {
-        return coloring;
+    public Map<AssemblyAbstractRegister, AssemblyExpression> getColoring() {
+        Map<AssemblyAbstractRegister, AssemblyExpression> coloring_ = new HashMap<>();
+        coloring_.putAll(coloring);
+        return coloring_;
     }
 
     /**
