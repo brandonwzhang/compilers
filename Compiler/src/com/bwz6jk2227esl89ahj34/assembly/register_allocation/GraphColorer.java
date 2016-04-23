@@ -95,6 +95,7 @@ public class GraphColorer {
         this.movePairs = new HashSet<>();
         this.coalesced = new HashSet<>();
         this.coloring = new HashMap<>();
+        this.movePairTransformations = new HashMap<>();
         this.lines = lines;
 
         this.graph = constructInterferenceGraph(liveVariableSets);
@@ -534,7 +535,7 @@ public class GraphColorer {
      * @return True if the graph was successfully colored. False otherwise.
      */
     public void colorGraph() {
-        
+
         //System.out.println("\n========= colorGraph() called =========");
 
         while (true) {
@@ -660,6 +661,7 @@ public class GraphColorer {
         this.movePairs = new HashSet<>();
         this.coalesced = new HashSet<>();
         this.coloring = new HashMap<>();
+        this.movePairTransformations = new HashMap<>();
         this.lines = lines;
 
         this.graph = graph;
