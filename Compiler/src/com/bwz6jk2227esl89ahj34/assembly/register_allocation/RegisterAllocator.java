@@ -9,6 +9,7 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
         .LiveVariableSet;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
+import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.util.*;
 
@@ -27,14 +28,22 @@ public class RegisterAllocator {
      */
     public static List<AssemblyLine> translate(List<AssemblyLine> lines) {
         // Perform live variable analysis to construct interference sets
-        LiveVariableAnalysis liveVars = new LiveVariableAnalysis(lines);
+        LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(lines);
+        Util.writeHelper(
+                "live_variables_",
+                "dot",
+                "./",
+                Collections.singletonList(liveVariables.toString())
+        );
+
         List<Set<AssemblyAbstractRegister>> interferenceSets = new LinkedList<>();
-        for (CFGNode node : liveVars.getGraph().getNodes().values()) {
+        for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
             LatticeElement element = node.getIn();
             interferenceSets.add(((LiveVariableSet) element).getLiveVars());
         }
         // Use Kempe's algorithm to allocate physical locations to abstract registers
-        registerMap = new HashMap<>();// TODO: Call Andy's code on interferenceSets
+        GraphColorer graphColorer = new GraphColorer(interferenceSets, lines);
+        registerMap = graphColorer.getColoring();
 
         // Translate all the instructions
         List<AssemblyLine> translatedLines = new LinkedList<>();

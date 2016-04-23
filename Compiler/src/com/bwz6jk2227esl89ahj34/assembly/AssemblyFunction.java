@@ -48,13 +48,6 @@ public class AssemblyFunction {
 
         // Testing live variable analysis
         LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(lines);
-        Util.writeHelper(
-                "live_variables_" + name,
-                "dot",
-                "./",
-                Collections.singletonList(liveVariables.toString())
-        );
-
         functionBody = RegisterAllocator.translate(functionBody);
 
         // generateFunctionPrologue() needs to be called after the registers

@@ -76,26 +76,26 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
              // x = f(e....)
              if (move.expr() instanceof IRCall) {
                  for (IRExpr e : ((IRCall)move.expr()).args()) {
-                     set.add(e);
-                     set.addAll(subexprs(e));
+                     set.add(findReference(e));
+                     set.addAll(findReferences(subexprs(e)));
                  }
              } else { // x = e
-                 set.add(move.expr());
-                 set.addAll(subexprs(move.expr()));
+                 set.add(findReference(move.expr()));
+                 set.addAll(findReferences(subexprs(move.expr())));
              }
 
              // [e1] = [e2]
              if (move.target() instanceof IRMem) {
-                 set.add(move.target());
-                 set.addAll(subexprs(move.target()));
+                 set.add(findReference(move.target()));
+                 set.addAll(findReferences(subexprs(move.target())));
              }
          }
          if (stmt instanceof IRCJump) {
              IRCJump cjump = (IRCJump) stmt;
 
              // if (e)
-             set.add(cjump.expr());
-             set.addAll(subexprs(cjump.expr()));
+             set.add(findReference(cjump.expr()));
+             set.addAll(findReferences(subexprs(cjump.expr())));
          }
 
          return new AvailableExpressionSet(set);
@@ -155,20 +155,19 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         for (IRStmt s : seq.stmts()) {
             if (s instanceof IRCJump) {
                 IRCJump cjump = (IRCJump)s;
-                set.add(cjump.expr());
+                addSubexprs(cjump.expr(), set);
             }
             if (s instanceof IRExp) {
                 IRExp exp = (IRExp)s;
-                set.add(exp.expr());
+                addSubexprs(exp.expr(), set);
             }
             if (s instanceof IRJump) {
                 IRJump jump = (IRJump)s;
-                set.add(jump.target());
+                addSubexprs(jump.target(), set);
             }
             if (s instanceof IRMove) {
                 IRMove move = (IRMove)s;
-                set.add(move.expr());
-                set.add(move.target()); // TODO do we need this?
+                addSubexprs(move.expr(), set);
             }
         }
 
@@ -232,5 +231,100 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         return filter.test(expr);
     }
 
+    // helper function that returns if two IRExprs are structurally equal
+    public boolean exprEquals(IRExpr e1, IRExpr e2) {
+        if (!e1.getClass().equals(e2.getClass())) {
+            return false;
+        }
 
+        if (e1 instanceof IRBinOp) {
+            assert e2 instanceof IRBinOp;
+
+            IRBinOp e1_ = (IRBinOp)e1;
+            IRBinOp e2_ = (IRBinOp)e2;
+
+            return e1_.opType().equals(e2_.opType()) &&
+                    exprEquals(e1_.left(), e2_.left()) &&
+                    exprEquals(e2_.right(), e2_.right());
+        }
+        if (e1 instanceof IRCall) {
+            assert e2 instanceof IRCall;
+
+            IRCall e1_ = (IRCall)e1;
+            IRCall e2_ = (IRCall)e2;
+
+            // compare function name
+            if (!exprEquals(e1_.target(), e2_.target())) {
+                return false;
+            }
+            // compare num of args
+            if (e1_.args().size() != e2_.args().size()) {
+                return false;
+            }
+
+            // compare all args
+            boolean b = true;
+            for (int i = 0; i < e1_.args().size(); i++) {
+                b &= exprEquals(e1_.args().get(i), e2_.args().get(i));
+            }
+
+            return b;
+        }
+        if (e1 instanceof IRConst) {
+            assert e2 instanceof IRConst;
+            return ((IRConst)e1).value() == ((IRConst)e2).value();
+        }
+        if (e1 instanceof IRMem) {
+            assert e2 instanceof IRMem;
+
+            IRMem e1_ = (IRMem)e1;
+            IRMem e2_ = (IRMem)e2;
+
+            return exprEquals(e1_.expr(), e2_.expr());
+        }
+        if (e1 instanceof IRName) {
+            assert e2 instanceof IRName;
+
+            return ((IRName)e1).name().equals(((IRName)e2).name());
+        }
+        if (e1 instanceof IRTemp) {
+            assert e2 instanceof IRTemp;
+
+            return ((IRTemp)e1).name().equals(((IRTemp)e2).name());
+        }
+
+
+        return false;
+    }
+
+    /*
+        Helper that given an expr e1, finds an e2 in top such that
+        exprEquals(e1,e2) is true, and returns the reference to e2.
+        Otherwise throw runtimeexception
+     */
+    public IRExpr findReference(IRExpr e1) {
+        assert this.getTop() instanceof AvailableExpressionSet;
+
+        for (IRExpr e2 : ((AvailableExpressionSet)this.getTop()).getExprs()) {
+            if (exprEquals(e1, e2)) {
+                return e2;
+            }
+        }
+        throw new RuntimeException("Expression not found in top for" +
+                "available expressions analysis. Please email esl89@cornell.edu");
+    }
+
+    /*
+        Same helper as above, but does it for a set of IRExprs
+     */
+    public Set<IRExpr> findReferences(Set<IRExpr> exprs) {
+        assert this.getTop() instanceof AvailableExpressionSet;
+
+        Set<IRExpr> refs = new HashSet<>();
+        for (IRExpr e : exprs) {
+            refs.add(findReference(e));
+        }
+
+        return refs;
+    }
 }
