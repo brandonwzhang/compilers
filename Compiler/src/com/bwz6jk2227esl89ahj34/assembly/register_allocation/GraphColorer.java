@@ -18,12 +18,22 @@ class MovePair {
         this.right = right;
     }
 
+    @Override
     public String toString() {
         return this.left.toString() + ", " + this.right.toString();
     }
 
+    @Override
     public int hashCode() {
         return this.left.hashCode() + this.right.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        MovePair other = (MovePair) o;
+        boolean result = this.left.equals(other.left) && this.right.equals(other.right);
+        result = (this.left.equals(other.right) && this.right.equals(other.left)) || result;
+        return result;
     }
 }
 
