@@ -30,7 +30,6 @@ public class AvailableExpressionSet extends LatticeElement {
         return new AvailableExpressionSet(newExprs);
     }
 
-    // checks structural equality
     public boolean equals(LatticeElement element) {
         if (!(element instanceof AvailableExpressionSet)) {
             return false;
@@ -38,6 +37,7 @@ public class AvailableExpressionSet extends LatticeElement {
             return ((AvailableExpressionSet)element).getExprs().equals(exprs);
         }
     }
+
 
     public String toString() {
         return exprs.toString().replace('\n', ' ');
