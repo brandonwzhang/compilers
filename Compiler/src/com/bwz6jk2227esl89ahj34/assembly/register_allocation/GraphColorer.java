@@ -105,7 +105,20 @@ public class GraphColorer {
         addMovePairs();
         removeAbsentMovePairs();
         removeImpossibleMovePairs();
-        colorGraph();
+    }
+
+    /**
+     * Use this instructor to include precolored nodes.
+     *
+     * This probably does not work right now.
+     */
+    public GraphColorer(
+            List<Set<AssemblyAbstractRegister>> liveVariableSets,
+            List<AssemblyLine> lines,
+            Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> precoloring
+    ) {
+        this(liveVariableSets, lines);
+        this.coloring.putAll(precoloring);
     }
 
     /**
@@ -118,21 +131,12 @@ public class GraphColorer {
     }
 
     /**
-     * Use this to define pre-colored nodes in the graph.
-     * @param node a node in the interference graph
-     * @param color the node's color assignment
-     */
-    public void addColoring(AssemblyAbstractRegister node, AssemblyPhysicalRegister color) {
-        coloring.put(node, color);
-    }
-
-    /**
      * Takes all of the live variable sets from the program.
      * Returns an interference graph.
      * Nodes are temps (abstract registers). Two nodes are connected by an edge
      * if their temps interfere with each other at any point in the program.
      */
-    public static Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>>
+    private static Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>>
         constructInterferenceGraph(List<Set<AssemblyAbstractRegister>> liveVariableSets) {
 
         Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph = new HashMap<>();
@@ -172,7 +176,7 @@ public class GraphColorer {
      * Finds all of the [mov t1 t2] pairs in the given assembly code.
      * Keeps track of them so move coalescing can be done later.
      */
-    public void addMovePairs() {
+    private void addMovePairs() {
         for (AssemblyLine line : lines) {
             if (!(line instanceof AssemblyInstruction)) {
                 continue;
@@ -200,7 +204,7 @@ public class GraphColorer {
      * Call this after addMovePairs. Removes any move pairs that contain nodes
      * that are not in the graph.
      */
-    public void removeAbsentMovePairs() {
+    private void removeAbsentMovePairs() {
         Set<MovePair> removeSet = new HashSet<>();
         for (MovePair pair : movePairs) {
             if (graph.get(pair.left) == null || graph.get(pair.right) == null) {
@@ -214,7 +218,7 @@ public class GraphColorer {
      * Call this after removeAbsentMovePairs(). Removes any move pairs made up of temps
      * that interfere with each other.
      */
-    public void removeImpossibleMovePairs() {
+    private void removeImpossibleMovePairs() {
         Set<MovePair> removeSet = new HashSet<>();
         for (MovePair pair : movePairs) {
             if (graph.get(pair.left).contains(pair.right) || graph.get(pair.right).contains(pair.left)) {
@@ -224,7 +228,7 @@ public class GraphColorer {
         movePairs.removeAll(removeSet);
     }
 
-    public void allocateCoalescedRegisters() {
+    private void allocateCoalescedRegisters() {
         for (AssemblyAbstractRegister register : replacementMap.keySet()) {
 
             AssemblyAbstractRegister replacement = register;
@@ -236,7 +240,7 @@ public class GraphColorer {
         }
     }
 
-    public AssemblyAbstractRegister getReplacement(AssemblyAbstractRegister register) {
+    private AssemblyAbstractRegister getReplacement(AssemblyAbstractRegister register) {
         while (replacementMap.keySet().contains(register)) {
             register = replacementMap.get(register);
         }
@@ -248,7 +252,7 @@ public class GraphColorer {
      * Removes any move instructions that were coalesced.
      * Mutates the given List of assembly lines.
      */
-    public void updateLines() {
+    private void updateLines() {
         
         for (AssemblyLine line : lines) {
             if (!(line instanceof AssemblyInstruction)) {
@@ -332,7 +336,7 @@ public class GraphColorer {
      * Requires: Both nodes must be in the graph. Both nodes are not connected
      * by an edge
      */
-    public void combineNodes(AssemblyAbstractRegister a, AssemblyAbstractRegister b) {
+    private void combineNodes(AssemblyAbstractRegister a, AssemblyAbstractRegister b) {
 
         assert activeNodes.contains(a) && activeNodes.contains(b);
         assert !graph.get(a).contains(b) && !graph.get(b).contains(a);
@@ -368,7 +372,7 @@ public class GraphColorer {
      * @param node a node in the interference graph
      * @return true if the given node is move-related
      */
-    public boolean isMoveRelated(AssemblyAbstractRegister node) {
+    private boolean isMoveRelated(AssemblyAbstractRegister node) {
 
         for (MovePair pair : movePairs) {
             if (pair.left.equals(node) || pair.right.equals(node)) {
@@ -387,7 +391,7 @@ public class GraphColorer {
      *      (2) it is not a pre-colored node
      *      (3) it is not a move-related node
      */
-    public Optional<AssemblyAbstractRegister> getRemovableNode() {
+    private Optional<AssemblyAbstractRegister> getRemovableNode() {
 
         for (AssemblyAbstractRegister node : activeNodes) {
             if (
@@ -405,7 +409,7 @@ public class GraphColorer {
      * @param n a node in the interference graph
      * @return the number of adjacent nodes that are already colored
      */
-    public int numAdjacentColors(AssemblyAbstractRegister n) {
+    private int numAdjacentColors(AssemblyAbstractRegister n) {
 
         Set<AssemblyPhysicalRegister> neighborColors = new HashSet<>();
         for (AssemblyAbstractRegister neighbor : graph.get(n)) {
@@ -428,7 +432,7 @@ public class GraphColorer {
      *
      * @return True if any nodes were removed. False otherwise.
      */
-    public boolean simplify() {
+    private boolean simplify() {
 
         boolean changed = false;
 
@@ -460,7 +464,7 @@ public class GraphColorer {
      *
      * Requires: a and b do not have an edge between them
      */
-    public boolean canCoalesce(AssemblyAbstractRegister a, AssemblyAbstractRegister b) {
+    private boolean canCoalesce(AssemblyAbstractRegister a, AssemblyAbstractRegister b) {
         assert !graph.get(a).contains(b) && !graph.get(b).contains(a);
 
         // George's
@@ -494,8 +498,8 @@ public class GraphColorer {
      * @return True if at least one pair of nodes was coalesced.
      *         False otherwise.
      */
-    public boolean coalesce() {
-
+    private boolean coalesce() {
+        // TODO: coalescing a precolored node
         boolean coalescingOccurred = false;
         boolean changed;
 
@@ -537,7 +541,7 @@ public class GraphColorer {
         return coalescingOccurred;
     }
 
-    public boolean freeze() {
+    private boolean freeze() {
 
         boolean frozeNode = false;
 
@@ -690,20 +694,9 @@ public class GraphColorer {
 
     // a constructor for testing purposes
     public GraphColorer(Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph, List<AssemblyLine> lines) {
-
-        this.removedNodes = new ArrayDeque<>();
-        this.activeNodes = new HashSet<>();
-        this.spillNodes = new HashSet<>();
-        this.movePairs = new HashSet<>();
-        this.coloring = new HashMap<>();
-        this.replacementMap = new HashMap<>();
-        this.lines = lines;
-
+        this(new ArrayList<>(), lines);
         this.graph = graph;
-
-        addMovePairs();
-        removeAbsentMovePairs();
-        removeImpossibleMovePairs();
-        colorGraph();
+        this.activeNodes.clear();
+        this.activeNodes.addAll(graph.keySet());
     }
 }

@@ -72,6 +72,7 @@ public class GraphColorerTests {
         lines.add(new AssemblyInstruction(OpCode.MOVQ, b, e));
 
         GraphColorer gc = new GraphColorer(graph, lines);
+        gc.colorGraph();
         Assert.assertTrue(gc.colored());
 
         printColoring(gc.getColoring());
@@ -102,6 +103,7 @@ public class GraphColorerTests {
         lines.add(new AssemblyInstruction(OpCode.MOVQ, a, c));
 
         GraphColorer gc = new GraphColorer(graph, lines);
+        gc.colorGraph();
         Assert.assertTrue(gc.colored());
 
         printColoring(gc.getColoring());
@@ -132,6 +134,7 @@ public class GraphColorerTests {
         lines.add(new AssemblyInstruction(OpCode.MOVQ, a, c));
 
         GraphColorer gc = new GraphColorer(graph, lines);
+        gc.colorGraph();
         Assert.assertFalse(gc.colored());
 
         printColoring(gc.getColoring());
@@ -157,6 +160,7 @@ public class GraphColorerTests {
         lines.add(new AssemblyInstruction(OpCode.MOVQ, a, c));
 
         GraphColorer gc = new GraphColorer(graph, lines);
+        gc.colorGraph();
         Assert.assertTrue(gc.colored());
         //Assert.assertEquals(0, lines.size());
 
@@ -188,6 +192,7 @@ public class GraphColorerTests {
         lines.add(new AssemblyInstruction(OpCode.MOVQ, b, d));
 
         GraphColorer gc = new GraphColorer(graph, lines);
+        gc.colorGraph();
         Assert.assertTrue(gc.colored());
 
         printColoring(gc.getColoring());
@@ -211,6 +216,7 @@ public class GraphColorerTests {
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn);
 
         GraphColorer gc = new GraphColorer(graph, lines);
+        gc.colorGraph();
         Assert.assertTrue(gc.colored());
 
         printColoring(gc.getColoring());
@@ -236,6 +242,7 @@ public class GraphColorerTests {
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn); graph.put(d, dn); graph.put(e, en);
 
         GraphColorer gc = new GraphColorer(graph, lines);
+        gc.colorGraph();
         Assert.assertTrue(gc.colored());
 
         printColoring(gc.getColoring());
@@ -265,6 +272,7 @@ public class GraphColorerTests {
         lines.add(new AssemblyInstruction(OpCode.MOVQ, b, e));
 
         GraphColorer gc = new GraphColorer(graph, lines);
+        gc.colorGraph();
         Assert.assertTrue(gc.colored());
 
         printColoring(gc.getColoring());
