@@ -38,13 +38,12 @@ public class RegisterAllocator {
 
         List<Set<AssemblyAbstractRegister>> interferenceSets = new LinkedList<>();
         for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
-            LatticeElement element = node.getIn();
+            LatticeElement element = node.getOut();
             interferenceSets.add(((LiveVariableSet) element).getLiveVars());
         }
         // Use Kempe's algorithm to allocate physical locations to abstract registers
         GraphColorer graphColorer = new GraphColorer(interferenceSets, lines);
         registerMap = graphColorer.getColoring();
-
         // Translate all the instructions
         List<AssemblyLine> translatedLines = new LinkedList<>();
         for (AssemblyLine line : lines) {

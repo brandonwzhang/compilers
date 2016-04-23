@@ -1,7 +1,7 @@
 use io;
 
 returnOne():int{
-	return 1
+	return 100
 }
 
 main(args:int[][]){

@@ -12,8 +12,6 @@ import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.*;
 
@@ -29,6 +27,7 @@ public class IRFuncDecl extends IRNode {
 
     /**
      * Copy constructor (shallow).
+     *
      * @param funcdecl
      */
     public IRFuncDecl(IRFuncDecl funcdecl) {
@@ -89,8 +88,8 @@ public class IRFuncDecl extends IRNode {
     public int indexOfLabel(String labelName, List<List<IRStmt>> blocks) {
         for (int i = 0; i < blocks.size(); i++) {
             List<IRStmt> block = blocks.get(i);
-            if(block.get(0) instanceof IRLabel &&
-                    ((IRLabel)(block.get(0))).name().equals(labelName)) {
+            if (block.get(0) instanceof IRLabel &&
+                    ((IRLabel) (block.get(0))).name().equals(labelName)) {
                 return i;
             }
         }
@@ -120,8 +119,7 @@ public class IRFuncDecl extends IRNode {
             int index = indexOfLabel(labelName, blocks);
             successors.add(index);
             return successors;
-        }
-        else if (lastStatement instanceof IRReturn){
+        } else if (lastStatement instanceof IRReturn) {
             return new LinkedList<>();
         } else {
             List<Integer> successors = new LinkedList<>();
@@ -141,8 +139,8 @@ public class IRFuncDecl extends IRNode {
         return graph;
     }
 
-    private List<IRStmt> reorderBlocks(int curNode, Map<Integer, List<Integer>> graph,
-                                       List<List<IRStmt>> blocks, boolean[] visited) {
+    private List<IRStmt> reorderBlocksHelper(int curNode, Map<Integer, List<Integer>> graph,
+                                             List<List<IRStmt>> blocks, boolean[] visited) {
         visited[curNode] = true;
         List<IRStmt> block = blocks.get(curNode);
         List<Integer> successors = graph.get(curNode);
@@ -155,7 +153,7 @@ public class IRFuncDecl extends IRNode {
                 return block;
             }
             List<IRStmt> retBlock = new LinkedList<>(block);
-            retBlock.addAll(reorderBlocks(successors.get(0), graph, blocks, visited));
+            retBlock.addAll(reorderBlocksHelper(successors.get(0), graph, blocks, visited));
             return retBlock;
         }
 
@@ -176,16 +174,16 @@ public class IRFuncDecl extends IRNode {
         } else if (visited[falseNode]) {
             // Only add true statements
             List<IRStmt> retBlock = new LinkedList<>(block);
-            retBlock.addAll(reorderBlocks(trueNode, graph, blocks, visited));
+            retBlock.addAll(reorderBlocksHelper(trueNode, graph, blocks, visited));
             return retBlock;
         } else if (visited[trueNode]) {
             // Only add false statements
             List<IRStmt> retBlock = new LinkedList<>(block);
-            retBlock.addAll(reorderBlocks(falseNode, graph, blocks, visited));
+            retBlock.addAll(reorderBlocksHelper(falseNode, graph, blocks, visited));
             return retBlock;
         }
-        List<IRStmt> falseBlock = reorderBlocks(falseNode, graph, blocks, visited);
-        List<IRStmt> trueBlock = reorderBlocks(trueNode, graph, blocks, visited);
+        List<IRStmt> falseBlock = reorderBlocksHelper(falseNode, graph, blocks, visited);
+        List<IRStmt> trueBlock = reorderBlocksHelper(trueNode, graph, blocks, visited);
         IRStmt lastFalseStatement = falseBlock.get(falseBlock.size() - 1);
         // If last statement in false block doesn't jump or break, we need to add a jump in
         if (!(lastFalseStatement instanceof IRJump || lastFalseStatement instanceof IRReturn)) {
@@ -199,26 +197,20 @@ public class IRFuncDecl extends IRNode {
         return retBlock;
     }
 
-    @Override
-    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
-        assert n_ instanceof IRFuncDecl;
-        // Result of lowering all the children
-        // All IRSeq's should be flattened by this point
-        IRFuncDecl fd = (IRFuncDecl) n_;
-        List<IRStmt> stmts = ((IRSeq)(fd.body())).stmts();
+    public List<IRStmt> reorderBlocks(List<IRStmt> stmts) {
         // Holds the basic blocks of the program
         // Split up by "leader instructions" (jump target, after jump, first
         // instruction in the program)
         List<List<IRStmt>> blocks = new LinkedList<>();
         List<IRStmt> temp = new LinkedList<>();
-        for(IRStmt stmt : stmts) {
+        for (IRStmt stmt : stmts) {
             if (stmt instanceof IRLabel) {
                 // We encountered beginning of new block
                 blocks.add(new LinkedList<>(temp));
                 temp = new LinkedList<>();
             }
             temp.add(stmt);
-            if(stmt instanceof IRCJump || stmt instanceof IRJump ||
+            if (stmt instanceof IRCJump || stmt instanceof IRJump ||
                     stmt instanceof IRReturn) {
                 // We encountered end of block
                 blocks.add(new LinkedList<>(temp));
@@ -237,10 +229,12 @@ public class IRFuncDecl extends IRNode {
             }
         }
         // If the list of blocks is empty, we don't need to reorder it
-        if (blocks.size() == 0) { return n_; }
+        if (blocks.size() == 0) {
+            return stmts;
+        }
 
         List<IRStmt> finalStatements = new LinkedList<>();
-        finalStatements.addAll(reorderBlocks(0, constructFlowGraph(blocks),
+        finalStatements.addAll(reorderBlocksHelper(0, constructFlowGraph(blocks),
                 blocks, new boolean[blocks.size()]));
 
         // Remove last return statement before we add epilogue block
@@ -260,9 +254,20 @@ public class IRFuncDecl extends IRNode {
             }
         }
 
-        IRSeq jihun = condtionalConstantPropagation(new IRSeq(finalStatements));
-        //return new IRFuncDecl(fd.name(), new IRSeq(finalStatements));
-        return new IRFuncDecl(fd.name(), jihun);
+        return finalStatements;
+    }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        assert n_ instanceof IRFuncDecl;
+        // Result of lowering all the children
+        // All IRSeq's should be flattened by this point
+        IRFuncDecl fd = (IRFuncDecl) n_;
+        List<IRStmt> stmts = ((IRSeq) (fd.body())).stmts();
+        List<IRStmt> reordered = reorderBlocks(stmts);
+        IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reordered));
+        return new IRFuncDecl(fd.name(), ccp_optimized);
+        //return new IRFuncDecl(fd.name(), new IRSeq(reorderBlocks(stmts)));
     }
 
     public IRSeq condtionalConstantPropagation(IRSeq seq) {
@@ -289,10 +294,10 @@ public class IRFuncDecl extends IRNode {
                     } else if (stmt instanceof IRCJump) {
                         IRCJump castedStmt = (IRCJump) stmt;
                         newStmts.add(new IRCJump( // optimize the guard
-                                update(info, castedStmt.expr()), // only
-                                castedStmt.trueLabel(),
-                                castedStmt.falseLabel()
-                              )
+                                        update(info, castedStmt.expr()), // only
+                                        castedStmt.trueLabel(),
+                                        castedStmt.falseLabel()
+                                )
                         );
                     } else if (stmt instanceof IRJump
                             || stmt instanceof IRReturn) { // can't really
@@ -325,7 +330,7 @@ public class IRFuncDecl extends IRNode {
                 return expr;
             }
         } else if (expr instanceof IRBinOp) {
-            IRBinOp castedExpr = (IRBinOp) expr ;
+            IRBinOp castedExpr = (IRBinOp) expr;
             return new IRBinOp(castedExpr.opType(), // recurse on left and right
                     update(info, castedExpr.left()), // and eventually return
                     update(info, castedExpr.right())); // a IRBinOp
@@ -344,4 +349,5 @@ public class IRFuncDecl extends IRNode {
             throw new RuntimeException("Please contact jk2227@cornell.edu");
         }
     }
+
 }

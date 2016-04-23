@@ -6,32 +6,50 @@ import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
 import java.util.*;
 
 /**
- * A class for representing a pair of abstract registers that appear together
- * in a mov instrcution.
- */
-class MovePair {
-    final AssemblyAbstractRegister left;
-    final AssemblyAbstractRegister right;
-
-    MovePair(AssemblyAbstractRegister left, AssemblyAbstractRegister right) {
-        this.left = left;
-        this.right = right;
-    }
-}
-
-/**
  * You must first perform live variable analysis on your program before using
  * this class. An instance of this class can used to allocate physical
  * registers to your program's abstract registers.
  */
 public class GraphColorer {
 
+    /**
+     * A class for representing a pair of abstract registers that appear together
+     * in a mov instrcution.
+     */
+    class MovePair {
+        final AssemblyAbstractRegister left;
+        final AssemblyAbstractRegister right;
+
+        MovePair(AssemblyAbstractRegister left, AssemblyAbstractRegister right) {
+            this.left = left;
+            this.right = right;
+        }
+
+        @Override
+        public String toString() {
+            return this.left.toString() + ", " + this.right.toString();
+        }
+
+        @Override
+        public int hashCode() {
+            return this.left.hashCode() + this.right.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            MovePair other = (MovePair) o;
+            boolean result = this.left.equals(other.left) && this.right.equals(other.right);
+            result = (this.left.equals(other.right) && this.right.equals(other.left)) || result;
+            return result;
+        }
+    }
+
     // the available colors for the graph
-    public static AssemblyPhysicalRegister[] colors = {
-            AssemblyPhysicalRegister.RAX,
-            AssemblyPhysicalRegister.RBX,
-            AssemblyPhysicalRegister.RCX,
-            AssemblyPhysicalRegister.R8
+    public static AssemblyPhysicalRegister[] colors = new AssemblyPhysicalRegister[]{
+            AssemblyPhysicalRegister.R8,
+            AssemblyPhysicalRegister.R10,
+            AssemblyPhysicalRegister.R11,
+            AssemblyPhysicalRegister.R12,
     };
 
     // the interference graph
@@ -59,25 +77,11 @@ public class GraphColorer {
     // the "coloring" of our interference graph
     private Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> coloring;
 
+    // when a movePair gets changed after a coalesce, we keep track of the
+    // change here so we can backtrack later
+    private Map<MovePair, MovePair> movePairTransformations;
+
     private List<AssemblyLine> lines;
-
-    // a constructor for testing purposes
-    public GraphColorer(Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph, List<AssemblyLine> lines) {
-
-        this.removedNodes = new Stack<>();
-        this.removed = new HashSet<>();
-        this.spillNodes = new HashSet<>();
-        this.movePairs = new HashSet<>();
-        this.coalesced = new HashSet<>();
-        this.coloring = new HashMap<>();
-        this.lines = lines;
-
-        this.graph = graph;
-
-        addMovePairs();
-        removeImpossibleMovePairs();
-        colorGraph();
-    }
 
     /**
      * @param liveVariableSets the live variable sets from every program point in the program
@@ -91,6 +95,7 @@ public class GraphColorer {
         this.movePairs = new HashSet<>();
         this.coalesced = new HashSet<>();
         this.coloring = new HashMap<>();
+        this.movePairTransformations = new HashMap<>();
         this.lines = lines;
 
         this.graph = constructInterferenceGraph(liveVariableSets);
@@ -98,7 +103,26 @@ public class GraphColorer {
         addMovePairs();
         removeAbsentMovePairs();
         removeImpossibleMovePairs();
+        movePairs.clear();
         colorGraph();
+    }
+
+    /**
+     * @return a mapping from abstract registers to physical registers
+     */
+    public Map<AssemblyAbstractRegister, AssemblyExpression> getColoring() {
+        Map<AssemblyAbstractRegister, AssemblyExpression> coloring_ = new HashMap<>();
+        coloring_.putAll(coloring);
+        return coloring_;
+    }
+
+    /**
+     * Use this to define precolored nodes in the graph.
+     * @param node a node in the interference graph
+     * @param color the node's color assignment
+     */
+    public void addColoring(AssemblyAbstractRegister node, AssemblyPhysicalRegister color) {
+        coloring.put(node, color);
     }
 
     /**
@@ -116,15 +140,22 @@ public class GraphColorer {
 
             List<AssemblyAbstractRegister> list = new ArrayList<>(set);
 
-            for (int i = 0; i < list.size() - 1; i++) {
+            for (int i = 0; i < list.size(); i++) {
+                AssemblyAbstractRegister t1 = list.get(i);
+                // construct node if it doesn't exist
+                if (!graph.keySet().contains(t1)) {
+                    graph.put(t1, new ArrayList<>());
+                }
+
+                if (i == list.size() - 1) {
+                    continue;
+                }
+
                 for (int j = i + 1; j < list.size(); j++) {
-                    AssemblyAbstractRegister t1 = list.get(i);
+
                     AssemblyAbstractRegister t2 = list.get(j);
 
-                    // add nodes if they don't exist
-                    if (!graph.keySet().contains(t1)) {
-                        graph.put(t1, new ArrayList<>());
-                    }
+                    // construct node if it doesn't exist
                     if (!graph.keySet().contains(t2)) {
                         graph.put(t2, new ArrayList<>());
                     }
@@ -201,6 +232,8 @@ public class GraphColorer {
      * Mutates the given List of assembly lines.
      */
     public void updateLines() {
+        backtrackTransformedMovePairs();
+
         int i = 0;
         while (i < lines.size()) {
             if (!(lines.get(i) instanceof AssemblyInstruction)) {
@@ -223,8 +256,10 @@ public class GraphColorer {
 
             AssemblyAbstractRegister t1 = (AssemblyAbstractRegister) args.get(0);
             AssemblyAbstractRegister t2 = (AssemblyAbstractRegister) args.get(1);
-            for (MovePair pair : coalesced) {
-                if (pair.left.equals(t1) && pair.right.equals(t2)) {
+            MovePair pair = new MovePair(t1, t2);
+            for (MovePair coalescedPair : coalesced) {
+                if (pair.equals(coalescedPair)) {
+                    System.out.println("removing: " + lines.get(i));
                     lines.remove(i);
                     i--;
                     break;
@@ -355,7 +390,7 @@ public class GraphColorer {
 
             removedNodes.push(removedNode);
             removed.add(removedNode);
-            System.out.println("--" + "removing " + removedNode);
+            //System.out.println("--" + "removing " + removedNode);
 
             for (AssemblyAbstractRegister neighbor : graph.get(removedNode)) {
                 // remove removedNode from the adjacency lists of its neighbors
@@ -419,19 +454,25 @@ public class GraphColorer {
                 AssemblyAbstractRegister t1 = pair.left;
                 AssemblyAbstractRegister t2 = pair.right;
                 if (canCoalesce(t1, t2)) {
-                    System.out.println("--coalescing: " + t1 + " and " + t2);
+                    //System.out.println("--coalescing: " + t1 + " and " + t2);
                     coalesced.add(pair);
                     combineNodes(t1, t2);
                     movePairs.remove(pair);
                     Set<MovePair> removeSet = new HashSet<>();
                     Set<MovePair> addSet = new HashSet<>();
-                    for (MovePair pair_ : movePairs) {
-                        if (pair_.left.equals(t2)) {
-                            removeSet.add(pair_);
-                            addSet.add(new MovePair(t1, pair_.right));
-                        } else if(pair_.right.equals(t2)) {
-                            removeSet.add(pair_);
-                            addSet.add(new MovePair(pair_.left, t1));
+                    for (MovePair originalPair : movePairs) {
+
+                        if (originalPair.left.equals(t2)) {
+                            MovePair transformedPair = new MovePair(t1, originalPair.right);
+                            removeSet.add(originalPair);
+                            addSet.add(transformedPair);
+                            movePairTransformations.put(transformedPair, originalPair);
+
+                        } else if(originalPair.right.equals(t2)) {
+                            MovePair transformedPair = new MovePair(originalPair.left, t1);
+                            removeSet.add(originalPair);
+                            addSet.add(new MovePair(originalPair.left, t1));
+                            movePairTransformations.put(transformedPair, originalPair);
                         }
                     }
                     movePairs.removeAll(removeSet);
@@ -462,7 +503,7 @@ public class GraphColorer {
 
             // give up on all move pairs that contain the node we are freezing
             if (frozen != null) {
-                System.out.println("--freezing " + frozen);
+                //System.out.println("--freezing " + frozen);
                 Set<MovePair> removeSet = new HashSet<>();
                 for (MovePair pair_ : movePairs) {
                     if (pair_.left.equals(frozen) || pair_.right.equals(frozen)) {
@@ -493,21 +534,22 @@ public class GraphColorer {
      *
      * @return True if the graph was successfully colored. False otherwise.
      */
-    public boolean colorGraph() {
+    public void colorGraph() {
 
-        System.out.println("\n========= colorGraph() called =========");
+        //System.out.println("\n========= colorGraph() called =========");
 
         while (true) {
             boolean frozeNode;
             do {
                 boolean changed;
                 do {
-                    System.out.println("simplify");
+                    //System.out.println(graph);
+                    //System.out.println("simplify");
                     changed = simplify();
-                    System.out.println("coalesce");
+                    //System.out.println("coalesce");
                     changed = coalesce() || changed;
                 } while (changed);
-                System.out.println("freeze");
+                //System.out.println("freeze");
                 frozeNode = freeze();
             } while(frozeNode);
 
@@ -522,7 +564,7 @@ public class GraphColorer {
                 spillNode = iterator.next();
             } while (removed.contains(spillNode));
 
-            System.out.println("potential spill " + spillNode);
+            //System.out.println("potential spill " + spillNode);
             for (AssemblyAbstractRegister neighbor : graph.get(spillNode)) {
                 graph.get(neighbor).remove(spillNode);
             }
@@ -538,7 +580,7 @@ public class GraphColorer {
             movePairs.removeAll(removeSet);
         }
 
-        System.out.println("begin coloring");
+        //System.out.println("begin coloring");
         AssemblyAbstractRegister currentNode;
         while (!removedNodes.isEmpty()) {
             currentNode = removedNodes.pop();
@@ -556,12 +598,12 @@ public class GraphColorer {
                 if (!coloring.containsKey(currentNode)) {
                     AssemblyPhysicalRegister color = assignColor(neighborColors);
                     coloring.put(currentNode, color);
-                    System.out.println("--assigned " + color + " to " + currentNode);
+                    //System.out.println("--assigned " + color + " to " + currentNode);
                 }
             }
         }
 
-        System.out.println("color the spill nodes");
+        //System.out.println("color the spill nodes");
         while (spillNodes.size() > 0) {
             AssemblyAbstractRegister colorable = null;
             for (AssemblyAbstractRegister sn : spillNodes) {
@@ -583,31 +625,50 @@ public class GraphColorer {
             AssemblyPhysicalRegister color = assignColor(neighborColors);
             coloring.put(colorable, color);
             spillNodes.remove(colorable);
-            System.out.println("colored potential spill node " + colorable);
+            //System.out.println("colored potential spill node " + colorable);
         }
 
         updateLines();
+    }
 
-        System.out.println(spillNodes.size() == 0);
+    public void backtrackTransformedMovePairs() {
+        Set<MovePair> coalesced_ = new HashSet<>();
+        for (MovePair pair : coalesced) {
+            MovePair pair_ = pair;
+            while (movePairTransformations.containsKey(pair_)) {
+                pair_ = movePairTransformations.get(pair_);
+            }
+            assert pair_ != null;
+            coalesced_.add(pair_);
+        }
+        assert coalesced_.size() == coalesced.size();
+        coalesced = coalesced_;
+    }
 
+    /**
+     * @return True if the entire graph was successfully colored. False otherwise.
+     */
+    public boolean colored() {
         return spillNodes.size() == 0;
     }
 
-    /**
-     * @return a mapping from abstract registers to physical registers
-     */
-    public Map<AssemblyAbstractRegister, AssemblyExpression> getColoring() {
-        Map<AssemblyAbstractRegister, AssemblyExpression> coloring_ = new HashMap<>();
-        coloring_.putAll(coloring);
-        return coloring_;
-    }
+    // a constructor for testing purposes
+    public GraphColorer(Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph, List<AssemblyLine> lines) {
 
-    /**
-     * Use this to define precolored nodes in the graph.
-     * @param node a node in the interference graph
-     * @param color the node's color assignment
-     */
-    public void addColoring(AssemblyAbstractRegister node, AssemblyPhysicalRegister color) {
-        coloring.put(node, color);
+        this.removedNodes = new Stack<>();
+        this.removed = new HashSet<>();
+        this.spillNodes = new HashSet<>();
+        this.movePairs = new HashSet<>();
+        this.coalesced = new HashSet<>();
+        this.coloring = new HashMap<>();
+        this.movePairTransformations = new HashMap<>();
+        this.lines = lines;
+
+        this.graph = graph;
+
+        addMovePairs();
+        removeAbsentMovePairs();
+        removeImpossibleMovePairs();
+        colorGraph();
     }
 }
