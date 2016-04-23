@@ -47,10 +47,13 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 (UnreachableValueTuplesPair) node.getIn();
 
         // root is always reachable
-        if (node.getPredecessors().isEmpty()) {
+        if (node.getPredecessors().size() == 0) {
             in.setUnreachable(false);
         }
 
+        if (in.isUnreachable()) {
+            return;
+        }
         // we will update the newMap as we perform the analysis
         // if no updates are made then we are basically passing the map given
         // by the "in"
@@ -101,40 +104,43 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
             // "unreachable"
             if (guard instanceof IRConst) {
                 IRConst castedGuard = (IRConst) guard;
-                UnreachableValueTuplesPair leftPair;
-                UnreachableValueTuplesPair rightPair;
+                UnreachableValueTuplesPair falsePair;
+                UnreachableValueTuplesPair truePair;
                 assert node.getSuccessors().size() == 2;
                 if (castedGuard.value() == 1) { // if (...) always goes to true
                     // then we have to kill the false branch by sending
                     // (true, (T,..,T))
                     // and send down appropriate info to true branch
-                    leftPair = new UnreachableValueTuplesPair(false, newMap);
+                    truePair = new UnreachableValueTuplesPair(false, newMap);
                     Map<String, LatticeElement> tops = new HashMap<>();
                     for (String temp : newMap.keySet()) {
                         tops.put(temp, new LatticeTop());
                     }
-                    rightPair = new UnreachableValueTuplesPair(true, tops);
+                    falsePair = new UnreachableValueTuplesPair(true, tops);
                 } else { // if (...) always goes to false
-                    rightPair = new UnreachableValueTuplesPair(false, newMap);
+                    falsePair = new UnreachableValueTuplesPair(false, newMap);
                     Map<String, LatticeElement> tops = new HashMap<>();
                     for (String temp : newMap.keySet()) {
                         tops.put(temp, new LatticeTop());
                     }
-                    leftPair = new UnreachableValueTuplesPair(true, tops);
+                    truePair = new UnreachableValueTuplesPair(true, tops);
                 }
                 // now we set the ins of the successor
                 // however, we do a null check; if the in is not null, then
                 // we meet it with whatever is already present at the in
-                int count = 0; // count = 0 -> right/false branch
-                              // otherwise left/true branch
+                int count = 0; // count = 0 -> false branch
+                              // otherwise true branch
                 for (CFGNode successor : node.getSuccessors()) {
-                    setIn(successor, count == 0 ? rightPair : leftPair);
+                    setIn(successor, count == 0 ? falsePair : truePair);
                     count++;
                 }
+
             } else { // otherwise we can't make any of the branches "unreachable"
                     // so we pass down the same information to all the branches
                 for (CFGNode successor : node.getSuccessors()) {
-                    setIn(successor, new UnreachableValueTuplesPair(false, newMap));
+                    setIn(successor,
+                            new UnreachableValueTuplesPair(in.isUnreachable(),
+                                    newMap));
                 }
             }
         } else if (stmt instanceof IRMove) { //  ... = ...
@@ -158,11 +164,15 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 }
             }
             for (CFGNode successor : node.getSuccessors()) {
-                setIn(successor, new UnreachableValueTuplesPair(false, newMap));
+                setIn(successor,
+                        new UnreachableValueTuplesPair(in.isUnreachable(),
+                                newMap));
             }
         } else {
             for (CFGNode successor : node.getSuccessors()) {
-                setIn(successor, new UnreachableValueTuplesPair(false, newMap));
+                setIn(successor,
+                        new UnreachableValueTuplesPair(in.isUnreachable(),
+                                newMap));
             }
         }
     }
@@ -171,6 +181,8 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
     public void setIn(CFGNode successor, UnreachableValueTuplesPair newIn) {
         if (successor.getIn() == null) { // if in is null prior, then
             successor.setIn(newIn);  // in = newIn
+        } else if (newIn.isUnreachable()) {
+          // we don't do anything if new in is unreachable
         } else { // otherwise we "meet" it
             Set<LatticeElement> ins = new HashSet<>(Arrays.asList(successor.getIn(), newIn));
             successor.setIn(meet(ins));

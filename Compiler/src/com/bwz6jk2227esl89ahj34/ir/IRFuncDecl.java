@@ -1,5 +1,12 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.ConditionalConstantPropagation;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.UnreachableValueTuplesPair;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.Value;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
@@ -253,6 +260,88 @@ public class IRFuncDecl extends IRNode {
             }
         }
 
-        return new IRFuncDecl(fd.name(), new IRSeq(finalStatements));
+        IRSeq jihun = condtionalConstantPropagation(new IRSeq(finalStatements));
+        //return new IRFuncDecl(fd.name(), new IRSeq(finalStatements));
+        return new IRFuncDecl(fd.name(), jihun);
+    }
+
+    public IRSeq condtionalConstantPropagation(IRSeq seq) {
+        ConditionalConstantPropagation ccp =
+                new ConditionalConstantPropagation(seq);
+        Map<Integer, CFGNode> graph = ccp.getGraph().getNodes();
+        List<IRStmt> stmts = seq.stmts();
+        List<IRStmt> newStmts = new LinkedList<>();
+        for (int i = 0; i < stmts.size(); i++) {
+            if (graph.containsKey(i)) {
+                UnreachableValueTuplesPair info =
+                        (UnreachableValueTuplesPair) graph.get(i).getIn();
+                IRStmt stmt = stmts.get(i);
+                if (info.isUnreachable()) {
+                    System.out.println("hello");
+                    // if not reachable, we don't do anything :)
+                } else {
+                    // it is reachable, we should see if we can
+                    // propagate constants
+                    if (stmt instanceof IRMove) {
+                        IRMove castedStmt = (IRMove) stmt;
+                        newStmts.add(new IRMove(castedStmt.target(),
+                                update(info, castedStmt.expr())));
+                    } else if (stmt instanceof IRCJump) {
+                        IRCJump castedStmt = (IRCJump) stmt;
+                        newStmts.add(new IRCJump( // optimize the guard
+                                update(info, castedStmt.expr()), // only
+                                castedStmt.trueLabel(),
+                                castedStmt.falseLabel()
+                              )
+                        );
+                    } else if (stmt instanceof IRJump
+                            || stmt instanceof IRReturn) { // can't really
+                        newStmts.add(stmt); // optimize jumps or return...
+                    } else {
+                        throw new RuntimeException("Please e-mail jk2227@cornell.edu");
+                    }
+                }
+            } else {
+                newStmts.add(stmts.get(i));
+            }
+        }
+
+        return new IRSeq(newStmts);
+    }
+
+    // if the expr can be optimized and be replaced with a IRConst value
+    // then it is optimized; otherwise we return expr
+    public IRExpr update(UnreachableValueTuplesPair info, IRExpr expr) {
+        if (expr instanceof IRTemp) {
+            String tempName = ((IRTemp) expr).name();
+            if (info.getValueTuples().containsKey(tempName)) {
+                LatticeElement elem = info.getValueTuples().get(tempName);
+                if (elem instanceof LatticeBottom || elem instanceof LatticeTop) {
+                    return expr; // if unassigned or overloaded, just return IRTemp
+                } else { // otherwise, it is a value, so we return the IRConst
+                    return ((Value) elem).getValue();    // wrapped by the value
+                }
+            } else {
+                return expr;
+            }
+        } else if (expr instanceof IRBinOp) {
+            IRBinOp castedExpr = (IRBinOp) expr ;
+            return new IRBinOp(castedExpr.opType(), // recurse on left and right
+                    update(info, castedExpr.left()), // and eventually return
+                    update(info, castedExpr.right())); // a IRBinOp
+        } else if (expr instanceof IRCall) {
+            IRCall castedExpr = (IRCall) expr;
+            List<IRExpr> args = castedExpr.args();
+            List<IRExpr> newArgs = new LinkedList<>();
+            for (IRExpr arg : args) {
+                newArgs.add(update(info, arg));
+            }
+            return new IRCall(castedExpr.target(), newArgs);
+        } else if (expr instanceof IRConst) {
+            return expr; // can't optimize IRConst further
+        } else { // doomed
+            System.out.println(expr);
+            throw new RuntimeException("Please contact jk2227@cornell.edu");
+        }
     }
 }

@@ -12,6 +12,7 @@ import com.bwz6jk2227esl89ahj34.assembly.AssemblyProgram;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGIR;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions.AvailableExpressionsAnalysis;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.ConditionalConstantPropagation;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
         .LiveVariableAnalysis;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
@@ -277,18 +278,17 @@ public class Core {
         IRCompUnit mirRoot = mirGen(file, program.get());
         IRCompUnit lirRoot = irGen(file, mirRoot);
 
-        // Testing IR CFG
-//        for (String functionName : lirRoot.functions().keySet()) {
-//            IRSeq seq = (IRSeq) lirRoot.functions().get(functionName).body();
-//            AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(seq);
-//
-//            Util.writeHelper(
-//                    "analysis" + functionName,
-//                    "dot",
-//                    "./",
-//                    Collections.singletonList(analysis.toString())
-//            );
-//        }
+        for (String functionName : lirRoot.functions().keySet()) {
+            IRSeq seq = (IRSeq) lirRoot.functions().get(functionName).body();
+            //AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(seq);
+            ConditionalConstantPropagation analysis = new ConditionalConstantPropagation(seq);
+            Util.writeHelper(
+                    "analysis" + functionName,
+                    "dot",
+                    "./",
+                    Collections.singletonList(analysis.toString())
+            );
+        }
 
         if (Main.irrun()) {
             irRun(file);

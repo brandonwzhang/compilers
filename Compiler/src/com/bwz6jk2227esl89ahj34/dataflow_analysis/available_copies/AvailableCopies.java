@@ -22,7 +22,7 @@ public class AvailableCopies extends DataflowAnalysis {
 
          // assumption: out of predecessor is filled in
          AvailableCopiesSet in;
-         Set<CFGNode> predecessors = node.getPredecessors();
+         List<CFGNode> predecessors = node.getPredecessors();
          if (predecessors.size() == 0) { // root node with no in[n]
              node.setOut(kill(node).union(gen(node)));
          } else {

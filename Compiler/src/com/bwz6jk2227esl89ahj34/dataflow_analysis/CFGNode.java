@@ -3,21 +3,27 @@ package com.bwz6jk2227esl89ahj34.dataflow_analysis;
 import lombok.Data;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 @Data
 
 public abstract class CFGNode {
-    private Set<CFGNode> predecessors = new HashSet<>();
-    private Set<CFGNode> successors = new HashSet<>();
+    private List<CFGNode> predecessors = new LinkedList<>();
+    private List<CFGNode> successors = new LinkedList<>();
     private LatticeElement in;
     private LatticeElement out;
 
     public void addPredecessor(CFGNode node) {
-        predecessors.add(node);
+        if (!predecessors.contains(node)) {
+            predecessors.add(node);
+        }
     }
 
     public void addSuccessor(CFGNode node) {
-        successors.add(node);
+        if (!successors.contains(node)) {
+            successors.add(node);
+        }
     }
 
     @Override
