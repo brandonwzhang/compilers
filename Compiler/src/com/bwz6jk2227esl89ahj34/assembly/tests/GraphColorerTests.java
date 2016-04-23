@@ -14,19 +14,19 @@ import java.util.Map;
 
 public class GraphColorerTests {
 
-    AssemblyAbstractRegister a = new AssemblyAbstractRegister(); // %0
-    AssemblyAbstractRegister b = new AssemblyAbstractRegister(); // %1
-    AssemblyAbstractRegister c = new AssemblyAbstractRegister(); // %2
-    AssemblyAbstractRegister d = new AssemblyAbstractRegister(); // %3
-    AssemblyAbstractRegister e = new AssemblyAbstractRegister(); // %4
-    AssemblyAbstractRegister f = new AssemblyAbstractRegister(); // %5
+    static AssemblyAbstractRegister a = new AssemblyAbstractRegister(); // %0
+    static AssemblyAbstractRegister b = new AssemblyAbstractRegister(); // %1
+    static AssemblyAbstractRegister c = new AssemblyAbstractRegister(); // %2
+    static AssemblyAbstractRegister d = new AssemblyAbstractRegister(); // %3
+    static AssemblyAbstractRegister e = new AssemblyAbstractRegister(); // %4
+    static AssemblyAbstractRegister f = new AssemblyAbstractRegister(); // %5
 
-    List<AssemblyAbstractRegister> an;
-    List<AssemblyAbstractRegister> bn;
-    List<AssemblyAbstractRegister> cn;
-    List<AssemblyAbstractRegister> dn;
-    List<AssemblyAbstractRegister> en;
-    List<AssemblyAbstractRegister> fn;
+    static List<AssemblyAbstractRegister> an;
+    static List<AssemblyAbstractRegister> bn;
+    static List<AssemblyAbstractRegister> cn;
+    static List<AssemblyAbstractRegister> dn;
+    static List<AssemblyAbstractRegister> en;
+    static List<AssemblyAbstractRegister> fn;
 
     Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph;
     List<AssemblyLine> lines;
@@ -72,8 +72,7 @@ public class GraphColorerTests {
         lines.add(new AssemblyInstruction(OpCode.MOVQ, b, e));
 
         GraphColorer gc = new GraphColorer(graph, lines);
-        boolean colored = gc.colorGraph();
-        Assert.assertTrue(colored);
+        Assert.assertTrue(gc.colored());
 
         printColoring(gc.getColoring());
     }
@@ -103,8 +102,7 @@ public class GraphColorerTests {
         lines.add(new AssemblyInstruction(OpCode.MOVQ, a, c));
 
         GraphColorer gc = new GraphColorer(graph, lines);
-        boolean colored = gc.colorGraph();
-        Assert.assertTrue(colored);
+        Assert.assertTrue(gc.colored());
 
         printColoring(gc.getColoring());
     }
@@ -134,8 +132,7 @@ public class GraphColorerTests {
         lines.add(new AssemblyInstruction(OpCode.MOVQ, a, c));
 
         GraphColorer gc = new GraphColorer(graph, lines);
-        boolean colored = gc.colorGraph();
-        Assert.assertFalse(colored);
+        Assert.assertFalse(gc.colored());
 
         printColoring(gc.getColoring());
     }
@@ -160,8 +157,7 @@ public class GraphColorerTests {
         lines.add(new AssemblyInstruction(OpCode.MOVQ, a, c));
 
         GraphColorer gc = new GraphColorer(graph, lines);
-        boolean colored = gc.colorGraph();
-        Assert.assertTrue(colored);
+        Assert.assertTrue(gc.colored());
         Assert.assertEquals(0, lines.size());
 
         printColoring(gc.getColoring());
@@ -192,8 +188,7 @@ public class GraphColorerTests {
         lines.add(new AssemblyInstruction(OpCode.MOVQ, b, d));
 
         GraphColorer gc = new GraphColorer(graph, lines);
-        boolean colored = gc.colorGraph();
-        Assert.assertTrue(colored);
+        Assert.assertTrue(gc.colored());
 
         printColoring(gc.getColoring());
         System.out.println(lines);
@@ -216,8 +211,7 @@ public class GraphColorerTests {
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn);
 
         GraphColorer gc = new GraphColorer(graph, lines);
-        boolean colored = gc.colorGraph();
-        Assert.assertTrue(colored);
+        Assert.assertTrue(gc.colored());
 
         printColoring(gc.getColoring());
     }
@@ -242,8 +236,7 @@ public class GraphColorerTests {
         graph.put(a, an); graph.put(b, bn); graph.put(c, cn); graph.put(d, dn); graph.put(e, en);
 
         GraphColorer gc = new GraphColorer(graph, lines);
-        boolean colored = gc.colorGraph();
-        Assert.assertTrue(colored);
+        Assert.assertTrue(gc.colored());
 
         printColoring(gc.getColoring());
     }
@@ -272,8 +265,7 @@ public class GraphColorerTests {
         lines.add(new AssemblyInstruction(OpCode.MOVQ, b, e));
 
         GraphColorer gc = new GraphColorer(graph, lines);
-        boolean colored = gc.colorGraph();
-        Assert.assertTrue(colored);
+        Assert.assertTrue(gc.colored());
 
         printColoring(gc.getColoring());
     }
