@@ -96,6 +96,7 @@ public class GraphColorer {
         this.graph = constructInterferenceGraph(liveVariableSets);
 
         addMovePairs();
+        removeAbsentMovePairs();
         removeImpossibleMovePairs();
         colorGraph();
     }
@@ -184,6 +185,16 @@ public class GraphColorer {
         movePairs.removeAll(removeSet);
     }
 
+    public void removeAbsentMovePairs() {
+        Set<MovePair> removeSet = new HashSet<>();
+        for (MovePair pair : movePairs) {
+            if (graph.get(pair.left) == null || graph.get(pair.right) == null) {
+                removeSet.add(pair);
+            }
+        }
+        movePairs.removeAll(removeSet);
+    }
+
     /**
      * Call this after graph coloring and move coalescing.
      * Removes any move instructions that were coasleced.
@@ -213,7 +224,7 @@ public class GraphColorer {
             AssemblyAbstractRegister t1 = (AssemblyAbstractRegister) args.get(0);
             AssemblyAbstractRegister t2 = (AssemblyAbstractRegister) args.get(1);
             for (MovePair pair : coalesced) {
-                if (pair.left == t1 && pair.right == t2) {
+                if (pair.left.equals(t1) && pair.right.equals(t2)) {
                     lines.remove(i);
                     i--;
                     break;
@@ -280,7 +291,7 @@ public class GraphColorer {
      */
     public boolean isMoveRelated(AssemblyAbstractRegister node) {
         for (MovePair pair : movePairs) {
-            if (pair.left == node || pair.right == node) {
+            if (pair.left.equals(node) || pair.right.equals(node)) {
                 return true;
             }
         }
@@ -415,10 +426,10 @@ public class GraphColorer {
                     Set<MovePair> removeSet = new HashSet<>();
                     Set<MovePair> addSet = new HashSet<>();
                     for (MovePair pair_ : movePairs) {
-                        if (pair_.left == t2) {
+                        if (pair_.left.equals(t2)) {
                             removeSet.add(pair_);
                             addSet.add(new MovePair(t1, pair_.right));
-                        } else if(pair_.right == t2) {
+                        } else if(pair_.right.equals(t2)) {
                             removeSet.add(pair_);
                             addSet.add(new MovePair(pair_.left, t1));
                         }
@@ -454,7 +465,7 @@ public class GraphColorer {
                 System.out.println("--freezing " + frozen);
                 Set<MovePair> removeSet = new HashSet<>();
                 for (MovePair pair_ : movePairs) {
-                    if (pair_.left == frozen || pair_.right == frozen) {
+                    if (pair_.left.equals(frozen) || pair_.right.equals(frozen)) {
                         removeSet.add(pair_);
                     }
                 }
@@ -520,7 +531,7 @@ public class GraphColorer {
             spillNodes.add(spillNode);
             Set<MovePair> removeSet = new HashSet<>();
             for (MovePair pair : movePairs) {
-                if (pair.left == spillNode || pair.right == spillNode) {
+                if (pair.left.equals(spillNode) || pair.right.equals(spillNode)) {
                     removeSet.add(pair);
                 }
             }
@@ -576,6 +587,8 @@ public class GraphColorer {
         }
 
         updateLines();
+
+        System.out.println(spillNodes.size() == 0);
 
         return spillNodes.size() == 0;
     }
