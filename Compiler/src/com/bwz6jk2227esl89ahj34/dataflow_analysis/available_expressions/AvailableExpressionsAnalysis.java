@@ -112,39 +112,34 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         IRStmt stmt = ((CFGNodeIR)node).getStatement();
         assert stmt != null;
 
-        if (stmt instanceof IRMove) {
-            IRMove move = (IRMove) stmt;
+        if (!(stmt instanceof IRMove)) {
+            // We only kill upon encountering move
+            return;
+        }
 
-            // x = e
-            if (move.target() instanceof IRTemp){
-                IRTemp x = (IRTemp)move.target();
-                for (Iterator<IRExpr> i = out.iterator(); i.hasNext();) {
-                    IRExpr expr = i.next();
-                    // remove if expr contains any usage of x
-                    if (containsCondition(expr, e -> (e instanceof IRTemp) ? ((IRTemp)e).name().equals(x.name()) : false)) {
-                        i.remove();
-                    }
-                }
-            }
+        IRMove move = (IRMove) stmt;
 
+        Predicate filter;
+        if (move.target() instanceof IRTemp) {
+            // Remove if expr contains any usage of x
+            IRTemp x = (IRTemp)move.target();
+            filter = e -> (e instanceof IRTemp) ? ((IRTemp)e).name().equals(x.name()) : false;
+        } else if (move.target() instanceof IRMem || move.expr() instanceof IRCall) {
             // [e1] = e or x = f(e...)
-            // Idea: Remove any expression with an [e'] where e' can alias e1
-            // Idea: Remove any expression with an [e'] where f can affect [e']
-            if (move.target() instanceof IRMem || move.expr() instanceof IRCall) {
-                // PANIC MODE: Kill everything
+            // Remove any expression with an [e'] where e' can alias e1
+            // Remove any expression with an [e'] where f can affect [e']
+            // We'll just remove any IRMem to be overly conservative
+            filter = e -> e instanceof IRMem;
+        } else {
+            return;
+        }
 
-                // normal mode: kill any expression with [e'] where e' can alias e1
-                for (Iterator<IRExpr> i = out.iterator(); i.hasNext();) {
-                    IRExpr expr = i.next();
-                    // remove if expr contains potential alias
-
-                    // For the project's sake, we will remove any expression
-                    // that has an IRMem at all
-                    if (containsCondition(expr, e -> e instanceof IRMem)) {
-                        i.remove();
-                    }
-                }
-
+        // Remove any exprs that satisfy the filter
+        for (Iterator<IRExpr> i = out.iterator(); i.hasNext();) {
+            IRExpr expr = i.next();
+            // remove if expr contains any usage of x
+            if (containsCondition(expr, filter)) {
+                i.remove();
             }
         }
     }
