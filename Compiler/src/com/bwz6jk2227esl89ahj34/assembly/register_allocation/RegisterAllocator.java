@@ -14,8 +14,7 @@ import com.bwz6jk2227esl89ahj34.util.Util;
 import java.util.*;
 
 public class RegisterAllocator {
-    public static final AssemblyPhysicalRegister[] shuttleRegisters = {AssemblyPhysicalRegister.R13,
-            AssemblyPhysicalRegister.R14, AssemblyPhysicalRegister.R15};
+    public static final AssemblyPhysicalRegister[] shuttleRegisters = AssemblyPhysicalRegister.shuttleRegisters;
     private static Map<AssemblyAbstractRegister, AssemblyExpression> registerMap;
     // Counts the number of spilled temps that have been encountered in an instruction
     // For each instruction, this should be reset to 0
@@ -44,6 +43,8 @@ public class RegisterAllocator {
         // Use Kempe's algorithm to allocate physical locations to abstract registers
         GraphColorer graphColorer = new GraphColorer(interferenceSets, lines);
         registerMap = graphColorer.getColoring();
+//        registerMap = new HashMap<>();
+
         // Translate all the instructions
         List<AssemblyLine> translatedLines = new LinkedList<>();
         for (AssemblyLine line : lines) {
