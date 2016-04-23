@@ -233,7 +233,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
 
     // helper function that returns if two IRExprs are structurally equal
     public boolean exprEquals(IRExpr e1, IRExpr e2) {
-        if (!e1.getClass().equals(e2)) {
+        if (!e1.getClass().equals(e2.getClass())) {
             return false;
         }
 
