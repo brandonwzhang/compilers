@@ -77,6 +77,10 @@ public class GraphColorer {
     // the "coloring" of our interference graph
     private Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> coloring;
 
+    // when a movePair gets changed after a coalesce, we keep track of the
+    // change here so we can backtrack later
+    private Map<MovePair, MovePair> movePairTransformations;
+
     private List<AssemblyLine> lines;
 
     /**
@@ -227,6 +231,8 @@ public class GraphColorer {
      * Mutates the given List of assembly lines.
      */
     public void updateLines() {
+        backtrackTransformedMovePairs();
+
         int i = 0;
         while (i < lines.size()) {
             if (!(lines.get(i) instanceof AssemblyInstruction)) {
@@ -252,6 +258,7 @@ public class GraphColorer {
             MovePair pair = new MovePair(t1, t2);
             for (MovePair coalescedPair : coalesced) {
                 if (pair.equals(coalescedPair)) {
+                    System.out.println("removing: " + lines.get(i));
                     lines.remove(i);
                     i--;
                     break;
@@ -452,13 +459,19 @@ public class GraphColorer {
                     movePairs.remove(pair);
                     Set<MovePair> removeSet = new HashSet<>();
                     Set<MovePair> addSet = new HashSet<>();
-                    for (MovePair pair_ : movePairs) {
-                        if (pair_.left.equals(t2)) {
-                            removeSet.add(pair_);
-                            addSet.add(new MovePair(t1, pair_.right));
-                        } else if(pair_.right.equals(t2)) {
-                            removeSet.add(pair_);
-                            addSet.add(new MovePair(pair_.left, t1));
+                    for (MovePair originalPair : movePairs) {
+
+                        if (originalPair.left.equals(t2)) {
+                            MovePair transformedPair = new MovePair(t1, originalPair.right);
+                            removeSet.add(originalPair);
+                            addSet.add(transformedPair);
+                            movePairTransformations.put(transformedPair, originalPair);
+
+                        } else if(originalPair.right.equals(t2)) {
+                            MovePair transformedPair = new MovePair(originalPair.left, t1);
+                            removeSet.add(originalPair);
+                            addSet.add(new MovePair(originalPair.left, t1));
+                            movePairTransformations.put(transformedPair, originalPair);
                         }
                     }
                     movePairs.removeAll(removeSet);
@@ -521,7 +534,7 @@ public class GraphColorer {
      * @return True if the graph was successfully colored. False otherwise.
      */
     public void colorGraph() {
-
+        
         //System.out.println("\n========= colorGraph() called =========");
 
         while (true) {
@@ -615,6 +628,20 @@ public class GraphColorer {
         }
 
         updateLines();
+    }
+
+    public void backtrackTransformedMovePairs() {
+        Set<MovePair> coalesced_ = new HashSet<>();
+        for (MovePair pair : coalesced) {
+            MovePair pair_ = pair;
+            while (movePairTransformations.containsKey(pair_)) {
+                pair_ = movePairTransformations.get(pair_);
+            }
+            assert pair_ != null;
+            coalesced_.add(pair_);
+        }
+        assert coalesced_.size() == coalesced.size();
+        coalesced = coalesced_;
     }
 
     /**
