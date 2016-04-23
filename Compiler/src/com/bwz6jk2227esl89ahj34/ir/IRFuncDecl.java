@@ -5,8 +5,6 @@ import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.*;
 
@@ -134,8 +132,8 @@ public class IRFuncDecl extends IRNode {
         return graph;
     }
 
-    private List<IRStmt> reorderBlocks(int curNode, Map<Integer, List<Integer>> graph,
-                                       List<List<IRStmt>> blocks, boolean[] visited) {
+    private List<IRStmt> reorderBlocksHelper(int curNode, Map<Integer, List<Integer>> graph,
+                                             List<List<IRStmt>> blocks, boolean[] visited) {
         visited[curNode] = true;
         List<IRStmt> block = blocks.get(curNode);
         List<Integer> successors = graph.get(curNode);
@@ -148,7 +146,7 @@ public class IRFuncDecl extends IRNode {
                 return block;
             }
             List<IRStmt> retBlock = new LinkedList<>(block);
-            retBlock.addAll(reorderBlocks(successors.get(0), graph, blocks, visited));
+            retBlock.addAll(reorderBlocksHelper(successors.get(0), graph, blocks, visited));
             return retBlock;
         }
 
@@ -169,16 +167,16 @@ public class IRFuncDecl extends IRNode {
         } else if (visited[falseNode]) {
             // Only add true statements
             List<IRStmt> retBlock = new LinkedList<>(block);
-            retBlock.addAll(reorderBlocks(trueNode, graph, blocks, visited));
+            retBlock.addAll(reorderBlocksHelper(trueNode, graph, blocks, visited));
             return retBlock;
         } else if (visited[trueNode]) {
             // Only add false statements
             List<IRStmt> retBlock = new LinkedList<>(block);
-            retBlock.addAll(reorderBlocks(falseNode, graph, blocks, visited));
+            retBlock.addAll(reorderBlocksHelper(falseNode, graph, blocks, visited));
             return retBlock;
         }
-        List<IRStmt> falseBlock = reorderBlocks(falseNode, graph, blocks, visited);
-        List<IRStmt> trueBlock = reorderBlocks(trueNode, graph, blocks, visited);
+        List<IRStmt> falseBlock = reorderBlocksHelper(falseNode, graph, blocks, visited);
+        List<IRStmt> trueBlock = reorderBlocksHelper(trueNode, graph, blocks, visited);
         IRStmt lastFalseStatement = falseBlock.get(falseBlock.size() - 1);
         // If last statement in false block doesn't jump or break, we need to add a jump in
         if (!(lastFalseStatement instanceof IRJump || lastFalseStatement instanceof IRReturn)) {
@@ -192,13 +190,7 @@ public class IRFuncDecl extends IRNode {
         return retBlock;
     }
 
-    @Override
-    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
-        assert n_ instanceof IRFuncDecl;
-        // Result of lowering all the children
-        // All IRSeq's should be flattened by this point
-        IRFuncDecl fd = (IRFuncDecl) n_;
-        List<IRStmt> stmts = ((IRSeq)(fd.body())).stmts();
+    public List<IRStmt> reorderBlocks(List<IRStmt> stmts) {
         // Holds the basic blocks of the program
         // Split up by "leader instructions" (jump target, after jump, first
         // instruction in the program)
@@ -230,10 +222,10 @@ public class IRFuncDecl extends IRNode {
             }
         }
         // If the list of blocks is empty, we don't need to reorder it
-        if (blocks.size() == 0) { return n_; }
+        if (blocks.size() == 0) { return stmts; }
 
         List<IRStmt> finalStatements = new LinkedList<>();
-        finalStatements.addAll(reorderBlocks(0, constructFlowGraph(blocks),
+        finalStatements.addAll(reorderBlocksHelper(0, constructFlowGraph(blocks),
                 blocks, new boolean[blocks.size()]));
 
         // Remove last return statement before we add epilogue block
@@ -253,6 +245,16 @@ public class IRFuncDecl extends IRNode {
             }
         }
 
-        return new IRFuncDecl(fd.name(), new IRSeq(finalStatements));
+        return finalStatements;
+    }
+
+    @Override
+    public IRNode leave(IRVisitor v, IRNode n, IRNode n_) {
+        assert n_ instanceof IRFuncDecl;
+        // Result of lowering all the children
+        // All IRSeq's should be flattened by this point
+        IRFuncDecl fd = (IRFuncDecl) n_;
+        List<IRStmt> stmts = ((IRSeq)(fd.body())).stmts();
+        return new IRFuncDecl(fd.name(), new IRSeq(reorderBlocks(stmts)));
     }
 }
