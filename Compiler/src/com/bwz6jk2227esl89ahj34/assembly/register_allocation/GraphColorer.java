@@ -174,7 +174,9 @@ public class GraphColorer {
     public void removeImpossibleMovePairs() {
         Set<MovePair> removeSet = new HashSet<>();
         for (MovePair pair : movePairs) {
-            if (graph.get(pair.left).contains(pair.right) || graph.get(pair.right).contains(pair.left)) {
+            if (graph.get(pair.left) != null && graph.get(pair.left).contains(pair.right)) {
+                removeSet.add(pair);
+            } else if (graph.get(pair.right) != null && graph.get(pair.right).contains(pair.left)) {
                 removeSet.add(pair);
             }
         }
