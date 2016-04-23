@@ -163,6 +163,10 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
             if (s instanceof IRMove) {
                 IRMove move = (IRMove)s;
                 addSubexprs(move.expr(), set);
+
+                if (move.target() instanceof IRMem) {
+                    addSubexprs(move.target(), set);
+                }
             }
         }
 
@@ -305,7 +309,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
                 return e2;
             }
         }
-        throw new RuntimeException("Expression not found in top for" +
+        throw new RuntimeException("Expression not found in top for " +
                 "available expressions analysis. Please email esl89@cornell.edu");
     }
 
