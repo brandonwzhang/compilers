@@ -51,12 +51,12 @@ public class StatementCodeGenerators {
 
         // prologue, call, move, epilogue
         functionCall(castedRoot.expr(), lines);
+        functionCallEpilogue(lines);
         lines.add(
                 new AssemblyInstruction(OpCode.MOVQ,
                         AssemblyPhysicalRegister.RAX,
                         translateExpression(castedRoot.target(), lines, false))
         );
-        functionCallEpilogue(lines);
 
         return lines;
     };
