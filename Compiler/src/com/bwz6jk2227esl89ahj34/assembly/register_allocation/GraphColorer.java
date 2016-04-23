@@ -45,7 +45,13 @@ public class GraphColorer {
     }
 
     // the available colors for the graph
-    public static AssemblyPhysicalRegister[] colors = AssemblyPhysicalRegister.calleeSavedRegisters;
+    public static AssemblyPhysicalRegister[] colors = new AssemblyPhysicalRegister[]{
+            AssemblyPhysicalRegister.R8,
+            AssemblyPhysicalRegister.R9,
+            AssemblyPhysicalRegister.R10,
+            AssemblyPhysicalRegister.R11,
+            AssemblyPhysicalRegister.R12,
+    };
 
     // the interference graph
     private Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph;
