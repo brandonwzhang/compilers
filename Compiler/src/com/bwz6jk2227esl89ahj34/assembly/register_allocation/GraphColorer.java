@@ -97,6 +97,7 @@ public class GraphColorer {
 
         addMovePairs();
         removeImpossibleMovePairs();
+        colorGraph();
     }
 
     /**

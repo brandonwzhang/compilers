@@ -278,17 +278,17 @@ public class Core {
         IRCompUnit lirRoot = irGen(file, mirRoot);
 
         // Testing IR CFG
-        for (String functionName : lirRoot.functions().keySet()) {
-            IRSeq seq = (IRSeq) lirRoot.functions().get(functionName).body();
-            AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(seq);
-
-            Util.writeHelper(
-                    "analysis" + functionName,
-                    "dot",
-                    "./",
-                    Collections.singletonList(analysis.toString())
-            );
-        }
+//        for (String functionName : lirRoot.functions().keySet()) {
+//            IRSeq seq = (IRSeq) lirRoot.functions().get(functionName).body();
+//            AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(seq);
+//
+//            Util.writeHelper(
+//                    "analysis" + functionName,
+//                    "dot",
+//                    "./",
+//                    Collections.singletonList(analysis.toString())
+//            );
+//        }
 
         if (Main.irrun()) {
             irRun(file);

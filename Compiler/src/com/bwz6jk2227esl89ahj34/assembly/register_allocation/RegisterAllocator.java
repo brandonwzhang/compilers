@@ -42,7 +42,8 @@ public class RegisterAllocator {
             interferenceSets.add(((LiveVariableSet) element).getLiveVars());
         }
         // Use Kempe's algorithm to allocate physical locations to abstract registers
-        registerMap = new HashMap<>();// TODO: Call Andy's code on interferenceSets
+        GraphColorer graphColorer = new GraphColorer(interferenceSets, lines);
+        registerMap = graphColorer.getColoring();
 
         // Translate all the instructions
         List<AssemblyLine> translatedLines = new LinkedList<>();
