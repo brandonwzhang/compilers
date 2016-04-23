@@ -1,10 +1,7 @@
 package com.bwz6jk2227esl89ahj34.assembly.tests;
 
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyAbstractRegister;
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction;
+import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyPhysicalRegister;
 import com.bwz6jk2227esl89ahj34.assembly.register_allocation.GraphColorer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -281,7 +278,7 @@ public class GraphColorerTests {
         printColoring(gc.getColoring());
     }
 
-    public void printColoring(Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> coloring) {
+    public void printColoring(Map<AssemblyAbstractRegister, AssemblyExpression> coloring) {
         System.out.println("\n" + GraphColorer.colors.length + " available colors");
         System.out.println(graph.size() + " nodes in the graph");
         System.out.println(coloring.size() + " nodes colored");
