@@ -29,5 +29,10 @@ public class Value extends LatticeElement {
         return new Value(new IRConst(value.value()));
     }
 
+    @Override
+    public String toString() {
+        return value.toString();
+    }
+
 
 }

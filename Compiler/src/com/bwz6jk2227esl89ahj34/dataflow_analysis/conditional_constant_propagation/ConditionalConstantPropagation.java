@@ -61,7 +61,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
             IRExpr guard = castedStmt.expr();
             if (guard instanceof IRTemp) { // if (x)
                 IRTemp castedGuard = (IRTemp) guard;
-                LatticeElement value = newMap.get(castedGuard);
+                LatticeElement value = newMap.get(castedGuard.name());
                 if (value instanceof Value) { // x = an actual value
                     guard = ((Value) value).getValue();
                     // this will trigger a if statement later in the code
@@ -72,13 +72,17 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 IRExpr right = castedGuard.right();
 
                 // can we substitute in const values for left and right?
-                if (left instanceof IRTemp
-                        && newMap.get(left) instanceof Value) {
-                    left = ((Value)(newMap.get(left))).getValue();
+                if (left instanceof IRTemp) {
+                    String leftName = ((IRTemp) left).name();
+                    if (newMap.get(leftName) instanceof Value) {
+                        left = ((Value) (newMap.get(leftName))).getValue();
+                    }
                 }
-                if (right instanceof IRTemp
-                        && newMap.get(right) instanceof Value) {
-                    right = ((Value)(newMap.get(right))).getValue();
+                if (right instanceof IRTemp) {
+                    String rightName = ((IRTemp) right).name();
+                    if (newMap.get(rightName) instanceof Value) {
+                        right = ((Value) (newMap.get(rightName))).getValue();
+                    }
                 }
 
                 // if we can then simplify the binop!
@@ -148,7 +152,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                     newMap.put(castedTarget, new LatticeBottom());
                 } else if (castedNode.expr() instanceof IRTemp) {
                     // x = y then we update x so that it takes the value of y
-                    newMap.put(castedTarget, newMap.get((IRTemp) castedNode.expr()));
+                    newMap.put(castedTarget, newMap.get(((IRTemp) castedNode.expr()).name()));
                 } else { // shouldn't reach here
                     throw new RuntimeException("Please contact jk2227@cornell.edu");
                 }
@@ -183,7 +187,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
             accumulator.setUnreachable(accumulator.isUnreachable()
                     && next.isUnreachable()); // AND the unreachable boolean values
             Map<String, LatticeElement> accumulatorMap = accumulator.getValueTuples();
-            Map<String, LatticeElement> nextMap = accumulator.getValueTuples();
+            Map<String, LatticeElement> nextMap = next.getValueTuples();
             for (String key : accumulatorMap.keySet()) { // update values accordingly
                 accumulatorMap.put(key,
                         valueMeet(accumulatorMap.get(key), nextMap.get(key)));
