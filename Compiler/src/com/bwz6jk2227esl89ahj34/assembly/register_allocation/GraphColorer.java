@@ -134,15 +134,22 @@ public class GraphColorer {
 
             List<AssemblyAbstractRegister> list = new ArrayList<>(set);
 
-            for (int i = 0; i < list.size() - 1; i++) {
+            for (int i = 0; i < list.size(); i++) {
+                AssemblyAbstractRegister t1 = list.get(i);
+                // construct node if it doesn't exist
+                if (!graph.keySet().contains(t1)) {
+                    graph.put(t1, new ArrayList<>());
+                }
+
+                if (i == list.size() - 1) {
+                    continue;
+                }
+
                 for (int j = i + 1; j < list.size(); j++) {
-                    AssemblyAbstractRegister t1 = list.get(i);
+
                     AssemblyAbstractRegister t2 = list.get(j);
 
-                    // add nodes if they don't exist
-                    if (!graph.keySet().contains(t1)) {
-                        graph.put(t1, new ArrayList<>());
-                    }
+                    // construct node if it doesn't exist
                     if (!graph.keySet().contains(t2)) {
                         graph.put(t2, new ArrayList<>());
                     }
@@ -520,6 +527,7 @@ public class GraphColorer {
             do {
                 boolean changed;
                 do {
+                    System.out.println(graph);
                     System.out.println("simplify");
                     changed = simplify();
                     System.out.println("coalesce");
