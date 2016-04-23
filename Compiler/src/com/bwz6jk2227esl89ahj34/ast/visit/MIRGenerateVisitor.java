@@ -643,12 +643,15 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRStmt falseBlock = (IRStmt) generatedNodes.pop();
             statements.add(falseBlock);
             statements.add(new IRJump(new IRName(endLabelName)));
-        } else {
+        } else { // the falselabel is to make cjumps consistent
             String falseLabelName = getFreshVariable();
-            IRCJump cjump = new IRCJump(guard, trueLabelName);
+            IRLabel falseLabel = new IRLabel(falseLabelName);
+            IRCJump cjump = new IRCJump(guard, trueLabelName, falseLabelName);
             statements.add(cjump);
             statements.add(trueLabel);
             statements.add(trueBlock);
+            statements.add(new IRJump(new IRName(endLabelName)));
+            statements.add(falseLabel);
             statements.add(new IRJump(new IRName(endLabelName)));
         }
         statements.add(endLabel);
