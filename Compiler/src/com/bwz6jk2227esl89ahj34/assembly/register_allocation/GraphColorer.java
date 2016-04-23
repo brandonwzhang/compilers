@@ -249,8 +249,9 @@ public class GraphColorer {
 
             AssemblyAbstractRegister t1 = (AssemblyAbstractRegister) args.get(0);
             AssemblyAbstractRegister t2 = (AssemblyAbstractRegister) args.get(1);
-            for (MovePair pair : coalesced) {
-                if (pair.left.equals(t1) && pair.right.equals(t2)) {
+            MovePair pair = new MovePair(t1, t2);
+            for (MovePair coalescedPair : coalesced) {
+                if (pair.equals(coalescedPair)) {
                     lines.remove(i);
                     i--;
                     break;
