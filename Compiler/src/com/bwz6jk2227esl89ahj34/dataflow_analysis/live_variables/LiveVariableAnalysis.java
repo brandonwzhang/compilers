@@ -13,7 +13,6 @@ public class LiveVariableAnalysis extends DataflowAnalysis{
     private static Set<OpCode> defOpCodes;
 
     static {
-//        OpCode[] defOpCodesArr = {OpCode.MOVQ, OpCode.MOVZX};
         OpCode[] defOpCodesArr = {OpCode.MOVQ, OpCode.MOVZX};
         defOpCodes = new HashSet<>(Arrays.asList(defOpCodesArr));
     }
