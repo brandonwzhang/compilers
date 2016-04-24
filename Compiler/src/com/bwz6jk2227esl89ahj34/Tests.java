@@ -42,7 +42,7 @@ public class Tests {
         Main.setLibPath(Util.rootPath + "/lib");
         Main.setAssemblyPath(".");
 
-        List<String> results = new LinkedList<>();
+        List<String> failed = new LinkedList<>();
         for (String file : files) {
             String fileName = file.substring(0, file.lastIndexOf('.'));
 
@@ -56,10 +56,8 @@ public class Tests {
             List<String> assemblyResults = Util.runCommand(assemblyCommand);
 
             // Store results
-            if (irResults.equals(assemblyResults)) {
-                results.add(file + ": passed");
-            } else {
-                results.add(file + ": failed");
+            if (!irResults.equals(assemblyResults)) {
+                failed.add(file + ": failed");
             }
 
             // Get rid of output files
@@ -76,9 +74,13 @@ public class Tests {
         }
 
         // Print out results
-        System.out.println("===============RESULTS===============");
-        for (String result : results) {
-            System.out.println(result);
+        if (failed.size() > 0) {
+            System.out.println("===============FAILED===============");
+            for (String result : failed) {
+                System.out.println(result);
+            }
+        } else {
+            System.out.println("=============ALL PASSED=============");
         }
     }
 
