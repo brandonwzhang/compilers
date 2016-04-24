@@ -75,12 +75,12 @@ public class Tests {
 
         // Print out results
         if (failed.size() > 0) {
-            System.out.println("===============FAILED===============");
+            System.out.println("================FAILED================");
             for (String result : failed) {
                 System.out.println(result);
             }
         } else {
-            System.out.println("=============ALL PASSED=============");
+            System.out.println("==============ALL PASSED==============");
         }
     }
 
