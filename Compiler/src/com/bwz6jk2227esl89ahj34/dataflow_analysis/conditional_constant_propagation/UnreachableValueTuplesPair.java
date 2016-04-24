@@ -25,7 +25,9 @@ public class UnreachableValueTuplesPair extends LatticeElement {
     public String toString() {
         String s = "Unreachable ->"+unreachable+"\n";
         for (String temp : valueTuples.keySet()) {
-            s += temp + " -> "+ valueTuples.get(temp).toString()+"\n";
+            if (!(valueTuples.get(temp) instanceof LatticeTop)) {
+                s += temp + " -> " + valueTuples.get(temp).toString() + "\n";
+            }
         }
         return s;
     }
@@ -57,8 +59,8 @@ public class UnreachableValueTuplesPair extends LatticeElement {
         } else {
             UnreachableValueTuplesPair castedElement =
                     (UnreachableValueTuplesPair) element;
-            return !(unreachable != castedElement.isUnreachable()) &&
-                    !(castedElement.getValueTuples().equals(valueTuples));
+            return (unreachable == castedElement.isUnreachable()) &&
+                    (castedElement.getValueTuples().equals(valueTuples));
         }
     }
 }

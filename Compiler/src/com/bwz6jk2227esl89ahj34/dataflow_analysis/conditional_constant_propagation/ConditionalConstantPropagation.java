@@ -41,6 +41,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
 
         // unwrap the IR stmt contained by node
         IRStmt stmt = ((CFGNodeIR)node).getStatement();
+        System.out.println(stmt);
 
         // the "in" is filled in as a precondition
         UnreachableValueTuplesPair in =
@@ -129,14 +130,14 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 // however, we do a null check; if the in is not null, then
                 // we meet it with whatever is already present at the in
                 int count = 0; // count = 0 -> false branch
-                              // otherwise true branch
+                // otherwise true branch
                 for (CFGNode successor : node.getSuccessors()) {
                     setIn(successor, count == 0 ? falsePair : truePair);
                     count++;
                 }
 
             } else { // otherwise we can't make any of the branches "unreachable"
-                    // so we pass down the same information to all the branches
+                // so we pass down the same information to all the branches
                 for (CFGNode successor : node.getSuccessors()) {
                     setIn(successor,
                             new UnreachableValueTuplesPair(in.isUnreachable(),
@@ -151,11 +152,37 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                     // update the newMap so that x = const
                     Value val = new Value((IRConst) castedNode.expr());
                     newMap.put(castedTarget, valueMeet(newMap.get(castedTarget), val));
-                } else if (castedNode.expr() instanceof IRCall
-                        || castedNode.expr() instanceof IRBinOp) {
+                } else if (castedNode.expr() instanceof IRCall) {
                     // a function call can return anything so variable becomes
                     // "overloaded"
                     newMap.put(castedTarget, new LatticeBottom());
+                } else if (castedNode.expr() instanceof IRBinOp) {
+                    IRExpr left = ((IRBinOp) castedNode.expr()).left();
+                    IRExpr right = ((IRBinOp) castedNode.expr()).right();
+                    if (left instanceof IRTemp && newMap.containsKey(((IRTemp)left).name())) {
+                        LatticeElement leftElement = newMap.get(((IRTemp)left).name());
+                        if (leftElement instanceof Value) {
+                            left = ((Value)leftElement).getValue();
+                        }
+                    }
+                    if (right instanceof IRTemp && newMap.containsKey(((IRTemp)right).name())) {
+                        LatticeElement rightElement = newMap.get(((IRTemp)right).name());
+                        if (rightElement instanceof Value) {
+                            right = ((Value)rightElement).getValue();
+                        }
+                    }
+                    if (left instanceof IRConst && right instanceof IRConst) {
+                        IRConst simplifiedResult = computeBinOp(
+                                new IRBinOp(
+                                        ((IRBinOp) castedNode.expr()).opType(),
+                                        left,
+                                        right
+                                )
+                        );
+                        newMap.put(castedTarget, new Value(simplifiedResult));
+                    } else {
+                        newMap.put(castedTarget, new LatticeBottom());
+                    }
                 } else if (castedNode.expr() instanceof IRTemp) {
                     // x = y then we update x so that it takes the value of y
                     newMap.put(castedTarget, newMap.get(((IRTemp) castedNode.expr()).name()));
@@ -186,7 +213,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         if (successor.getIn() == null) { // if in is null prior, then
             successor.setIn(newIn);  // in = newIn
         } else if (newIn.isUnreachable()) {
-          // we don't do anything if new in is unreachable
+            // we don't do anything if new in is unreachable
         } else { // otherwise we "meet" it
             Set<LatticeElement> ins = new HashSet<>(Arrays.asList(successor.getIn(), newIn));
             successor.setIn(meet(ins));
@@ -233,7 +260,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
 
     // precondition: left and right are both IRConst
     // computes binop expression to const
-    private IRConst computeBinOp(IRBinOp bop) {
+    public static IRConst computeBinOp(IRBinOp bop) {
         BigInteger left = new BigInteger(""+((IRConst)(bop.left())).value());
         BigInteger right = new BigInteger(""+((IRConst)(bop.right())).value());
         switch(bop.opType()) {
@@ -281,4 +308,35 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 throw new RuntimeException("Please contact jk2227@cornell.edu");
         }
     }
+
+//    @Override
+//    public void fixpoint(Direction direction) {
+//        Map<Integer, CFGNode> nodes = graph.getNodes();
+//        LinkedList<CFGNode> worklist = new LinkedList<>();
+//        // Initialize the in and out of each node and add it to the worklist
+//        for (CFGNode node : nodes.values()) {
+//            // Initialize all in and out to be top
+//            node.setIn(top.copy());
+//            //node.setOut(top.copy());
+//            //worklist.add(node);
+//        }
+//        worklist.add(nodes.values().iterator().next());
+//        while (!worklist.isEmpty()) {
+//            // We find the fixpoint using the worklist algorithm
+//            System.out.println(worklist.size());
+//            CFGNode node = worklist.remove();
+//            //LatticeElement oldIn = node.getIn().copy();
+//            List<CFGNode> old = new LinkedList<>();
+//            old.addAll(node.getSuccessors());
+//            transfer(node);
+//            for(int i = 0 ; i < node.getSuccessors().size(); i++) {
+//                if (!(node.getSuccessors().get(i).equals(old.get(i)))) {
+//                    worklist.add(node);
+//                }
+//            }
+//        }
+//    }
+
 }
+
+
