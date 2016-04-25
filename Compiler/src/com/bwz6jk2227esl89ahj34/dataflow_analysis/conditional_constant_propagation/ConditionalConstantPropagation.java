@@ -13,6 +13,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
     public ConditionalConstantPropagation(IRSeq seq) {
         super(seq, Direction.FORWARD,
                 new UnreachableValueTuplesPair(findAllTemps(seq)), null);
+        this.top = new UnreachableValueTuplesPair(findAllTemps(seq));
     }
 
     public static List<IRTemp> findAllTemps(IRSeq seq) {
@@ -35,213 +36,188 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
     }
 
     // assumption: ins will always be defined appropriately
+    // unless it is the root; then the root will be changed
+    // such that unreachable = false
+    //
+    // for each node, we read apply the transfer function, and place
+    // the result of the transfer function onto the out.
+    //
+    // if there is already something on the out edge then we will MEET
+    //
+    // then, we will transmit the information on out to the ins of its
+    // successors
+    //
+    // if there is already something on the successor's in edge then we
+    // will MEET
     public void transfer(CFGNode node) {
-        // we are performing the analysis on the IR level so
-        // make sure that we are at the right place
+        // this analysis is being done on the IR level so
+        // this is a sanity check to make sure we are at the right place
+        assert node instanceof CFGNodeIR;
 
-        // unwrap the IR stmt contained by node
+        // we first unwrap the IR stmt contained by node
         IRStmt stmt = ((CFGNodeIR)node).getStatement();
-        System.out.println(stmt);
 
-        // the "in" is filled in as a precondition
-        UnreachableValueTuplesPair in =
-                (UnreachableValueTuplesPair) node.getIn();
-
-        // root is always reachable
+        // and extract its in
+        UnreachableValueTuplesPair in = (UnreachableValueTuplesPair) node.getIn();
+        // this checks whether the node is the root or not
         if (node.getPredecessors().size() == 0) {
             in.setUnreachable(false);
         }
 
+        // otherwise, it is not the root
+        // therefore, it should already have information on the "in" edge
+        // if this node is reachable or not -- if it is unreachable
+        // we do not have to do anything
         if (in.isUnreachable()) {
+            // for the branch we do not take, we have to prepare
+            // new information to send
+            Map<String, LatticeElement> infoForDead = new HashMap<>();
+            for (String key : in.getValueTuples().keySet()) {
+                infoForDead.put(key, new LatticeTop());
+            }
+
+            UnreachableValueTuplesPair deadBranchInfo =
+                    new UnreachableValueTuplesPair(true, infoForDead);
+            node.setOut(deadBranchInfo);
+
+            // now we disperse this information to the successor
+            for (CFGNode successor : node.getSuccessors()) {
+                setIn(successor, (UnreachableValueTuplesPair) node.getOut());
+            }
             return;
         }
+
+        // once we are here, we know that this node is reachable
+        // therefore, we perform our analysis
+
         // we will update the newMap as we perform the analysis
         // if no updates are made then we are basically passing the map given
         // by the "in"
         Map<String, LatticeElement> newMap = new HashMap<>(in.getValueTuples());
 
-        if (stmt instanceof IRCJump) { // if (...)
-            IRCJump castedStmt = (IRCJump) stmt;
-            IRExpr guard = castedStmt.expr();
-            if (guard instanceof IRTemp) { // if (x)
-                IRTemp castedGuard = (IRTemp) guard;
-                LatticeElement value = newMap.get(castedGuard.name());
-                if (value instanceof Value) { // x = an actual value
-                    guard = ((Value) value).getValue();
-                    // this will trigger a if statement later in the code
-                }
-            } else if (guard instanceof IRBinOp) { // if (x binop y)
-                IRBinOp castedGuard = (IRBinOp) guard;
-                IRExpr left = castedGuard.left();
-                IRExpr right = castedGuard.right();
+        // now we exhaust the possible forms that statements can take
+        // however, the only ones we should consider are statements
+        // of the following form:
+        //
+        // When LHS is a IRTemp...
+        // LHS = RHS ==> if RHS is a IRConst then we can set LHS to RHS
+        //
+        // if RHS is a IRBinOp, then we attempt to evaluate the IRBinOp
+        // if IRBinOp is able to be calculated to a IRConst, we treat it like
+        // an IRConst, but otherwise we set it as BOTTOM
+        //
+        // if RHS is a IRTemp, then we see if that IRTemp is bound to any value
+        // and set it as that value
+        //
+        // if RHS is a IRCall then we set LHS to BOTTOM because it can be anything
+        //
+        // if RHS is a IRMem then we set LHS to BOTTOM because MEM is hard
+        if (stmt instanceof IRMove) { // LHS = RHS
 
-                // can we substitute in const values for left and right?
-                if (left instanceof IRTemp) {
-                    String leftName = ((IRTemp) left).name();
-                    if (newMap.get(leftName) instanceof Value) {
-                        left = ((Value) (newMap.get(leftName))).getValue();
-                    }
-                }
-                if (right instanceof IRTemp) {
-                    String rightName = ((IRTemp) right).name();
-                    if (newMap.get(rightName) instanceof Value) {
-                        right = ((Value) (newMap.get(rightName))).getValue();
-                    }
-                }
+            //we first cast the stmt to an IRMove
+            IRMove castedStmt = (IRMove) stmt;
 
-                // if we can then simplify the binop!
-                if (left instanceof IRConst && right instanceof IRConst) {
-                    if (castedGuard.opType() != OpType.DIV ||
-                            ((IRConst)right).value() != 0) {
-                        guard = computeBinOp(
-                                new IRBinOp(castedGuard.opType(), left, right)
-                        );
-                        // this will trigger the if statement later in the code
-                    }
-                }
-            }
+            // we get the LHS
+            IRExpr LHS = castedStmt.target();
+            if (LHS instanceof IRTemp) {
+                String nameLHS = ((IRTemp)LHS).name();
+                IRExpr RHS = castedStmt.expr();
+                if (RHS instanceof IRConst) {
+                    newMap.put(nameLHS, new Value((IRConst)RHS));
+                } else if (RHS instanceof IRTemp) {
+                    String nameRHS = ((IRTemp)RHS).name();
+                    newMap.put(nameLHS, newMap.get(nameRHS));
+                } else if (RHS instanceof IRBinOp) {
+                    IRBinOp castedRHS = (IRBinOp) RHS;
+                    IRExpr result = compute(castedRHS, newMap);
 
-            // if the guard is a const we can make one of the branches
-            // "unreachable"
-            if (guard instanceof IRConst) {
-                IRConst castedGuard = (IRConst) guard;
-                UnreachableValueTuplesPair falsePair;
-                UnreachableValueTuplesPair truePair;
-                assert node.getSuccessors().size() == 2;
-                if (castedGuard.value() == 1) { // if (...) always goes to true
-                    // then we have to kill the false branch by sending
-                    // (true, (T,..,T))
-                    // and send down appropriate info to true branch
-                    truePair = new UnreachableValueTuplesPair(false, newMap);
-                    Map<String, LatticeElement> tops = new HashMap<>();
-                    for (String temp : newMap.keySet()) {
-                        tops.put(temp, new LatticeTop());
+                    // if we are unable to simplify the bin op expression,
+                    // then it can take multiple forms, so LHS -> BOTTOM
+                    if (result instanceof IRBinOp) {
+                        newMap.put(nameLHS, new LatticeBottom());
+                    } else if (result instanceof IRConst) {
+                        // otherwise we attempt to associate it with LHS in the map
+                        newMap.put(nameLHS, new Value((IRConst)result));
+                    } else { // shouldn't reach here
+                        System.out.println("RHS is: " + RHS);
+                        throw new RuntimeException("Please contact jk2227@cornell.edu");
                     }
-                    falsePair = new UnreachableValueTuplesPair(true, tops);
-                } else { // if (...) always goes to false
-                    falsePair = new UnreachableValueTuplesPair(false, newMap);
-                    Map<String, LatticeElement> tops = new HashMap<>();
-                    for (String temp : newMap.keySet()) {
-                        tops.put(temp, new LatticeTop());
-                    }
-                    truePair = new UnreachableValueTuplesPair(true, tops);
-                }
-                // now we set the ins of the successor
-                // however, we do a null check; if the in is not null, then
-                // we meet it with whatever is already present at the in
-                int count = 0; // count = 0 -> false branch
-                // otherwise true branch
-                for (CFGNode successor : node.getSuccessors()) {
-                    setIn(successor, count == 0 ? falsePair : truePair);
-                    count++;
-                }
-
-            } else { // otherwise we can't make any of the branches "unreachable"
-                // so we pass down the same information to all the branches
-                for (CFGNode successor : node.getSuccessors()) {
-                    setIn(successor,
-                            new UnreachableValueTuplesPair(in.isUnreachable(),
-                                    newMap));
-                }
-            }
-        } else if (stmt instanceof IRMove) { //  ... = ...
-            IRMove castedNode = (IRMove) stmt;
-            if (castedNode.target() instanceof IRTemp) { // x = ...
-                String castedTarget = ((IRTemp) castedNode.target()).name();
-                if (castedNode.expr() instanceof IRConst) { // x = const
-                    // update the newMap so that x = const
-                    Value val = new Value((IRConst) castedNode.expr());
-                    newMap.put(castedTarget, valueMeet(newMap.get(castedTarget), val));
-                } else if (castedNode.expr() instanceof IRCall) {
-                    // a function call can return anything so variable becomes
-                    // "overloaded"
-                    newMap.put(castedTarget, new LatticeBottom());
-                } else if (castedNode.expr() instanceof IRBinOp) {
-                    IRExpr left = ((IRBinOp) castedNode.expr()).left();
-                    IRExpr right = ((IRBinOp) castedNode.expr()).right();
-                    if (left instanceof IRTemp && newMap.containsKey(((IRTemp)left).name())) {
-                        LatticeElement leftElement = newMap.get(((IRTemp)left).name());
-                        if (leftElement instanceof Value) {
-                            left = ((Value)leftElement).getValue();
-                        }
-                    }
-                    if (right instanceof IRTemp && newMap.containsKey(((IRTemp)right).name())) {
-                        LatticeElement rightElement = newMap.get(((IRTemp)right).name());
-                        if (rightElement instanceof Value) {
-                            right = ((Value)rightElement).getValue();
-                        }
-                    }
-                    if (left instanceof IRConst && right instanceof IRConst) {
-                        IRConst simplifiedResult = computeBinOp(
-                                new IRBinOp(
-                                        ((IRBinOp) castedNode.expr()).opType(),
-                                        left,
-                                        right
-                                )
-                        );
-                        newMap.put(castedTarget, new Value(simplifiedResult));
-                    } else {
-                        newMap.put(castedTarget, new LatticeBottom());
-                    }
-                } else if (castedNode.expr() instanceof IRTemp) {
-                    // x = y then we update x so that it takes the value of y
-                    newMap.put(castedTarget, newMap.get(((IRTemp) castedNode.expr()).name()));
-                } else if (castedNode.expr() instanceof IRMem) {
-                    // MEM is hard
-                    newMap.put(castedTarget, new LatticeBottom());
-                } else { // shouldn't reach here
-                    System.out.println(castedNode.expr());
+                } else if (RHS instanceof IRCall || RHS instanceof IRMem) {
+                    newMap.put(nameLHS, new LatticeBottom());
+                } else { // should not reach here
+                    System.out.println("RHS is: "+ RHS);
                     throw new RuntimeException("Please contact jk2227@cornell.edu");
                 }
             }
-            for (CFGNode successor : node.getSuccessors()) {
-                setIn(successor,
-                        new UnreachableValueTuplesPair(in.isUnreachable(),
-                                newMap));
-            }
-        } else {
-            for (CFGNode successor : node.getSuccessors()) {
-                setIn(successor,
-                        new UnreachableValueTuplesPair(in.isUnreachable(),
-                                newMap));
-            }
-        }
-    }
+            // the out is set to the updated information
+            node.setOut(new UnreachableValueTuplesPair(in.isUnreachable(), newMap));
 
-    // we set the successor's in as newIn
-    public void setIn(CFGNode successor, UnreachableValueTuplesPair newIn) {
-        if (successor.getIn() == null) { // if in is null prior, then
-            successor.setIn(newIn);  // in = newIn
-        } else if (newIn.isUnreachable()) {
-            // we don't do anything if new in is unreachable
-        } else { // otherwise we "meet" it
-            Set<LatticeElement> ins = new HashSet<>(Arrays.asList(successor.getIn(), newIn));
-            successor.setIn(meet(ins));
-        }
-    }
-
-    // meet operator for CCP
-    public UnreachableValueTuplesPair meet(Set<LatticeElement> elements) {
-        assert elements.size() >= 2;
-        Iterator<LatticeElement> iterator = elements.iterator();
-        UnreachableValueTuplesPair accumulator = (UnreachableValueTuplesPair) iterator.next();
-        while(iterator.hasNext()) {
-            UnreachableValueTuplesPair next = (UnreachableValueTuplesPair) iterator.next();
-            accumulator.setUnreachable(accumulator.isUnreachable()
-                    && next.isUnreachable()); // AND the unreachable boolean values
-            Map<String, LatticeElement> accumulatorMap = accumulator.getValueTuples();
-            Map<String, LatticeElement> nextMap = next.getValueTuples();
-            for (String key : accumulatorMap.keySet()) { // update values accordingly
-                accumulatorMap.put(key,
-                        valueMeet(accumulatorMap.get(key), nextMap.get(key)));
+            // now we disperse this information to the successor
+            for (CFGNode successor : node.getSuccessors()) {
+                setIn(successor, (UnreachableValueTuplesPair) node.getOut());
             }
-            accumulator.setValueTuples(accumulatorMap);
+        } else if (stmt instanceof IRCJump) { // if (...)
+            // we cast stmt to a IRCJump
+            IRCJump castedStmt = (IRCJump) stmt;
+            IRExpr guard = computeGuard(castedStmt.expr(), newMap);
+
+            // if the guard is a IRConst we can kill one of the branches
+            // thus we would disperse different information
+            if (guard instanceof IRConst) {
+                // as a sanity check, we assert that the size of
+                // successors must be 2
+                assert node.getSuccessors().size() == 2;
+
+                node.setOut(node.getIn()); // no information is changed for
+                                         // branch that we always take
+
+                // for the branch we do not take, we have to prepare
+                // new information to send
+                Map<String, LatticeElement> infoForDead = new HashMap<>();
+                for (String key : newMap.keySet()) {
+                    infoForDead.put(key, new LatticeTop());
+                }
+
+                UnreachableValueTuplesPair deadBranchInfo =
+                        new UnreachableValueTuplesPair(true, infoForDead);
+
+                // the false branch is always the first successor
+                // and the false branch is killed if the guard evaluated to 1
+                if (((IRConst)guard).value() == 1) {
+                    setIn(node.getSuccessors().get(0), deadBranchInfo);
+                    setIn(node.getSuccessors().get(1),
+                            (UnreachableValueTuplesPair) node.getOut());
+                } else { // otherwise, we pass the regular info to the false
+                        // branch and the dead info to true branch
+                    setIn(node.getSuccessors().get(1), deadBranchInfo);
+                    setIn(node.getSuccessors().get(0),
+                            (UnreachableValueTuplesPair) node.getOut());
+                }
+
+            } else { // we disperse the same informations to the successor
+                node.setOut(node.getIn());
+                // now we disperse this information to the successor
+                for (CFGNode successor : node.getSuccessors()) {
+                    setIn(successor, (UnreachableValueTuplesPair) node.getOut());
+                }
+            }
+        } else { // only case I think can fall through here is an IRJump
+            // the out is set to in because no information was changed
+            node.setOut(node.getIn());
+            // now we disperse this information to the successor
+            for (CFGNode successor : node.getSuccessors()) {
+                setIn(successor, (UnreachableValueTuplesPair) node.getOut());
+            }
+
         }
-        return accumulator;
+
+
+
     }
 
     // 2 + top = 2 ; 2 + 3 = bottom; 2 + 2 = 2; bottom + anything = bottom
     public LatticeElement valueMeet(LatticeElement e1, LatticeElement e2) {
+        assert (e1 != null && e2 != null);
         if(e1 instanceof LatticeBottom || e2 instanceof LatticeBottom) {
             return new LatticeBottom();
         } else if (e1 instanceof LatticeTop) {
@@ -258,11 +234,38 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         }
     }
 
-    // precondition: left and right are both IRConst
     // computes binop expression to const
-    public static IRConst computeBinOp(IRBinOp bop) {
-        BigInteger left = new BigInteger(""+((IRConst)(bop.left())).value());
-        BigInteger right = new BigInteger(""+((IRConst)(bop.right())).value());
+    public static IRExpr compute(IRBinOp bop, Map<String, LatticeElement> map) {
+
+        IRExpr leftBop = bop.left();
+        IRExpr rightBop = bop.right();
+
+        // if left and right are IRTemp, we attempt to convert it to
+        // a IRConst
+        if (leftBop instanceof IRTemp) {
+            String leftName = ((IRTemp) leftBop).name();
+            if (map.get(leftName) instanceof Value) {
+                leftBop = ((Value) (map.get(leftName))).getValue();
+            }
+        }
+
+        if (rightBop instanceof IRTemp) {
+            String rightName = ((IRTemp) rightBop).name();
+            if (map.get(rightName) instanceof Value) {
+                rightBop = ((Value) (map.get(rightName))).getValue();
+            }
+        }
+
+        //if the attempt fails, we return bop
+        if (!(leftBop instanceof IRConst && rightBop instanceof IRConst)) {
+            return bop;
+        }
+
+        // otherwise, they are both IRConst, so we attempt to simplify
+
+
+        BigInteger left = new BigInteger(""+((IRConst)(leftBop)).value());
+        BigInteger right = new BigInteger(""+((IRConst)(rightBop)).value());
         switch(bop.opType()) {
             case ADD:
                 return new IRConst(left.add(right).longValue());
@@ -272,7 +275,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 return new IRConst(left.multiply(right).longValue());
             case HMUL:
                 return new IRConst(left.multiply(right).longValue() >> 64);
-            case DIV:
+            case DIV: // TODO: divide by zero
                 return new IRConst(left.divide(right).longValue());
             case MOD:
                 return new IRConst(left.mod(right).longValue());
@@ -309,33 +312,76 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         }
     }
 
-//    @Override
-//    public void fixpoint(Direction direction) {
-//        Map<Integer, CFGNode> nodes = graph.getNodes();
-//        LinkedList<CFGNode> worklist = new LinkedList<>();
-//        // Initialize the in and out of each node and add it to the worklist
-//        for (CFGNode node : nodes.values()) {
-//            // Initialize all in and out to be top
-//            node.setIn(top.copy());
-//            //node.setOut(top.copy());
-//            //worklist.add(node);
-//        }
-//        worklist.add(nodes.values().iterator().next());
-//        while (!worklist.isEmpty()) {
-//            // We find the fixpoint using the worklist algorithm
-//            System.out.println(worklist.size());
-//            CFGNode node = worklist.remove();
-//            //LatticeElement oldIn = node.getIn().copy();
-//            List<CFGNode> old = new LinkedList<>();
-//            old.addAll(node.getSuccessors());
-//            transfer(node);
-//            for(int i = 0 ; i < node.getSuccessors().size(); i++) {
-//                if (!(node.getSuccessors().get(i).equals(old.get(i)))) {
-//                    worklist.add(node);
-//                }
-//            }
-//        }
-//    }
+    public static IRExpr computeGuard (IRExpr guard, Map<String, LatticeElement> map) {
+        if (guard instanceof IRTemp) {
+            LatticeElement guardValue = map.get(((IRTemp)guard).name());
+            if (guardValue instanceof LatticeTop || guardValue instanceof LatticeBottom) {
+                return guard;
+            } else {
+                return ((Value) guardValue).getValue();
+            }
+        } else if (guard instanceof IRBinOp) {
+            return compute((IRBinOp)guard, map);
+        } else if (guard instanceof IRConst || guard instanceof IRCall || guard instanceof IRMem) {
+            return guard;
+        } else { // should not reach here...
+            throw new RuntimeException("Please contact jk2227@cornell.edu");
+        }
+    }
+
+
+    // we set the successor's in as newIn
+    public void setIn(CFGNode successor, UnreachableValueTuplesPair newIn) {
+        if (successor.getIn() == null) { // if in is null prior, then
+            successor.setIn(newIn);  // in = newIn
+        } else { // otherwise we "meet" it
+            Set<LatticeElement> ins = new HashSet<>(Arrays.asList(successor.getIn(), newIn));
+            successor.setIn(meet(ins));
+        }
+    }
+
+    // meet operator for CCP
+    public UnreachableValueTuplesPair meet(Set<LatticeElement> elements) {
+        assert elements.size() >= 2;
+        Iterator<LatticeElement> iterator = elements.iterator();
+        UnreachableValueTuplesPair accumulator = (UnreachableValueTuplesPair) iterator.next();
+        while(iterator.hasNext()) {
+            UnreachableValueTuplesPair next = (UnreachableValueTuplesPair) iterator.next();
+            accumulator.setUnreachable(accumulator.isUnreachable()
+                    && next.isUnreachable()); // AND the unreachable boolean values
+            Map<String, LatticeElement> accumulatorMap = accumulator.getValueTuples();
+            Map<String, LatticeElement> nextMap = next.getValueTuples();
+            for (String key : accumulatorMap.keySet()) { // update values accordingly
+                accumulatorMap.put(key,
+                        valueMeet(accumulatorMap.get(key), nextMap.get(key)));
+            }
+            accumulator.setValueTuples(accumulatorMap);
+        }
+        return accumulator;
+    }
+
+    @Override
+    public void fixpoint(Direction direction) {
+        Map<Integer, CFGNode> nodes = graph.getNodes();
+        LinkedList<CFGNode> worklist = new LinkedList<>();
+        // Initialize the in and out of each node and add it to the worklist
+        for (CFGNode node : nodes.values()) {
+            // Initialize all in and out to be top
+            node.setIn(top.copy());
+            node.setOut(top.copy());
+        }
+        worklist.add(nodes.values().iterator().next());
+        while (!worklist.isEmpty()) {
+            // We find the fixpoint using the worklist algorithm
+            CFGNode node = worklist.remove();
+            LatticeElement oldOut = node.getOut().copy();
+            transfer(node);
+            LatticeElement newOut = node.getOut().copy();
+            if (!oldOut.equals(newOut)) {
+                worklist.addAll(node.getSuccessors());
+            }
+        }
+    }
 
 }
 
