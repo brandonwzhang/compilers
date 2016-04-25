@@ -373,7 +373,8 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
             node.setIn(top.copy());
             node.setOut(top.copy());
         }
-        worklist.add(nodes.values().iterator().next());
+        //worklist.add(nodes.values().iterator().next());
+        worklist.addAll(nodes.values());
         while (!worklist.isEmpty()) {
             // We find the fixpoint using the worklist algorithm
             CFGNode node = worklist.remove();
