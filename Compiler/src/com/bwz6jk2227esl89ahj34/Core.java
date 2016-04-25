@@ -278,8 +278,28 @@ public class Core {
             return;
         }
 
+        if (Main.reportInitialIR()) {
+            Map<Optimization, Boolean> originalCopy = new HashMap<>();
+            originalCopy.putAll(Main.optimizationMap);
+            for (Optimization opt : Main.optimizationMap.keySet()) {
+                Main.optimizationMap.put(opt, false);
+            }
+            IRCompUnit unoptimizedLIRRoot = irGen(file, mirGen(file, program.get()));
+            Main.optimizationMap.clear();
+            Main.optimizationMap.putAll(originalCopy);
+            int dotIndex = file.lastIndexOf('.');
+            String irReportName = file.substring(0, dotIndex) + "_initial.xi";
+            Util.writeIRTree(unoptimizedLIRRoot, Main.diagnosticPath(), irReportName, "ir");
+        }
+
         IRCompUnit mirRoot = mirGen(file, program.get());
         IRCompUnit lirRoot = irGen(file, mirRoot);
+
+        if (Main.reportFinalIR()) {
+            int dotIndex = file.lastIndexOf('.');
+            String irReportName = file.substring(0, dotIndex) + "_final.xi";
+            Util.writeIRTree(lirRoot, Main.diagnosticPath(), irReportName, "ir");
+        }
 
         for (String functionName : lirRoot.functions().keySet()) {
             IRSeq seq = (IRSeq) lirRoot.functions().get(functionName).body();

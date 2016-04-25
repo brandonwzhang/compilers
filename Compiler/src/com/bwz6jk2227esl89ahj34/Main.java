@@ -18,6 +18,8 @@ public class Main {
     private static boolean typecheck;
     private static boolean irgen;
     private static boolean irrun;
+    private static boolean reportInitialIR = false;
+    private static boolean reportFinalIR = false;
 
     public static boolean allOptimizations = true;
     public static HashMap<Optimization, Boolean> optimizationMap = new HashMap<>();
@@ -82,6 +84,10 @@ public class Main {
                       "Generate and interpret intermediate code",
                       Main::turnIRRunDiagnosticsOn,
                       0);
+        cli.addOption("--optir",
+                      "Report the intermediate code at the specified phase of optimization.",
+                      phase -> reportIR(phase[0]),
+                      1);
 
         cli.execute(args);
 
@@ -103,6 +109,21 @@ public class Main {
             //Tests.irGenTests();
             //Tests.irRunTests();
             Tests.regressionTest();
+        }
+    }
+
+    public static void reportIR(String phase) {
+        switch(phase) {
+            case "initial":
+                reportInitialIR = true;
+                break;
+            case "final":
+                reportFinalIR = true;
+                break;
+            default:
+                System.out.println(phase + " is not a supported phase.");
+                System.out.println("An extra IR file will not be written.");
+                break;
         }
     }
 
@@ -205,6 +226,10 @@ public class Main {
     public static boolean irrun() {
         return irrun;
     }
+
+    public static boolean reportInitialIR() { return reportInitialIR; }
+
+    public static boolean reportFinalIR() { return reportFinalIR; }
 
     public static void turnTestsOn(String[] args) {
         tests = true;
