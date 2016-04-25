@@ -2,7 +2,7 @@ package com.bwz6jk2227esl89ahj34.cli;
 
 import com.bwz6jk2227esl89ahj34.Core;
 import com.bwz6jk2227esl89ahj34.Main;
-import com.bwz6jk2227esl89ahj34.Main.Optimization;
+import com.bwz6jk2227esl89ahj34.optimization.Optimization;
 
 import java.util.*;
 

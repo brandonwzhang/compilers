@@ -24,7 +24,7 @@ import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRConstantFoldingVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
-import com.bwz6jk2227esl89ahj34.Main.Optimization;
+import com.bwz6jk2227esl89ahj34.optimization.Optimization;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
@@ -188,6 +188,8 @@ public class Core {
             // annotate the new nodes with types
             NodeVisitor tcv = new TypeCheckVisitor(Main.libPath());
             program.accept(tcv);
+        } else if (Main.debugOn()) {
+            System.out.println("constant folding off");
         }
 
         MIRGenerateVisitor mirgv =

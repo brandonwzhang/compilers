@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34;
 
 import com.bwz6jk2227esl89ahj34.cli.CLI;
+import com.bwz6jk2227esl89ahj34.optimization.Optimization;
 
 import java.util.*;
 
@@ -20,16 +21,6 @@ public class Main {
 
     public static boolean allOptimizations = true;
     public static HashMap<Optimization, Boolean> optimizationMap = new HashMap<>();
-
-    public enum Optimization {
-        CF, REG, MC, UCE, CSE, ALG, COPY, DCE,
-        INL, SR, LU, LICM, PRE, CP, VN;
-
-        @Override
-        public String toString() {
-            return super.toString().toLowerCase();
-        }
-    }
 
     public static void main(String[] args) {
         CLI cli = new CLI();
