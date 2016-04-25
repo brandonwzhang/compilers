@@ -24,6 +24,7 @@ import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRConstantFoldingVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
+import com.bwz6jk2227esl89ahj34.Main.Optimization;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
@@ -180,7 +181,7 @@ public class Core {
      */
     public static IRCompUnit mirGen(String file, Program program) {
 
-        if (Main.optimizationsOn()) {
+        if (Main.optimizationOn(Optimization.CF)) {
             // constant folding on the AST
             NodeVisitor cfv = new ConstantFoldingVisitor();
             program.accept(cfv);
@@ -194,7 +195,7 @@ public class Core {
         program.accept(mirgv);
         IRCompUnit mirRoot = mirgv.getRoot();
 
-        if (Main.optimizationsOn()) {
+        if (Main.optimizationOn(Optimization.CF)) {
             // constant folding on the MIR tree
             IRVisitor mircfv = new IRConstantFoldingVisitor();
             mirRoot = (IRCompUnit) mircfv.visit(mirRoot);
@@ -219,7 +220,7 @@ public class Core {
         CheckCanonicalIRVisitor cv = new CheckCanonicalIRVisitor();
         assert cv.visit(lirRoot);
 
-        if (Main.optimizationsOn()) {
+        if (Main.optimizationOn(Optimization.CF)) {
             IRVisitor mircfv = new IRConstantFoldingVisitor();
             lirRoot = (IRCompUnit) mircfv.visit(lirRoot);
         }

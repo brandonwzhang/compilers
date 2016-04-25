@@ -2,6 +2,7 @@ package com.bwz6jk2227esl89ahj34.cli;
 
 import com.bwz6jk2227esl89ahj34.Core;
 import com.bwz6jk2227esl89ahj34.Main;
+import com.bwz6jk2227esl89ahj34.Main.Optimization;
 
 import java.util.*;
 
@@ -30,6 +31,14 @@ public class CLI {
     private Map<String, Option> options;
     private ArrayList<String> files;
 
+    private static Set<String> validOpts = new HashSet<>();
+
+    static {
+        for (Optimization opt : Optimization.values()) {
+            validOpts.add(opt.toString());
+        }
+    }
+
     public CLI() {
         // we use a LinkedHashMap because we want to preserve the order
         // in which the options were added
@@ -48,9 +57,35 @@ public class CLI {
 
         Map<String, String[]> optionArgsMap = new HashMap<>();
 
+        Set<Optimization> enable = new HashSet<>();
+        Set<Optimization> disable = new HashSet<>();
+
         for (int i = 0; i < args.length; i++) {
             if (args[i].charAt(0) == '-') {
                 String optionName = args[i];
+
+                if (args[i].length() > 2 && args[i].charAt(1) == 'O') {
+                    if (args[i].length() > 6 && args[i].substring(2, 6).equals("-no-")) {
+                        // -O-no-<opt>
+                        String opt_ = args[i].substring(6);
+                        if (validOpts.contains(opt_)) {
+                            Optimization opt = Optimization.valueOf(opt_.toUpperCase());
+                            disable.add(opt);
+                            Main.allOptimizations = true;
+                            continue;
+                        }
+
+                    } else {
+                        // -O<opt>
+                        String opt_ = args[i].substring(3);
+                        if (validOpts.contains(opt_)) {
+                            Optimization opt = Optimization.valueOf(opt_.toUpperCase());
+                            enable.add(opt);
+                            Main.allOptimizations = false;
+                            continue;
+                        }
+                    }
+                }
 
                 if (!options.keySet().contains(optionName)) {
                     System.out.println(args[i] + " is not a valid option");
@@ -77,6 +112,11 @@ public class CLI {
             }
         }
 
+        if (!enable.isEmpty() && !disable.isEmpty()) {
+            System.out.println("-O<opt> and -O-no-<opt> cannot be used at the same time.");
+            return;
+        }
+
         String[] filesArray = files.toArray(new String[files.size()]);
 
         // options with two dashes operate on filenames
@@ -98,6 +138,20 @@ public class CLI {
         if (!Main.target().equals("linux") && !Main.target().equals("osx")) {
             System.out.println("\nError: target operating system must be linux or osx.");
             return;
+        }
+
+        Main.optimizationMap.clear();
+        for (Optimization opt : enable) {
+            Main.optimizationMap.put(opt, true);
+        }
+        for (Optimization opt : disable) {
+            Main.optimizationMap.put(opt, false);
+        }
+        for (Optimization opt : Optimization.values()) {
+            if (!Main.optimizationMap.containsKey(opt)) {
+                // fill the rest of the map
+                Main.optimizationMap.put(opt, Main.allOptimizations);
+            }
         }
 
         // assembly generation

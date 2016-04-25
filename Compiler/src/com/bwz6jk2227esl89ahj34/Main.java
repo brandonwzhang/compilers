@@ -2,7 +2,7 @@ package com.bwz6jk2227esl89ahj34;
 
 import com.bwz6jk2227esl89ahj34.cli.CLI;
 
-import java.util.Collections;
+import java.util.*;
 
 public class Main {
     private static String sourcePath = "./";
@@ -11,13 +11,25 @@ public class Main {
     private static String assemblyPath = "./";
     private static String target = "linux";
     private static boolean debug;
-    private static boolean optimizations = true;
     private static boolean tests;
     private static boolean lex;
     private static boolean parse;
     private static boolean typecheck;
     private static boolean irgen;
     private static boolean irrun;
+
+    public static boolean allOptimizations = true;
+    public static HashMap<Optimization, Boolean> optimizationMap = new HashMap<>();
+
+    public enum Optimization {
+        CF, REG, MC, UCE, CSE, ALG, COPY, DCE,
+        INL, SR, LU, LICM, PRE, CP, VN;
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
+    }
 
     public static void main(String[] args) {
         CLI cli = new CLI();
@@ -151,19 +163,16 @@ public class Main {
         debug = true;
     }
 
-    /**
-     * Turns on optimizations (constant folding).
-     */
     public static void turnOptimizationsOff(String[] args) {
-        optimizations = false;
+        allOptimizations = false;
     }
 
     public static boolean debugOn() {
         return debug;
     }
 
-    public static boolean optimizationsOn() {
-        return optimizations;
+    public static boolean optimizationOn(Optimization o) {
+        return optimizationMap.get(o);
     }
 
     public static void turnLexDiagnosticsOn(String[] args) {
