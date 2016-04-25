@@ -342,6 +342,9 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
 
     // meet operator for CCP
     public UnreachableValueTuplesPair meet(Set<LatticeElement> elements) {
+        if (elements.size() == 1) { // would only happen if set had duplicate lattice element
+            return (UnreachableValueTuplesPair) elements.iterator().next();
+        }
         assert elements.size() >= 2;
         Iterator<LatticeElement> iterator = elements.iterator();
         UnreachableValueTuplesPair accumulator = (UnreachableValueTuplesPair) iterator.next();
