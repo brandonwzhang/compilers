@@ -42,6 +42,7 @@ public class RegisterAllocator {
         }
         // Use Kempe's algorithm to allocate physical locations to abstract registers
         GraphColorer graphColorer = new GraphColorer(interferenceSets, lines);
+        graphColorer.colorGraph();
         registerMap = graphColorer.getColoring();
 //        registerMap = new HashMap<>();
 
