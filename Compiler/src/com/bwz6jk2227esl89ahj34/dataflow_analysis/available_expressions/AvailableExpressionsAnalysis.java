@@ -204,6 +204,27 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         }
     }
 
+    public static int exprSize(IRExpr expr) {
+        if (expr instanceof IRBinOp) {
+            IRBinOp binop = (IRBinOp)expr;
+            return 1 + exprSize(binop.left()) + exprSize(binop.right());
+        }
+        if (expr instanceof IRCall) {
+            int size = 1;
+            IRCall call = (IRCall)expr;
+            for (IRExpr arg : call.args()) {
+                size += exprSize(arg);
+            }
+            return size;
+        }
+        if (expr instanceof IRMem) {
+            IRMem mem = (IRMem)expr;
+            return exprSize(mem.expr());
+        }
+        return 1;
+    }
+
+
     /**
      * Takes in an IRExpr tree (lowered), and searches for a node that passes the predicate
      * specified by filter.
