@@ -265,11 +265,12 @@ public class IRFuncDecl extends IRNode {
         IRFuncDecl fd = (IRFuncDecl) n_;
         List<IRStmt> stmts = ((IRSeq) (fd.body())).stmts();
         List<IRStmt> reordered = reorderBlocks(stmts);
-        //IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reordered));
-        //return new IRFuncDecl(fd.name(), ccp_optimized);
-        return new IRFuncDecl(fd.name(), new IRSeq(reorderBlocks(stmts)));
+        IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reordered));
+        return new IRFuncDecl(fd.name(), ccp_optimized);
+        //return new IRFuncDecl(fd.name(), new IRSeq(reorderBlocks(stmts)));
     }
 
+    // NOTE: at the moment, this only eliminates dead code 
     public IRSeq condtionalConstantPropagation(IRSeq seq) {
         ConditionalConstantPropagation ccp =
                 new ConditionalConstantPropagation(seq);
@@ -277,43 +278,24 @@ public class IRFuncDecl extends IRNode {
         List<IRStmt> stmts = seq.stmts();
         List<IRStmt> newStmts = new LinkedList<>();
         for (int i = 0; i < stmts.size(); i++) {
-            if (graph.containsKey(i)) {
-                UnreachableValueTuplesPair info =
-                        (UnreachableValueTuplesPair) graph.get(i).getIn();
-                IRStmt stmt = stmts.get(i);
-                if (info.isUnreachable()) {
-                    System.out.println("hello");
-                    // if not reachable, we don't do anything :)
-                } else {
-                    // it is reachable, we should see if we can
-                    // propagate constants
-                    if (stmt instanceof IRMove) {
-                        IRMove castedStmt = (IRMove) stmt;
-                        newStmts.add(new IRMove(castedStmt.target(),
-                                update(info, castedStmt.expr())));
-                    } else if (stmt instanceof IRCJump) {
-                        IRCJump castedStmt = (IRCJump) stmt;
-                        newStmts.add(new IRCJump( // optimize the guard
-                                        update(info, castedStmt.expr()), // only
-                                        castedStmt.trueLabel(),
-                                        castedStmt.falseLabel()
-                                )
-                        );
-                    } else if (stmt instanceof IRJump
-                            || stmt instanceof IRReturn) { // can't really
-                        newStmts.add(stmt); // optimize jumps or return...
-                    } else {
-                        throw new RuntimeException("Please e-mail jk2227@cornell.edu");
-                    }
-                }
+            if (!graph.containsKey(i)) {
+              newStmts.add(stmts.get(i));
             } else {
-                newStmts.add(stmts.get(i));
+                IRStmt stmt = stmts.get(i);
+                CFGNode node = graph.get(i);
+                UnreachableValueTuplesPair tuple = (UnreachableValueTuplesPair) node.getIn();
+                if (tuple.isUnreachable()) {
+                    // unreachable so we do not add it to new stmts
+                } else {
+                    newStmts.add(stmt);
+                }
             }
         }
 
         return new IRSeq(newStmts);
     }
 
+    // TODO: THIS IS FOR PROPAGATING CONSTANTS...
     // if the expr can be optimized and be replaced with a IRConst value
     // then it is optimized; otherwise we return expr
     public IRExpr update(UnreachableValueTuplesPair info, IRExpr expr) {
@@ -331,9 +313,7 @@ public class IRFuncDecl extends IRNode {
             }
         } else if (expr instanceof IRBinOp) {
             IRBinOp castedExpr = (IRBinOp) expr;
-            return new IRBinOp(castedExpr.opType(), // recurse on left and right
-                    update(info, castedExpr.left()), // and eventually return
-                    update(info, castedExpr.right())); // a IRBinOp
+            return ConditionalConstantPropagation.compute(castedExpr, info.getValueTuples());
         } else if (expr instanceof IRCall) {
             IRCall castedExpr = (IRCall) expr;
             List<IRExpr> args = castedExpr.args();
@@ -342,6 +322,8 @@ public class IRFuncDecl extends IRNode {
                 newArgs.add(update(info, arg));
             }
             return new IRCall(castedExpr.target(), newArgs);
+        } else if (expr instanceof IRMem) {
+          return new IRMem(update(info, ((IRMem)expr).expr()));
         } else if (expr instanceof IRConst) {
             return expr; // can't optimize IRConst further
         } else { // doomed
