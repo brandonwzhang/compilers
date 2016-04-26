@@ -1,10 +1,11 @@
-package com.bwz6jk2227esl89ahj34;
+package com.bwz6jk2227esl89ahj34.ast.parse;
+
+import java_cup.runtime.Symbol;
 import java_cup.runtime.*;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.io.FileReader;
 import java.io.PrintWriter;
-
 %%
 %public
 %class Lexer
@@ -65,7 +66,7 @@ HexChar = \\x[2-7][0-9A-E]
 "bool"                              { return symbol(ParserSym.BOOL); }
 "true"                              { return symbol(ParserSym.TRUE); }
 "false"                             { return symbol(ParserSym.FALSE); }
-"length"                            { return symbol(ParserSym.LENGTH); }
+"length"                            { return symbol(ParserSym.LENGTH, yytext()); }
  {Identifier}                       { return symbol(ParserSym.IDENTIFIER, yytext()); }
 
  /* literals */
