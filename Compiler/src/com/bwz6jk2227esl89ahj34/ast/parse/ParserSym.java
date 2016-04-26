@@ -9,6 +9,7 @@ package com.bwz6jk2227esl89ahj34.ast.parse;
 public class ParserSym {
   /* terminals */
   public static final int UNDERSCORE = 40;
+  public static final int LENGTH = 43;
   public static final int LT = 22;
   public static final int CLOSE_BRACKET = 32;
   public static final int INTEGER_LITERAL = 5;
@@ -94,7 +95,8 @@ public class ParserSym {
   "SEMICOLON",
   "UNDERSCORE",
   "HIGH_MULT",
-  "NEGATIVE_INT_BOUND"
+  "NEGATIVE_INT_BOUND",
+  "LENGTH"
   };
 }
 

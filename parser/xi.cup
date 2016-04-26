@@ -1,13 +1,16 @@
-package com.bwz6jk2227esl89ahj34.AST.parse;
+package com.bwz6jk2227esl89ahj34.ast.parse;
 
-import com.bwz6jk2227esl89ahj34.AST.*;
-import com.bwz6jk2227esl89ahj34.AST.type.PrimitiveType;
-import com.bwz6jk2227esl89ahj34.AST.type.VariableType;
-import com.bwz6jk2227esl89ahj34.AST.type.VariableTypeList;
+import com.bwz6jk2227esl89ahj34.ast.*;
+import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
+import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
+import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
-import java.util.*;
-import java.util.AbstractMap.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 class Parser;
 
@@ -37,7 +40,7 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH;
 
 nonterminal Program program;
 
@@ -214,6 +217,7 @@ typed_declaration ::= identifier:id COLON primitive_type:t array_size_type:ast {
 
 function_call ::= identifier:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(id, lst); RESULT.setLocation(id); :}//f(x,y,z,...)
                 | identifier:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(id, new LinkedList<Expression>()); RESULT.setLocation(id); :} // f()
+                | LENGTH:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier("length"), lst); RESULT.setLocation(parser.cur_token); :}
                 ;
 
 
