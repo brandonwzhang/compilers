@@ -474,7 +474,10 @@ public class GraphColorer {
      * Requires: a and b do not have an edge between them
      */
     private boolean canCoalesce(AssemblyAbstractRegister a, AssemblyAbstractRegister b) {
-        assert !graph.get(a).contains(b) && !graph.get(b).contains(a);
+
+        if (graph.get(a).contains(b) || graph.get(b).contains(a)) {
+            return false;
+        }
 
         // George's
 //        List<AssemblyAbstractRegister> a_neighbors = graph.get(a);
