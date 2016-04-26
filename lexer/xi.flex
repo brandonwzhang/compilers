@@ -66,7 +66,7 @@ HexChar = \\x[2-7][0-9A-E]
 "bool"                              { return symbol(ParserSym.BOOL); }
 "true"                              { return symbol(ParserSym.TRUE); }
 "false"                             { return symbol(ParserSym.FALSE); }
-"length"                            { return symbol(ParserSym.LENGTH, yytext()); }
+"length"                            { return symbol(ParserSym.LENGTH); }
  {Identifier}                       { return symbol(ParserSym.IDENTIFIER, yytext()); }
 
  /* literals */
