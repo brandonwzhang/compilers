@@ -166,7 +166,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 // successors must be 2
                 assert node.getSuccessors().size() == 2;
 
-                node.setOut(node.getIn()); // no information is changed for
+                node.setOut(node.getIn().copy()); // no information is changed for
                                          // branch that we always take
 
                 // for the branch we do not take, we have to prepare
@@ -201,7 +201,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
             }
         } else { // only case I think can fall through here is an IRJump
             // the out is set to in because no information was changed
-            node.setOut(node.getIn());
+            node.setOut(node.getIn().copy());
             // now we disperse this information to the successor
             for (CFGNode successor : node.getSuccessors()) {
                 setIn(successor, (UnreachableValueTuplesPair) node.getOut().copy());
@@ -398,8 +398,10 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
             transfer(node);
             LatticeElement newOut = node.getOut().copy();
 
-            assert (((UnreachableValueTuplesPair) node.getIn()).isUnreachable() ==
-                    ((UnreachableValueTuplesPair) node.getOut()).isUnreachable());
+            boolean inBool = ((UnreachableValueTuplesPair) node.getIn()).isUnreachable();
+            boolean outBool = ((UnreachableValueTuplesPair) node.getOut()).isUnreachable();
+
+            assert inBool == outBool;
 
             if (!oldIn.equals(newOut) || !oldOut.equals(newOut)) {
                 worklist.addAll(node.getSuccessors());

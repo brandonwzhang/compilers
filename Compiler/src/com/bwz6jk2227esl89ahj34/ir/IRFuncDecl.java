@@ -331,6 +331,7 @@ public class IRFuncDecl extends IRNode {
                 UnreachableValueTuplesPair tuple = (UnreachableValueTuplesPair) node.getIn();
                 if (tuple.isUnreachable()) {
                     // unreachable so we do not add it to new stmts
+                    System.out.println("?");
                 } else {
                     //ConditionalConstantPropagationVisitor visitor =
                     //        new ConditionalConstantPropagationVisitor(tuple.getValueTuples());
