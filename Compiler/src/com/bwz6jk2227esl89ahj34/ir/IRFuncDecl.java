@@ -341,6 +341,8 @@ public class IRFuncDecl extends IRNode {
             }
         }
 
+        System.out.println("am i reaching here");
+        System.out.println(stmts.size() == newStmts.size());
         return new IRSeq(newStmts);
     }
 
