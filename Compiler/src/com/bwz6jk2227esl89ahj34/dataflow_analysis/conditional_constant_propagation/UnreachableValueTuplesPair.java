@@ -46,7 +46,16 @@ public class UnreachableValueTuplesPair extends LatticeElement {
     @Override
     public LatticeElement copy() {
         Map<String, LatticeElement> valueTuplesCopy = new HashMap<>();
-        valueTuplesCopy.putAll(valueTuples);
+        for (String key : valueTuples.keySet()) {
+            if(valueTuples.get(key) instanceof LatticeBottom) {
+                valueTuplesCopy.put(key, new LatticeBottom());
+            } else if (valueTuples.get(key) instanceof LatticeTop) {
+                valueTuplesCopy.put(key, new LatticeTop());
+            } else {
+                Value value = (Value)(((Value) (valueTuples.get(key))).copy());
+                valueTuplesCopy.put(key, value);
+            }
+        }
         UnreachableValueTuplesPair copy =
                 new UnreachableValueTuplesPair(unreachable, valueTuplesCopy);
         return copy;
@@ -59,8 +68,25 @@ public class UnreachableValueTuplesPair extends LatticeElement {
         } else {
             UnreachableValueTuplesPair castedElement =
                     (UnreachableValueTuplesPair) element;
-            return (unreachable == castedElement.isUnreachable()) &&
-                    (castedElement.getValueTuples().equals(valueTuples));
+
+            Map<String, LatticeElement> castedElementMap = castedElement.getValueTuples();
+            if (castedElementMap.keySet().size() != valueTuples.keySet().size()) {
+                return false;
+            }
+
+            if (unreachable != castedElement.isUnreachable()) {
+                return false;
+            }
+
+            for (String key : castedElementMap.keySet()) {
+                if (!valueTuples.containsKey(key)) {
+                    return false;
+                }
+                if (!castedElementMap.get(key).equals(valueTuples.get(key))) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

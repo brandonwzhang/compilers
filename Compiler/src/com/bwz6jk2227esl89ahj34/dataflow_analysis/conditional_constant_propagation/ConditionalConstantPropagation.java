@@ -166,7 +166,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 // successors must be 2
                 assert node.getSuccessors().size() == 2;
 
-                node.setOut(node.getIn()); // no information is changed for
+                node.setOut(node.getIn().copy()); // no information is changed for
                                          // branch that we always take
 
                 // for the branch we do not take, we have to prepare
@@ -193,7 +193,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 }
 
             } else { // we disperse the same informations to the successor
-                node.setOut(node.getIn());
+                node.setOut(node.getIn().copy());
                 // now we disperse this information to the successor
                 for (CFGNode successor : node.getSuccessors()) {
                     setIn(successor, (UnreachableValueTuplesPair) node.getOut().copy());
@@ -405,13 +405,6 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
 
             if (!oldIn.equals(newOut) || !oldOut.equals(newOut)) {
                 worklist.addAll(node.getSuccessors());
-            } else { // not sure why this is needed but hard code fix
-                for (CFGNode successor : node.getSuccessors()) {
-                    if (((UnreachableValueTuplesPair)(successor.getIn())).isUnreachable() !=
-                            ((UnreachableValueTuplesPair)(successor.getOut())).isUnreachable()) {
-                        worklist.add(successor);
-                    }
-                }
             }
         }
     }
