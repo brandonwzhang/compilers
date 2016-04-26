@@ -166,7 +166,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 // successors must be 2
                 assert node.getSuccessors().size() == 2;
 
-                node.setOut(node.getIn().copy()); // no information is changed for
+                node.setOut(node.getIn()); // no information is changed for
                                          // branch that we always take
 
                 // for the branch we do not take, we have to prepare
