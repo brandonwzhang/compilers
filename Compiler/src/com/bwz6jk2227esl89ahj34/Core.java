@@ -13,6 +13,7 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGIR;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions.AvailableExpressionsAnalysis;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.ConditionalConstantPropagation;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.UnreachableValueTuplesPair;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
         .LiveVariableAnalysis;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
@@ -281,7 +282,7 @@ public class Core {
         for (String functionName : lirRoot.functions().keySet()) {
             IRSeq seq = (IRSeq) lirRoot.functions().get(functionName).body();
             AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(seq);
-            //ConditionalConstantPropagation analysis = new ConditionalConstantPropagation(seq);
+            System.out.println(functionName);
             Util.writeHelper(
                     "analysis" + functionName,
                     "dot",

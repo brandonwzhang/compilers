@@ -69,22 +69,22 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         // if this node is reachable or not -- if it is unreachable
         // we do not have to do anything
         if (in.isUnreachable()) {
-            // for the branch we do not take, we have to prepare
-            // new information to send
-            Map<String, LatticeElement> infoForDead = new HashMap<>();
-            for (String key : in.getValueTuples().keySet()) {
-                infoForDead.put(key, new LatticeTop());
-            }
+                // for the branch we do not take, we have to prepare
+                // new information to send
+                Map<String, LatticeElement> infoForDead = new HashMap<>();
+                for (String key : in.getValueTuples().keySet()) {
+                    infoForDead.put(key, new LatticeTop());
+                }
 
-            UnreachableValueTuplesPair deadBranchInfo =
-                    new UnreachableValueTuplesPair(true, infoForDead);
-            node.setOut(deadBranchInfo);
+                UnreachableValueTuplesPair deadBranchInfo =
+                        new UnreachableValueTuplesPair(true, infoForDead);
+                node.setOut(deadBranchInfo.copy());
 
-            // now we disperse this information to the successor
-            for (CFGNode successor : node.getSuccessors()) {
-                setIn(successor, (UnreachableValueTuplesPair) node.getOut());
-            }
-            return;
+                // now we disperse this information to the successor
+                for (CFGNode successor : node.getSuccessors()) {
+                    setIn(successor, (UnreachableValueTuplesPair) node.getOut().copy());
+                }
+                return;
         }
 
         // once we are here, we know that this node is reachable
@@ -154,7 +154,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
 
             // now we disperse this information to the successor
             for (CFGNode successor : node.getSuccessors()) {
-                setIn(successor, (UnreachableValueTuplesPair) node.getOut());
+                setIn(successor, (UnreachableValueTuplesPair) node.getOut().copy());
             }
         } else if (stmt instanceof IRCJump) { // if (...)
             // we cast stmt to a IRCJump
@@ -184,21 +184,21 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
                 // the false branch is always the first successor
                 // and the false branch is killed if the guard evaluated to 1
                 if (((IRConst)guard).value() == 1) {
-                    setIn(node.getSuccessors().get(0), deadBranchInfo);
+                    setIn(node.getSuccessors().get(0), (UnreachableValueTuplesPair) (deadBranchInfo.copy()));
                     setIn(node.getSuccessors().get(1),
-                            (UnreachableValueTuplesPair) node.getOut());
+                            (UnreachableValueTuplesPair) node.getOut().copy());
                 } else { // otherwise, we pass the regular info to the false
                         // branch and the dead info to true branch
-                    setIn(node.getSuccessors().get(1), deadBranchInfo);
+                    setIn(node.getSuccessors().get(1), (UnreachableValueTuplesPair) (deadBranchInfo.copy()));
                     setIn(node.getSuccessors().get(0),
-                            (UnreachableValueTuplesPair) node.getOut());
+                            (UnreachableValueTuplesPair) node.getOut().copy());
                 }
 
             } else { // we disperse the same informations to the successor
                 node.setOut(node.getIn());
                 // now we disperse this information to the successor
                 for (CFGNode successor : node.getSuccessors()) {
-                    setIn(successor, (UnreachableValueTuplesPair) node.getOut());
+                    setIn(successor, (UnreachableValueTuplesPair) node.getOut().copy());
                 }
             }
         } else { // only case I think can fall through here is an IRJump
@@ -206,7 +206,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
             node.setOut(node.getIn());
             // now we disperse this information to the successor
             for (CFGNode successor : node.getSuccessors()) {
-                setIn(successor, (UnreachableValueTuplesPair) node.getOut());
+                setIn(successor, (UnreachableValueTuplesPair) node.getOut().copy());
             }
 
         }
@@ -239,6 +239,22 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
 
         IRExpr leftBop = bop.left();
         IRExpr rightBop = bop.right();
+
+        // if either left or right is a IR binop then
+        // we recurse on these first
+        if (leftBop instanceof IRBinOp) {
+            leftBop = compute((IRBinOp)leftBop, map);
+        }
+
+        if (rightBop instanceof IRBinOp) {
+            rightBop = compute((IRBinOp)rightBop, map);
+        }
+
+        // if after the recursion either of them are still binops
+        // then we return bop
+        if (leftBop instanceof IRBinOp || rightBop instanceof IRBinOp) {
+            return bop;
+        }
 
         // if left and right are IRTemp, we attempt to convert it to
         // a IRConst
@@ -378,10 +394,16 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         while (!worklist.isEmpty()) {
             // We find the fixpoint using the worklist algorithm
             CFGNode node = worklist.remove();
+            // LatticeElement oldOut = node.getOut().copy();
+            LatticeElement oldIn = node.getIn().copy();
             LatticeElement oldOut = node.getOut().copy();
             transfer(node);
             LatticeElement newOut = node.getOut().copy();
-            if (!oldOut.equals(newOut)) {
+
+            assert (((UnreachableValueTuplesPair) node.getIn()).isUnreachable() ==
+                    ((UnreachableValueTuplesPair) node.getOut()).isUnreachable());
+
+            if (!oldIn.equals(newOut) || !oldOut.equals(newOut)) {
                 worklist.addAll(node.getSuccessors());
             }
         }

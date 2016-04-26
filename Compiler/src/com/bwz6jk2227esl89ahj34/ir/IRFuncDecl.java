@@ -11,6 +11,7 @@ import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
+import com.bwz6jk2227esl89ahj34.util.Util;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 
 import java.util.*;
@@ -264,16 +265,21 @@ public class IRFuncDecl extends IRNode {
         // All IRSeq's should be flattened by this point
         IRFuncDecl fd = (IRFuncDecl) n_;
         List<IRStmt> stmts = ((IRSeq) (fd.body())).stmts();
-        //List<IRStmt> reordered = reorderBlocks(stmts);
-        //IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reordered));
-        //return new IRFuncDecl(fd.name(), ccp_optimized);
-        return new IRFuncDecl(fd.name(), new IRSeq(reorderBlocks(stmts)));
+        // jihun: running with CCP for now
+        // comment the next 3 lines out and uncomment the return statement
+        // to get rid of CCP
+        List<IRStmt> reordered = reorderBlocks(stmts);
+        IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reordered));
+        return new IRFuncDecl(fd.name(), ccp_optimized);
+        //return new IRFuncDecl(fd.name(), new IRSeq(reorderBlocks(stmts)));
     }
 
-    // NOTE: at the moment, this only eliminates dead code
+    // NOTE: at the moment, this only eliminates unreachable code
     public IRSeq condtionalConstantPropagation(IRSeq seq) {
         ConditionalConstantPropagation ccp =
                 new ConditionalConstantPropagation(seq);
+
+
         Map<Integer, CFGNode> graph = ccp.getGraph().getNodes();
         List<IRStmt> stmts = seq.stmts();
         List<IRStmt> newStmts = new LinkedList<>();

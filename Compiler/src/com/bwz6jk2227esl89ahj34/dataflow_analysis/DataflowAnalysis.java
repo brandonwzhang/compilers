@@ -17,7 +17,7 @@ public abstract class DataflowAnalysis {
         FORWARD, BACKWARD
     }
 
-    public CFG graph;
+    protected CFG graph;
     protected LatticeElement top;
     protected LatticeElement bottom;
 
