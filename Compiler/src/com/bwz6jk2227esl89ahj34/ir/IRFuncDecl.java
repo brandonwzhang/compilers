@@ -7,10 +7,7 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.ConditionalConstantPropagation;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.UnreachableValueTuplesPair;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.Value;
-import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
-import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
-import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
-import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
+import com.bwz6jk2227esl89ahj34.ir.visit.*;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 
@@ -293,6 +290,9 @@ public class IRFuncDecl extends IRNode {
                 if (tuple.isUnreachable()) {
                     // unreachable so we do not add it to new stmts
                 } else {
+                    //ConditionalConstantPropagationVisitor visitor =
+                    //        new ConditionalConstantPropagationVisitor(tuple.getValueTuples());
+                    //newStmts.add((IRStmt) visitor.visit(stmt));
                     newStmts.add(stmt);
                 }
             }
