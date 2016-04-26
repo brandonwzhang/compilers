@@ -305,7 +305,6 @@ public class Core {
         for (String functionName : lirRoot.functions().keySet()) {
             IRSeq seq = (IRSeq) lirRoot.functions().get(functionName).body();
             AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(seq);
-            System.out.println(functionName);
             Util.writeHelper(
                     "analysis" + functionName,
                     "dot",
