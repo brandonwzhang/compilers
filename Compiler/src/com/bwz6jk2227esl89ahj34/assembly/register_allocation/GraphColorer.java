@@ -1,7 +1,9 @@
 package com.bwz6jk2227esl89ahj34.assembly.register_allocation;
 
+import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
+import com.bwz6jk2227esl89ahj34.optimization.Optimization;
 
 import java.util.*;
 
@@ -105,6 +107,13 @@ public class GraphColorer {
         addMovePairs();
         removeAbsentMovePairs();
         removeImpossibleMovePairs();
+
+        if (!Main.optimizationOn(Optimization.MC)) {
+            if (Main.debugOn()) {
+                System.out.println("move coalescing off");
+            }
+            movePairs.clear();
+        }
     }
 
     /**
@@ -446,7 +455,7 @@ public class GraphColorer {
 
             removedNodes.push(removedNode);
             activeNodes.remove(removedNode);
-            //System.out.println("--" + "removing " + removedNode);
+            System.out.println("--" + "removing " + removedNode);
 
             for (AssemblyAbstractRegister neighbor : graph.get(removedNode)) {
                 // remove removedNode from the adjacency lists of its neighbors
@@ -511,7 +520,7 @@ public class GraphColorer {
                 AssemblyAbstractRegister t1 = pair.left;
                 AssemblyAbstractRegister t2 = pair.right;
                 if (canCoalesce(t1, t2)) {
-                    //System.out.println("--coalescing: " + t1 + " and " + t2);
+                    System.out.println("--coalescing: " + t1 + " and " + t2);
                     combineNodes(t1, t2);
                     replacementMap.put(t2, t1);
                     removeSet.add(pair);
@@ -557,7 +566,7 @@ public class GraphColorer {
 
             // give up on all move pairs that contain the node we are freezing
             if (frozen != null) {
-                //System.out.println("--freezing " + frozen);
+                System.out.println("--freezing " + frozen);
                 Set<MovePair> removeSet = new HashSet<>();
                 for (MovePair pair_ : movePairs) {
                     if (pair_.left.equals(frozen) || pair_.right.equals(frozen)) {
@@ -590,7 +599,7 @@ public class GraphColorer {
      */
     public void colorGraph() {
 
-        //System.out.println("\n========= colorGraph() called =========");
+        System.out.println("\n========= colorGraph() called =========");
 
         int numPrecolored = coloring.size();
 
@@ -599,12 +608,12 @@ public class GraphColorer {
             do {
                 boolean changed;
                 do {
-                    //System.out.println("simplify");
+                    System.out.println("simplify");
                     changed = simplify();
-                    //System.out.println("coalesce");
+                    System.out.println("coalesce");
                     changed = coalesce() || changed;
                 } while (changed);
-                //System.out.println("freeze");
+                System.out.println("freeze");
                 frozeNode = freeze();
             } while(frozeNode);
 
@@ -616,7 +625,7 @@ public class GraphColorer {
             // potential spill node
             AssemblyAbstractRegister spillNode = activeNodes.iterator().next();
 
-            //System.out.println("potential spill " + spillNode);
+            System.out.println("potential spill " + spillNode);
             for (AssemblyAbstractRegister neighbor : graph.get(spillNode)) {
                 graph.get(neighbor).remove(spillNode);
             }
@@ -632,7 +641,7 @@ public class GraphColorer {
             movePairs.removeAll(removeSet);
         }
 
-        //System.out.println("begin coloring");
+        System.out.println("begin coloring");
         AssemblyAbstractRegister currentNode;
         while (!removedNodes.isEmpty()) {
             currentNode = removedNodes.pop();
@@ -650,12 +659,12 @@ public class GraphColorer {
                 if (!coloring.containsKey(currentNode)) {
                     AssemblyPhysicalRegister color = assignColor(neighborColors);
                     coloring.put(currentNode, color);
-                    //System.out.println("--assigned " + color + " to " + currentNode);
+                    System.out.println("--assigned " + color + " to " + currentNode);
                 }
             }
         }
 
-        //System.out.println("color the spill nodes");
+        System.out.println("color the spill nodes");
         while (spillNodes.size() > 0) {
             AssemblyAbstractRegister colorable = null;
             for (AssemblyAbstractRegister sn : spillNodes) {
@@ -677,10 +686,10 @@ public class GraphColorer {
             AssemblyPhysicalRegister color = assignColor(neighborColors);
             coloring.put(colorable, color);
             spillNodes.remove(colorable);
-            //System.out.println("colored potential spill node " + colorable);
+            System.out.println("colored potential spill node " + colorable);
         }
 
-        //System.out.println("spill nodes: " + spillNodes.size());
+        System.out.println("spill nodes: " + spillNodes.size());
         allocateCoalescedRegisters();
         //updateLines();
     }

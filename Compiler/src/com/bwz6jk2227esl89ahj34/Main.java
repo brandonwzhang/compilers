@@ -1,8 +1,9 @@
 package com.bwz6jk2227esl89ahj34;
 
 import com.bwz6jk2227esl89ahj34.cli.CLI;
+import com.bwz6jk2227esl89ahj34.optimization.Optimization;
 
-import java.util.Collections;
+import java.util.*;
 
 public class Main {
     private static String sourcePath = "./";
@@ -11,13 +12,17 @@ public class Main {
     private static String assemblyPath = "./";
     private static String target = "linux";
     private static boolean debug;
-    private static boolean optimizations = true;
     private static boolean tests;
     private static boolean lex;
     private static boolean parse;
     private static boolean typecheck;
     private static boolean irgen;
     private static boolean irrun;
+    private static boolean reportInitialIR = false;
+    private static boolean reportFinalIR = false;
+
+    public static boolean allOptimizations = true;
+    public static HashMap<Optimization, Boolean> optimizationMap = new HashMap<>();
 
     public static void main(String[] args) {
         CLI cli = new CLI();
@@ -79,6 +84,10 @@ public class Main {
                       "Generate and interpret intermediate code",
                       Main::turnIRRunDiagnosticsOn,
                       0);
+        cli.addOption("--optir",
+                      "Report the intermediate code at the specified phase of optimization.",
+                      phase -> reportIR(phase[0]),
+                      1);
 
         cli.execute(args);
 
@@ -100,6 +109,21 @@ public class Main {
             //Tests.irGenTests();
             //Tests.irRunTests();
             Tests.regressionTest();
+        }
+    }
+
+    public static void reportIR(String phase) {
+        switch(phase) {
+            case "initial":
+                reportInitialIR = true;
+                break;
+            case "final":
+                reportFinalIR = true;
+                break;
+            default:
+                System.out.println(phase + " is not a supported phase.");
+                System.out.println("An extra IR file will not be written.");
+                break;
         }
     }
 
@@ -151,19 +175,16 @@ public class Main {
         debug = true;
     }
 
-    /**
-     * Turns on optimizations (constant folding).
-     */
     public static void turnOptimizationsOff(String[] args) {
-        optimizations = false;
+        allOptimizations = false;
     }
 
     public static boolean debugOn() {
         return debug;
     }
 
-    public static boolean optimizationsOn() {
-        return optimizations;
+    public static boolean optimizationOn(Optimization o) {
+        return optimizationMap.get(o);
     }
 
     public static void turnLexDiagnosticsOn(String[] args) {
@@ -205,6 +226,10 @@ public class Main {
     public static boolean irrun() {
         return irrun;
     }
+
+    public static boolean reportInitialIR() { return reportInitialIR; }
+
+    public static boolean reportFinalIR() { return reportFinalIR; }
 
     public static void turnTestsOn(String[] args) {
         tests = true;
