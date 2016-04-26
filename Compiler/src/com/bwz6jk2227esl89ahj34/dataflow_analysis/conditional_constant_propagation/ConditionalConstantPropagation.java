@@ -405,6 +405,13 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
 
             if (!oldIn.equals(newOut) || !oldOut.equals(newOut)) {
                 worklist.addAll(node.getSuccessors());
+            } else { // not sure why this is needed but hard code fix
+                for (CFGNode successor : node.getSuccessors()) {
+                    if (((UnreachableValueTuplesPair)(successor.getIn())).isUnreachable() !=
+                            ((UnreachableValueTuplesPair)(successor.getOut())).isUnreachable()) {
+                        worklist.add(successor);
+                    }
+                }
             }
         }
     }
