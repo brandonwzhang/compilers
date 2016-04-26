@@ -125,12 +125,11 @@ public class StatementCodeGenerators {
 
         IRCJump castedRoot = (IRCJump) root;
         assert castedRoot.falseLabel() == null; // assert lowered CJump
-        AssemblyExpression guard = translateExpression(castedRoot.expr(), lines, true);
+        AssemblyExpression guard = ExpressionCodeGenerators.makeTemp(translateExpression(castedRoot.expr(), lines, true), lines);
 
         // compare guard to 0, jump to trueLabel if not equal
         lines.add(new AssemblyInstruction(OpCode.CMPQ, new AssemblyImmediate(0), guard));
         lines.add(new AssemblyInstruction(OpCode.JNE, new AssemblyName(castedRoot.trueLabel())));
-
         return lines;
     };
 

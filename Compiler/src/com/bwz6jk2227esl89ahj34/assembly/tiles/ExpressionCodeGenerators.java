@@ -300,7 +300,7 @@ public class ExpressionCodeGenerators {
      * @param lines
      * @return
      */
-    private static AssemblyRegister makeTemp(AssemblyExpression e, List<AssemblyLine> lines) {
+    public static AssemblyRegister makeTemp(AssemblyExpression e, List<AssemblyLine> lines) {
 
         if(e instanceof AssemblyRegister){
             return (AssemblyRegister)e;

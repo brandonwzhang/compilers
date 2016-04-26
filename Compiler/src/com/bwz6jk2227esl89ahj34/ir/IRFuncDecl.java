@@ -333,7 +333,7 @@ public class IRFuncDecl extends IRNode {
                     // unreachable so we do not add it to new stmts
                 } else {
                     //ConditionalConstantPropagationVisitor visitor =
-                    //        new ConditionalConstantPropagationVisitor(tuple.getValueTuples());
+                            new ConditionalConstantPropagationVisitor(tuple.getValueTuples());
                     //newStmts.add((IRStmt) visitor.visit(stmt));
                     newStmts.add(stmt);
                 }
@@ -342,42 +342,4 @@ public class IRFuncDecl extends IRNode {
 
         return new IRSeq(newStmts);
     }
-
-    // TODO: THIS IS FOR PROPAGATING CONSTANTS...
-    // if the expr can be optimized and be replaced with a IRConst value
-    // then it is optimized; otherwise we return expr
-    public IRExpr update(UnreachableValueTuplesPair info, IRExpr expr) {
-        if (expr instanceof IRTemp) {
-            String tempName = ((IRTemp) expr).name();
-            if (info.getValueTuples().containsKey(tempName)) {
-                LatticeElement elem = info.getValueTuples().get(tempName);
-                if (elem instanceof LatticeBottom || elem instanceof LatticeTop) {
-                    return expr; // if unassigned or overloaded, just return IRTemp
-                } else { // otherwise, it is a value, so we return the IRConst
-                    return ((Value) elem).getValue();    // wrapped by the value
-                }
-            } else {
-                return expr;
-            }
-        } else if (expr instanceof IRBinOp) {
-            IRBinOp castedExpr = (IRBinOp) expr;
-            return ConditionalConstantPropagation.compute(castedExpr, info.getValueTuples());
-        } else if (expr instanceof IRCall) {
-            IRCall castedExpr = (IRCall) expr;
-            List<IRExpr> args = castedExpr.args();
-            List<IRExpr> newArgs = new LinkedList<>();
-            for (IRExpr arg : args) {
-                newArgs.add(update(info, arg));
-            }
-            return new IRCall(castedExpr.target(), newArgs);
-        } else if (expr instanceof IRMem) {
-          return new IRMem(update(info, ((IRMem)expr).expr()));
-        } else if (expr instanceof IRConst) {
-            return expr; // can't optimize IRConst further
-        } else { // doomed
-            System.out.println(expr);
-            throw new RuntimeException("Please contact jk2227@cornell.edu");
-        }
-    }
-
 }
