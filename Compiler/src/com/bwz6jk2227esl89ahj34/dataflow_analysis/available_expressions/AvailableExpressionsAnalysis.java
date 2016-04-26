@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 
 public class AvailableExpressionsAnalysis extends DataflowAnalysis{
     public AvailableExpressionsAnalysis(IRSeq seq) {
-        super(seq, Direction.FORWARD, allExprs(seq), new AvailableExpressionSet(new HashSet<>()));
+        super(seq, Direction.FORWARD, allExprs(seq));
         // top = {all exprs}
         // bottom = {}
     }
@@ -48,7 +48,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
             return new AvailableExpressionSet(new HashSet<>());
         }
 
-        AvailableExpressionSet meet = (AvailableExpressionSet)top.copy();
+        AvailableExpressionSet meet = (AvailableExpressionSet)initial.copy();
         Set<IRExpr> exprs = meet.getExprs();
         for (LatticeElement e : elements) {
             AvailableExpressionSet set = (AvailableExpressionSet)e;
@@ -323,9 +323,9 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         Otherwise throw runtimeexception
      */
     public IRExpr findReference(IRExpr e1) {
-        assert this.getTop() instanceof AvailableExpressionSet;
+        assert initial instanceof AvailableExpressionSet;
 
-        for (IRExpr e2 : ((AvailableExpressionSet)this.getTop()).getExprs()) {
+        for (IRExpr e2 : ((AvailableExpressionSet) initial).getExprs()) {
             if (exprEquals(e1, e2)) {
                 return e2;
             }
@@ -338,7 +338,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         Same helper as above, but does it for a set of IRExprs
      */
     public Set<IRExpr> findReferences(Set<IRExpr> exprs) {
-        assert this.getTop() instanceof AvailableExpressionSet;
+        assert initial instanceof AvailableExpressionSet;
 
         Set<IRExpr> refs = new HashSet<>();
         for (IRExpr e : exprs) {
