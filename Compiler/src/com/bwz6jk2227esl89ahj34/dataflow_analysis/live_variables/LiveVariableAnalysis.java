@@ -18,7 +18,7 @@ public class LiveVariableAnalysis extends DataflowAnalysis{
     }
 
     public LiveVariableAnalysis(List<AssemblyLine> lines) {
-        super(lines, Direction.BACKWARD);
+        super(lines, Direction.BACKWARD, new LatticeTop());
     }
 
     /**

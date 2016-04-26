@@ -647,7 +647,7 @@ public class GraphColorer {
             currentNode = removedNodes.pop();
             activeNodes.add(currentNode);
             Set<AssemblyPhysicalRegister> neighborColors = new HashSet<>();
-            // readd currentNode to the adjacency lists of its neighbors
+            // read currentNode to the adjacency lists of its neighbors
             for (AssemblyAbstractRegister neighbor : graph.get(currentNode)) {
                 graph.get(neighbor).add(currentNode);
                 if (coloring.containsKey(neighbor)) {

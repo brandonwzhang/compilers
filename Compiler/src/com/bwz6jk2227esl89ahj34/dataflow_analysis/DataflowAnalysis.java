@@ -18,40 +18,18 @@ public abstract class DataflowAnalysis {
     }
 
     protected CFG graph;
-    protected LatticeElement top;
-    protected LatticeElement bottom;
+    // Either the top or bottom element of the lattice
+    protected LatticeElement initial;
 
-    public DataflowAnalysis(List<AssemblyLine> lines, Direction direction) {
+    public DataflowAnalysis(List<AssemblyLine> lines, Direction direction, LatticeElement initial) {
         this.graph = new CFGAssembly(lines);
-        top = new LatticeTop();
-        bottom = new LatticeBottom();
+        this.initial = initial;
         fixpoint(direction);
     }
 
-    public DataflowAnalysis(List<AssemblyLine> lines,
-                            Direction direction,
-                            LatticeElement top,
-                            LatticeElement bottom) {
-        this.graph = new CFGAssembly(lines);
-        this.top = top;
-        this.bottom = bottom;
-        fixpoint(direction);
-    }
-
-    public DataflowAnalysis(IRSeq seq, Direction direction) {
+    public DataflowAnalysis(IRSeq seq, Direction direction, LatticeElement initial) {
         this.graph = new CFGIR(seq);
-        top = new LatticeTop();
-        bottom = new LatticeBottom();
-        fixpoint(direction);
-    }
-
-    public DataflowAnalysis(IRSeq seq,
-                            Direction direction,
-                            LatticeElement top,
-                            LatticeElement bottom) {
-        this.graph = new CFGIR(seq);
-        this.top = top;
-        this.bottom = bottom;
+        this.initial = initial;
         fixpoint(direction);
     }
 
@@ -65,8 +43,8 @@ public abstract class DataflowAnalysis {
         // Initialize the in and out of each node and add it to the worklist
         for (CFGNode node : nodes.values()) {
             // Initialize all in and out to be top
-            node.setIn(top.copy());
-            node.setOut(top.copy());
+            node.setIn(initial);
+            node.setOut(initial);
             worklist.add(node);
         }
         while (!worklist.isEmpty()) {

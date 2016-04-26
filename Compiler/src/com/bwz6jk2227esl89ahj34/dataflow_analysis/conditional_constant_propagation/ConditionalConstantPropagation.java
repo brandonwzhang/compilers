@@ -11,9 +11,7 @@ import java.util.*;
 public class ConditionalConstantPropagation extends DataflowAnalysis {
 
     public ConditionalConstantPropagation(IRSeq seq) {
-        super(seq, Direction.FORWARD,
-                new UnreachableValueTuplesPair(findAllTemps(seq)), null);
-        this.top = new UnreachableValueTuplesPair(findAllTemps(seq));
+        super(seq, Direction.FORWARD, new UnreachableValueTuplesPair(findAllTemps(seq)));
     }
 
     public static List<IRTemp> findAllTemps(IRSeq seq) {
@@ -386,8 +384,8 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         // Initialize the in and out of each node and add it to the worklist
         for (CFGNode node : nodes.values()) {
             // Initialize all in and out to be top
-            node.setIn(top.copy());
-            node.setOut(top.copy());
+            node.setIn(initial.copy());
+            node.setOut(initial.copy());
         }
         //worklist.add(nodes.values().iterator().next());
         worklist.addAll(nodes.values());

@@ -9,76 +9,92 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 public class AvailableCopiesSet extends LatticeElement {
-    private Map<String, String> map;
+    @Data
+    @EqualsAndHashCode(callSuper = false)
+    @AllArgsConstructor
+    public static class TempPair {
+        public String left;
+        public String right;
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof TempPair)) {
+                return false;
+            }
+            TempPair tempPair = (TempPair) o;
+            return left.equals(tempPair.left) && right.equals(tempPair.right);
+        }
+        @Override
+        public int hashCode() {
+            return left.hashCode() + right.hashCode();
+        }
+    }
+
+    private Set<TempPair> copies;
+
+    /**
+     * Returns the mapping for a given temp name.
+     * Returns null if no mapping exists
+     */
+    public String get(String tempName) {
+        String mapping = null;
+        for (TempPair tempPair : copies) {
+            if (tempPair.left.equals(tempName)) {
+                assert mapping == null : "More than one mapping for temp";
+                mapping = tempPair.right;
+            }
+        }
+        return mapping;
+    }
 
     @Override
     public String toString() {
         String s = "";
-        for (String key : map.keySet()) {
-            s += key + "->" + map.get(key)+"\n";
+        for (TempPair pair : copies) {
+            s += pair.left + "->" + pair.right + "\n";
         }
         return s;
     }
 
     @Override
     public LatticeElement copy() {
-        Map<String, String> newMap = new HashMap<>();
-        newMap.putAll(map);
-        return new AvailableCopiesSet(newMap);
+        Set<TempPair> newSet = new HashSet<>(copies);
+        return new AvailableCopiesSet(newSet);
     }
 
     @Override
     public boolean equals(LatticeElement set) {
         if (!(set instanceof AvailableCopiesSet)) {
             return false;
-        } else {
-           // System.out.println("wat");
-            return map.equals(((AvailableCopiesSet)set).getMap());
         }
+        return copies.equals(((AvailableCopiesSet)set).getCopies());
     }
 
     public void intersect(LatticeElement set) {
-        if (set instanceof LatticeTop) {
-            // then map stays the same
-        } else if (set instanceof LatticeBottom) {
-            // then we empty out map
-            map = new HashMap<>();
-        } else if (set instanceof AvailableCopiesSet) {
-            // then we take information that is common in both
-            AvailableCopiesSet castedSet = (AvailableCopiesSet) set;
-            Map<String, String> castedSetMap = castedSet.getMap();
-            Map<String, String> newMap = new HashMap<>();
-            for (String key : map.keySet()) {
-                if (castedSetMap.containsKey(key) &&
-                        castedSetMap.get(key).equals(map.get(key))) {
-                    newMap.put(key, map.get(key));
-                }
-            }
-            map = newMap;
-        }
+        assert set instanceof AvailableCopiesSet;
+        // then we take information that is common in both
+        AvailableCopiesSet castedSet = (AvailableCopiesSet) set;
+        Set<TempPair> castedSetCopies = new HashSet<>(castedSet.getCopies());
+        copies.retainAll(castedSetCopies);
     }
 
     public AvailableCopiesSet subtract(AvailableCopiesSet subtrahend) {
-        AvailableCopiesSet copy = (AvailableCopiesSet) this.copy();
-        Map<String, String> subtrahendMap = subtrahend.getMap();
-        for (String key : subtrahendMap.keySet()) {
-            if (copy.getMap().containsKey(key) &&
-                    copy.getMap().get(key).equals(subtrahendMap.get(key))) {
-                  copy.getMap().remove(key);
-            }
-        }
-        return copy;
+        Set<TempPair> resultCopies = new HashSet<>(copies);
+        Set<TempPair> subtrahendCopies = subtrahend.getCopies();
+        resultCopies.removeAll(subtrahendCopies);
+        return new AvailableCopiesSet(resultCopies);
     }
 
     public AvailableCopiesSet union(AvailableCopiesSet set) {
-        Map<String, String> union = new HashMap<>();
-        union.putAll(map);
-        union.putAll(set.getMap());
-        return new AvailableCopiesSet(union);
+        Set<TempPair> unionCopies = new HashSet<>(copies);
+        Set<TempPair> setCopies = set.getCopies();
+        unionCopies.addAll(setCopies);
+        return new AvailableCopiesSet(unionCopies);
     }
 }

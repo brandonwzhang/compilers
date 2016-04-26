@@ -4,6 +4,10 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
+        .AvailableCopies;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
+        .AvailableCopiesSet;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.ConditionalConstantPropagation;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.UnreachableValueTuplesPair;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.Value;
@@ -11,6 +15,8 @@ import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
+
+import com.bwz6jk2227esl89ahj34.ir.visit.*;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 
@@ -270,8 +276,42 @@ public class IRFuncDecl extends IRNode {
         // to get rid of CCP
         List<IRStmt> reordered = reorderBlocks(stmts);
         IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reordered));
+        // Run an available copies analysis and replace all copies
+        //availableCopies(reorderedBody);
         return new IRFuncDecl(fd.name(), ccp_optimized);
         //return new IRFuncDecl(fd.name(), new IRSeq(reorderBlocks(stmts)));
+    }
+
+    /**
+     * Runs an available copies analysis and replaces all copies in body with
+     * their mappings.
+     */
+    private void availableCopies(IRSeq body) {
+        AvailableCopies availableCopies = new AvailableCopies(body);
+        Util.writeHelper(
+                "available" + name,
+                "dot",
+                "./",
+                Collections.singletonList(availableCopies.toString())
+        );
+        Map<Integer, CFGNode> nodes = availableCopies.getGraph().getNodes();
+        List<IRStmt> stmts = body.stmts();
+        for (int i = 0; i < stmts.size(); i++) {
+            // Get the CFGNode corresponding to the current statement
+            CFGNode node = nodes.get(i);
+            if (node == null) {
+                // If we don't have an instance of a statement, then it's not
+                // going to be in the nodes map
+                continue;
+            }
+            LatticeElement in = node.getIn();
+            assert in instanceof AvailableCopiesSet;
+            // Retrieve available copies at current node
+            AvailableCopiesVisitor availableCopiesVisitor =
+                    new AvailableCopiesVisitor((AvailableCopiesSet) in);
+            // Replace the current statement with one with all copies replaced
+            stmts.set(i, (IRStmt) availableCopiesVisitor.visit(stmts.get(i)));
+        }
     }
 
     // NOTE: at the moment, this only eliminates unreachable code
