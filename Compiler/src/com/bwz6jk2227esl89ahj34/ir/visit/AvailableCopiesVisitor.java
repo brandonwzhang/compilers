@@ -31,15 +31,27 @@ public class AvailableCopiesVisitor extends IRVisitor {
             if (move.target() instanceof IRMem) {
                 return n_;
             }
+            if (move.target() instanceof IRTemp) {
+                IRTemp temp = (IRTemp) move.target();
+                // We don't rename the temp if it's a return temp since the caller
+                // relies on them
+                if (temp.name().length() > 4 &&
+                        (temp.name().substring(0, 4).equals(Configuration.ABSTRACT_RET_PREFIX) ||
+                        temp.name().substring(0, 4).equals(Configuration.ABSTRACT_ARG_PREFIX))) {
+                    return n_;
+                }
+            }
             if (move.expr() instanceof IRTemp) {
                 IRTemp temp = (IRTemp) move.expr();
                 // We don't rename the temp if it's a return temp since the caller
                 // relies on them
                 if (temp.name().length() > 4 &&
-                        temp.name().substring(0, 4).equals(Configuration.ABSTRACT_RET_PREFIX)) {
+                        (temp.name().substring(0, 4).equals(Configuration.ABSTRACT_RET_PREFIX) ||
+                        temp.name().substring(0, 4).equals(Configuration.ABSTRACT_ARG_PREFIX))) {
                     return n_;
                 }
-                return new IRMove(move.target(), new IRTemp(getMapping(temp.name())));
+                IRTemp newtemp = new IRTemp(getMapping(temp.name()));
+                return new IRMove(move.target(), newtemp);
             }
         }
         return n_;
