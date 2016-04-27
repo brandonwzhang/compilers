@@ -1,13 +1,14 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
         .AvailableCopies;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
         .AvailableCopiesSet;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
+        .AvailableExpressionSet;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
+        .AvailableExpressionsAnalysis;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.ConditionalConstantPropagation;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.UnreachableValueTuplesPair;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.Value;
@@ -273,19 +274,74 @@ public class IRFuncDecl extends IRNode {
         // jihun: running with CCP for now
         // comment the next 3 lines out and uncomment the return statement
         // to get rid of CCP
-        List<IRStmt> reordered = reorderBlocks(stmts);
-        IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reordered));
-        // Run an available copies analysis and replace all copies
-        //availableCopies(reorderedBody);
+        IRSeq reorderedBody = new IRSeq(reorderBlocks(stmts));
+        IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reorderedBody));
+        // Iterate constant propagation and common subexpression elimination
+        for (int i = 0; i < 1; i++) {
+            propagateCopies(ccp_optimized);
+            eliminateCommonSubexpressions(ccp_optimized);
+        }
         return new IRFuncDecl(fd.name(), ccp_optimized);
-        //return new IRFuncDecl(fd.name(), new IRSeq(reorderBlocks(stmts)));
+    }
+
+    /**
+     * Runs an available expressions analysis and replaces all common subexpressions
+     */
+    private void eliminateCommonSubexpressions(IRSeq body) {
+        AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(body);
+        Util.writeHelper(
+                "subexpressions" + name,
+                "dot",
+                "./",
+                Collections.singletonList(analysis.toString())
+        );
+
+        // create new set of cse temps
+        int tempCounter = 0;
+        Map<IRExpr, IRTemp> tempMap = new HashMap<>();
+        for (IRExpr expr : analysis.allExprs) {
+            tempMap.put(expr, new IRTemp("cse" + tempCounter++));
+        }
+
+        List<IRStmt> stmts = body.stmts();
+        Map<Integer, CFGNode> nodes = analysis.getGraph().getNodes();
+
+        for (int i : nodes.keySet()) {
+            CFGNodeIR node = (CFGNodeIR) nodes.get(i);
+            CommonSubexpressionVisitor visitor =
+                    new CommonSubexpressionVisitor((AvailableExpressionSet) node.getOut(), analysis, tempMap);
+            IRStmt newStmt = (IRStmt) visitor.visit(stmts.get(i));
+            node.setStatement(newStmt);
+            stmts.set(i, newStmt);
+        }
+
+        for (CFGNode node : analysis.getGraph().getNodes().values()) {
+            // Find all the expressions that this node adds to the out
+            Set<IRExpr> inSet = ((AvailableExpressionSet) node.getIn()).getExprs();
+            Set<IRExpr> outSet = ((AvailableExpressionSet) node.getOut()).getExprs();
+            Set<IRExpr> exprs = new HashSet<>(outSet);
+            exprs.removeAll(inSet);
+
+            for (ListIterator<IRStmt> it = stmts.listIterator(); it.hasNext();) {
+                IRStmt stmt = it.next();
+                if (stmt == ((CFGNodeIR) node).getStatement()) {
+                    // Assign the new temp for the expression
+                    for (IRExpr expr : exprs) {
+                        it.previous();
+                        it.add(new IRMove(tempMap.get(expr), expr));
+                        it.next();
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     /**
      * Runs an available copies analysis and replaces all copies in body with
      * their mappings.
      */
-    private void availableCopies(IRSeq body) {
+    private void propagateCopies(IRSeq body) {
         AvailableCopies availableCopies = new AvailableCopies(body);
         Util.writeHelper(
                 "available" + name,
@@ -310,6 +366,21 @@ public class IRFuncDecl extends IRNode {
                     new AvailableCopiesVisitor((AvailableCopiesSet) in);
             // Replace the current statement with one with all copies replaced
             stmts.set(i, (IRStmt) availableCopiesVisitor.visit(stmts.get(i)));
+        }
+
+        // Get rid of redundant moves
+        for (Iterator<IRStmt> it = stmts.iterator(); it.hasNext();) {
+            IRStmt stmt = it.next();
+            if (stmt instanceof IRMove) {
+                IRMove move = (IRMove) stmt;
+                if (move.target() instanceof IRTemp && move.expr() instanceof IRTemp) {
+                    IRTemp target = (IRTemp) move.target();
+                    IRTemp expr = (IRTemp) move.expr();
+                    if (target.name().equals(expr.name())) {
+                        it.remove();
+                    }
+                }
+            }
         }
     }
 

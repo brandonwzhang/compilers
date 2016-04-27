@@ -5,7 +5,7 @@ public enum Optimization {
     INL, SR, LU, LICM, PRE, CP, VN;
 
     public static final Optimization[] SUPPORTED_OPTIMIZATIONS =
-            {CF, REG, MC, UCE, CSE};
+            {CF, REG, MC, UCE, CSE, COPY};
 
     @Override
     public String toString() {

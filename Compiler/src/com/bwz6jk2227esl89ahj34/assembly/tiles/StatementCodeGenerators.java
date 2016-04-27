@@ -35,6 +35,15 @@ public class StatementCodeGenerators {
         AssemblyExpression dst = translateExpression(castedRoot.target(), lines, false);
 
         assert !(dst instanceof AssemblyImmediate);
+
+        if (src instanceof AssemblyMemoryLocation && dst instanceof AssemblyMemoryLocation) {
+            // We cannot move from memory location to memory location directly
+            AssemblyAbstractRegister register = new AssemblyAbstractRegister();
+            lines.add(new AssemblyInstruction(OpCode.MOVQ, src, register));
+            lines.add(new AssemblyInstruction(OpCode.MOVQ, register, dst));
+            return lines;
+        }
+
         lines.add(new AssemblyInstruction(OpCode.MOVQ, src, dst));
 
         return lines;

@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34.assembly.register_allocation;
 
+import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
@@ -9,6 +10,7 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
         .LiveVariableSet;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
+import com.bwz6jk2227esl89ahj34.optimization.Optimization;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.util.*;
@@ -40,11 +42,14 @@ public class RegisterAllocator {
             LatticeElement element = node.getOut();
             interferenceSets.add(((LiveVariableSet) element).getLiveVars());
         }
-        // Use Kempe's algorithm to allocate physical locations to abstract registers
-        GraphColorer graphColorer = new GraphColorer(interferenceSets, lines);
-        graphColorer.colorGraph();
-        registerMap = graphColorer.getColoring();
-//        registerMap = new HashMap<>();
+
+        registerMap = new HashMap<>();
+        if (Main.optimizationOn(Optimization.REG)) {
+            // Use Kempe's algorithm to allocate physical locations to abstract registers
+            GraphColorer graphColorer = new GraphColorer(interferenceSets, lines);
+            graphColorer.colorGraph();
+            registerMap = graphColorer.getColoring();
+        }
 
         // Translate all the instructions
         List<AssemblyLine> translatedLines = new LinkedList<>();
@@ -54,25 +59,27 @@ public class RegisterAllocator {
             translatedLines.addAll(translateInstruction(line));
         }
 
-        // Remove duplicate lines
-        // Does another optimization do this for us?
-        int i = 0;
-        while (i < translatedLines.size()) {
-            if (!(translatedLines.get(i) instanceof AssemblyInstruction)) {
-                i++;
-                continue;
-            }
-            AssemblyInstruction instruction = (AssemblyInstruction) translatedLines.get(i);
-            if (!(instruction.getOpCode() == OpCode.MOVQ)) {
-                i++;
-                continue;
-            }
+        if (Main.optimizationOn(Optimization.REG)) {
+            // Remove duplicate lines
+            // Does another optimization do this for us?
+            int i = 0;
+            while (i < translatedLines.size()) {
+                if (!(translatedLines.get(i) instanceof AssemblyInstruction)) {
+                    i++;
+                    continue;
+                }
+                AssemblyInstruction instruction = (AssemblyInstruction) translatedLines.get(i);
+                if (!(instruction.getOpCode() == OpCode.MOVQ)) {
+                    i++;
+                    continue;
+                }
 
-            List<AssemblyExpression> args = instruction.args;
-            if (args.get(0).equals(args.get(1))){
-                translatedLines.remove(i);
-            } else {
-                i++;
+                List<AssemblyExpression> args = instruction.args;
+                if (args.get(0).equals(args.get(1))){
+                    translatedLines.remove(i);
+                } else {
+                    i++;
+                }
             }
         }
 

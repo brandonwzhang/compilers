@@ -184,6 +184,7 @@ public class GraphColorer {
     /**
      * Finds all of the [mov t1 t2] pairs in the given assembly code.
      * Keeps track of them so move coalescing can be done later.
+     * Does not add move pairs where t1 and t2 the same.
      */
     private void addMovePairs() {
         for (AssemblyLine line : lines) {
@@ -205,6 +206,11 @@ public class GraphColorer {
 
             AssemblyAbstractRegister a = (AssemblyAbstractRegister) args.get(0);
             AssemblyAbstractRegister b = (AssemblyAbstractRegister) args.get(1);
+
+            if (a.equals(b)) {
+                continue;
+            }
+
             movePairs.add(new MovePair(a, b));
         }
     }

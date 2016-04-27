@@ -71,6 +71,11 @@ public class AvailableCopies extends DataflowAnalysis {
                     if (target.name().length() > 4 && target.name().substring(0, 4).equals(Configuration.ABSTRACT_RET_PREFIX)) {
                         return new AvailableCopiesSet(genSet);
                     }
+                    if (expr.name().length() > 4 && (
+                            expr.name().substring(0,4).equals(Configuration.ABSTRACT_ARG_PREFIX) ||
+                            expr.name().substring(0,4).equals(Configuration.ABSTRACT_RET_PREFIX))) {
+                        return new AvailableCopiesSet(genSet);
+                    }
                     genSet.add(new TempPair(target.name(), expr.name()));
                 }
             }
@@ -92,6 +97,8 @@ public class AvailableCopies extends DataflowAnalysis {
         // if the wrapped statement is a move, we check for this condition
         // the below if statement checks ^ and if the target of the move
         // is a temp
+
+        // in addition, we kill any pair that contains any _RET or _ARG register
         Set<TempPair> killPairs = new HashSet<>();
         if(castedNodeStmt instanceof IRMove
                 && ((IRMove)castedNodeStmt).target() instanceof IRTemp ) {

@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class LiveVariableAnalysis extends DataflowAnalysis{
+public class LiveVariableAnalysis extends DataflowAnalysis {
     private static Set<OpCode> defOpCodes;
 
     static {
@@ -18,7 +18,7 @@ public class LiveVariableAnalysis extends DataflowAnalysis{
     }
 
     public LiveVariableAnalysis(List<AssemblyLine> lines) {
-        super(lines, Direction.BACKWARD, new LatticeTop());
+        super(lines, Direction.BACKWARD, new LiveVariableSet(new HashSet<>()));
     }
 
     /**
@@ -108,12 +108,6 @@ public class LiveVariableAnalysis extends DataflowAnalysis{
     public LatticeElement meet(Set<LatticeElement> elements) {
         Set<AssemblyAbstractRegister> union = new HashSet<>();
         for (LatticeElement element : elements) {
-            if (element instanceof LatticeTop) {
-                continue;
-            }
-            if (element instanceof LatticeBottom) {
-                return new LatticeBottom();
-            }
             union.addAll(((LiveVariableSet)element).getLiveVars());
         }
         return new LiveVariableSet(union);
