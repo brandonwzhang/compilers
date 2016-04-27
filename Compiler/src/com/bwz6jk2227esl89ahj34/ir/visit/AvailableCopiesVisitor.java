@@ -33,7 +33,7 @@ public class AvailableCopiesVisitor extends IRVisitor {
                 // relies on them
                 if (temp.name().length() > 4 &&
                         temp.name().substring(0, 4).equals(Configuration.ABSTRACT_RET_PREFIX)) {
-                    return temp;
+                    return n_;
                 }
                 return new IRMove(move.target(), new IRTemp(getMapping(temp.name())));
             }

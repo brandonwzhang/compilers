@@ -277,7 +277,7 @@ public class IRFuncDecl extends IRNode {
         IRSeq reorderedBody = new IRSeq(reorderBlocks(stmts));
         IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reorderedBody));
         // Run an available copies analysis and replace all copies
-        //availableCopies(reorderedBody);
+        availableCopies(ccp_optimized);
         eliminateCommonSubexpressions(ccp_optimized);
         return new IRFuncDecl(fd.name(), ccp_optimized);
     }
