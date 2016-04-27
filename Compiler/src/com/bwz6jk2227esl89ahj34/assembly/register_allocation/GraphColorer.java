@@ -184,7 +184,7 @@ public class GraphColorer {
     /**
      * Finds all of the [mov t1 t2] pairs in the given assembly code.
      * Keeps track of them so move coalescing can be done later.
-     * Does not add move pairs where t1 and t2 are equal.
+     * Does not add move pairs where t1 and t2 the same.
      */
     private void addMovePairs() {
         for (AssemblyLine line : lines) {
