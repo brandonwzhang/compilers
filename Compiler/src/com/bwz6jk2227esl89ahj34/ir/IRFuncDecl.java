@@ -278,11 +278,7 @@ public class IRFuncDecl extends IRNode {
         IRSeq ccp_optimized = reorderedBody;
 
         // Iterate constant propagation and common subexpression elimination
-        //for (int i = 0; i < 1; i++) {
-            //propagateCopies(ccp_optimized);
-            //eliminateCommonSubexpressions(ccp_optimized);
-        //}
-        //propagateCopies(ccp_optimized);
+        propagateCopies(ccp_optimized);
         //eliminateCommonSubexpressions(ccp_optimized);
         return new IRFuncDecl(fd.name(), ccp_optimized);
     }

@@ -3,16 +3,14 @@ package com.bwz6jk2227esl89ahj34.assembly.register_allocation;
 import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGAssembly;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeAssembly;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
         .LiveVariableAnalysis;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
         .LiveVariableSet;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
-import com.bwz6jk2227esl89ahj34.optimization.Optimization;
+import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.util.*;
@@ -64,7 +62,7 @@ public class RegisterAllocator {
         }
 
         registerMap = new HashMap<>();
-        if (Main.optimizationOn(Optimization.REG)) {
+        if (Main.optimizationOn(OptimizationType.REG)) {
             // Use Kempe's algorithm to allocate physical locations to abstract registers
             GraphColorer graphColorer = new GraphColorer(interferenceSets, lines);
             graphColorer.colorGraph();
@@ -79,7 +77,7 @@ public class RegisterAllocator {
             translatedLines.addAll(translateInstruction(line));
         }
 
-        if (Main.optimizationOn(Optimization.REG)) {
+        if (Main.optimizationOn(OptimizationType.REG)) {
             // Remove duplicate lines
             // Does another optimization do this for us?
             int i = 0;
