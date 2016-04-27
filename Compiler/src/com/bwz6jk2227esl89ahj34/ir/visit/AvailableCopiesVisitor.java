@@ -34,9 +34,8 @@ public class AvailableCopiesVisitor extends IRVisitor {
 
         if (n instanceof IRTemp) {
             IRTemp temp = (IRTemp) n;
-            if (temp.name().length() > 4 &&
-                    (temp.name().substring(0, 4).equals(Configuration.ABSTRACT_RET_PREFIX) ||
-                            temp.name().substring(0, 4).equals(Configuration.ABSTRACT_ARG_PREFIX))) {
+            if (temp.name().startsWith(Configuration.ABSTRACT_RET_PREFIX) ||
+                            temp.name().startsWith(Configuration.ABSTRACT_ARG_PREFIX)) {
                 return n;
             }
             return new IRTemp(getMapping(temp.name()));

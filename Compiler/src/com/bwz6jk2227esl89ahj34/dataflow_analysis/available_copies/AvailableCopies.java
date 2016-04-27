@@ -68,15 +68,15 @@ public class AvailableCopies extends DataflowAnalysis {
                 IRTemp target = (IRTemp) move.target();
                 IRTemp expr = (IRTemp) move.expr();
                 if (!target.name().equals(expr.name())) {
+                    if (target.name().startsWith(Configuration.ABSTRACT_ARG_PREFIX) ||
+                            target.name().startsWith(Configuration.ABSTRACT_RET_PREFIX)) {
+                        return new AvailableCopiesSet(genSet);
+                    }
+                    if (expr.name().startsWith(Configuration.ABSTRACT_ARG_PREFIX) ||
+                            expr.name().startsWith(Configuration.ABSTRACT_RET_PREFIX)) {
+                        return new AvailableCopiesSet(genSet);
+                    }
                     genSet.add(new TempPair(target.name(), expr.name()));
-                    if (target.name().length() > 4 && target.name().substring(0, 4).equals(Configuration.ABSTRACT_RET_PREFIX)) {
-                        return new AvailableCopiesSet(genSet);
-                    }
-                    if (expr.name().length() > 4 && (
-                            expr.name().substring(0,4).equals(Configuration.ABSTRACT_ARG_PREFIX) ||
-                                    expr.name().substring(0,4).equals(Configuration.ABSTRACT_RET_PREFIX))) {
-                        return new AvailableCopiesSet(genSet);
-                    }
                 }
             }
         }

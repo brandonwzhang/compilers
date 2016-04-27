@@ -280,7 +280,7 @@ public class IRFuncDecl extends IRNode {
         //IRSeq ccp_optimized = Optimization.condtionalConstantPropagation(new IRSeq(reorderedBody));
         IRSeq ccp_optimized = reorderedBody;
         // Iterate constant propagation and common subexpression elimination
-        //Optimization.propagateCopies(ccp_optimized);
+        Optimization.propagateCopies(ccp_optimized);
         //Optimization.eliminateCommonSubexpressions(ccp_optimized);
         return new IRFuncDecl(fd.name(), ccp_optimized);
     }
