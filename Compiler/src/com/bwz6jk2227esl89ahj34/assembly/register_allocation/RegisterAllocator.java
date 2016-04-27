@@ -44,22 +44,22 @@ public class RegisterAllocator {
         }
 
         // Remove assignments to variables that aren't used
-        for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
-            CFGNodeAssembly assemblyNode = (CFGNodeAssembly) node;
-            AssemblyInstruction instruction = assemblyNode.getInstruction();
-            Set<AssemblyAbstractRegister> outSet = ((LiveVariableSet) node.getOut()).getLiveVars();
-            if (instruction.opCode == OpCode.MOVQ) {
-                assert instruction.getArgs().size() == 2;
-                if (instruction.getArgs().get(1) instanceof AssemblyAbstractRegister) {
-                    AssemblyAbstractRegister dst = (AssemblyAbstractRegister) instruction.getArgs().get(1);
-                    if (!outSet.contains(dst)) {
-                        lines.remove(instruction);
-                    }
-                }
-            }
-
-
-        }
+//        for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
+//            CFGNodeAssembly assemblyNode = (CFGNodeAssembly) node;
+//            AssemblyInstruction instruction = assemblyNode.getInstruction();
+//            Set<AssemblyAbstractRegister> outSet = ((LiveVariableSet) node.getOut()).getLiveVars();
+//            if (instruction.opCode == OpCode.MOVQ) {
+//                assert instruction.getArgs().size() == 2;
+//                if (instruction.getArgs().get(1) instanceof AssemblyAbstractRegister) {
+//                    AssemblyAbstractRegister dst = (AssemblyAbstractRegister) instruction.getArgs().get(1);
+//                    if (!outSet.contains(dst)) {
+//                        lines.remove(instruction);
+//                    }
+//                }
+//            }
+//
+//
+//        }
 
         registerMap = new HashMap<>();
         if (Main.optimizationOn(OptimizationType.REG)) {
