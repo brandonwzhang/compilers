@@ -332,10 +332,10 @@ public class IRFuncDecl extends IRNode {
                 if (tuple.isUnreachable()) {
                     // unreachable so we do not add it to new stmts
                 } else {
-                    //ConditionalConstantPropagationVisitor visitor =
+                    ConditionalConstantPropagationVisitor visitor =
                             new ConditionalConstantPropagationVisitor(tuple.getValueTuples());
-                    //newStmts.add((IRStmt) visitor.visit(stmt));
-                    newStmts.add(stmt);
+                    newStmts.add((IRStmt) visitor.visit(stmt));
+                    //newStmts.add(stmt);
                 }
             }
         }

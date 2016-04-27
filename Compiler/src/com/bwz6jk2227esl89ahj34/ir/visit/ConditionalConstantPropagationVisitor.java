@@ -4,11 +4,9 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.Value;
-import com.bwz6jk2227esl89ahj34.ir.IRBinOp;
-import com.bwz6jk2227esl89ahj34.ir.IRExpr;
-import com.bwz6jk2227esl89ahj34.ir.IRNode;
-import com.bwz6jk2227esl89ahj34.ir.IRTemp;
+import com.bwz6jk2227esl89ahj34.ir.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,7 +41,15 @@ public class ConditionalConstantPropagationVisitor extends IRVisitor {
      */
     protected IRNode leave(IRNode parent, IRNode n, IRNode n_,
                            IRVisitor v_) {
-        if (n_ instanceof IRTemp) {
+        if (n_ instanceof IRMove) {
+            IRMove castedMove = (IRMove) n_;
+            if (castedMove.target() instanceof IRConst) {
+                IRExpr newSrc = castedMove.expr();
+                return new IRMove(((IRMove)n).target(), newSrc);
+            } else {
+                return n_;
+            }
+        } else if (n_ instanceof IRTemp) {
             return temp((IRTemp)n_);
         } else if (n_ instanceof IRBinOp) {
             IRBinOp casted = (IRBinOp) n_;
@@ -55,7 +61,8 @@ public class ConditionalConstantPropagationVisitor extends IRVisitor {
             if (right instanceof IRTemp) {
                 right = temp((IRTemp) right);
             }
-            return new IRBinOp(casted.opType(), left, right);
+            IRConstantFoldingVisitor v = new IRConstantFoldingVisitor();
+            return v.visit(new IRBinOp(casted.opType(), left, right));
         } else {
             return n_;
         }
@@ -68,7 +75,7 @@ public class ConditionalConstantPropagationVisitor extends IRVisitor {
             if (tuples instanceof LatticeBottom || tuples instanceof LatticeTop) {
                 return n_;
             } else {
-                return ((Value)tuples).getValue();
+                return new IRConst(((Value)tuples).getValue().value());
             }
         } else {
             return n_;

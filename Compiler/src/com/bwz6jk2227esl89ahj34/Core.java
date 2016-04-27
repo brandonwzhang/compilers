@@ -305,12 +305,12 @@ public class Core {
         for (String functionName : lirRoot.functions().keySet()) {
             IRSeq seq = (IRSeq) lirRoot.functions().get(functionName).body();
             AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(seq);
-            Util.writeHelper(
-                    "analysis" + functionName,
-                    "dot",
-                    "./",
-                    Collections.singletonList(analysis.toString())
-            );
+//            Util.writeHelper(
+//                    "analysis" + functionName,
+//                    "dot",
+//                    "./",
+//                    Collections.singletonList(analysis.toString())
+//            );
         }
 
         if (Main.irrun()) {

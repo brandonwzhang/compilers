@@ -106,6 +106,9 @@ public class ExpressionCodeGenerators {
         // t is the ultimate return value
         AssemblyAbstractRegister t = new AssemblyAbstractRegister();
         // left is t1, right is t2 in the annotations below
+        if (left instanceof AssemblyImmediate) {
+            left = makeTemp(left, lines);
+        }
 
         switch(opType) {
             case ADD:
