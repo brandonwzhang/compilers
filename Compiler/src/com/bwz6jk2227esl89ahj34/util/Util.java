@@ -7,7 +7,9 @@ import com.bwz6jk2227esl89ahj34.ast.parse.ParserSym;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyComment;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGIR;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
+import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import org.junit.rules.TestName;
 
@@ -385,5 +387,17 @@ public class Util {
            }
        }
         return filteredList;
+    }
+
+    public static void writeCFG(String file, IRCompUnit root) {
+        int dotIndex = file.lastIndexOf('.');
+        for (String functionName : root.functions().keySet()) {
+            String cfgReportName =
+                    file.substring(0, dotIndex) + "_" + functionName + "_initial.xi";
+            IRSeq seq = (IRSeq) root.functions().get(functionName).body();
+            CFGIR cfg = new CFGIR(seq);
+            List<String> lines = Collections.singletonList(cfg.toString());
+            Util.writeHelper(cfgReportName, "dot", Main.diagnosticPath(), lines);
+        }
     }
 }

@@ -20,6 +20,8 @@ public class Main {
     private static boolean irrun;
     private static boolean reportInitialIR = false;
     private static boolean reportFinalIR = false;
+    private static boolean reportInitialCFG = false;
+    private static boolean reportFinalCFG = false;
 
     public static boolean allOptimizations = true;
     public static HashMap<Optimization, Boolean> optimizationMap = new HashMap<>();
@@ -88,6 +90,10 @@ public class Main {
                       "Report the intermediate code at the specified phase of optimization.",
                       phase -> reportIR(phase[0]),
                       1);
+        cli.addOption("--optcfg",
+                "Report the control-flow graph at the specified phase of optimization.",
+                phase -> reportCFG(phase[0]),
+                1);
 
         cli.execute(args);
 
@@ -122,7 +128,22 @@ public class Main {
                 break;
             default:
                 System.out.println(phase + " is not a supported phase.");
-                System.out.println("An extra IR file will not be written.");
+                System.out.println("The IR file will not be written.");
+                break;
+        }
+    }
+
+    public static void reportCFG(String phase) {
+        switch(phase) {
+            case "initial":
+                reportInitialCFG = true;
+                break;
+            case "final":
+                reportFinalCFG = true;
+                break;
+            default:
+                System.out.println(phase + " is not a supported phase.");
+                System.out.println("The CFG will not be written.");
                 break;
         }
     }
@@ -230,6 +251,14 @@ public class Main {
     public static boolean reportInitialIR() { return reportInitialIR; }
 
     public static boolean reportFinalIR() { return reportFinalIR; }
+
+    public static boolean reportInitialCFG() {
+        return reportInitialCFG;
+    }
+
+    public static boolean reportFinalCFG() {
+        return reportFinalCFG;
+    }
 
     public static void turnTestsOn(String[] args) {
         tests = true;
