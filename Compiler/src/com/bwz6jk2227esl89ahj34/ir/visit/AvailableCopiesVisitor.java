@@ -2,6 +2,7 @@ package com.bwz6jk2227esl89ahj34.ir.visit;
 
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
         .AvailableCopiesSet;
+import com.bwz6jk2227esl89ahj34.ir.IRMove;
 import com.bwz6jk2227esl89ahj34.ir.IRNode;
 import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
@@ -24,15 +25,18 @@ public class AvailableCopiesVisitor extends IRVisitor {
      * a set for use in available copies analysis.
      */
     protected IRNode leave(IRNode parent, IRNode n, IRNode n_, IRVisitor v_) {
-        if (n instanceof IRTemp) {
-            IRTemp temp = (IRTemp) n;
-            // We don't rename the temp if it's a return temp since the caller
-            // relies on them
-            if (temp.name().length() > 4 &&
-                    temp.name().substring(0, 4).equals(Configuration.ABSTRACT_RET_PREFIX)) {
-                return temp;
+        if (n instanceof IRMove) {
+            IRMove move = (IRMove) n;
+            if (move.expr() instanceof IRTemp) {
+                IRTemp temp = (IRTemp) move.expr();
+                // We don't rename the temp if it's a return temp since the caller
+                // relies on them
+                if (temp.name().length() > 4 &&
+                        temp.name().substring(0, 4).equals(Configuration.ABSTRACT_RET_PREFIX)) {
+                    return temp;
+                }
+                return new IRMove(move.target(), new IRTemp(getMapping(temp.name())));
             }
-            return new IRTemp(getMapping(temp.name()));
         }
         return n_;
     }
