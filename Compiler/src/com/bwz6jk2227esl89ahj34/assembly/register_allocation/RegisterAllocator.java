@@ -3,7 +3,9 @@ package com.bwz6jk2227esl89ahj34.assembly.register_allocation;
 import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGAssembly;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeAssembly;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
         .LiveVariableAnalysis;
@@ -39,8 +41,26 @@ public class RegisterAllocator {
 
         List<Set<AssemblyAbstractRegister>> interferenceSets = new LinkedList<>();
         for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
-            LatticeElement element = node.getOut();
-            interferenceSets.add(((LiveVariableSet) element).getLiveVars());
+            LiveVariableSet out = (LiveVariableSet) node.getOut();
+            interferenceSets.add(out.getLiveVars());
+        }
+
+        // Remove assignments to variables that aren't used
+        for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
+            CFGNodeAssembly assemblyNode = (CFGNodeAssembly) node;
+            AssemblyInstruction instruction = assemblyNode.getInstruction();
+            Set<AssemblyAbstractRegister> outSet = ((LiveVariableSet) node.getOut()).getLiveVars();
+            if (instruction.opCode == OpCode.MOVQ) {
+                assert instruction.getArgs().size() == 2;
+                if (instruction.getArgs().get(1) instanceof AssemblyAbstractRegister) {
+                    AssemblyAbstractRegister dst = (AssemblyAbstractRegister) instruction.getArgs().get(1);
+                    if (!outSet.contains(dst)) {
+                        lines.remove(instruction);
+                    }
+                }
+            }
+
+
         }
 
         registerMap = new HashMap<>();

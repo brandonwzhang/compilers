@@ -11,7 +11,6 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
         .AvailableExpressionsAnalysis;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.ConditionalConstantPropagation;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.UnreachableValueTuplesPair;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.Value;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
@@ -275,12 +274,16 @@ public class IRFuncDecl extends IRNode {
         // comment the next 3 lines out and uncomment the return statement
         // to get rid of CCP
         IRSeq reorderedBody = new IRSeq(reorderBlocks(stmts));
-        IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reorderedBody));
+        //IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reorderedBody));
+        IRSeq ccp_optimized = reorderedBody;
+
         // Iterate constant propagation and common subexpression elimination
         //for (int i = 0; i < 1; i++) {
             //propagateCopies(ccp_optimized);
             //eliminateCommonSubexpressions(ccp_optimized);
         //}
+        //propagateCopies(ccp_optimized);
+        //eliminateCommonSubexpressions(ccp_optimized);
         return new IRFuncDecl(fd.name(), ccp_optimized);
     }
 
@@ -296,7 +299,7 @@ public class IRFuncDecl extends IRNode {
                 Collections.singletonList(analysis.toString())
         );
 
-        // create new set of cse temps
+        // Create new set of cse temps
         int tempCounter = 0;
         Map<IRExpr, IRTemp> tempMap = new HashMap<>();
         for (IRExpr expr : analysis.allExprs) {
@@ -306,6 +309,7 @@ public class IRFuncDecl extends IRNode {
         List<IRStmt> stmts = body.stmts();
         Map<Integer, CFGNode> nodes = analysis.getGraph().getNodes();
 
+        // Replace common subexpressions with their corresponding temp
         for (int i : nodes.keySet()) {
             CFGNodeIR node = (CFGNodeIR) nodes.get(i);
             CommonSubexpressionVisitor visitor =
