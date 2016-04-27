@@ -277,10 +277,10 @@ public class IRFuncDecl extends IRNode {
         IRSeq reorderedBody = new IRSeq(reorderBlocks(stmts));
         IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reorderedBody));
         // Iterate constant propagation and common subexpression elimination
-        for (int i = 0; i < 1; i++) {
-            propagateCopies(ccp_optimized);
-            eliminateCommonSubexpressions(ccp_optimized);
-        }
+        //for (int i = 0; i < 1; i++) {
+            //propagateCopies(ccp_optimized);
+            //eliminateCommonSubexpressions(ccp_optimized);
+        //}
         return new IRFuncDecl(fd.name(), ccp_optimized);
     }
 
@@ -388,6 +388,12 @@ public class IRFuncDecl extends IRNode {
     public IRSeq condtionalConstantPropagation(IRSeq seq) {
         ConditionalConstantPropagation ccp =
                 new ConditionalConstantPropagation(seq);
+        Util.writeHelper(
+                "ccp" + name,
+                "dot",
+                "./",
+                Collections.singletonList(ccp.toString())
+        );
 
 
         Map<Integer, CFGNode> graph = ccp.getGraph().getNodes();
@@ -399,7 +405,8 @@ public class IRFuncDecl extends IRNode {
             } else {
                 IRStmt stmt = stmts.get(i);
                 CFGNode node = graph.get(i);
-                UnreachableValueTuplesPair tuple = (UnreachableValueTuplesPair) node.getIn();
+                // out has all the information associated with the node
+                UnreachableValueTuplesPair tuple = (UnreachableValueTuplesPair) node.getOut();
                 if (tuple.isUnreachable()) {
                     // unreachable so we do not add it to new stmts
                 } else {

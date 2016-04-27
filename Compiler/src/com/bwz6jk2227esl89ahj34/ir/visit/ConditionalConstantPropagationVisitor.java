@@ -51,6 +51,18 @@ public class ConditionalConstantPropagationVisitor extends IRVisitor {
             }
         } else if (n_ instanceof IRTemp) {
             return temp((IRTemp)n_);
+        } else if (n_ instanceof IRBinOp) {
+            IRBinOp casted = (IRBinOp) n_;
+            IRExpr left = casted.left();
+            IRExpr right = casted.right();
+            if (left instanceof IRTemp) {
+                left = temp((IRTemp) left);
+            }
+            if (right instanceof IRTemp) {
+                right = temp((IRTemp) right);
+            }
+            IRConstantFoldingVisitor v = new IRConstantFoldingVisitor();
+            return v.visit(new IRBinOp(casted.opType(), left, right));
         } else {
             return n_;
         }
