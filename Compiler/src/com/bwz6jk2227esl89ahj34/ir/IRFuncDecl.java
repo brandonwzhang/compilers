@@ -293,6 +293,8 @@ public class IRFuncDecl extends IRNode {
                 "./",
                 Collections.singletonList(analysis.toString())
         );
+
+        // create new set of cse temps
         int tempCounter = 0;
         Map<IRExpr, IRTemp> tempMap = new HashMap<>();
         for (IRExpr expr : analysis.allExprs) {
