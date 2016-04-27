@@ -3,7 +3,7 @@ package com.bwz6jk2227esl89ahj34.assembly.register_allocation;
 import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
-import com.bwz6jk2227esl89ahj34.optimization.Optimization;
+import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
 
 import java.util.*;
 
@@ -108,7 +108,7 @@ public class GraphColorer {
         removeAbsentMovePairs();
         removeImpossibleMovePairs();
 
-        if (!Main.optimizationOn(Optimization.MC)) {
+        if (!Main.optimizationOn(OptimizationType.MC)) {
             if (Main.debugOn()) {
                 //System.out.println("move coalescing off");
             }

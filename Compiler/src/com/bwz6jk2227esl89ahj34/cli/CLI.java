@@ -2,7 +2,7 @@ package com.bwz6jk2227esl89ahj34.cli;
 
 import com.bwz6jk2227esl89ahj34.Core;
 import com.bwz6jk2227esl89ahj34.Main;
-import com.bwz6jk2227esl89ahj34.optimization.Optimization;
+import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
 
 import java.util.*;
 
@@ -34,7 +34,7 @@ public class CLI {
     private static Set<String> validOpts = new HashSet<>();
 
     static {
-        for (Optimization opt : Optimization.values()) {
+        for (OptimizationType opt : OptimizationType.values()) {
             validOpts.add(opt.toString());
         }
     }
@@ -57,8 +57,8 @@ public class CLI {
 
         Map<String, String[]> optionArgsMap = new HashMap<>();
 
-        Set<Optimization> enable = new HashSet<>();
-        Set<Optimization> disable = new HashSet<>();
+        Set<OptimizationType> enable = new HashSet<>();
+        Set<OptimizationType> disable = new HashSet<>();
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].charAt(0) == '-') {
@@ -66,7 +66,7 @@ public class CLI {
 
                 // TODO: document that --report-opts prevents other options from running
                 if (args[i].equals("--report-opts")) {
-                    for (Optimization opt : Optimization.SUPPORTED_OPTIMIZATIONS) {
+                    for (OptimizationType opt : OptimizationType.SUPPORTED_OPTIMIZATIONS) {
                         System.out.println(opt.toString());
                     }
                     return;
@@ -77,7 +77,7 @@ public class CLI {
                         // -O-no-<opt>
                         String opt_ = args[i].substring(6);
                         if (validOpts.contains(opt_)) {
-                            Optimization opt = Optimization.valueOf(opt_.toUpperCase());
+                            OptimizationType opt = OptimizationType.valueOf(opt_.toUpperCase());
                             disable.add(opt);
                             Main.allOptimizations = true;
                             continue;
@@ -87,7 +87,7 @@ public class CLI {
                         // -O<opt>
                         String opt_ = args[i].substring(3);
                         if (validOpts.contains(opt_)) {
-                            Optimization opt = Optimization.valueOf(opt_.toUpperCase());
+                            OptimizationType opt = OptimizationType.valueOf(opt_.toUpperCase());
                             enable.add(opt);
                             Main.allOptimizations = false;
                             continue;
@@ -149,13 +149,13 @@ public class CLI {
         }
 
         Main.optimizationMap.clear();
-        for (Optimization opt : enable) {
+        for (OptimizationType opt : enable) {
             Main.optimizationMap.put(opt, true);
         }
-        for (Optimization opt : disable) {
+        for (OptimizationType opt : disable) {
             Main.optimizationMap.put(opt, false);
         }
-        for (Optimization opt : Optimization.values()) {
+        for (OptimizationType opt : OptimizationType.values()) {
             if (!Main.optimizationMap.containsKey(opt)) {
                 // fill the rest of the map
                 Main.optimizationMap.put(opt, Main.allOptimizations);

@@ -16,6 +16,7 @@ import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.*;
+import com.bwz6jk2227esl89ahj34.optimization.Optimization;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 
@@ -274,154 +275,14 @@ public class IRFuncDecl extends IRNode {
         // comment the next 3 lines out and uncomment the return statement
         // to get rid of CCP
         IRSeq reorderedBody = new IRSeq(reorderBlocks(stmts));
-        //IRSeq ccp_optimized = condtionalConstantPropagation(new IRSeq(reorderedBody));
-        IRSeq ccp_optimized = reorderedBody;
 
+        Optimization.functionName = name;
+        //IRSeq ccp_optimized = Optimization.condtionalConstantPropagation(new IRSeq(reorderedBody));
+        IRSeq ccp_optimized = reorderedBody;
         // Iterate constant propagation and common subexpression elimination
-        //for (int i = 0; i < 1; i++) {
-            //propagateCopies(ccp_optimized);
-            //eliminateCommonSubexpressions(ccp_optimized);
-        //}
-        //propagateCopies(ccp_optimized);
-        //eliminateCommonSubexpressions(ccp_optimized);
+        Optimization.propagateCopies(ccp_optimized);
+        //Optimization.eliminateCommonSubexpressions(ccp_optimized);
         return new IRFuncDecl(fd.name(), ccp_optimized);
     }
 
-    /**
-     * Runs an available expressions analysis and replaces all common subexpressions
-     */
-    private void eliminateCommonSubexpressions(IRSeq body) {
-        AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(body);
-        Util.writeHelper(
-                "subexpressions" + name,
-                "dot",
-                "./",
-                Collections.singletonList(analysis.toString())
-        );
-
-        // Create new set of cse temps
-        int tempCounter = 0;
-        Map<IRExpr, IRTemp> tempMap = new HashMap<>();
-        for (IRExpr expr : analysis.allExprs) {
-            tempMap.put(expr, new IRTemp("cse" + tempCounter++));
-        }
-
-        List<IRStmt> stmts = body.stmts();
-        Map<Integer, CFGNode> nodes = analysis.getGraph().getNodes();
-
-        // Replace common subexpressions with their corresponding temp
-        for (int i : nodes.keySet()) {
-            CFGNodeIR node = (CFGNodeIR) nodes.get(i);
-            CommonSubexpressionVisitor visitor =
-                    new CommonSubexpressionVisitor((AvailableExpressionSet) node.getOut(), analysis, tempMap);
-            IRStmt newStmt = (IRStmt) visitor.visit(stmts.get(i));
-            node.setStatement(newStmt);
-            stmts.set(i, newStmt);
-        }
-
-        for (CFGNode node : analysis.getGraph().getNodes().values()) {
-            // Find all the expressions that this node adds to the out
-            Set<IRExpr> inSet = ((AvailableExpressionSet) node.getIn()).getExprs();
-            Set<IRExpr> outSet = ((AvailableExpressionSet) node.getOut()).getExprs();
-            Set<IRExpr> exprs = new HashSet<>(outSet);
-            exprs.removeAll(inSet);
-
-            for (ListIterator<IRStmt> it = stmts.listIterator(); it.hasNext();) {
-                IRStmt stmt = it.next();
-                if (stmt == ((CFGNodeIR) node).getStatement()) {
-                    // Assign the new temp for the expression
-                    for (IRExpr expr : exprs) {
-                        it.previous();
-                        it.add(new IRMove(tempMap.get(expr), expr));
-                        it.next();
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * Runs an available copies analysis and replaces all copies in body with
-     * their mappings.
-     */
-    private void propagateCopies(IRSeq body) {
-        AvailableCopies availableCopies = new AvailableCopies(body);
-        Util.writeHelper(
-                "available" + name,
-                "dot",
-                "./",
-                Collections.singletonList(availableCopies.toString())
-        );
-        Map<Integer, CFGNode> nodes = availableCopies.getGraph().getNodes();
-        List<IRStmt> stmts = body.stmts();
-        for (int i = 0; i < stmts.size(); i++) {
-            // Get the CFGNode corresponding to the current statement
-            CFGNode node = nodes.get(i);
-            if (node == null) {
-                // If we don't have an instance of a statement, then it's not
-                // going to be in the nodes map
-                continue;
-            }
-            LatticeElement in = node.getIn();
-            assert in instanceof AvailableCopiesSet;
-            // Retrieve available copies at current node
-            AvailableCopiesVisitor availableCopiesVisitor =
-                    new AvailableCopiesVisitor((AvailableCopiesSet) in);
-            // Replace the current statement with one with all copies replaced
-            stmts.set(i, (IRStmt) availableCopiesVisitor.visit(stmts.get(i)));
-        }
-
-        // Get rid of redundant moves
-        for (Iterator<IRStmt> it = stmts.iterator(); it.hasNext();) {
-            IRStmt stmt = it.next();
-            if (stmt instanceof IRMove) {
-                IRMove move = (IRMove) stmt;
-                if (move.target() instanceof IRTemp && move.expr() instanceof IRTemp) {
-                    IRTemp target = (IRTemp) move.target();
-                    IRTemp expr = (IRTemp) move.expr();
-                    if (target.name().equals(expr.name())) {
-                        it.remove();
-                    }
-                }
-            }
-        }
-    }
-
-    // NOTE: at the moment, this only eliminates unreachable code
-    public IRSeq condtionalConstantPropagation(IRSeq seq) {
-        ConditionalConstantPropagation ccp =
-                new ConditionalConstantPropagation(seq);
-        Util.writeHelper(
-                "ccp" + name,
-                "dot",
-                "./",
-                Collections.singletonList(ccp.toString())
-        );
-
-
-        Map<Integer, CFGNode> graph = ccp.getGraph().getNodes();
-        List<IRStmt> stmts = seq.stmts();
-        List<IRStmt> newStmts = new LinkedList<>();
-        for (int i = 0; i < stmts.size(); i++) {
-            if (!graph.containsKey(i)) {
-              newStmts.add(stmts.get(i));
-            } else {
-                IRStmt stmt = stmts.get(i);
-                CFGNode node = graph.get(i);
-                // out has all the information associated with the node
-                UnreachableValueTuplesPair tuple = (UnreachableValueTuplesPair) node.getOut();
-                if (tuple.isUnreachable()) {
-                    // unreachable so we do not add it to new stmts
-                } else {
-                    ConditionalConstantPropagationVisitor visitor =
-                            new ConditionalConstantPropagationVisitor(tuple.getValueTuples());
-                    newStmts.add((IRStmt) visitor.visit(stmt));
-                    //newStmts.add(stmt);
-                }
-            }
-        }
-
-        return new IRSeq(newStmts);
-    }
 }

@@ -1,7 +1,7 @@
 package com.bwz6jk2227esl89ahj34;
 
 import com.bwz6jk2227esl89ahj34.cli.CLI;
-import com.bwz6jk2227esl89ahj34.optimization.Optimization;
+import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
 
 import java.util.*;
 
@@ -24,7 +24,7 @@ public class Main {
     private static boolean reportFinalCFG = false;
 
     public static boolean allOptimizations = true;
-    public static HashMap<Optimization, Boolean> optimizationMap = new HashMap<>();
+    public static HashMap<OptimizationType, Boolean> optimizationMap = new HashMap<>();
 
     public static void main(String[] args) {
         CLI cli = new CLI();
@@ -204,7 +204,7 @@ public class Main {
         return debug;
     }
 
-    public static boolean optimizationOn(Optimization o) {
+    public static boolean optimizationOn(OptimizationType o) {
         return optimizationMap.get(o);
     }
 
