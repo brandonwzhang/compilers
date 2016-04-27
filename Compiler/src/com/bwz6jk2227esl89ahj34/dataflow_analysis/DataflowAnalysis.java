@@ -27,10 +27,26 @@ public abstract class DataflowAnalysis {
         fixpoint(direction);
     }
 
+    public DataflowAnalysis(List<AssemblyLine> lines, Direction direction, LatticeElement initial, boolean runFixpoint) {
+        this.graph = new CFGAssembly(lines);
+        this.initial = initial;
+        if (runFixpoint) {
+            fixpoint(direction);
+        }
+    }
+
     public DataflowAnalysis(IRSeq seq, Direction direction, LatticeElement initial) {
         this.graph = new CFGIR(seq);
         this.initial = initial;
         fixpoint(direction);
+    }
+
+    public DataflowAnalysis(IRSeq seq, Direction direction, LatticeElement initial, boolean runFixpoint) {
+        this.graph = new CFGIR(seq);
+        this.initial = initial;
+        if (runFixpoint) {
+            fixpoint(direction);
+        }
     }
 
     public abstract void transfer(CFGNode node);

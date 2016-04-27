@@ -3,22 +3,51 @@ package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class AvailableExpressionsAnalysis extends DataflowAnalysis{
+    public Set<IRExpr> allExprs;
+
     public AvailableExpressionsAnalysis(IRSeq seq) {
-        super(seq, Direction.FORWARD, allExprs(seq));
-        // top = {all exprs}
-        // bottom = {}
+        // We initialize all nodes to the bottom element, {}
+        super(seq, Direction.FORWARD, new AvailableExpressionSet(new HashSet<>()), false);
+        allExprs = allExprs(seq);
+        fixpoint(Direction.FORWARD);
     }
 
+    /**
+     * Returns all expressions in seq
+     */
+    public static Set<IRExpr> allExprs(IRSeq seq) {
+        Set<IRExpr> set = new HashSet<>();
+        for (IRStmt s : seq.stmts()) {
+            if (s instanceof IRCJump) {
+                IRCJump cjump = (IRCJump)s;
+                addSubexprs(cjump.expr(), set);
+            }
+            if (s instanceof IRExp) {
+                IRExp exp = (IRExp)s;
+                addSubexprs(exp.expr(), set);
+            }
+            if (s instanceof IRJump) {
+                IRJump jump = (IRJump)s;
+                addSubexprs(jump.target(), set);
+            }
+            if (s instanceof IRMove) {
+                IRMove move = (IRMove)s;
+                addSubexprs(move.expr(), set);
+
+                if (move.target() instanceof IRMem) {
+                    addSubexprs(move.target(), set);
+                }
+            }
+        }
+        return set;
+    }
 
     /**
      * Updates the node's equations as detailed below in comments.
-     * @param node
      */
     public void transfer(CFGNode node) {
         assert node instanceof CFGNodeIR;
@@ -31,7 +60,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         node.setIn(meet(pred_outs));
 
         // out[n] = in[n] U eval[n] - kill[n]
-        Set<IRExpr> out = new HashSet<IRExpr>(((AvailableExpressionSet)node.getIn()).getExprs());
+        Set<IRExpr> out = new HashSet<>(((AvailableExpressionSet)node.getIn()).getExprs());
         out.addAll(eval(node).getExprs());
         kill(node, out); // removes kill[n]
         node.setOut(new AvailableExpressionSet(out));
@@ -40,28 +69,23 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
 
     /**
      * Applies the meet operator (intersection)
-     * @param elements
-     * @return
      */
     public LatticeElement meet(Set<LatticeElement> elements) {
         if (elements.isEmpty()) {
             return new AvailableExpressionSet(new HashSet<>());
         }
 
-        AvailableExpressionSet meet = (AvailableExpressionSet)initial.copy();
-        Set<IRExpr> exprs = meet.getExprs();
+        Set<IRExpr> exprs = new HashSet<>(allExprs);
         for (LatticeElement e : elements) {
-            AvailableExpressionSet set = (AvailableExpressionSet)e;
+            AvailableExpressionSet set = (AvailableExpressionSet) e;
             exprs.retainAll(set.getExprs());
         }
 
-        return meet;
+        return new AvailableExpressionSet(exprs);
     }
 
     /**
      * Returns the LatticeElement of eval[node]
-     * @param node
-     * @return
      */
      public AvailableExpressionSet eval(CFGNode node) {
          assert node instanceof CFGNodeIR;
@@ -73,20 +97,10 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
          if (stmt instanceof IRMove) {
              IRMove move = (IRMove)stmt;
 
-             // x = f(e....)
-             if (move.expr() instanceof IRCall) {
-                 for (IRExpr e : ((IRCall)move.expr()).args()) {
-                     set.add(findReference(e));
-                     set.addAll(findReferences(subexprs(e)));
-                 }
-             } else { // x = e
-                 set.add(findReference(move.expr()));
-                 set.addAll(findReferences(subexprs(move.expr())));
-             }
+             set.addAll(findReferences(subexprs(move.expr())));
 
              // [e1] = [e2]
              if (move.target() instanceof IRMem) {
-                 set.add(findReference(move.target()));
                  set.addAll(findReferences(subexprs(move.target())));
              }
          }
@@ -94,7 +108,6 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
              IRCJump cjump = (IRCJump) stmt;
 
              // if (e)
-             set.add(findReference(cjump.expr()));
              set.addAll(findReferences(subexprs(cjump.expr())));
          }
 
@@ -104,8 +117,6 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
 
     /**
      * Removes kill[node] from the set out
-     * @param node
-     * @param out
      */
     public void kill(CFGNode node, Set<IRExpr> out) {
         // destructively modify out to remove kill[node]
@@ -144,36 +155,6 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         }
     }
 
-    // given a seq, return the "top"
-    public static AvailableExpressionSet allExprs(IRSeq seq) {
-        Set<IRExpr> set = new HashSet<>();
-        for (IRStmt s : seq.stmts()) {
-            if (s instanceof IRCJump) {
-                IRCJump cjump = (IRCJump)s;
-                addSubexprs(cjump.expr(), set);
-            }
-            if (s instanceof IRExp) {
-                IRExp exp = (IRExp)s;
-                addSubexprs(exp.expr(), set);
-            }
-            if (s instanceof IRJump) {
-                IRJump jump = (IRJump)s;
-                addSubexprs(jump.target(), set);
-            }
-            if (s instanceof IRMove) {
-                IRMove move = (IRMove)s;
-                addSubexprs(move.expr(), set);
-
-                if (move.target() instanceof IRMem) {
-                    addSubexprs(move.target(), set);
-                }
-            }
-        }
-
-        return new AvailableExpressionSet(set);
-    }
-
-
     // Returns a set of expressions that are subexpressions of expr
     // Analogous to powerset
     private static Set<IRExpr> subexprs(IRExpr expr) {
@@ -182,23 +163,29 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         return set;
     }
 
-    // recursive helper function
-    // precondition: IR is lowered
+    /**
+     * Adds all nontrivial subexpressions of expr to the set
+     */
     private static void addSubexprs(IRExpr expr, Set<IRExpr> set) {
-        set.add(expr);
-
+        // We don't add a subexpression unless it involves some sort of
+        // computation, so no CONST or TEMP
         if (expr instanceof IRBinOp) {
+            set.add(expr);
             IRBinOp binop = (IRBinOp)expr;
             addSubexprs(binop.left(), set);
             addSubexprs(binop.right(), set);
         }
         if (expr instanceof IRCall) {
+            // We don't add the call itself to the set of subexpressions because
+            // it could return different results
+            // TODO: Check if we need to do this
             IRCall call = (IRCall)expr;
             for (IRExpr e : call.args()) {
                 addSubexprs(e, set);
             }
         }
         if (expr instanceof IRMem) {
+            set.add(expr);
             IRMem mem = (IRMem)expr;
             addSubexprs(mem.expr(), set);
         }
@@ -228,9 +215,6 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
     /**
      * Takes in an IRExpr tree (lowered), and searches for a node that passes the predicate
      * specified by filter.
-     * @param expr
-     * @param filter
-     * @return
      */
     private boolean containsCondition(IRExpr expr, Predicate filter) {
         if (expr instanceof IRCall) {
@@ -251,8 +235,10 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         return filter.test(expr);
     }
 
-    // helper function that returns if two IRExprs are structurally equal
-    public boolean exprEquals(IRExpr e1, IRExpr e2) {
+    /**
+     * Helper function that returns if two IRExprs are structurally equal
+     */
+    public static boolean exprEquals(IRExpr e1, IRExpr e2) {
         if (!e1.getClass().equals(e2.getClass())) {
             return false;
         }
@@ -313,7 +299,6 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
             return ((IRTemp)e1).name().equals(((IRTemp)e2).name());
         }
 
-
         return false;
     }
 
@@ -323,13 +308,14 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         Otherwise throw runtimeexception
      */
     public IRExpr findReference(IRExpr e1) {
-        assert initial instanceof AvailableExpressionSet;
+        assert allExprs != null;
 
-        for (IRExpr e2 : ((AvailableExpressionSet) initial).getExprs()) {
+        for (IRExpr e2 : allExprs) {
             if (exprEquals(e1, e2)) {
                 return e2;
             }
         }
+        System.out.println(e1);
         throw new RuntimeException("Expression not found in top for " +
                 "available expressions analysis. Please email esl89@cornell.edu");
     }
@@ -338,8 +324,6 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         Same helper as above, but does it for a set of IRExprs
      */
     public Set<IRExpr> findReferences(Set<IRExpr> exprs) {
-        assert initial instanceof AvailableExpressionSet;
-
         Set<IRExpr> refs = new HashSet<>();
         for (IRExpr e : exprs) {
             refs.add(findReference(e));

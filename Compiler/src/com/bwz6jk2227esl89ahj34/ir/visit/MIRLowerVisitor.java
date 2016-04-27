@@ -7,7 +7,7 @@ public class MIRLowerVisitor extends IRVisitor{
     private static long labelCounter = 0;
 
     public static String getFreshVariable() {
-        return "temp_" + (labelCounter++);
+        return "low" + (labelCounter++);
     }
 
     /**
