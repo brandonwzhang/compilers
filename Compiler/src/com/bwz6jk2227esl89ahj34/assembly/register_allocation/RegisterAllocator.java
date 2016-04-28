@@ -47,7 +47,12 @@ public class RegisterAllocator {
                 if (instruction.getArgs().get(1) instanceof AssemblyAbstractRegister) {
                     AssemblyAbstractRegister dst = (AssemblyAbstractRegister) instruction.getArgs().get(1);
                     if (!outSet.contains(dst)) {
-                        lines.remove(instruction);
+                        for (Iterator<AssemblyLine> it = lines.iterator(); it.hasNext();) {
+                            AssemblyLine line = it.next();
+                            if (line == instruction) {
+                                it.remove();
+                            }
+                        }
                     }
                 }
             }
