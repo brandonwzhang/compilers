@@ -28,7 +28,7 @@ public class RegisterAllocator {
      * Returns a list of instructions with all abstract registers with physical locations
      */
     public static List<AssemblyLine> translate(List<AssemblyLine> lines) {
-        // Perform live variable analysis to construct interference sets
+        // Perform live variable analysis for dead code elimination
         LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(lines);
         Util.writeHelper(
                 "live_variables_",
@@ -37,27 +37,31 @@ public class RegisterAllocator {
                 Collections.singletonList(liveVariables.toString())
         );
 
+        // Remove assignments to variables that aren't used (dead code)
+        for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
+            CFGNodeAssembly assemblyNode = (CFGNodeAssembly) node;
+            AssemblyInstruction instruction = assemblyNode.getInstruction();
+            Set<AssemblyAbstractRegister> outSet = ((LiveVariableSet) node.getOut()).getLiveVars();
+            if (instruction.opCode == OpCode.MOVQ) {
+                assert instruction.getArgs().size() == 2;
+                if (instruction.getArgs().get(1) instanceof AssemblyAbstractRegister) {
+                    AssemblyAbstractRegister dst = (AssemblyAbstractRegister) instruction.getArgs().get(1);
+                    if (!outSet.contains(dst)) {
+                        lines.remove(instruction);
+                    }
+                }
+            }
+        }
+
+        // Rerunning live variable analysis after dead code elimination
+        liveVariables = new LiveVariableAnalysis(lines);
+
+        // Constructing the interference sets for register allocation
         List<Set<AssemblyAbstractRegister>> interferenceSets = new LinkedList<>();
         for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
             LiveVariableSet out = (LiveVariableSet) node.getOut();
             interferenceSets.add(out.getLiveVars());
         }
-
-        // Remove assignments to variables that aren't used
-//        for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
-//            CFGNodeAssembly assemblyNode = (CFGNodeAssembly) node;
-//            AssemblyInstruction instruction = assemblyNode.getInstruction();
-//            Set<AssemblyAbstractRegister> outSet = ((LiveVariableSet) node.getOut()).getLiveVars();
-//            if (instruction.opCode == OpCode.MOVQ) {
-//                assert instruction.getArgs().size() == 2;
-//                if (instruction.getArgs().get(1) instanceof AssemblyAbstractRegister) {
-//                    AssemblyAbstractRegister dst = (AssemblyAbstractRegister) instruction.getArgs().get(1);
-//                    if (!outSet.contains(dst)) {
-//                        lines.remove(instruction);
-//                    }
-//                }
-//            }
-//        }
 
         registerMap = new HashMap<>();
         if (Main.optimizationOn(OptimizationType.REG)) {
