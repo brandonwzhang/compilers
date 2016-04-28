@@ -112,7 +112,7 @@ public class GraphColorer {
             movePairs.clear();
         } else {
             if (Main.debugOn()) {
-                System.out.println("*** performing optimization: move coalescing");
+                System.out.println("DEBUG: performing optimization: move coalescing");
             }
         }
     }
@@ -337,6 +337,19 @@ public class GraphColorer {
         while (exclude.contains(color)) {
             color = colors[(int) Math.floor(Math.random() * colors.length)];
         }
+
+        // Deterministic coloring
+//        AssemblyPhysicalRegister color = colors[0];
+//        int i = 0;
+//        while (exclude.contains(color)) {
+//            if (i < colors.length) {
+//                color = colors[i];
+//                i++;
+//            } else {
+//                color = null;
+//                break;
+//            }
+//        }
 
         return color;
     }

@@ -62,7 +62,7 @@ public class RegisterAllocator {
         registerMap = new HashMap<>();
         if (Main.optimizationOn(OptimizationType.REG)) {
             if (Main.debugOn()) {
-                System.out.println("*** performing optimization: register allocation");
+                System.out.println("DEBUG: performing optimization: register allocation");
             }
             // Use Kempe's algorithm to allocate physical locations to abstract registers
             GraphColorer graphColorer = new GraphColorer(interferenceSets, lines);

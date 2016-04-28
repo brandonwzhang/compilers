@@ -282,7 +282,7 @@ public class IRFuncDecl extends IRNode {
         IRSeq ccp_optimized = reorderedBody;
         if (Main.optimizationOn(OptimizationType.UCE)) {
             if (Main.debugOn()) {
-                System.out.println("*** performing optimization: unreachable code elimination");
+                System.out.println("DEBUG: performing optimization: unreachable code elimination");
             }
             ccp_optimized = Optimization.condtionalConstantPropagation(new IRSeq(reorderedBody));
         }
@@ -290,13 +290,13 @@ public class IRFuncDecl extends IRNode {
         // Iterate constant propagation and common subexpression elimination
         if (Main.optimizationOn(OptimizationType.COPY)) {
             if (Main.debugOn()) {
-                System.out.println("*** performing optimization: copy propagation");
+                System.out.println("DEBUG: performing optimization: copy propagation");
             }
             Optimization.propagateCopies(ccp_optimized);
         }
         if (Main.optimizationOn(OptimizationType.CSE)) {
             if (Main.debugOn()) {
-                System.out.println("*** performing optimization: common subexpression elimination");
+                System.out.println("DEBUG: performing optimization: common subexpression elimination");
             }
             Optimization.eliminateCommonSubexpressions(ccp_optimized);
         }
