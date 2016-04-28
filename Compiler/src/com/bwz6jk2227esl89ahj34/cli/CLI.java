@@ -85,7 +85,7 @@ public class CLI {
 
                     } else {
                         // -O<opt>
-                        String opt_ = args[i].substring(3);
+                        String opt_ = args[i].substring(2);
                         if (validOpts.contains(opt_)) {
                             OptimizationType opt = OptimizationType.valueOf(opt_.toUpperCase());
                             enable.add(opt);
