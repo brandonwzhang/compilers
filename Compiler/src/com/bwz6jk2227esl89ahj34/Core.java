@@ -178,7 +178,7 @@ public class Core {
 
         if (Main.optimizationOn(OptimizationType.CF)) {
             if (Main.debugOn()) {
-                System.out.println("*** Constant folding is on. Will be applied at multiple stages.");
+                System.out.println("DEBUG: Constant folding is on. Will be applied at multiple stages.");
             }
             // constant folding on the AST
             NodeVisitor cfv = new ConstantFoldingVisitor();
