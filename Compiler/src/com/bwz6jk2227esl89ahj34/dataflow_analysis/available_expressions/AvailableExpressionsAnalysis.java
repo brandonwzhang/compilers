@@ -251,7 +251,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
 
             return e1_.opType().equals(e2_.opType()) &&
                     exprEquals(e1_.left(), e2_.left()) &&
-                    exprEquals(e2_.right(), e2_.right());
+                    exprEquals(e1_.right(), e2_.right());
         }
         if (e1 instanceof IRCall) {
             assert e2 instanceof IRCall;
