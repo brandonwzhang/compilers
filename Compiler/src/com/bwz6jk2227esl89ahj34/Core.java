@@ -177,14 +177,15 @@ public class Core {
     public static IRCompUnit mirGen(String file, Program program) {
 
         if (Main.optimizationOn(OptimizationType.CF)) {
+            if (Main.debugOn()) {
+                System.out.println("*** Constant folding is on. Will be applied at multiple stages.");
+            }
             // constant folding on the AST
             NodeVisitor cfv = new ConstantFoldingVisitor();
             program.accept(cfv);
             // annotate the new nodes with types
             NodeVisitor tcv = new TypeCheckVisitor(Main.libPath());
             program.accept(tcv);
-        } else if (Main.debugOn()) {
-            System.out.println("constant folding off");
         }
 
         MIRGenerateVisitor mirgv =

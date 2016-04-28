@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
+import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
         .AvailableCopies;
@@ -17,6 +18,7 @@ import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.*;
 import com.bwz6jk2227esl89ahj34.optimization.Optimization;
+import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 
@@ -277,11 +279,28 @@ public class IRFuncDecl extends IRNode {
         IRSeq reorderedBody = new IRSeq(reorderBlocks(stmts));
 
         Optimization.functionName = name;
-        //IRSeq ccp_optimized = Optimization.condtionalConstantPropagation(new IRSeq(reorderedBody));
         IRSeq ccp_optimized = reorderedBody;
+        if (Main.optimizationOn(OptimizationType.UCE)) {
+            if (Main.debugOn()) {
+                System.out.println("*** performing optimization: unreachable code elimination");
+            }
+            ccp_optimized = Optimization.condtionalConstantPropagation(new IRSeq(reorderedBody));
+        }
+
         // Iterate constant propagation and common subexpression elimination
-        Optimization.propagateCopies(ccp_optimized);
-        //Optimization.eliminateCommonSubexpressions(ccp_optimized);
+        if (Main.optimizationOn(OptimizationType.COPY)) {
+            if (Main.debugOn()) {
+                System.out.println("*** performing optimization: copy propagation");
+            }
+            Optimization.propagateCopies(ccp_optimized);
+        }
+        if (Main.optimizationOn(OptimizationType.CSE)) {
+            if (Main.debugOn()) {
+                System.out.println("*** performing optimization: common subexpression elimination");
+            }
+            Optimization.eliminateCommonSubexpressions(ccp_optimized);
+        }
+
         return new IRFuncDecl(fd.name(), ccp_optimized);
     }
 

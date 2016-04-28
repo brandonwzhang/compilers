@@ -109,10 +109,11 @@ public class GraphColorer {
         removeImpossibleMovePairs();
 
         if (!Main.optimizationOn(OptimizationType.MC)) {
-            if (Main.debugOn()) {
-                //System.out.println("move coalescing off");
-            }
             movePairs.clear();
+        } else {
+            if (Main.debugOn()) {
+                System.out.println("*** performing optimization: move coalescing");
+            }
         }
     }
 
@@ -632,14 +633,15 @@ public class GraphColorer {
             }
 
             // potential spill node
-            AssemblyAbstractRegister spillNode = activeNodes.iterator().next();
+            Iterator<AssemblyAbstractRegister> iterator = activeNodes.iterator();
+            AssemblyAbstractRegister spillNode = iterator.next();
 
             //System.out.println("potential spill " + spillNode);
             for (AssemblyAbstractRegister neighbor : graph.get(spillNode)) {
                 graph.get(neighbor).remove(spillNode);
             }
             removedNodes.push(spillNode);
-            activeNodes.remove(spillNode);
+            iterator.remove();
             spillNodes.add(spillNode);
             Set<MovePair> removeSet = new HashSet<>();
             for (MovePair pair : movePairs) {
