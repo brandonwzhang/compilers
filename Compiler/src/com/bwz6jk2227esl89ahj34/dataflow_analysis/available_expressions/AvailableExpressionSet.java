@@ -12,29 +12,61 @@ import java.util.Set;
 
 @Data
 public class AvailableExpressionSet extends LatticeElement {
-    private Set<IRExpr> exprs;
+    public static class ExpressionNodePair {
+        public IRExpr expr;
+        public CFGNodeIR node;
 
-    public AvailableExpressionSet(Set<IRExpr> set) {
-        this.exprs = new HashSet<>(set);
+        public ExpressionNodePair(IRExpr expr, CFGNodeIR node) {
+            this.expr = expr;
+            this.node = node;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof ExpressionNodePair)) {
+                return false;
+            }
+            ExpressionNodePair pair = (ExpressionNodePair) o;
+            return expr.equals(pair.expr);
+        }
+
+        @Override
+        public int hashCode() {
+            return expr.hashCode();
+        }
+    }
+    private Set<ExpressionNodePair> pairs;
+
+    public AvailableExpressionSet(Set<ExpressionNodePair> set) {
+        this.pairs = new HashSet<>(set);
+    }
+
+    public ExpressionNodePair get(IRExpr expr) {
+        for (ExpressionNodePair pair : pairs) {
+            if (expr.equals(pair.expr)) {
+                return pair;
+            }
+        }
+        return null;
     }
 
     public LatticeElement copy() {
-        Set<IRExpr> newExprs = new HashSet<>();
-        newExprs.addAll(exprs);
-        return new AvailableExpressionSet(newExprs);
+        Set<ExpressionNodePair> newPairs = new HashSet<>();
+        newPairs.addAll(pairs);
+        return new AvailableExpressionSet(newPairs);
     }
 
     public boolean equals(LatticeElement element) {
         if (!(element instanceof AvailableExpressionSet)) {
             return false;
         } else {
-            return ((AvailableExpressionSet)element).getExprs().equals(exprs);
+            return ((AvailableExpressionSet)element).getPairs().equals(pairs);
         }
     }
 
 
     public String toString() {
-        return exprs.toString().replace('\n', ' ');
+        return pairs.toString().replace('\n', ' ');
     }
 
 }

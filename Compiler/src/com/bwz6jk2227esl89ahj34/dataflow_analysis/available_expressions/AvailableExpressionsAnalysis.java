@@ -2,6 +2,7 @@ package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions;
 
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions.AvailableExpressionSet.ExpressionNodePair;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -60,8 +61,8 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         node.setIn(meet(pred_outs));
 
         // out[n] = in[n] U eval[n] - kill[n]
-        Set<IRExpr> out = new HashSet<>(((AvailableExpressionSet)node.getIn()).getExprs());
-        out.addAll(eval(node).getExprs());
+        Set<AvailableExpressionSet.ExpressionNodePair> out = new HashSet<>(((AvailableExpressionSet)node.getIn()).getPairs());
+        out.addAll(eval(node).getPairs());
         kill(node, out); // removes kill[n]
         node.setOut(new AvailableExpressionSet(out));
     }
@@ -75,13 +76,17 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
             return new AvailableExpressionSet(new HashSet<>());
         }
 
-        Set<IRExpr> exprs = new HashSet<>(allExprs);
+        Set<ExpressionNodePair> pairs = null;
         for (LatticeElement e : elements) {
-            AvailableExpressionSet set = (AvailableExpressionSet) e;
-            exprs.retainAll(set.getExprs());
+            Set<ExpressionNodePair> set = ((AvailableExpressionSet) e).getPairs();
+            if (pairs == null) {
+                pairs = set;
+            } else {
+                pairs.retainAll(set);
+            }
         }
 
-        return new AvailableExpressionSet(exprs);
+        return new AvailableExpressionSet(pairs);
     }
 
     /**
@@ -111,14 +116,25 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
              set.addAll(findReferences(subexprs(cjump.expr())));
          }
 
-         return new AvailableExpressionSet(set);
+         Set<ExpressionNodePair> pairs = new HashSet<>();
+         AvailableExpressionSet inSet = (AvailableExpressionSet) node.getIn();
+         for (IRExpr expr : set) {
+             ExpressionNodePair pair = inSet.get(expr);
+             if (pair == null) {
+                 pairs.add(new ExpressionNodePair(expr, (CFGNodeIR) node));
+             } else {
+                 pairs.add(pair);
+             }
+         }
+
+         return new AvailableExpressionSet(pairs);
 
      }
 
     /**
      * Removes kill[node] from the set out
      */
-    public void kill(CFGNode node, Set<IRExpr> out) {
+    public void kill(CFGNode node, Set<ExpressionNodePair> out) {
         // destructively modify out to remove kill[node]
         IRStmt stmt = ((CFGNodeIR)node).getStatement();
         assert stmt != null;
@@ -146,10 +162,10 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         }
 
         // Remove any exprs that satisfy the filter
-        for (Iterator<IRExpr> i = out.iterator(); i.hasNext();) {
-            IRExpr expr = i.next();
+        for (Iterator<ExpressionNodePair> i = out.iterator(); i.hasNext();) {
+            ExpressionNodePair pair = i.next();
             // remove if expr contains any usage of x
-            if (containsCondition(expr, filter)) {
+            if (containsCondition(pair.expr, filter)) {
                 i.remove();
             }
         }

@@ -20,6 +20,7 @@ import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.visit.AvailableCopiesVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.CommonSubexpressionVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.ConditionalConstantPropagationVisitor;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions.AvailableExpressionSet.ExpressionNodePair;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.util.*;
@@ -56,18 +57,18 @@ public class Optimization {
 
         for (CFGNode node : analysis.getGraph().getNodes().values()) {
             // Find all the expressions that this node adds to the out
-            Set<IRExpr> inSet = ((AvailableExpressionSet) node.getIn()).getExprs();
-            Set<IRExpr> outSet = ((AvailableExpressionSet) node.getOut()).getExprs();
-            Set<IRExpr> exprs = new HashSet<>(outSet);
-            exprs.removeAll(inSet);
+            Set<ExpressionNodePair> inSet = ((AvailableExpressionSet) node.getIn()).getPairs();
+            Set<ExpressionNodePair> outSet = ((AvailableExpressionSet) node.getOut()).getPairs();
+            Set<ExpressionNodePair> pairs = new HashSet<>(outSet);
+            pairs.removeAll(inSet);
 
             for (ListIterator<IRStmt> it = stmts.listIterator(); it.hasNext();) {
                 IRStmt stmt = it.next();
                 if (stmt == ((CFGNodeIR) node).getStatement()) {
                     // Assign the new temp for the expression
-                    for (IRExpr expr : exprs) {
+                    for (ExpressionNodePair pair : pairs) {
                         it.previous();
-                        it.add(new IRMove(tempMap.get(expr), expr));
+                        it.add(new IRMove(tempMap.get(pair.expr), pair.expr));
                         it.next();
                     }
                     break;

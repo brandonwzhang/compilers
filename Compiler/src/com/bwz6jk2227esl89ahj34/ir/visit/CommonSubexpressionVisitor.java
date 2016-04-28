@@ -39,15 +39,7 @@ public class CommonSubexpressionVisitor extends IRVisitor {
         // Get the reference to an equivalent expr so we can compare physical equality
         IRExpr expr = analysis.findReference((IRExpr) n);
 
-        assert analysis.allExprs.containsAll(set.getExprs());
-        assert analysis.allExprs.contains(expr);
-
-        if (!set.getExprs().contains(expr)) {
-//            System.out.println("==================Set Expressions=================");
-//            System.out.println(set.getExprs());
-//            System.out.println("========================Expr======================");
-//            System.out.println(expr);
-//            System.out.println("**************************************************");
+        if (set.get(expr) == null) {
             // If the expr is not available, we just return the result of visiting the children
             return n_;
         }
