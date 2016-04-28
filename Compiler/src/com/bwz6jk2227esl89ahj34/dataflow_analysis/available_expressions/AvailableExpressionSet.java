@@ -1,32 +1,30 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions;
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeIR;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.ir.IRExpr;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
 public class AvailableExpressionSet extends LatticeElement {
-    public static class ExpressionNodePair {
+    public static class TaggedExpression {
         public IRExpr expr;
         public CFGNodeIR node;
 
-        public ExpressionNodePair(IRExpr expr, CFGNodeIR node) {
+        public TaggedExpression(IRExpr expr, CFGNodeIR node) {
             this.expr = expr;
             this.node = node;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof ExpressionNodePair)) {
+            if (!(o instanceof TaggedExpression)) {
                 return false;
             }
-            ExpressionNodePair pair = (ExpressionNodePair) o;
+            TaggedExpression pair = (TaggedExpression) o;
             return expr.equals(pair.expr);
         }
 
@@ -35,14 +33,14 @@ public class AvailableExpressionSet extends LatticeElement {
             return expr.hashCode();
         }
     }
-    private Set<ExpressionNodePair> pairs;
+    private Set<TaggedExpression> exprs;
 
-    public AvailableExpressionSet(Set<ExpressionNodePair> set) {
-        this.pairs = new HashSet<>(set);
+    public AvailableExpressionSet(Set<TaggedExpression> set) {
+        this.exprs = new HashSet<>(set);
     }
 
-    public ExpressionNodePair get(IRExpr expr) {
-        for (ExpressionNodePair pair : pairs) {
+    public TaggedExpression get(IRExpr expr) {
+        for (TaggedExpression pair : exprs) {
             if (expr.equals(pair.expr)) {
                 return pair;
             }
@@ -51,8 +49,8 @@ public class AvailableExpressionSet extends LatticeElement {
     }
 
     public LatticeElement copy() {
-        Set<ExpressionNodePair> newPairs = new HashSet<>();
-        newPairs.addAll(pairs);
+        Set<TaggedExpression> newPairs = new HashSet<>();
+        newPairs.addAll(exprs);
         return new AvailableExpressionSet(newPairs);
     }
 
@@ -60,13 +58,13 @@ public class AvailableExpressionSet extends LatticeElement {
         if (!(element instanceof AvailableExpressionSet)) {
             return false;
         } else {
-            return ((AvailableExpressionSet)element).getPairs().equals(pairs);
+            return ((AvailableExpressionSet)element).getExprs().equals(exprs);
         }
     }
 
 
     public String toString() {
-        return pairs.toString().replace('\n', ' ');
+        return exprs.toString().replace('\n', ' ');
     }
 
 }
