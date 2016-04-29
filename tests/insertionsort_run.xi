@@ -19,7 +19,7 @@ sort(a: int[]) {
 
 main(args:int[][]) {
   sortme: int[] = "fadbgce"
-  reverse: int[] = "ponmlkjih"
+  reverse: int[] = "qponmlkjih" // if you take away the q, this program loops infinitely with 2+ iterations of copy+cse 4/28/2016 11:40pm
 
   println(sortme)
   sort(sortme)
@@ -29,3 +29,4 @@ main(args:int[][]) {
   sort(reverse)
   println(reverse)
 }
+
