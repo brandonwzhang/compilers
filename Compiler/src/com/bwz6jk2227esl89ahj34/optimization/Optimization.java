@@ -41,7 +41,6 @@ public class Optimization {
      */
     public static void eliminateCommonSubexpressions(IRSeq body) {
         AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(body);
-        writeCFG(analysis, "cse");
 
         // Create new set of cse temps
         Map<IRExpr, IRTemp> tempMap = new HashMap<>();
@@ -137,7 +136,6 @@ public class Optimization {
      */
     public static void propagateCopies(IRSeq body) {
         AvailableCopies availableCopies = new AvailableCopies(body);
-        writeCFG(availableCopies, "copy");
 
         Map<Integer, CFGNode> nodes = availableCopies.getGraph().getNodes();
         List<IRStmt> stmts = body.stmts();
@@ -178,7 +176,6 @@ public class Optimization {
     public static IRSeq condtionalConstantPropagation(IRSeq seq) {
         ConditionalConstantPropagation ccp =
                 new ConditionalConstantPropagation(seq);
-        writeCFG(ccp, "ccp");
 
         Map<Integer, CFGNode> graph = ccp.getGraph().getNodes();
         List<IRStmt> stmts = seq.stmts();
