@@ -288,17 +288,21 @@ public class IRFuncDecl extends IRNode {
         }
 
         // Iterate constant propagation and common subexpression elimination
-        if (Main.optimizationOn(OptimizationType.COPY)) {
-            if (Main.debugOn()) {
-                System.out.println("DEBUG: performing optimization: copy propagation");
+        int iterations = 2;
+        for (int i = 0; i < iterations; i++) {
+            if (Main.optimizationOn(OptimizationType.COPY)) {
+                if (Main.debugOn()) {
+                    System.out.println("DEBUG: performing optimization: copy propagation");
+
+                }
+                Optimization.propagateCopies(ccp_optimized);
             }
-            Optimization.propagateCopies(ccp_optimized);
-        }
-        if (Main.optimizationOn(OptimizationType.CSE)) {
-            if (Main.debugOn()) {
-                System.out.println("DEBUG: performing optimization: common subexpression elimination");
+            if (Main.optimizationOn(OptimizationType.CSE)) {
+                if (Main.debugOn()) {
+                    System.out.println("DEBUG: performing optimization: common subexpression elimination");
+                }
+                Optimization.eliminateCommonSubexpressions(ccp_optimized);
             }
-            Optimization.eliminateCommonSubexpressions(ccp_optimized);
         }
 
         return new IRFuncDecl(fd.name(), ccp_optimized);
