@@ -4,8 +4,8 @@ import com.bwz6jk2227esl89ahj34.analysis.available_expressions
         .AvailableExpressionSet;
 import com.bwz6jk2227esl89ahj34.analysis.available_expressions
         .AvailableExpressionSet.TaggedExpression;
-import com.bwz6jk2227esl89ahj34.analysis.available_expressions.AvailableExpressions;
-import com.bwz6jk2227esl89ahj34.analysis.available_expressions.AvailableExpressions.ExpressionNodePair;
+import com.bwz6jk2227esl89ahj34.analysis.available_expressions.AvailableExpressionAnalysis;
+import com.bwz6jk2227esl89ahj34.analysis.available_expressions.AvailableExpressionAnalysis.ExpressionNodePair;
 import com.bwz6jk2227esl89ahj34.ir.*;
 
 import java.util.LinkedHashSet;
@@ -17,7 +17,7 @@ public class CommonSubexpressionVisitor extends IRVisitor {
     private AvailableExpressionSet set;
     // Analysis used to find available expressions
     // We need this to find the references of equivalent expressions
-    private AvailableExpressions analysis;
+    private AvailableExpressionAnalysis analysis;
     // A mapping from IRExpr's to IRTemp's that we use to replace common subexpressions
     private Map<IRExpr, IRTemp> map;
     // A set of expression that are redundant enough to be replaced
@@ -26,7 +26,7 @@ public class CommonSubexpressionVisitor extends IRVisitor {
     public Set<ExpressionNodePair> usedTemps = new LinkedHashSet<>();
 
     public CommonSubexpressionVisitor(AvailableExpressionSet set,
-                                      AvailableExpressions analysis,
+                                      AvailableExpressionAnalysis analysis,
                                       Map<IRExpr, IRTemp> map,
                                       Set<ExpressionNodePair> redundantSubexpressions) {
         this.set = set;

@@ -2,6 +2,7 @@ package com.bwz6jk2227esl89ahj34.assembly;
 
 import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.LinkedHashMap;
 

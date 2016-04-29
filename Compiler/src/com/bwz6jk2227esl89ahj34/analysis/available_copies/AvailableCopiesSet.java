@@ -11,7 +11,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class AvailableCopiesSet extends LatticeElement {
     @Data
-    @EqualsAndHashCode(callSuper = false)
     @AllArgsConstructor
     public static class TempPair {
         public String left;

@@ -16,9 +16,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AvailableCopies extends DataflowAnalysis {
+public class AvailableCopiesAnalysis extends DataflowAnalysis {
 
-    public AvailableCopies(IRSeq seq) {
+    public AvailableCopiesAnalysis(IRSeq seq) {
         super(seq, Direction.FORWARD, new AvailableCopiesSet(new LinkedHashSet<>()));
     }
 

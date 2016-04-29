@@ -1,14 +1,14 @@
 package com.bwz6jk2227esl89ahj34.analysis.tests;
 
-import com.bwz6jk2227esl89ahj34.analysis.available_expressions.AvailableExpressions;
+import com.bwz6jk2227esl89ahj34.analysis.available_expressions.AvailableExpressionAnalysis;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AvailableExpressionsTest {
-    AvailableExpressions analysis;
+public class AvailableExpressionAnalysisTest {
+    AvailableExpressionAnalysis analysis;
 
     @Before
     public void setup() {

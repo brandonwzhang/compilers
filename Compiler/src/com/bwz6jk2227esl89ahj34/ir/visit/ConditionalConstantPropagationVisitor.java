@@ -5,7 +5,7 @@ import com.bwz6jk2227esl89ahj34.analysis.LatticeBottom;
 import com.bwz6jk2227esl89ahj34.analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.analysis.LatticeTop;
 import com.bwz6jk2227esl89ahj34.analysis
-        .conditional_constant_propagation.Value;
+        .conditional_constants.Value;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
 

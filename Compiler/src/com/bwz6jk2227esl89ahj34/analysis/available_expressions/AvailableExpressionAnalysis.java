@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public class AvailableExpressions extends DataflowAnalysis{
+public class AvailableExpressionAnalysis extends DataflowAnalysis{
     public static class ExpressionNodePair {
         public IRExpr expr;
         public CFGNode node;
@@ -51,7 +51,7 @@ public class AvailableExpressions extends DataflowAnalysis{
 
     public Set<IRExpr> allExprs;
 
-    public AvailableExpressions(IRSeq seq) {
+    public AvailableExpressionAnalysis(IRSeq seq) {
         // We initialize all nodes to the bottom element, {}
         super(seq, Direction.FORWARD, new AvailableExpressionSet(new LinkedHashSet<>()), false);
         allExprs = allExprs(seq);

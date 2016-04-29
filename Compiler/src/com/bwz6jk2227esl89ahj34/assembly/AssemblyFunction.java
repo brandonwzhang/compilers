@@ -3,7 +3,7 @@ package com.bwz6jk2227esl89ahj34.assembly;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
 import com.bwz6jk2227esl89ahj34.assembly.register_allocation.RegisterAllocator;
 import com.bwz6jk2227esl89ahj34.assembly.tiles.TileContainer;
-import com.bwz6jk2227esl89ahj34.analysis.live_variables.LiveVariables;
+import com.bwz6jk2227esl89ahj34.analysis.live_variables.LiveVariableAnalysis;
 import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import com.bwz6jk2227esl89ahj34.ir.IRStmt;
@@ -44,7 +44,7 @@ public class AssemblyFunction {
         }
 
         // Testing live variable analysis
-        LiveVariables liveVariables = new LiveVariables(lines);
+        LiveVariableAnalysis liveVariableAnalysis = new LiveVariableAnalysis(lines);
         functionBody = RegisterAllocator.translate(functionBody);
 
         // generateFunctionPrologue() needs to be called after the registers

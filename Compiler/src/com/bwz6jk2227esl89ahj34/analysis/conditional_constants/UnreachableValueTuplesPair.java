@@ -1,4 +1,4 @@
-package com.bwz6jk2227esl89ahj34.analysis.conditional_constant_propagation;
+package com.bwz6jk2227esl89ahj34.analysis.conditional_constants;
 
 
 import com.bwz6jk2227esl89ahj34.analysis.LatticeBottom;
@@ -15,7 +15,6 @@ import java.util.Map;
 @Getter
 @Setter
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class UnreachableValueTuplesPair extends LatticeElement {
     private boolean unreachable;
     private Map<String, LatticeElement>  valueTuples;

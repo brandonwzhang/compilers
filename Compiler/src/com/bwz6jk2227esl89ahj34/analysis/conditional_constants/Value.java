@@ -1,4 +1,4 @@
-package com.bwz6jk2227esl89ahj34.analysis.conditional_constant_propagation;
+package com.bwz6jk2227esl89ahj34.analysis.conditional_constants;
 
 
 

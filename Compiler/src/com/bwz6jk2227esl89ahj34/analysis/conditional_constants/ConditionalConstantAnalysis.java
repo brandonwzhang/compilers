@@ -1,4 +1,4 @@
-package com.bwz6jk2227esl89ahj34.analysis.conditional_constant_propagation;
+package com.bwz6jk2227esl89ahj34.analysis.conditional_constants;
 
 
 
@@ -8,9 +8,9 @@ import com.bwz6jk2227esl89ahj34.ir.visit.IRConstantFoldingVisitor;
 
 import java.util.*;
 
-public class ConditionalConstantPropagation extends DataflowAnalysis {
+public class ConditionalConstantAnalysis extends DataflowAnalysis {
 
-    public ConditionalConstantPropagation(IRSeq seq) {
+    public ConditionalConstantAnalysis(IRSeq seq) {
         super(seq, Direction.FORWARD, new UnreachableValueTuplesPair(findAllTemps(seq)));
     }
 

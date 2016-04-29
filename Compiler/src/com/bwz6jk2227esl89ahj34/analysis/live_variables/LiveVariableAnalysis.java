@@ -12,7 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class LiveVariables extends DataflowAnalysis {
+public class LiveVariableAnalysis extends DataflowAnalysis {
     public static Set<OpCode> defOpCodes;
 
     static {
@@ -20,7 +20,7 @@ public class LiveVariables extends DataflowAnalysis {
         defOpCodes = new LinkedHashSet<>(Arrays.asList(defOpCodesArr));
     }
 
-    public LiveVariables(List<AssemblyLine> lines) {
+    public LiveVariableAnalysis(List<AssemblyLine> lines) {
         super(lines, Direction.BACKWARD, new LiveVariableSet(new LinkedHashSet<>()));
     }
 
