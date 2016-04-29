@@ -64,12 +64,14 @@ public class ConditionalConstantPropagationVisitor extends IRVisitor {
                 right = temp((IRTemp) right);
             }
 
+            // if all optimizations are enabled or
+            // CF is specifically on, we constant fold our expression
             if (Main.allOptimizations ||
                     (Main.optimizationMap.containsKey(OptimizationType.CF)
-                    && !Main.optimizationMap.get(OptimizationType.CF) )) {
+                    && Main.optimizationMap.get(OptimizationType.CF) )) {
                 IRConstantFoldingVisitor v = new IRConstantFoldingVisitor();
                 return v.visit(new IRBinOp(casted.opType(), left, right));
-            } else{
+            } else{ // otherwise we do not constant fold the IRBinOp
                 return new IRBinOp(casted.opType(), left, right);
             }
         } else {
