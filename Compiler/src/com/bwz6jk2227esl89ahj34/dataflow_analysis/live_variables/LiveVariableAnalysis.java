@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 public class LiveVariableAnalysis extends DataflowAnalysis {
-    private static Set<OpCode> defOpCodes;
+    public static Set<OpCode> defOpCodes;
 
     static {
         OpCode[] defOpCodesArr = {OpCode.MOVQ, OpCode.MOVZX};

@@ -182,7 +182,7 @@ public class Optimization {
     }
 
     // NOTE: at the moment, this only eliminates unreachable code
-    public static IRSeq condtionalConstantPropagation(IRSeq seq) {
+    public static IRSeq conditionalConstantPropagation(IRSeq seq) {
         ConditionalConstantPropagation ccp =
                 new ConditionalConstantPropagation(seq);
 
@@ -221,23 +221,30 @@ public class Optimization {
     public static void removeDeadCode(List<AssemblyLine> lines) {
         // Perform live variable analysis for dead code elimination
         LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(lines);
-
         // Remove assignments to variables that aren't used (dead code)
         for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
             CFGNodeAssembly assemblyNode = (CFGNodeAssembly) node;
             AssemblyInstruction instruction = assemblyNode.getInstruction();
             Set<AssemblyAbstractRegister> outSet = ((LiveVariableSet) node.getOut()).getLiveVars();
-            if (instruction.opCode == AssemblyInstruction.OpCode.MOVQ) {
-                assert instruction.getArgs().size() == 2;
-                if (instruction.getArgs().get(1) instanceof AssemblyAbstractRegister) {
-                    AssemblyAbstractRegister dst = (AssemblyAbstractRegister) instruction.getArgs().get(1);
-                    if (!outSet.contains(dst)) {
-                        for (Iterator<AssemblyLine> it = lines.iterator(); it.hasNext();) {
-                            AssemblyLine line = it.next();
-                            if (line == instruction) {
-                                it.remove();
-                            }
-                        }
+            // We only consider instructions that could define a temp that is unused until its
+            // next definition
+            if (!LiveVariableAnalysis.defOpCodes.contains(instruction.opCode)) {
+                continue;
+            }
+            assert instruction.getArgs().size() == 2;
+            if (instruction.getArgs().get(1) instanceof AssemblyAbstractRegister) {
+                AssemblyAbstractRegister dst = (AssemblyAbstractRegister) instruction.getArgs().get(1);
+                if (outSet.contains(dst)) {
+                    // If the outset contains this temp, we know it's needed
+                    continue;
+                }
+                // If the outset does not contain the variable we just define, we know this
+                // code is useless
+                for (Iterator<AssemblyLine> it = lines.iterator(); it.hasNext();) {
+                    // Find the line in the assembly and remove it
+                    AssemblyLine line = it.next();
+                    if (line == instruction) {
+                        it.remove();
                     }
                 }
             }
@@ -248,24 +255,27 @@ public class Optimization {
      * Removes redundant moves that result from move coalescing.
      */
     public static void removeRedundantMoves(List<AssemblyLine> lines) {
-        // Remove duplicate lines
-        int i = 0;
-        while (i < lines.size()) {
-            if (!(lines.get(i) instanceof AssemblyInstruction)) {
-                i++;
+        // Remove all instructions of the form: move x to x
+        for (Iterator<AssemblyLine> it = lines.iterator(); it.hasNext();) {
+            // Find the line in the assembly and remove it
+            AssemblyLine line = it.next();
+            if (!(line instanceof AssemblyInstruction)) {
+                // Only consider instructions
                 continue;
             }
-            AssemblyInstruction instruction = (AssemblyInstruction) lines.get(i);
-            if (!(instruction.getOpCode() == AssemblyInstruction.OpCode.MOVQ)) {
-                i++;
+            AssemblyInstruction instruction = (AssemblyInstruction) line;
+            if (!LiveVariableAnalysis.defOpCodes.contains(instruction.opCode)) {
+                // Only consider instructions that could define a temp
                 continue;
             }
-
-            List<AssemblyExpression> args = instruction.args;
-            if (args.get(0).equals(args.get(1))){
-                lines.remove(i);
-            } else {
-                i++;
+            if (instruction.getArgs().size() < 2) {
+                // We only consider useless moves (move x to x)
+                continue;
+            }
+            AssemblyExpression src = instruction.args.get(0);
+            AssemblyExpression dst = instruction.args.get(1);
+            if (src.equals(dst)) {
+                it.remove();
             }
         }
     }

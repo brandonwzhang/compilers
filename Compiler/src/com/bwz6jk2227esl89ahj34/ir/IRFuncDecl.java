@@ -81,7 +81,7 @@ public class IRFuncDecl extends IRNode {
         p.endList();
     }
 
-    public int indexOfLabel(String labelName, List<List<IRStmt>> blocks) {
+    private static int indexOfLabel(String labelName, List<List<IRStmt>> blocks) {
         for (int i = 0; i < blocks.size(); i++) {
             List<IRStmt> block = blocks.get(i);
             if (block.get(0) instanceof IRLabel &&
@@ -92,7 +92,7 @@ public class IRFuncDecl extends IRNode {
         throw new RuntimeException("Jump to non-existent label: " + labelName);
     }
 
-    public List<Integer> getSuccessors(int i, List<List<IRStmt>> blocks) {
+    private static List<Integer> getSuccessors(int i, List<List<IRStmt>> blocks) {
         List<IRStmt> block = blocks.get(i);
         assert block.size() > 0;
         IRStmt lastStatement = block.get(block.size() - 1);
@@ -127,7 +127,7 @@ public class IRFuncDecl extends IRNode {
 
     }
 
-    public Map<Integer, List<Integer>> constructFlowGraph(List<List<IRStmt>> blocks) {
+    private static Map<Integer, List<Integer>> constructFlowGraph(List<List<IRStmt>> blocks) {
         Map<Integer, List<Integer>> graph = new LinkedHashMap<>();
         for (int i = 0; i < blocks.size(); i++) {
             graph.put(i, getSuccessors(i, blocks));
@@ -135,7 +135,7 @@ public class IRFuncDecl extends IRNode {
         return graph;
     }
 
-    private List<IRStmt> reorderBlocksHelper(int curNode, Map<Integer, List<Integer>> graph,
+    private static List<IRStmt> reorderBlocksHelper(int curNode, Map<Integer, List<Integer>> graph,
                                              List<List<IRStmt>> blocks, boolean[] visited) {
         visited[curNode] = true;
         List<IRStmt> block = blocks.get(curNode);
@@ -193,7 +193,7 @@ public class IRFuncDecl extends IRNode {
         return retBlock;
     }
 
-    public List<IRStmt> reorderBlocks(List<IRStmt> stmts) {
+    private static List<IRStmt> reorderBlocks(List<IRStmt> stmts) {
         // Holds the basic blocks of the program
         // Split up by "leader instructions" (jump target, after jump, first
         // instruction in the program)
@@ -268,7 +268,7 @@ public class IRFuncDecl extends IRNode {
             if (Main.debugOn()) {
                 System.out.println("DEBUG: performing optimization: unreachable code elimination");
             }
-            optimizedBody = Optimization.condtionalConstantPropagation(new IRSeq(reorderedBody));
+            optimizedBody = Optimization.conditionalConstantPropagation(new IRSeq(reorderedBody));
         }
 
         // Iterate copy propagation and common subexpression elimination
