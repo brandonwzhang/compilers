@@ -335,11 +335,15 @@ public class Core {
                 Main.assemblyPath(),
                 Collections.singletonList(assemblyProgram.toString())
         );
+    }
 
-        // Link and run the assembly file
+    public static void generateExecutable(String file) {
+        generateAssembly(file);
+        // Link and generate executable
         String fileName = file.substring(0, file.lastIndexOf('.'));
         ProcessBuilder pb =
-                new ProcessBuilder(Util.rootPath + "/runtime/linkxi.sh", "-o", fileName, Main.assemblyPath() + "/" + fileName + ".s").inheritIO();
+                new ProcessBuilder(Util.rootPath + "/runtime/linkxi.sh", "-o",
+                        fileName, Main.assemblyPath() + "/" + fileName + ".s").inheritIO();
         try {
             Process linkProcess = pb.start();
             linkProcess.waitFor();
