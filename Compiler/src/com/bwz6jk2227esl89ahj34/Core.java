@@ -22,6 +22,7 @@ import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import java_cup.runtime.Symbol;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
 
@@ -36,12 +37,16 @@ public class Core {
      */
     public static void lexFile(String file) {
 
-        Optional<FileReader> reader = Util.getFileReader(Main.sourcePath(), file);
-        if (!reader.isPresent()) {
+        // Not using Util.getFileReader so it doesn't print "file was not found"
+        // twice in debug mode.
+        FileReader reader;
+        try {
+            reader = new FileReader(Main.sourcePath() + file);
+        } catch (FileNotFoundException e) {
             return;
         }
 
-        Lexer lexer = new Lexer(reader.get());
+        Lexer lexer = new Lexer(reader);
         List<String> lines = new ArrayList<>();
 
         try {
@@ -330,8 +335,7 @@ public class Core {
                 Main.assemblyPath(),
                 Collections.singletonList(assemblyProgram.toString())
         );
-
-
+        
         // Link and run the assembly file
         String fileName = file.substring(0, file.lastIndexOf('.'));
         ProcessBuilder pb =
