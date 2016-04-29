@@ -273,7 +273,7 @@ public class IRFuncDecl extends IRNode {
                     System.out.println("DEBUG: performing optimization: constant propagation");
                 }
             }
-            optimizedBody = Optimization.conditionalConstantPropagation(new IRSeq(reorderedBody));
+            Optimization.condtionalConstantPropagation(optimizedBody);
         }
 
         // Iterate copy propagation and common subexpression elimination

@@ -176,39 +176,44 @@ public class Optimization {
         }
     }
 
-    // NOTE: at the moment, this only eliminates unreachable code
-    public static IRSeq conditionalConstantPropagation(IRSeq seq) {
+    // Given a IRSeq, we go through and apply either...
+    // (1) unreachable code elimination
+    // (2) constant propagation
+    // or both
+    public static void condtionalConstantPropagation(IRSeq seq) {
         ConditionalConstantAnalysis ccp =
                 new ConditionalConstantAnalysis(seq);
 
         Map<Integer, CFGNode> graph = ccp.getGraph().getNodes();
         List<IRStmt> stmts = seq.stmts();
-        List<IRStmt> newStmts = new LinkedList<>();
-        for (int i = 0; i < stmts.size(); i++) {
-            if (!graph.containsKey(i)) {
-                newStmts.add(stmts.get(i));
+
+        int i = 0;
+        for (ListIterator<IRStmt> it = stmts.listIterator(); it.hasNext();) {
+            IRStmt stmt = it.next();
+            if(!graph.containsKey(i)) { // if graph does not contain i as a key
+                // don't do anything
             } else {
-                IRStmt stmt = stmts.get(i);
                 CFGNode node = graph.get(i);
                 // out has all the information associated with the node
                 UnreachableValueTuplesPair tuple = (UnreachableValueTuplesPair) node.getOut();
                 // if it is unreachable and UCE is enabled
                 if (tuple.isUnreachable() && Main.optimizationOn(OptimizationType.UCE)) {
-                    // unreachable so we do not add it to new stmts
+                    // unreachable so we remove it from stmts
+                    it.remove();
                 } else {
-                    // if CP is on
+                    // if CP is on, propagate the constant
                     if (Main.optimizationOn(OptimizationType.CP)) {
                         ConditionalConstantPropagationVisitor visitor =
                                 new ConditionalConstantPropagationVisitor(tuple.getValueTuples());
-                        newStmts.add((IRStmt) visitor.visit(stmt));
+                        it.set((IRStmt) visitor.visit(stmt));
                     } else {
-                        newStmts.add(stmt);
+
                     }
                 }
-            }
-        }
 
-        return new IRSeq(newStmts);
+            }
+            i++;
+        }
     }
 
     /**
