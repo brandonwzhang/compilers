@@ -2,13 +2,13 @@ package com.bwz6jk2227esl89ahj34.dataflow_analysis;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Getter
 public abstract class CFG {
     protected Map<Integer, CFGNode> nodes = new HashMap<>();
     protected Map<Integer, List<Integer>> graph = new HashMap<>();
