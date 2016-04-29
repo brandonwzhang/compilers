@@ -4,11 +4,14 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeIR;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.ir.IRExpr;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 public class AvailableExpressionSet extends LatticeElement {
     public static class TaggedExpression {
         public IRExpr expr;

@@ -8,8 +8,11 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
 import com.bwz6jk2227esl89ahj34.ir.IRConst;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class Value extends LatticeElement {
     private IRConst value;
