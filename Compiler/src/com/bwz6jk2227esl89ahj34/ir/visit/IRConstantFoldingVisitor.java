@@ -39,7 +39,7 @@ public class IRConstantFoldingVisitor extends IRVisitor{
      * @param bop
      * @return
      */
-    private IRConst computeBinOp(IRBinOp bop) {
+    public static IRConst computeBinOp(IRBinOp bop) {
         BigInteger left = new BigInteger(""+((IRConst)(bop.left())).value());
         BigInteger right = new BigInteger(""+((IRConst)(bop.right())).value());
         switch(bop.opType()) {

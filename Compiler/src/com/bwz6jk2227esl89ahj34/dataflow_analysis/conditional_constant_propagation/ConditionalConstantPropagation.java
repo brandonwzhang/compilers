@@ -4,6 +4,7 @@ package com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagat
 
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.ir.visit.IRConstantFoldingVisitor;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -275,67 +276,14 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
             return bop;
         }
 
-        // otherwise, they are both IRConst, so we attempt to simplify
-        
-        BigInteger left = new BigInteger(""+((IRConst)(leftBop)).value());
-        BigInteger right = new BigInteger(""+((IRConst)(rightBop)).value());
-        switch(bop.opType()) {
-            case ADD:
-                return new IRConst(left.add(right).longValue());
-            case SUB:
-                return new IRConst(left.subtract(right).longValue());
-            case MUL:
-                return new IRConst(left.multiply(right).longValue());
-            case HMUL:
-                if (left.longValue() < 0) {
-                    left = left.multiply(new BigInteger("-1"));
-                }
-                if (right.longValue() < 0) {
-                    right = right.multiply(new BigInteger("-1"));
-                }
-                BigInteger temp = left.multiply(right).shiftRight(64);
-                if (left.longValue() < 0) {
-                    temp = temp.multiply(new BigInteger("-1"));
-                }
-                if (right.longValue() < 0) {
-                    temp = temp.multiply(new BigInteger("-1"));
-                }
-                return new IRConst(temp.longValue());
-            case DIV: // TODO: divide by zero
-                return new IRConst(left.divide(right).longValue());
-            case MOD:
-                return new IRConst(left.mod(right).longValue());
-            case AND:
-                return new IRConst(left.and(right).longValue());
-            case OR:
-                return new IRConst(left.or(right).longValue());
-            case XOR:
-                return new IRConst(left.xor(right).longValue());
-            case LSHIFT:
-                return new IRConst(left.shiftLeft(right.intValue()).longValue());
-            case RSHIFT:
-                return new IRConst(left.longValue() >>> right.longValue());
-            case ARSHIFT:
-                return new IRConst(left.longValue() >> right.longValue());
-            case EQ:
-                return (left.equals(right)) ? new IRConst(1) : new IRConst(0);
-            case NEQ:
-                return (left.equals(right)) ? new IRConst(0) : new IRConst(1);
-            case LT:
-                return (left.compareTo(right) < 0) ? new IRConst(1)
-                        : new IRConst(0);
-            case GT:
-                return (left.compareTo(right) > 0) ? new IRConst(1)
-                        : new IRConst(0);
-            case LEQ:
-                return (left.compareTo(right) <= 0) ? new IRConst(1)
-                        : new IRConst(0) ;
-            case GEQ:
-                return (left.compareTo(right) >= 0) ? new IRConst(1)
-                        : new IRConst(0);
-            default: // should not reach here
-                throw new RuntimeException("Please contact jk2227@cornell.edu");
+        // divide by zero? check for it
+        if (bop.opType() == IRBinOp.OpType.DIV &&
+                ((IRConst)rightBop).value() == 0) { // if divide by zero ... 
+            return bop;  // do not simplify so it will fail at run time
         }
+
+        // otherwise, they are both IRConst, so we attempt to simplify
+        return IRConstantFoldingVisitor.computeBinOp(new IRBinOp(bop.opType(), leftBop, rightBop));
     }
 
     public static IRExpr computeGuard (IRExpr guard, Map<String, LatticeElement> map) {
