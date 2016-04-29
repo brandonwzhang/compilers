@@ -1,11 +1,13 @@
 package com.bwz6jk2227esl89ahj34.ir.visit;
 
+import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis
         .conditional_constant_propagation.Value;
 import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
 
 import java.util.Map;
 
@@ -61,8 +63,15 @@ public class ConditionalConstantPropagationVisitor extends IRVisitor {
             if (right instanceof IRTemp) {
                 right = temp((IRTemp) right);
             }
-            IRConstantFoldingVisitor v = new IRConstantFoldingVisitor();
-            return v.visit(new IRBinOp(casted.opType(), left, right));
+
+            if (Main.allOptimizations ||
+                    (Main.optimizationMap.containsKey(OptimizationType.CF)
+                    && !Main.optimizationMap.get(OptimizationType.CF) )) {
+                IRConstantFoldingVisitor v = new IRConstantFoldingVisitor();
+                return v.visit(new IRBinOp(casted.opType(), left, right));
+            } else{
+                return new IRBinOp(casted.opType(), left, right);
+            }
         } else {
             return n_;
         }
