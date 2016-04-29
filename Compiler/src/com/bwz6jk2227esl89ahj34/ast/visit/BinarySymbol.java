@@ -74,7 +74,19 @@ public class BinarySymbol {
                         BigInteger moduloBigInt = leftValueBigInt.remainder(rightValueBigInt);
                         return new IntegerLiteral(""+moduloBigInt.longValue());
                     case HIGH_MULT:
+                        if (leftValueBigInt.longValue() < 0) {
+                            leftValueBigInt = leftValueBigInt.multiply(new BigInteger("-1"));
+                        }
+                        if (rightValueBigInt.longValue() < 0) {
+                            rightValueBigInt = rightValueBigInt.multiply(new BigInteger("-1"));
+                        }
                         BigInteger highMultBigInt = leftValueBigInt.multiply(rightValueBigInt).shiftRight(64);
+                        if (leftValueBigInt.longValue() < 0) {
+                            highMultBigInt = highMultBigInt.multiply(new BigInteger("-1"));
+                        }
+                        if (rightValueBigInt.longValue() < 0) {
+                            highMultBigInt = highMultBigInt.multiply(new BigInteger("-1"));
+                        }
                         return new IntegerLiteral(highMultBigInt.toString());
                     default:
                         return b; //shouldn't reach here

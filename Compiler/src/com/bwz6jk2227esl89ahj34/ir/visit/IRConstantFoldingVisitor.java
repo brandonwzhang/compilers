@@ -50,7 +50,20 @@ public class IRConstantFoldingVisitor extends IRVisitor{
             case MUL:
                 return new IRConst(left.multiply(right).longValue());
             case HMUL:
-                return new IRConst(left.multiply(right).longValue() >> 64);
+                if (left.longValue() < 0) {
+                    left = left.multiply(new BigInteger("-1"));
+                }
+                if (right.longValue() < 0) {
+                    right = right.multiply(new BigInteger("-1"));
+                }
+                BigInteger temp = left.multiply(right).shiftRight(64);
+                if (left.longValue() < 0) {
+                    temp = temp.multiply(new BigInteger("-1"));
+                }
+                if (right.longValue() < 0) {
+                    temp = temp.multiply(new BigInteger("-1"));
+                }
+                return new IRConst(temp.longValue());
             case DIV:
                 return new IRConst(left.divide(right).longValue());
             case MOD:
