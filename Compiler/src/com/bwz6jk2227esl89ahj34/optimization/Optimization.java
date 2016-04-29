@@ -219,32 +219,43 @@ public class Optimization {
      * that are never used.
      */
     public static void removeDeadCode(List<AssemblyLine> lines) {
-        // Perform live variable analysis for dead code elimination
-        LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(lines);
-        // Remove assignments to variables that aren't used (dead code)
-        for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
-            CFGNodeAssembly assemblyNode = (CFGNodeAssembly) node;
-            AssemblyInstruction instruction = assemblyNode.getInstruction();
-            Set<AssemblyAbstractRegister> outSet = ((LiveVariableSet) node.getOut()).getLiveVars();
-            // We only consider instructions that could define a temp that is unused until its
-            // next definition
-            if (!LiveVariableAnalysis.defOpCodes.contains(instruction.opCode)) {
-                continue;
-            }
-            assert instruction.getArgs().size() == 2;
-            if (instruction.getArgs().get(1) instanceof AssemblyAbstractRegister) {
-                AssemblyAbstractRegister dst = (AssemblyAbstractRegister) instruction.getArgs().get(1);
-                if (outSet.contains(dst)) {
-                    // If the outset contains this temp, we know it's needed
+        boolean fixpointReached = false;
+        // Iterate dead code removal until a fixpoint is reached
+        while (!fixpointReached) {
+            fixpointReached = true;
+            // Perform live variable analysis for dead code elimination
+            LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(lines);
+
+            // Remove assignments to variables that aren't used (dead code)
+            for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
+                CFGNodeAssembly assemblyNode = (CFGNodeAssembly) node;
+                AssemblyInstruction instruction = assemblyNode.getInstruction();
+                Set<AssemblyAbstractRegister> outSet = ((LiveVariableSet) node.getOut()).getLiveVars();
+                // We only consider instructions that could define a temp that is unused until its
+                // next definition
+                if (!LiveVariableAnalysis.defOpCodes.contains(instruction
+                        .opCode)) {
                     continue;
                 }
-                // If the outset does not contain the variable we just define, we know this
-                // code is useless
-                for (Iterator<AssemblyLine> it = lines.iterator(); it.hasNext();) {
-                    // Find the line in the assembly and remove it
-                    AssemblyLine line = it.next();
-                    if (line == instruction) {
-                        it.remove();
+                assert instruction.getArgs().size() == 2;
+                if (instruction.getArgs().get(1) instanceof AssemblyAbstractRegister) {
+                    AssemblyAbstractRegister dst = (AssemblyAbstractRegister)
+                            instruction.getArgs().get(1);
+                    if (outSet.contains(dst)) {
+                        // If the outset contains this temp, we know it's needed
+                        continue;
+                    }
+                    // If the outset does not contain the variable we just
+                    // define, we know this
+                    // code is useless
+                    for (Iterator<AssemblyLine> it = lines.iterator(); it
+                            .hasNext(); ) {
+                        // Find the line in the assembly and remove it
+                        AssemblyLine line = it.next();
+                        if (line == instruction) {
+                            it.remove();
+                            fixpointReached = false;
+                        }
                     }
                 }
             }
