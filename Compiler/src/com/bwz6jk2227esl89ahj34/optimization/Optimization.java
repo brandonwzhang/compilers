@@ -194,10 +194,13 @@ public class Optimization {
                 if (tuple.isUnreachable()) {
                     // unreachable so we do not add it to new stmts
                 } else {
-                    ConditionalConstantPropagationVisitor visitor =
-                            new ConditionalConstantPropagationVisitor(tuple.getValueTuples());
-                    newStmts.add((IRStmt) visitor.visit(stmt));
-                    //newStmts.add(stmt);
+                    if (Main.optimizationOn(OptimizationType.CP)) {
+                        ConditionalConstantPropagationVisitor visitor =
+                                new ConditionalConstantPropagationVisitor(tuple.getValueTuples());
+                        newStmts.add((IRStmt) visitor.visit(stmt));
+                    } else {
+                        newStmts.add(stmt);
+                    }
                 }
             }
         }
