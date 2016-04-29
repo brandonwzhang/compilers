@@ -78,6 +78,7 @@ public class Optimization {
             }
         }
 
+        // Find redundant subexpressions that surpass a threshold
         Set<ExpressionNodePair> redundantSubexpressions = new HashSet<>();
         for (ExpressionNodePair pair : counts.keySet()) {
             int threshold = 1;
@@ -86,6 +87,25 @@ public class Optimization {
                 redundantSubexpressions.add(pair);
             }
         }
+
+        // Replace common subexpressions with their corresponding temp
+        Set<ExpressionNodePair> usedTemps = new HashSet<>();
+        for (int i = 0; i < stmts.size(); i++) {
+            IRStmt stmt = stmts.get(i);
+            for (CFGNode node : nodes.values()) {
+                if (!stmt.equals(((CFGNodeIR) node).getStatement())) {
+                    continue;
+                }
+                CommonSubexpressionVisitor visitor =
+                        new CommonSubexpressionVisitor((AvailableExpressionSet) node.getOut(), analysis, tempMap, redundantSubexpressions);
+                // The visitor keeps track of all the temps it actually used
+                IRStmt newStmt = (IRStmt) visitor.visit(stmts.get(i));
+                usedTemps.addAll(visitor.usedTemps);
+                ((CFGNodeIR) node).setStatement(newStmt);
+                stmts.set(i, newStmt);
+            }
+        }
+
 
         for (CFGNode node : nodes.values()) {
             List<IRExpr> exprs = nodeExpressions.get(node);
@@ -104,30 +124,19 @@ public class Optimization {
                 if (stmt == ((CFGNodeIR) node).getStatement()) {
                     // Assign the new temp for the expression
                     for (IRExpr expr : neededExprs) {
-                        it.previous();
-                        it.add(new IRMove(tempMap.get(expr), expr));
-                        it.next();
+                        IRTemp cseTemp = tempMap.get(expr);
+                        ExpressionNodePair pair = new ExpressionNodePair(cseTemp, node);
+                        if (usedTemps.contains(pair)) {
+                            // If this temp is used, add an assignment for it
+                            it.previous();
+                            it.add(new IRMove(cseTemp, expr));
+                            it.next();
+                        }
                     }
                     break;
                 }
             }
         }
-
-        // Replace common subexpressions with their corresponding temp
-        for (int i = 0; i < stmts.size(); i++) {
-            IRStmt stmt = stmts.get(i);
-            for (CFGNode node : nodes.values()) {
-                if (!stmt.equals(((CFGNodeIR) node).getStatement())) {
-                    continue;
-                }
-                CommonSubexpressionVisitor visitor =
-                        new CommonSubexpressionVisitor((AvailableExpressionSet) node.getOut(), analysis, tempMap, redundantSubexpressions);
-
-                IRStmt newStmt = (IRStmt) visitor.visit(stmts.get(i));
-                stmts.set(i, newStmt);
-            }
-        }
-
     }
 
     /**

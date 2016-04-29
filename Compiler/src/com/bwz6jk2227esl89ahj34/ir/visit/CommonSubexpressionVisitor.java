@@ -10,6 +10,8 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
         .AvailableExpressionsAnalysis.ExpressionNodePair;
 import com.bwz6jk2227esl89ahj34.ir.*;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,6 +25,8 @@ public class CommonSubexpressionVisitor extends IRVisitor {
     private Map<IRExpr, IRTemp> map;
     // A set of expression that are redundant enough to be replaced
     private Set<ExpressionNodePair> redundantSubexpressions;
+    // Keep track of the CSE variables we use in this statement
+    public Set<ExpressionNodePair> usedTemps = new HashSet<>();
 
     public CommonSubexpressionVisitor(AvailableExpressionSet set,
                                       AvailableExpressionsAnalysis analysis,
@@ -34,13 +38,32 @@ public class CommonSubexpressionVisitor extends IRVisitor {
         this.redundantSubexpressions = redundantSubexpressions;
     }
 
+    protected IRVisitor enter(IRNode parent, IRNode n) {
+        ExpressionNodePair mapping = getNodeMapping(n);
+        if (mapping != null) {
+            // If we match a CSE temp here, we pass a dummy visitor to children, so we don't
+            // anything in the subtree to usedTemps
+            usedTemps.add(mapping);
+            return new CommonSubexpressionVisitor(set, analysis, map, redundantSubexpressions);
+        }
+        return this;
+    }
+
     /**
      * Replaces an instance of a common subexpression with a
      */
     protected IRNode leave(IRNode parent, IRNode n, IRNode n_, IRVisitor v_) {
+        ExpressionNodePair mapping = getNodeMapping(n);
+        if (mapping == null) {
+            return n_;
+        }
+        return mapping.expr;
+    }
+
+    private ExpressionNodePair getNodeMapping(IRNode n) {
         if (!(n instanceof IRExpr) || n instanceof IRConst || n instanceof IRTemp || n instanceof IRCall || n instanceof IRName) {
             // If it's not an IRExpr, we just return the result of visiting the children
-            return n_;
+            return null;
         }
         // Get the reference to an equivalent expr so we can compare physical equality
         IRExpr expr = analysis.findReference((IRExpr) n);
@@ -49,17 +72,18 @@ public class CommonSubexpressionVisitor extends IRVisitor {
 
         if (taggedExpr == null) {
             // If the expr is not available, we just return the result of visiting the children
-            return n_;
+            return null;
         }
 
         if (!redundantSubexpressions.contains(new ExpressionNodePair(taggedExpr))) {
             // This expression is not redundant enough to be replaced
-            return n_;
+            return null;
         }
 
         IRTemp mapping = map.get(expr);
         // There should be a mapping for every expression
         assert mapping != null;
-        return mapping;
+
+        return new ExpressionNodePair(mapping, taggedExpr.node);
     }
 }

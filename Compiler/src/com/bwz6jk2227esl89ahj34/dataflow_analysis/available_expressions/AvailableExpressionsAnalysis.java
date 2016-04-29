@@ -42,6 +42,11 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         public int hashCode() {
             return expr.hashCode() + node.hashCode();
         }
+
+        @Override
+        public String toString() {
+            return "(" + expr + ", " + node.hashCode() + ")";
+        }
     }
 
     public Set<IRExpr> allExprs;
