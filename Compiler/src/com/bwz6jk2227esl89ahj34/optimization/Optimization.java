@@ -294,13 +294,4 @@ public class Optimization {
 
         return registerMap;
     }
-
-    private static void writeCFG(DataflowAnalysis analysis, String optName) {
-        Util.writeHelper(
-                optName + functionName,
-                "dot",
-                "./",
-                Collections.singletonList(analysis.toString())
-        );
-    }
 }

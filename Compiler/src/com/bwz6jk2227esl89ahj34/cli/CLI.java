@@ -82,7 +82,6 @@ public class CLI {
                             Main.allOptimizations = true;
                             continue;
                         }
-
                     } else {
                         // -O<opt>
                         String opt_ = args[i].substring(2);

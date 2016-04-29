@@ -272,7 +272,7 @@ public class IRFuncDecl extends IRNode {
         }
 
         // Iterate copy propagation and common subexpression elimination
-        int iterations = 2;
+        int iterations = 4;
         for (int i = 0; i < iterations; i++) {
             if (Main.optimizationOn(OptimizationType.COPY)) {
                 if (Main.debugOn()) {
