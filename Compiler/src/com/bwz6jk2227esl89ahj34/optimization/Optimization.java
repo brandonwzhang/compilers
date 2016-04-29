@@ -292,7 +292,9 @@ public class Optimization {
         }
     }
 
-    public static Map<AssemblyAbstractRegister, AssemblyExpression> allocateRegisters(List<AssemblyLine> lines) {
+    public static Map<AssemblyAbstractRegister, AssemblyExpression>
+        allocateRegisters(List<AssemblyLine> lines,
+                          Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> precoloring) {
         // Rerunning live variable analysis after dead code elimination
         LiveVariableAnalysis liveVariableAnalysis = new LiveVariableAnalysis(lines);
 
@@ -309,7 +311,7 @@ public class Optimization {
                 System.out.println("DEBUG: performing optimization: register allocation");
             }
             // Use Kempe's algorithm to allocate physical locations to abstract registers
-            GraphColorer graphColorer = new GraphColorer(interferenceSets, lines);
+            GraphColorer graphColorer = new GraphColorer(interferenceSets, lines, precoloring);
             graphColorer.colorGraph();
             registerMap = graphColorer.getColoring();
         }

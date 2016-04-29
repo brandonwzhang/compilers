@@ -1,10 +1,13 @@
 package com.bwz6jk2227esl89ahj34.assembly.tiles;
 
+import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
+import com.bwz6jk2227esl89ahj34.assembly.register_allocation.RegisterAllocator;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
+import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -298,7 +301,7 @@ public class StatementCodeGenerators {
         if (name.length() < 5) {
             return -1;
         }
-        if (name.substring(0, 4).equals(Configuration.ABSTRACT_ARG_PREFIX)) {
+        if (name.startsWith(Configuration.ABSTRACT_ARG_PREFIX)) {
             return Integer.parseInt(name.substring(4));
         }
         return -1;
@@ -312,7 +315,7 @@ public class StatementCodeGenerators {
         if (name.length() < 5) {
             return -1;
         }
-        if (name.substring(0, 4).equals(Configuration.ABSTRACT_RET_PREFIX)) {
+        if (name.startsWith(Configuration.ABSTRACT_RET_PREFIX)) {
             return Integer.parseInt(name.substring(4));
         }
         return -1;
@@ -323,9 +326,18 @@ public class StatementCodeGenerators {
      */
     private static AssemblyExpression getArgumentMapping(int id, AssemblyMemoryLocation argumentsSpace) {
         // If the id is lower than the number of argument registers available,
-        // return the corresponding register
+        // return an abstract register that will be precolored to the corresponding
+        // argument register
         if (id < AssemblyPhysicalRegister.argumentRegisters.length) {
-            return AssemblyPhysicalRegister.argumentRegisters[id];
+            if (!Main.optimizationOn(OptimizationType.REG)) {
+                // If register allocation is off, we just return the corresponding
+                // argument register
+                return AssemblyPhysicalRegister.argumentRegisters[id];
+            }
+            AssemblyAbstractRegister register = new AssemblyAbstractRegister();
+            // Precolor this temp to the correct argument register
+            RegisterAllocator.precoloring.put(register, AssemblyPhysicalRegister.argumentRegisters[id]);
+            return register;
         }
         // Return the corresponding memory location
         argumentsSpace.displacement +=

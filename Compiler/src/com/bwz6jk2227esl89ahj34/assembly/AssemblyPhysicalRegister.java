@@ -54,6 +54,7 @@ public class AssemblyPhysicalRegister extends AssemblyRegister {
             R14, R15, RBX
     };
 
+    // We use R9 to pass in the pointer to the caller's return space, so it's not available
     public static final AssemblyPhysicalRegister[] availableRegisters = {
             R10, R11, R12, R13
     };

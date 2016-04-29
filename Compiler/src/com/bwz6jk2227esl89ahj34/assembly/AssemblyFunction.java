@@ -36,6 +36,10 @@ public class AssemblyFunction {
         // Reset the space for abstract registers
         AssemblyAbstractRegister.reset();
 
+        // Reset the register allocator to keep track of number of spilled temps
+        // and precolored nodes
+        RegisterAllocator.reset();
+
         // Generate assembly lines for this function
         IRSeq seq = (IRSeq) func.body();
         List<AssemblyLine> functionBody = new LinkedList<>();
@@ -43,8 +47,6 @@ public class AssemblyFunction {
             functionBody.addAll(TileContainer.matchStatement(statement));
         }
 
-        // Testing live variable analysis
-        LiveVariableAnalysis liveVariableAnalysis = new LiveVariableAnalysis(lines);
         functionBody = RegisterAllocator.translate(functionBody);
 
         // generateFunctionPrologue() needs to be called after the registers

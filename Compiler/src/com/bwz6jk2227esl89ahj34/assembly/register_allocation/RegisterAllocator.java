@@ -12,11 +12,23 @@ import java.util.*;
 public class RegisterAllocator {
     public static final AssemblyPhysicalRegister[] shuttleRegisters = AssemblyPhysicalRegister.shuttleRegisters;
     private static Map<AssemblyAbstractRegister, AssemblyExpression> registerMap;
+    public static Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> precoloring;
     // Counts the number of spilled temps that have been encountered in an instruction
     // For each instruction, this should be reset to 0
     private static int shuttleRegisterIndex;
     // Number of spilled temps we need for this function
     public static int numSpilledTemps;
+
+    /**
+     * Resets the register allocator by setting all counters to zero and
+     * resetting the maps
+     */
+    public static void reset() {
+        registerMap = new LinkedHashMap<>();
+        precoloring = new LinkedHashMap<>();
+        shuttleRegisterIndex = 0;
+        numSpilledTemps = 0;
+    }
 
     /**
      * Returns a list of instructions with all abstract registers with physical locations
@@ -29,7 +41,7 @@ public class RegisterAllocator {
 
         registerMap = new LinkedHashMap<>();
         if (Main.optimizationOn(OptimizationType.REG)) {
-            registerMap = Optimization.allocateRegisters(lines);
+            registerMap = Optimization.allocateRegisters(lines, precoloring);
         }
 
         // Translate all the instructions
