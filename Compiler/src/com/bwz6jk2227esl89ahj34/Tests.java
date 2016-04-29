@@ -29,8 +29,6 @@ public class Tests {
      * Must be run from the directory containing the xi files
      */
     public static void regressionTest() {
-        String target = "linux"; // TODO: change this
-
         // Get all files in test directory
         List<String> files = Util.getDirectoryFiles(Util.rootPath + "/tests").stream()
                 .filter(filename -> filename.contains(".xi"))
@@ -46,13 +44,17 @@ public class Tests {
         for (String file : files) {
             String fileName = file.substring(0, file.lastIndexOf('.'));
 
-            String[] irCommand = {Util.rootPath + "/xic", "-libpath", Util.rootPath + "/lib", "--irrun", "tests/" + file};
+            String[] irNoOptCommand = {Util.rootPath + "/xic", "-libpath",
+                    Util.rootPath + "/lib", "--irrun", "-O", "tests/" + file};
+            String[] optCommand = {Util.rootPath + "/xic", "-libpath",
+                    Util.rootPath + "/lib", "tests/" + file};
             String[] assemblyCommand = {"./tests/" + fileName};
             // Run the IR and executable and print the outputs
             System.out.println("***************" + file + "***************");
             System.out.println("==================IR==================");
-            List<String> irResults = Util.runCommand(irCommand);
+            List<String> irResults = Util.runCommand(irNoOptCommand);
             System.out.println("===============Assembly===============");
+            Util.runCommand(optCommand);
             List<String> assemblyResults = Util.runCommand(assemblyCommand);
 
             // Store results
