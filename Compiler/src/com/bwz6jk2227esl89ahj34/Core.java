@@ -287,7 +287,7 @@ public class Core {
                 Util.writeIRTree(unoptimizedLIRRoot, Main.diagnosticPath(), irReportName, "ir");
             }
             if (Main.reportInitialCFG()) {
-                Util.writeCFG(file, unoptimizedLIRRoot);
+                Util.writeCFGs(file, "initial", unoptimizedLIRRoot);
             }
         }
 
@@ -299,7 +299,7 @@ public class Core {
             Util.writeIRTree(lirRoot, Main.diagnosticPath(), irReportName, "ir");
         }
         if (Main.reportFinalCFG()) {
-            Util.writeCFG(file, lirRoot);
+            Util.writeCFGs(file, "final", lirRoot);
         }
 
         if (Main.irrun()) {

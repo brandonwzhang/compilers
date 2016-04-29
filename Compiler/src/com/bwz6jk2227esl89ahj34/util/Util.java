@@ -389,11 +389,14 @@ public class Util {
         return filteredList;
     }
 
-    public static void writeCFG(String file, IRCompUnit root) {
+    public static void writeCFGs(String file, String phase, IRCompUnit root) {
         int dotIndex = file.lastIndexOf('.');
         for (String functionName : root.functions().keySet()) {
+            int i = functionName.indexOf('I');
+            String afterI = functionName.substring(i + 1);
+            String demangled = afterI.substring(0, afterI.indexOf('_'));
             String cfgReportName =
-                    file.substring(0, dotIndex) + "_" + functionName + "_initial.xi";
+                    file.substring(0, dotIndex) + "_" + demangled + "_" + phase + ".xi";
             IRSeq seq = (IRSeq) root.functions().get(functionName).body();
             CFGIR cfg = new CFGIR(seq);
             List<String> lines = Collections.singletonList(cfg.toString());
