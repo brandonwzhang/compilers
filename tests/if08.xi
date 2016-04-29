@@ -2,22 +2,21 @@
   use conv
  
   main(args: int[][]) {
-  if (lt(0, 0) & lt(0, 0)) println("true") else println("false")
-  if (lt(0, 0) & lt(0, -1)) println("true") else println("false")
-  if (lt(0, 0) & lt(0, 1)) println("true") else println("false")
-  if (lt(0, -1) & lt(0, 0)) println("true") else println("false")
-  if (lt(0, -1) & lt(0, -1)) println("true") else println("false")
- if (lt(0, -1) & lt(0, 1)) println("true") else println("false")
- if (lt(0, 1) & lt(0, 0)) println("true") else println("false")
- if (lt(0, 1) & lt(0, -1)) println("true") else println("false")
- if (lt(0, 1) & lt(0, 1)) println("true") else println("false")
- println("printed")
+  if (lt(0, 0) & lt(0, 0)) println("t") else println("f")
+  if (lt(0, 0) & lt(0, -1)) println("t") else println("f")
+  if (lt(0, 0) & lt(0, 1)) println("t") else println("f")
+  if (lt(0, -1) & lt(0, 0)) println("t") else println("f")
+  if (lt(0, -1) & lt(0, -1)) println("t") else println("f")
+ if (lt(0, -1) & lt(0, 1)) println("t") else println("f")
+ if (lt(0, 1) & lt(0, 0)) println("t") else println("f")
+ if (lt(0, 1) & lt(0, -1)) println("t") else println("f")
+ if (lt(0, 1) & lt(0, 1)) println("t") else println("f")
  }
 
  lt(x: int, y: int): bool {
- print("lt() called: ")
+ print("lt(): ")
  print(unparseInt(x))
- print(" < ")
+ print("<")
  println(unparseInt(y))
  return x < y
  }
