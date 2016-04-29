@@ -143,8 +143,8 @@ public class CLI {
             }
         }
 
-        if (!Main.target().equals("linux") && !Main.target().equals("osx")) {
-            System.out.println("\nError: target operating system must be linux or osx.");
+        if (!Main.target().equals("linux") && !Main.target().equals("macos")) {
+            System.out.println("\nError: target operating system must be linux or macos.");
             return;
         }
 
