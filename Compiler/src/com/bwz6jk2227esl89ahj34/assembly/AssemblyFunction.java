@@ -9,10 +9,8 @@ import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import com.bwz6jk2227esl89ahj34.ir.IRStmt;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
-import com.bwz6jk2227esl89ahj34.util.Util;
 import lombok.Data;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 

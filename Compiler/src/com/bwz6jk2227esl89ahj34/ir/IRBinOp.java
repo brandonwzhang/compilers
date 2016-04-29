@@ -6,8 +6,6 @@ import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.LinkedList;
 import java.util.List;

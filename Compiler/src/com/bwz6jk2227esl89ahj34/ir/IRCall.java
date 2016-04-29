@@ -5,8 +5,6 @@ import com.bwz6jk2227esl89ahj34.ir.visit.CheckCanonicalIRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.Arrays;

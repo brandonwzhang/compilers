@@ -3,8 +3,6 @@ package com.bwz6jk2227esl89ahj34.ir;
 import com.bwz6jk2227esl89ahj34.ir.visit.*;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

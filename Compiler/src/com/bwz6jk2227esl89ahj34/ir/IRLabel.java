@@ -2,8 +2,6 @@ package com.bwz6jk2227esl89ahj34.ir;
 
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * An intermediate representation for naming a memory address

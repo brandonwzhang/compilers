@@ -1,8 +1,6 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis;
 
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyFunction;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
-import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import lombok.Data;
 

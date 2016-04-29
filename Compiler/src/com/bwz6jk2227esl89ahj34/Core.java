@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34;
 
+import com.bwz6jk2227esl89ahj34.assembly.AssemblyProgram;
 import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
 import com.bwz6jk2227esl89ahj34.ast.Program;
 import com.bwz6jk2227esl89ahj34.ast.parse.Lexer;
@@ -7,11 +8,7 @@ import com.bwz6jk2227esl89ahj34.ast.parse.Parser;
 import com.bwz6jk2227esl89ahj34.ast.parse.ParserSym;
 import com.bwz6jk2227esl89ahj34.ast.type.TypeException;
 import com.bwz6jk2227esl89ahj34.ast.visit.*;
-import com.bwz6jk2227esl89ahj34.assembly.AssemblyProgram;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions.AvailableExpressionsAnalysis;
-
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
-import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import com.bwz6jk2227esl89ahj34.ir.interpret.IRSimulator;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRLexer;
 import com.bwz6jk2227esl89ahj34.ir.parse.IRParser;
