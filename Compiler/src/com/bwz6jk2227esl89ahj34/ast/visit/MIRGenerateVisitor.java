@@ -7,6 +7,7 @@ import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public class MIRGenerateVisitor implements NodeVisitor {
@@ -825,20 +826,30 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 throw new RuntimeException("Unknown UnaryOperator");
         }
         // As a convention, we will make the left the constant
-        node.getExpression().accept(this);
-        assert generatedNodes.peek() instanceof IRExpr;
-        right = (IRExpr)generatedNodes.pop();
 
-        if (optype == IRBinOp.OpType.SUB) {
-            left = new IRConst(0);
-        } else if (optype == IRBinOp.OpType.XOR) {
-            left = new IRConst(1);
+        // however, we will check for a hard cose case in which
+        // the smallest value possible is used; we need this because
+        // the actual value exceeds the max value for a long, and if
+        // we unwrap it from the negative sign then it will get exposed
+        if (optype == IRBinOp.OpType.SUB &&
+                node.getExpression().equals(new IntegerLiteral("9223372036854775808"))) {
+            generatedNodes.push(new IRConst(new BigInteger("-9223372036854775808").longValue()));
         } else {
-            throw new RuntimeException("Invalid BinOp");
-        }
+            node.getExpression().accept(this);
+            assert generatedNodes.peek() instanceof IRExpr;
+            right = (IRExpr) generatedNodes.pop();
 
-        assert left != null;
-        generatedNodes.push(new IRBinOp(optype, left, right));
+            if (optype == IRBinOp.OpType.SUB) {
+                left = new IRConst(0);
+            } else if (optype == IRBinOp.OpType.XOR) {
+                left = new IRConst(1);
+            } else {
+                throw new RuntimeException("Invalid BinOp");
+            }
+
+            assert left != null;
+            generatedNodes.push(new IRBinOp(optype, left, right));
+        }
     }
     public void visit(Underscore node) {
         // Handled in Assignment
