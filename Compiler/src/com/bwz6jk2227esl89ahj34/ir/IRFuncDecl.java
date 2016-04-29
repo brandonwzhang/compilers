@@ -260,37 +260,34 @@ public class IRFuncDecl extends IRNode {
         // All IRSeq's should be flattened by this point
         IRFuncDecl fd = (IRFuncDecl) n_;
         List<IRStmt> stmts = ((IRSeq) (fd.body())).stmts();
-        // jihun: running with CCP for now
-        // comment the next 3 lines out and uncomment the return statement
-        // to get rid of CCP
         IRSeq reorderedBody = new IRSeq(reorderBlocks(stmts));
 
         Optimization.functionName = name;
-        IRSeq ccp_optimized = reorderedBody;
+        IRSeq optimizedBody = reorderedBody;
         if (Main.optimizationOn(OptimizationType.UCE)) {
             if (Main.debugOn()) {
                 System.out.println("DEBUG: performing optimization: unreachable code elimination");
             }
-            ccp_optimized = Optimization.condtionalConstantPropagation(new IRSeq(reorderedBody));
+            optimizedBody = Optimization.condtionalConstantPropagation(new IRSeq(reorderedBody));
         }
 
-        // Iterate constant propagation and common subexpression elimination
+        // Iterate copy propagation and common subexpression elimination
         int iterations = 2;
         for (int i = 0; i < iterations; i++) {
             if (Main.optimizationOn(OptimizationType.COPY)) {
                 if (Main.debugOn()) {
                     System.out.println("DEBUG: performing optimization: copy propagation");
                 }
-                Optimization.propagateCopies(ccp_optimized);
+                Optimization.propagateCopies(optimizedBody);
             }
             if (Main.optimizationOn(OptimizationType.CSE)) {
                 if (Main.debugOn()) {
                     System.out.println("DEBUG: performing optimization: common subexpression elimination");
                 }
-                Optimization.eliminateCommonSubexpressions(ccp_optimized);
+                Optimization.eliminateCommonSubexpressions(optimizedBody);
             }
         }
 
-        return new IRFuncDecl(fd.name(), ccp_optimized);
+        return new IRFuncDecl(fd.name(), optimizedBody);
     }
 }
