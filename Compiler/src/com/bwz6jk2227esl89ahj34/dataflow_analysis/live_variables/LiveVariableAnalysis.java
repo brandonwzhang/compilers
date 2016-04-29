@@ -8,7 +8,7 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.DataflowAnalysis;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,18 +17,18 @@ public class LiveVariableAnalysis extends DataflowAnalysis {
 
     static {
         OpCode[] defOpCodesArr = {OpCode.MOVQ, OpCode.MOVZX};
-        defOpCodes = new HashSet<>(Arrays.asList(defOpCodesArr));
+        defOpCodes = new LinkedHashSet<>(Arrays.asList(defOpCodesArr));
     }
 
     public LiveVariableAnalysis(List<AssemblyLine> lines) {
-        super(lines, Direction.BACKWARD, new LiveVariableSet(new HashSet<>()));
+        super(lines, Direction.BACKWARD, new LiveVariableSet(new LinkedHashSet<>()));
     }
 
     /**
      * Returns the set of temps in this expression
      */
     private static Set<AssemblyAbstractRegister> tempsInExpression(AssemblyExpression expression) {
-        Set<AssemblyAbstractRegister> temps = new HashSet<>();
+        Set<AssemblyAbstractRegister> temps = new LinkedHashSet<>();
         if (expression instanceof AssemblyAbstractRegister) {
             // We just need to add it to the set
             temps.add((AssemblyAbstractRegister) expression);
@@ -49,7 +49,7 @@ public class LiveVariableAnalysis extends DataflowAnalysis {
      * Returns the set of temps used by this instruction
      */
     private static Set<AssemblyAbstractRegister> use(AssemblyInstruction instruction) {
-        Set<AssemblyAbstractRegister> temps = new HashSet<>();
+        Set<AssemblyAbstractRegister> temps = new LinkedHashSet<>();
         List<AssemblyExpression> args = instruction.getArgs();
         if (args.size() == 0) {
             return temps;
@@ -76,7 +76,7 @@ public class LiveVariableAnalysis extends DataflowAnalysis {
      * Returns the set of temps defined by this instruction
      */
     private static Set<AssemblyAbstractRegister> def(AssemblyInstruction instruction) {
-        Set<AssemblyAbstractRegister> temps = new HashSet<>();
+        Set<AssemblyAbstractRegister> temps = new LinkedHashSet<>();
         // We only have defs in the case of an instruction that defines a temp
         if (!defOpCodes.contains(instruction.opCode)) {
             return temps;
@@ -91,7 +91,7 @@ public class LiveVariableAnalysis extends DataflowAnalysis {
     }
 
     public void transfer(CFGNode node) {
-        Set<LatticeElement> successorIns = new HashSet<>();
+        Set<LatticeElement> successorIns = new LinkedHashSet<>();
         for (CFGNode successor : node.getSuccessors()) {
             successorIns.add(successor.getIn());
         }
@@ -100,7 +100,7 @@ public class LiveVariableAnalysis extends DataflowAnalysis {
         AssemblyInstruction instruction = ((CFGNodeAssembly) node).getInstruction();
         // in[n] = use[n] + (out[n] - def[n])
         Set<AssemblyAbstractRegister> outSet =
-                new HashSet<>(((LiveVariableSet) node.getOut()).getLiveVars());
+                new LinkedHashSet<>(((LiveVariableSet) node.getOut()).getLiveVars());
         outSet.removeAll(def(instruction));
         Set<AssemblyAbstractRegister> inSet = use(instruction);
         inSet.addAll(outSet);
@@ -109,7 +109,7 @@ public class LiveVariableAnalysis extends DataflowAnalysis {
     }
 
     public LatticeElement meet(Set<LatticeElement> elements) {
-        Set<AssemblyAbstractRegister> union = new HashSet<>();
+        Set<AssemblyAbstractRegister> union = new LinkedHashSet<>();
         for (LatticeElement element : elements) {
             union.addAll(((LiveVariableSet)element).getLiveVars());
         }

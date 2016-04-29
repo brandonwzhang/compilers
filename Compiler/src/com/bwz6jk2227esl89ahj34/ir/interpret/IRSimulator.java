@@ -71,7 +71,7 @@ public class IRSimulator {
 
         r = new Random();
 
-        regs = new HashMap<>();
+        regs = new LinkedHashMap<>();
 
         mem = new long[heapSize];
         // initialize heap to garbage
@@ -488,7 +488,7 @@ public class IRSimulator {
 
         public ExecutionFrame(IRNode ip) {
             this.ip = ip;
-            regs = new HashMap<>();
+            regs = new LinkedHashMap<>();
         }
 
         /**

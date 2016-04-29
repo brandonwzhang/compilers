@@ -11,7 +11,7 @@
 //import org.junit.Before;
 //import org.junit.Test;
 //
-//import java.util.HashMap;
+//import java.util.LinkedHashMap;
 //import java.util.Map;
 //
 ///**
@@ -23,7 +23,7 @@
 //    // runs before every test invocation
 //    @Before
 //    public void setUp() {
-//        Map<String, String> map = new HashMap<>();
+//        Map<String, String> map = new LinkedHashMap<>();
 //        map.put("x", "y");
 //        map.put("a", "b");
 //        set = new AvailableCopiesSet(map);
@@ -65,12 +65,12 @@
 //
 //        castedCopy.intersect(new LatticeBottom());
 //
-//        Assert.assertTrue(castedCopy.equals(new AvailableCopiesSet(new HashMap<>())));
+//        Assert.assertTrue(castedCopy.equals(new AvailableCopiesSet(new LinkedHashMap<>())));
 //
 //        copy = set.copy();
 //        castedCopy = (AvailableCopiesSet) copy;
 //
-//        Map<String, String> dummyMap = new HashMap<>();
+//        Map<String, String> dummyMap = new LinkedHashMap<>();
 //        dummyMap.put("x", "y");
 //
 //        castedCopy.intersect(new AvailableCopiesSet(dummyMap));
@@ -81,7 +81,7 @@
 //
 //    @Test
 //    public void unionTest() {
-//        Map<String, String> dummyMap = new HashMap<>();
+//        Map<String, String> dummyMap = new LinkedHashMap<>();
 //        dummyMap.put("c", "d");
 //
 //        AvailableCopiesSet castedCopy = (AvailableCopiesSet) set.copy();
@@ -96,7 +96,7 @@
 //        Assert.assertEquals(castedCopy.getMap().keySet().size(), 2);
 //        Assert.assertFalse(castedCopy.getMap().containsKey("c"));
 //
-//        dummyMap = new HashMap<>();
+//        dummyMap = new LinkedHashMap<>();
 //
 //        // sanity check to see resetting dummy map does not screw up anything
 //        Assert.assertTrue(union.getMap().containsKey("c"));
@@ -115,7 +115,7 @@
 //
 //        // with empty map
 //        // this also tests equals method in conjunction
-//        union = castedCopy.union(new AvailableCopiesSet(new HashMap<>()));
+//        union = castedCopy.union(new AvailableCopiesSet(new LinkedHashMap<>()));
 //        Assert.assertTrue(union.equals(castedCopy));
 //        Assert.assertEquals(union.getMap().keySet().size(), 2);
 //        Assert.assertFalse(union.getMap().containsKey("c"));
@@ -123,7 +123,7 @@
 //
 //    @Test
 //    public void subtractTest() {
-//        Map<String, String> dummyMap = new HashMap<>();
+//        Map<String, String> dummyMap = new LinkedHashMap<>();
 //        dummyMap.put("c", "d");
 //
 //        AvailableCopiesSet castedCopy = (AvailableCopiesSet) set.copy();
@@ -134,9 +134,9 @@
 //        castedCopy = (AvailableCopiesSet) set.copy();
 //        difference = castedCopy.subtract((AvailableCopiesSet)(set.copy())) ;
 //
-//        Assert.assertTrue(difference.equals(new AvailableCopiesSet(new HashMap<>())));
+//        Assert.assertTrue(difference.equals(new AvailableCopiesSet(new LinkedHashMap<>())));
 //
-//        dummyMap = new HashMap<>();
+//        dummyMap = new LinkedHashMap<>();
 //        dummyMap.put("a", "b");
 //        difference = castedCopy.subtract(new AvailableCopiesSet(dummyMap));
 //
@@ -144,7 +144,7 @@
 //        Assert.assertFalse(difference.getMap().containsKey("a"));
 //
 //        castedCopy = (AvailableCopiesSet) set.copy();
-//        dummyMap = new HashMap<>();
+//        dummyMap = new LinkedHashMap<>();
 //        dummyMap.put("a", "jihun");
 //        difference = castedCopy.subtract(new AvailableCopiesSet(dummyMap));
 //

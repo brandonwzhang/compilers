@@ -3,7 +3,7 @@ package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import lombok.*;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
@@ -58,7 +58,7 @@ public class AvailableCopiesSet extends LatticeElement {
 
     @Override
     public LatticeElement copy() {
-        Set<TempPair> newSet = new HashSet<>(copies);
+        Set<TempPair> newSet = new LinkedHashSet<>(copies);
         return new AvailableCopiesSet(newSet);
     }
 
@@ -74,19 +74,19 @@ public class AvailableCopiesSet extends LatticeElement {
         assert set instanceof AvailableCopiesSet;
         // then we take information that is common in both
         AvailableCopiesSet castedSet = (AvailableCopiesSet) set;
-        Set<TempPair> castedSetCopies = new HashSet<>(castedSet.getCopies());
+        Set<TempPair> castedSetCopies = new LinkedHashSet<>(castedSet.getCopies());
         copies.retainAll(castedSetCopies);
     }
 
     public AvailableCopiesSet subtract(AvailableCopiesSet subtrahend) {
-        Set<TempPair> resultCopies = new HashSet<>(copies);
+        Set<TempPair> resultCopies = new LinkedHashSet<>(copies);
         Set<TempPair> subtrahendCopies = subtrahend.getCopies();
         resultCopies.removeAll(subtrahendCopies);
         return new AvailableCopiesSet(resultCopies);
     }
 
     public AvailableCopiesSet union(AvailableCopiesSet set) {
-        Set<TempPair> unionCopies = new HashSet<>(copies);
+        Set<TempPair> unionCopies = new LinkedHashSet<>(copies);
         Set<TempPair> setCopies = set.getCopies();
         unionCopies.addAll(setCopies);
         return new AvailableCopiesSet(unionCopies);

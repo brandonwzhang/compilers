@@ -8,7 +8,7 @@ import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 import lombok.*;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +31,7 @@ public class UnreachableValueTuplesPair extends LatticeElement {
         return s;
     }
     public UnreachableValueTuplesPair(List<IRTemp> temps) {
-        this.valueTuples = new HashMap<>();
+        this.valueTuples = new LinkedHashMap<>();
         for(IRTemp temp : temps) {
             if (temp.name().contains(Configuration.ABSTRACT_ARG_PREFIX)) {
                 this.valueTuples.put(temp.name(), new LatticeBottom());
@@ -44,7 +44,7 @@ public class UnreachableValueTuplesPair extends LatticeElement {
 
     @Override
     public LatticeElement copy() {
-        Map<String, LatticeElement> valueTuplesCopy = new HashMap<>();
+        Map<String, LatticeElement> valueTuplesCopy = new LinkedHashMap<>();
         for (String key : valueTuples.keySet()) {
             if(valueTuples.get(key) instanceof LatticeBottom) {
                 valueTuplesCopy.put(key, new LatticeBottom());

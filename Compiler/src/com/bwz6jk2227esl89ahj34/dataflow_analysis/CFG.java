@@ -2,14 +2,14 @@ package com.bwz6jk2227esl89ahj34.dataflow_analysis;
 
 import lombok.Getter;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @Getter
 public abstract class CFG {
-    protected Map<Integer, CFGNode> nodes = new HashMap<>();
-    protected Map<Integer, List<Integer>> graph = new HashMap<>();
+    protected Map<Integer, CFGNode> nodes = new LinkedHashMap<>();
+    protected Map<Integer, List<Integer>> graph = new LinkedHashMap<>();
 
     @Override
     public String toString() {

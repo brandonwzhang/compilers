@@ -93,12 +93,12 @@ public class GraphColorer {
      */
     public GraphColorer(List<Set<AssemblyAbstractRegister>> liveVariableSets, List<AssemblyLine> lines) {
 
-        this.coloring = new HashMap<>();
+        this.coloring = new LinkedHashMap<>();
         this.removedNodes = new ArrayDeque<>();
-        this.activeNodes = new HashSet<>();
-        this.spillNodes = new HashSet<>();
-        this.movePairs = new HashSet<>();
-        this.replacementMap = new HashMap<>();
+        this.activeNodes = new LinkedHashSet<>();
+        this.spillNodes = new LinkedHashSet<>();
+        this.movePairs = new LinkedHashSet<>();
+        this.replacementMap = new LinkedHashMap<>();
         this.lines = lines;
 
         this.graph = constructInterferenceGraph(liveVariableSets);
@@ -135,7 +135,7 @@ public class GraphColorer {
      * @return a mapping from abstract registers to physical registers
      */
     public Map<AssemblyAbstractRegister, AssemblyExpression> getColoring() {
-        Map<AssemblyAbstractRegister, AssemblyExpression> coloring_ = new HashMap<>();
+        Map<AssemblyAbstractRegister, AssemblyExpression> coloring_ = new LinkedHashMap<>();
         coloring_.putAll(coloring);
         return coloring_;
     }
@@ -149,7 +149,7 @@ public class GraphColorer {
     private static Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>>
         constructInterferenceGraph(List<Set<AssemblyAbstractRegister>> liveVariableSets) {
 
-        Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph = new HashMap<>();
+        Map<AssemblyAbstractRegister, List<AssemblyAbstractRegister>> graph = new LinkedHashMap<>();
 
         for (Set<AssemblyAbstractRegister> set : liveVariableSets) {
 
@@ -221,7 +221,7 @@ public class GraphColorer {
      * that are not in the graph.
      */
     private void removeAbsentMovePairs() {
-        Set<MovePair> removeSet = new HashSet<>();
+        Set<MovePair> removeSet = new LinkedHashSet<>();
         for (MovePair pair : movePairs) {
             if (graph.get(pair.left) == null || graph.get(pair.right) == null) {
                 removeSet.add(pair);
@@ -235,7 +235,7 @@ public class GraphColorer {
      * that interfere with each other.
      */
     private void removeImpossibleMovePairs() {
-        Set<MovePair> removeSet = new HashSet<>();
+        Set<MovePair> removeSet = new LinkedHashSet<>();
         for (MovePair pair : movePairs) {
             if (graph.get(pair.left).contains(pair.right) || graph.get(pair.right).contains(pair.left)) {
                 removeSet.add(pair);
@@ -440,7 +440,7 @@ public class GraphColorer {
      */
     private int numAdjacentColors(AssemblyAbstractRegister n) {
 
-        Set<AssemblyPhysicalRegister> neighborColors = new HashSet<>();
+        Set<AssemblyPhysicalRegister> neighborColors = new LinkedHashSet<>();
         for (AssemblyAbstractRegister neighbor : graph.get(n)) {
             if (coloring.containsKey(neighbor)) {
                 neighborColors.add(coloring.get(neighbor));
@@ -513,7 +513,7 @@ public class GraphColorer {
 //        return true;
 
         // Brigg's
-        Set<AssemblyAbstractRegister> ab_neighbors = new HashSet<>();
+        Set<AssemblyAbstractRegister> ab_neighbors = new LinkedHashSet<>();
         ab_neighbors.addAll(graph.get(a));
         ab_neighbors.addAll(graph.get(b));
         int significantNeighbors = 0;
@@ -537,8 +537,8 @@ public class GraphColorer {
 
         do {
             changed = false;
-            Set<MovePair> addSet = new HashSet<>();
-            Set<MovePair> removeSet = new HashSet<>();
+            Set<MovePair> addSet = new LinkedHashSet<>();
+            Set<MovePair> removeSet = new LinkedHashSet<>();
             for (MovePair pair : movePairs) {
                 AssemblyAbstractRegister t1 = pair.left;
                 AssemblyAbstractRegister t2 = pair.right;
@@ -590,7 +590,7 @@ public class GraphColorer {
             // give up on all move pairs that contain the node we are freezing
             if (frozen != null) {
                 //System.out.println("--freezing " + frozen);
-                Set<MovePair> removeSet = new HashSet<>();
+                Set<MovePair> removeSet = new LinkedHashSet<>();
                 for (MovePair pair_ : movePairs) {
                     if (pair_.left.equals(frozen) || pair_.right.equals(frozen)) {
                         removeSet.add(pair_);
@@ -656,7 +656,7 @@ public class GraphColorer {
             removedNodes.push(spillNode);
             iterator.remove();
             spillNodes.add(spillNode);
-            Set<MovePair> removeSet = new HashSet<>();
+            Set<MovePair> removeSet = new LinkedHashSet<>();
             for (MovePair pair : movePairs) {
                 if (pair.left.equals(spillNode) || pair.right.equals(spillNode)) {
                     removeSet.add(pair);
@@ -670,7 +670,7 @@ public class GraphColorer {
         while (!removedNodes.isEmpty()) {
             currentNode = removedNodes.pop();
             activeNodes.add(currentNode);
-            Set<AssemblyPhysicalRegister> neighborColors = new HashSet<>();
+            Set<AssemblyPhysicalRegister> neighborColors = new LinkedHashSet<>();
             // read currentNode to the adjacency lists of its neighbors
             for (AssemblyAbstractRegister neighbor : graph.get(currentNode)) {
                 graph.get(neighbor).add(currentNode);
@@ -701,7 +701,7 @@ public class GraphColorer {
                 break;
             }
 
-            Set<AssemblyPhysicalRegister> neighborColors = new HashSet<>();
+            Set<AssemblyPhysicalRegister> neighborColors = new LinkedHashSet<>();
             for (AssemblyAbstractRegister neighbor : graph.get(colorable)) {
                 if (coloring.containsKey(neighbor)) {
                     neighborColors.add(coloring.get(neighbor));

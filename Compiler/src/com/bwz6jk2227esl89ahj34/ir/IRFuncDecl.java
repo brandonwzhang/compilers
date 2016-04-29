@@ -128,7 +128,7 @@ public class IRFuncDecl extends IRNode {
     }
 
     public Map<Integer, List<Integer>> constructFlowGraph(List<List<IRStmt>> blocks) {
-        Map<Integer, List<Integer>> graph = new HashMap<>();
+        Map<Integer, List<Integer>> graph = new LinkedHashMap<>();
         for (int i = 0; i < blocks.size(); i++) {
             graph.put(i, getSuccessors(i, blocks));
         }

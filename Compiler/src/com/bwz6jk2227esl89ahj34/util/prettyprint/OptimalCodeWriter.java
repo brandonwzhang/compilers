@@ -337,7 +337,7 @@ class SearchState implements Cloneable {
         this.maxbi = maxbi;
         forward = true;
         findminovf = false;
-        brkAssignment = new HashMap<>();
+        brkAssignment = new LinkedHashMap<>();
         afterBrkAssignment = ConsList.empty();
 
         blks = ConsList.empty();
@@ -682,7 +682,7 @@ class AllowBreak extends OCItem {
 
     /* maxbr -> pos -> minovf * afterBrkAssignment */
     Map<Integer, Map<Integer, Pair<Integer, ConsList<Boolean>>>> cache =
-            new HashMap<>();
+            new LinkedHashMap<>();
 
     int minovf;
     ConsList<Boolean> afterBrkAssignment;
@@ -807,7 +807,7 @@ class AllowBreak extends OCItem {
             if (cache.containsKey(s.maxbr))
                 brCache = cache.get(s.maxbr);
             else {
-                brCache = new HashMap<>();
+                brCache = new LinkedHashMap<>();
                 cache.put(s.maxbr, brCache);
             }
             Pair<Integer, ConsList<Boolean>> result =

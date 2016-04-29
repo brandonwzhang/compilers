@@ -34,7 +34,7 @@ public class RegisterAllocator {
             Optimization.removeDeadCode(lines);
         }
 
-        registerMap = new HashMap<>();
+        registerMap = new LinkedHashMap<>();
         if (Main.optimizationOn(OptimizationType.REG)) {
             registerMap = Optimization.allocateRegisters(lines);
         }

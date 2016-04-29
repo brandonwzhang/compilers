@@ -31,7 +31,7 @@ public class CLI {
     private Map<String, Option> options;
     private ArrayList<String> files;
 
-    private static Set<String> validOpts = new HashSet<>();
+    private static Set<String> validOpts = new LinkedHashSet<>();
 
     static {
         for (OptimizationType opt : OptimizationType.values()) {
@@ -40,7 +40,7 @@ public class CLI {
     }
 
     public CLI() {
-        // we use a LinkedHashMap because we want to preserve the order
+        // we use a LinkedLinkedHashMap because we want to preserve the order
         // in which the options were added
         options = new LinkedHashMap<>();
         files = new ArrayList<>();
@@ -55,10 +55,10 @@ public class CLI {
      */
     public void execute(String[] args) {
 
-        Map<String, String[]> optionArgsMap = new HashMap<>();
+        Map<String, String[]> optionArgsMap = new LinkedHashMap<>();
 
-        Set<OptimizationType> enable = new HashSet<>();
-        Set<OptimizationType> disable = new HashSet<>();
+        Set<OptimizationType> enable = new LinkedHashSet<>();
+        Set<OptimizationType> disable = new LinkedHashSet<>();
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].charAt(0) == '-') {

@@ -3,24 +3,24 @@ package com.bwz6jk2227esl89ahj34.assembly;
 import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 import lombok.Data;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 @Data
 public class AssemblyAbstractRegister extends AssemblyRegister {
     // Maintains the number of temps that aren't return or argument temps
     public static int counter = 0;
     // Keeps track of id's that were assigned to given temp names
-    private static HashMap<String, Integer> nameIdMap = new HashMap<>();
+    private static LinkedHashMap<String, Integer> nameIdMap = new LinkedHashMap<>();
 
     // The id for this instance
     public int id;
 
     /**
-     * Resets the counter to 0 and nameIdMap to a new HashMap
+     * Resets the counter to 0 and nameIdMap to a new LinkedHashMap
      */
     public static void reset() {
         counter = 0;
-        nameIdMap = new HashMap<>();
+        nameIdMap = new LinkedHashMap<>();
     }
 
     public AssemblyAbstractRegister() {

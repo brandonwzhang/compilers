@@ -3,7 +3,7 @@ package com.bwz6jk2227esl89ahj34.ir.visit;
 import com.bwz6jk2227esl89ahj34.ir.IRNode;
 import com.bwz6jk2227esl89ahj34.util.InternalCompilerError;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +17,9 @@ public class InsnMapsBuilder extends IRVisitor {
     private long index;
 
     public InsnMapsBuilder() {
-        nameToIndex = new HashMap<>();
-        indexToInsn = new HashMap<>();
-        insnToIndex = new HashMap<>();
+        nameToIndex = new LinkedHashMap<>();
+        indexToInsn = new LinkedHashMap<>();
+        insnToIndex = new LinkedHashMap<>();
         ctors = new LinkedList<>();
         index = 0;
     }

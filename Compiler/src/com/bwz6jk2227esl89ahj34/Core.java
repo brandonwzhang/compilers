@@ -278,7 +278,7 @@ public class Core {
 
         int dotIndex = file.lastIndexOf('.');
         if (Main.reportInitialIR() || Main.reportInitialCFG()) {
-            Map<OptimizationType, Boolean> originalCopy = new HashMap<>();
+            Map<OptimizationType, Boolean> originalCopy = new LinkedHashMap<>();
             originalCopy.putAll(Main.optimizationMap);
             for (OptimizationType opt : Main.optimizationMap.keySet()) {
                 Main.optimizationMap.put(opt, false);

@@ -8,7 +8,7 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
         .AvailableExpressionSet.TaggedExpression;
 import com.bwz6jk2227esl89ahj34.ir.*;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -53,7 +53,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
 
     public AvailableExpressionsAnalysis(IRSeq seq) {
         // We initialize all nodes to the bottom element, {}
-        super(seq, Direction.FORWARD, new AvailableExpressionSet(new HashSet<>()), false);
+        super(seq, Direction.FORWARD, new AvailableExpressionSet(new LinkedHashSet<>()), false);
         allExprs = allExprs(seq);
         fixpoint(Direction.FORWARD);
     }
@@ -62,7 +62,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
      * Returns all expressions and subexpressions in seq
      */
     public static Set<IRExpr> allExprs(IRSeq seq) {
-        Set<IRExpr> set = new HashSet<>();
+        Set<IRExpr> set = new LinkedHashSet<>();
         for (IRStmt s : seq.stmts()) {
             if (s instanceof IRCJump) {
                 IRCJump cjump = (IRCJump)s;
@@ -95,14 +95,14 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         assert node instanceof CFGNodeIR;
 
         // in[n] = intersection over all out[n'], where n' is pred of n
-        Set<LatticeElement> pred_outs = new HashSet<>();
+        Set<LatticeElement> pred_outs = new LinkedHashSet<>();
         for (CFGNode pred : node.getPredecessors()) {
             pred_outs.add(pred.getOut());
         }
         node.setIn(meet(pred_outs));
 
         // out[n] = in[n] U eval[n] - kill[n]
-        Set<TaggedExpression> out = new HashSet<>(((AvailableExpressionSet)node.getIn()).getExprs());
+        Set<TaggedExpression> out = new LinkedHashSet<>(((AvailableExpressionSet)node.getIn()).getExprs());
         out.addAll(eval(node).getExprs());
         kill(node, out); // removes kill[n]
         node.setOut(new AvailableExpressionSet(out));
@@ -114,7 +114,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
      */
     public LatticeElement meet(Set<LatticeElement> elements) {
         if (elements.isEmpty()) {
-            return new AvailableExpressionSet(new HashSet<>());
+            return new AvailableExpressionSet(new LinkedHashSet<>());
         }
 
         Set<TaggedExpression> exprs = null;
@@ -139,7 +139,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
          IRStmt stmt = ((CFGNodeIR) node).getStatement();
          assert stmt != null;
 
-         Set<IRExpr> set = new HashSet<>();
+         Set<IRExpr> set = new LinkedHashSet<>();
          // Always lowered IR
          if (stmt instanceof IRMove) {
              IRMove move = (IRMove)stmt;
@@ -158,7 +158,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
              set.addAll(findReferences(subexprs(cjump.expr())));
          }
 
-         Set<TaggedExpression> exprs = new HashSet<>();
+         Set<TaggedExpression> exprs = new LinkedHashSet<>();
          AvailableExpressionSet inSet = (AvailableExpressionSet) node.getIn();
          for (IRExpr expr : set) {
              TaggedExpression pair = inSet.get(expr);
@@ -222,7 +222,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
      * @return
      */
     private static Set<IRExpr> subexprs(IRExpr expr) {
-        HashSet<IRExpr> set = new HashSet<>();
+        LinkedHashSet<IRExpr> set = new LinkedHashSet<>();
         addSubexprs(expr, set);
         return set;
     }
@@ -396,7 +396,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
         Same helper as above, but does it for a set of IRExprs
      */
     public Set<IRExpr> findReferences(Set<IRExpr> exprs) {
-        Set<IRExpr> refs = new HashSet<>();
+        Set<IRExpr> refs = new LinkedHashSet<>();
         for (IRExpr e : exprs) {
             refs.add(findReference(e));
         }

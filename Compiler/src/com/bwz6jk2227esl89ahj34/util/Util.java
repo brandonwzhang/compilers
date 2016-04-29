@@ -52,8 +52,8 @@ public class Util {
      * Translates symbol numbers into print-friendly strings. Used for lexer
      * and parser outputting.
      */
-    public static final HashMap<Integer, String> symbolTranslation =
-            new HashMap<Integer, String>() {{
+    public static final LinkedHashMap<Integer, String> symbolTranslation =
+            new LinkedHashMap<Integer, String>() {{
         put(ParserSym.IF, "if");
         put(ParserSym.WHILE, "while");
         put(ParserSym.ELSE, "else");

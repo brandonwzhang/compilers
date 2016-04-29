@@ -17,7 +17,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
 
     public static List<IRTemp> findAllTemps(IRSeq seq) {
         List<IRStmt> stmts = seq.stmts();
-        Set<IRTemp> temps = new HashSet<>();
+        Set<IRTemp> temps = new LinkedHashSet<>();
         for (IRStmt stmt : stmts) {
             if (stmt instanceof IRMove) {
                 IRMove castedStmt = (IRMove) stmt;
@@ -70,7 +70,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         if (in.isUnreachable()) {
                 // for the branch we do not take, we have to prepare
                 // new information to send
-                Map<String, LatticeElement> infoForDead = new HashMap<>();
+                Map<String, LatticeElement> infoForDead = new LinkedHashMap<>();
                 for (String key : in.getValueTuples().keySet()) {
                     infoForDead.put(key, new LatticeTop());
                 }
@@ -92,7 +92,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         // we will update the newMap as we perform the analysis
         // if no updates are made then we are basically passing the map given
         // by the "in"
-        Map<String, LatticeElement> newMap = new HashMap<>(in.getValueTuples());
+        Map<String, LatticeElement> newMap = new LinkedHashMap<>(in.getValueTuples());
 
         // now we exhaust the possible forms that statements can take
         // however, the only ones we should consider are statements
@@ -172,7 +172,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
 
                 // for the branch we do not take, we have to prepare
                 // new information to send
-                Map<String, LatticeElement> infoForDead = new HashMap<>();
+                Map<String, LatticeElement> infoForDead = new LinkedHashMap<>();
                 for (String key : newMap.keySet()) {
                     infoForDead.put(key, new LatticeTop());
                 }
@@ -309,7 +309,7 @@ public class ConditionalConstantPropagation extends DataflowAnalysis {
         if (successor.getIn() == null) { // if in is null prior, then
             successor.setIn(newIn);  // in = newIn
         } else { // otherwise we "meet" it
-            Set<LatticeElement> ins = new HashSet<>(Arrays.asList(successor.getIn(), newIn));
+            Set<LatticeElement> ins = new LinkedHashSet<>(Arrays.asList(successor.getIn(), newIn));
             successor.setIn(meet(ins));
         }
     }

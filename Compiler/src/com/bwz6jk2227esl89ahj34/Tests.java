@@ -14,7 +14,7 @@ public class Tests {
      * A set of files to exclude from testing. It is assumed that entries in this
      * set do not contain a file extension.
      */
-    public static Set<String> exclude = new HashSet<>();
+    public static Set<String> exclude = new LinkedHashSet<>();
 
     /**
      * Returns true if the given file is excluded from testing. Assumes that

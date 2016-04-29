@@ -10,8 +10,8 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
         .AvailableExpressionsAnalysis.ExpressionNodePair;
 import com.bwz6jk2227esl89ahj34.ir.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,7 +26,7 @@ public class CommonSubexpressionVisitor extends IRVisitor {
     // A set of expression that are redundant enough to be replaced
     private Set<ExpressionNodePair> redundantSubexpressions;
     // Keep track of the CSE variables we use in this statement
-    public Set<ExpressionNodePair> usedTemps = new HashSet<>();
+    public Set<ExpressionNodePair> usedTemps = new LinkedHashSet<>();
 
     public CommonSubexpressionVisitor(AvailableExpressionSet set,
                                       AvailableExpressionsAnalysis analysis,

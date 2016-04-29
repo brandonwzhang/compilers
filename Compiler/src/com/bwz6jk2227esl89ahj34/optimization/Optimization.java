@@ -43,15 +43,15 @@ public class Optimization {
         AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(body);
 
         // Create new set of cse temps
-        Map<IRExpr, IRTemp> tempMap = new HashMap<>();
+        Map<IRExpr, IRTemp> tempMap = new LinkedHashMap<>();
         for (IRExpr expr : analysis.allExprs) {
             tempMap.put(expr, new IRTemp("cse" + tempCounter++));
         }
 
         List<IRStmt> stmts = body.stmts();
         Map<Integer, CFGNode> nodes = analysis.getGraph().getNodes();
-        Map<ExpressionNodePair, Integer> counts = new HashMap<>();
-        Map<CFGNode, List<IRExpr>> nodeExpressions = new HashMap<>();
+        Map<ExpressionNodePair, Integer> counts = new LinkedHashMap<>();
+        Map<CFGNode, List<IRExpr>> nodeExpressions = new LinkedHashMap<>();
 
         for (CFGNode node : nodes.values()) {
             // Get the set of expressions evaluated at this node
@@ -79,7 +79,7 @@ public class Optimization {
         }
 
         // Find redundant subexpressions that surpass a threshold
-        Set<ExpressionNodePair> redundantSubexpressions = new HashSet<>();
+        Set<ExpressionNodePair> redundantSubexpressions = new LinkedHashSet<>();
         for (ExpressionNodePair pair : counts.keySet()) {
             int threshold = 1;
             Integer count = counts.get(pair);
@@ -89,7 +89,7 @@ public class Optimization {
         }
 
         // Replace common subexpressions with their corresponding temp
-        Set<ExpressionNodePair> usedTemps = new HashSet<>();
+        Set<ExpressionNodePair> usedTemps = new LinkedHashSet<>();
         for (int i = 0; i < stmts.size(); i++) {
             IRStmt stmt = stmts.get(i);
             for (CFGNode node : nodes.values()) {
@@ -111,7 +111,7 @@ public class Optimization {
             List<IRExpr> exprs = nodeExpressions.get(node);
             // Determine which subexpressions are evaluated enough times to be worth
             // creating a new temp
-            Set<IRExpr> neededExprs = new HashSet<>();
+            Set<IRExpr> neededExprs = new LinkedHashSet<>();
             for (IRExpr expr : exprs) {
                 ExpressionNodePair pair = new ExpressionNodePair(expr, node);
                 if (redundantSubexpressions.contains(pair)) {
@@ -281,7 +281,7 @@ public class Optimization {
             interferenceSets.add(out.getLiveVars());
         }
 
-        Map<AssemblyAbstractRegister, AssemblyExpression> registerMap = new HashMap<>();
+        Map<AssemblyAbstractRegister, AssemblyExpression> registerMap = new LinkedHashMap<>();
         if (Main.optimizationOn(OptimizationType.REG)) {
             if (Main.debugOn()) {
                 System.out.println("DEBUG: performing optimization: register allocation");

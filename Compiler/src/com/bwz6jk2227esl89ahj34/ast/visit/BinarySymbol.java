@@ -27,10 +27,10 @@ public class BinarySymbol {
             BinaryOperator.EQUAL, BinaryOperator.NOT_EQUAL
     };
 
-    static final Set<BinaryOperator> INT_BINARY_OPERATOR_INT = new HashSet<>(Arrays.asList(int_binary_operator_int));
-    static final Set<BinaryOperator> INT_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(int_binary_operator_bool));
-    static final Set<BinaryOperator> BOOL_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(bool_binary_operator_bool));
-    static final Set<BinaryOperator> ARRAY_BINARY_OPERATOR_BOOL = new HashSet<>(Arrays.asList(array_binary_operator_bool));
+    static final Set<BinaryOperator> INT_BINARY_OPERATOR_INT = new LinkedHashSet<>(Arrays.asList(int_binary_operator_int));
+    static final Set<BinaryOperator> INT_BINARY_OPERATOR_BOOL = new LinkedHashSet<>(Arrays.asList(int_binary_operator_bool));
+    static final Set<BinaryOperator> BOOL_BINARY_OPERATOR_BOOL = new LinkedHashSet<>(Arrays.asList(bool_binary_operator_bool));
+    static final Set<BinaryOperator> ARRAY_BINARY_OPERATOR_BOOL = new LinkedHashSet<>(Arrays.asList(array_binary_operator_bool));
 
     private static final VariableType INT_TYPE = new VariableType(PrimitiveType.INT, 0);
     private static final VariableType BOOL_TYPE = new VariableType(PrimitiveType.BOOL, 0);

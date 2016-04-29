@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
@@ -21,7 +21,7 @@ public class LiveVariableSet extends LatticeElement{
 
     @Override
     public LatticeElement copy() {
-        return new LiveVariableSet(new HashSet<>(liveVars));
+        return new LiveVariableSet(new LinkedHashSet<>(liveVars));
     }
 
     @Override

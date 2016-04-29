@@ -687,7 +687,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(Program node) {
-        Map<String, IRFuncDecl> functions = new HashMap<>();
+        Map<String, IRFuncDecl> functions = new LinkedHashMap<>();
         // Go through all function declarations
         for (FunctionDeclaration fd : node.getFunctionDeclarationList()) {
             fd.accept(this);

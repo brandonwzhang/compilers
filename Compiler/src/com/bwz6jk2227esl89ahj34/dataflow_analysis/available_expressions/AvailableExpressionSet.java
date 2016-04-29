@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
@@ -39,7 +39,7 @@ public class AvailableExpressionSet extends LatticeElement {
     private Set<TaggedExpression> exprs;
 
     public AvailableExpressionSet(Set<TaggedExpression> set) {
-        this.exprs = new HashSet<>(set);
+        this.exprs = new LinkedHashSet<>(set);
     }
 
     public TaggedExpression get(IRExpr expr) {
@@ -52,7 +52,7 @@ public class AvailableExpressionSet extends LatticeElement {
     }
 
     public LatticeElement copy() {
-        Set<TaggedExpression> newPairs = new HashSet<>();
+        Set<TaggedExpression> newPairs = new LinkedHashSet<>();
         newPairs.addAll(exprs);
         return new AvailableExpressionSet(newPairs);
     }

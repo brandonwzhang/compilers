@@ -4,7 +4,7 @@ import com.bwz6jk2227esl89ahj34.cli.CLI;
 import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class Main {
     private static String sourcePath = "./";
@@ -25,7 +25,7 @@ public class Main {
     private static boolean reportFinalCFG = false;
 
     public static boolean allOptimizations = true;
-    public static HashMap<OptimizationType, Boolean> optimizationMap = new HashMap<>();
+    public static LinkedHashMap<OptimizationType, Boolean> optimizationMap = new LinkedHashMap<>();
 
     public static void main(String[] args) {
         CLI cli = new CLI();

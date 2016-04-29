@@ -12,14 +12,14 @@ import com.bwz6jk2227esl89ahj34.ir.IRStmt;
 import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 public class AvailableCopies extends DataflowAnalysis {
 
     public AvailableCopies(IRSeq seq) {
-        super(seq, Direction.FORWARD, new AvailableCopiesSet(new HashSet<>()));
+        super(seq, Direction.FORWARD, new AvailableCopiesSet(new LinkedHashSet<>()));
     }
 
     public void transfer(CFGNode node) {
@@ -28,7 +28,7 @@ public class AvailableCopies extends DataflowAnalysis {
 
         // assumption: out of predecessor is filled in
         List<CFGNode> predecessors = node.getPredecessors();
-        Set<LatticeElement> preds = new HashSet<>();
+        Set<LatticeElement> preds = new LinkedHashSet<>();
         for (CFGNode predNode : predecessors) {
             preds.add(predNode.getOut());
         }
@@ -42,13 +42,13 @@ public class AvailableCopies extends DataflowAnalysis {
     //                        return intersection of out[n']
     public AvailableCopiesSet meet(Set<LatticeElement> elements) {
         if (elements.size() == 0) {
-            return new AvailableCopiesSet(new HashSet<>());
+            return new AvailableCopiesSet(new LinkedHashSet<>());
         }
 
         AvailableCopiesSet accumulator = null;
         for(LatticeElement element : elements) {
             if (accumulator == null) {
-                Set<TempPair> copies = new HashSet<>(((AvailableCopiesSet) element).getCopies());
+                Set<TempPair> copies = new LinkedHashSet<>(((AvailableCopiesSet) element).getCopies());
                 accumulator = new AvailableCopiesSet(copies);
             } else {
                 AvailableCopiesSet castedPred = (AvailableCopiesSet) element;
@@ -67,7 +67,7 @@ public class AvailableCopies extends DataflowAnalysis {
     public AvailableCopiesSet gen(CFGNode node) {
         assert node instanceof CFGNodeIR;
         CFGNodeIR castedNode = (CFGNodeIR) node;
-        Set<TempPair> genSet = new HashSet<>();
+        Set<TempPair> genSet = new LinkedHashSet<>();
         IRStmt castedNodeStmt = castedNode.getStatement();
         if (castedNodeStmt instanceof IRMove) {
             IRMove move = (IRMove) castedNodeStmt;
@@ -106,7 +106,7 @@ public class AvailableCopies extends DataflowAnalysis {
         // is a temp
 
         // in addition, we kill any pair that contains any _RET or _ARG register
-        Set<TempPair> killPairs = new HashSet<>();
+        Set<TempPair> killPairs = new LinkedHashSet<>();
         if(castedNodeStmt instanceof IRMove
                 && ((IRMove)castedNodeStmt).target() instanceof IRTemp ) {
             // if so, we cast the target to a IRTemp
