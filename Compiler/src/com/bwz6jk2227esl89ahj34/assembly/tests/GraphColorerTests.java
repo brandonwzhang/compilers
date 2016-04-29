@@ -1,8 +1,10 @@
 package com.bwz6jk2227esl89ahj34.assembly.tests;
 
+import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
 import com.bwz6jk2227esl89ahj34.assembly.register_allocation.GraphColorer;
+import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +36,9 @@ public class GraphColorerTests {
     // runs before every test invocation
     @Before
     public void setUp() {
+
+        Main.optimizationMap.put(OptimizationType.REG, true);
+        Main.optimizationMap.put(OptimizationType.MC, true);
 
         an = new ArrayList<>();
         bn = new ArrayList<>();
