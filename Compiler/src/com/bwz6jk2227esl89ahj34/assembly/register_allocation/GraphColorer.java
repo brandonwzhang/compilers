@@ -329,27 +329,27 @@ public class GraphColorer {
      */
     public static AssemblyPhysicalRegister assignColor(Set<AssemblyPhysicalRegister> exclude) {
 
-        if (exclude.containsAll(Arrays.asList(colors))) {
-            return null;
-        }
-
-        AssemblyPhysicalRegister color = colors[(int) Math.floor(Math.random() * colors.length)];
-        while (exclude.contains(color)) {
-            color = colors[(int) Math.floor(Math.random() * colors.length)];
-        }
+//        if (exclude.containsAll(Arrays.asList(colors))) {
+//            return null;
+//        }
+//
+//        AssemblyPhysicalRegister color = colors[(int) Math.floor(Math.random() * colors.length)];
+//        while (exclude.contains(color)) {
+//            color = colors[(int) Math.floor(Math.random() * colors.length)];
+//        }
 
         // Deterministic coloring
-//        AssemblyPhysicalRegister color = colors[0];
-//        int i = 0;
-//        while (exclude.contains(color)) {
-//            if (i < colors.length) {
-//                color = colors[i];
-//                i++;
-//            } else {
-//                color = null;
-//                break;
-//            }
-//        }
+        AssemblyPhysicalRegister color = colors[0];
+        int i = 0;
+        while (exclude.contains(color)) {
+            if (i < colors.length) {
+                color = colors[i];
+                i++;
+            } else {
+                color = null;
+                break;
+            }
+        }
 
         return color;
     }

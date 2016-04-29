@@ -1,15 +1,17 @@
 package com.bwz6jk2227esl89ahj34.ir.visit;
 
-import com.bwz6jk2227esl89ahj34.ast.Expression;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
         .AvailableExpressionSet;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
         .AvailableExpressionsAnalysis;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions.AvailableExpressionsAnalysis.ExpressionNodePair;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions.AvailableExpressionSet.TaggedExpression;
 
 
 import com.bwz6jk2227esl89ahj34.ir.*;
 
 import java.util.Map;
+import java.util.Set;
 
 public class CommonSubexpressionVisitor extends IRVisitor {
     // The set of available expressions available at the statement we're visiting
@@ -19,13 +21,17 @@ public class CommonSubexpressionVisitor extends IRVisitor {
     private AvailableExpressionsAnalysis analysis;
     // A mapping from IRExpr's to IRTemp's that we use to replace common subexpressions
     private Map<IRExpr, IRTemp> map;
+    // A set of expression that are redundant enough to be replaced
+    private Set<ExpressionNodePair> redundantSubexpressions;
 
     public CommonSubexpressionVisitor(AvailableExpressionSet set,
                                       AvailableExpressionsAnalysis analysis,
-                                      Map<IRExpr, IRTemp> map) {
+                                      Map<IRExpr, IRTemp> map,
+                                      Set<ExpressionNodePair> redundantSubexpressions) {
         this.set = set;
         this.analysis = analysis;
         this.map = map;
+        this.redundantSubexpressions = redundantSubexpressions;
     }
 
     /**
@@ -39,16 +45,15 @@ public class CommonSubexpressionVisitor extends IRVisitor {
         // Get the reference to an equivalent expr so we can compare physical equality
         IRExpr expr = analysis.findReference((IRExpr) n);
 
-        assert analysis.allExprs.containsAll(set.getExprs());
-        assert analysis.allExprs.contains(expr);
+        TaggedExpression taggedExpr = set.get(expr);
 
-        if (!set.getExprs().contains(expr)) {
-//            System.out.println("==================Set Expressions=================");
-//            System.out.println(set.getExprs());
-//            System.out.println("========================Expr======================");
-//            System.out.println(expr);
-//            System.out.println("**************************************************");
+        if (taggedExpr == null) {
             // If the expr is not available, we just return the result of visiting the children
+            return n_;
+        }
+
+        if (!redundantSubexpressions.contains(new ExpressionNodePair(taggedExpr))) {
+            // This expression is not redundant enough to be replaced
             return n_;
         }
 
