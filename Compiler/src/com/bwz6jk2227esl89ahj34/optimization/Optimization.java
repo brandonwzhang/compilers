@@ -192,9 +192,11 @@ public class Optimization {
                 CFGNode node = graph.get(i);
                 // out has all the information associated with the node
                 UnreachableValueTuplesPair tuple = (UnreachableValueTuplesPair) node.getOut();
-                if (tuple.isUnreachable()) {
+                // if it is unreachable and UCE is enabled
+                if (tuple.isUnreachable() && Main.optimizationOn(OptimizationType.UCE)) {
                     // unreachable so we do not add it to new stmts
                 } else {
+                    // if CP is on
                     if (Main.optimizationOn(OptimizationType.CP)) {
                         ConditionalConstantPropagationVisitor visitor =
                                 new ConditionalConstantPropagationVisitor(tuple.getValueTuples());

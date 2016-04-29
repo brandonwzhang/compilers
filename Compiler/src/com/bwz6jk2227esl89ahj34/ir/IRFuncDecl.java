@@ -264,9 +264,14 @@ public class IRFuncDecl extends IRNode {
 
         Optimization.functionName = name;
         IRSeq optimizedBody = reorderedBody;
-        if (Main.optimizationOn(OptimizationType.UCE)) {
+        if (Main.optimizationOn(OptimizationType.UCE) || Main.optimizationOn(OptimizationType.CP)) {
             if (Main.debugOn()) {
-                System.out.println("DEBUG: performing optimization: unreachable code elimination");
+                if (Main.optimizationOn(OptimizationType.UCE)) {
+                    System.out.println("DEBUG: performing optimization: unreachable code elimination");
+                }
+                if (Main.optimizationOn(OptimizationType.CP)) {
+                    System.out.println("DEBUG: performing optimization: constant propagation");
+                }
             }
             optimizedBody = Optimization.conditionalConstantPropagation(new IRSeq(reorderedBody));
         }
