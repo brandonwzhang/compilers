@@ -1,9 +1,9 @@
 package com.bwz6jk2227esl89ahj34.optimization;
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeIR;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.DataflowAnalysis;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.Main;
+import com.bwz6jk2227esl89ahj34.assembly.*;
+import com.bwz6jk2227esl89ahj34.assembly.register_allocation.GraphColorer;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
         .AvailableCopies;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
@@ -20,6 +20,8 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis
         .conditional_constant_propagation.ConditionalConstantPropagation;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis
         .conditional_constant_propagation.UnreachableValueTuplesPair;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables.LiveVariableAnalysis;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables.LiveVariableSet;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.visit.AvailableCopiesVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.CommonSubexpressionVisitor;
@@ -201,6 +203,87 @@ public class Optimization {
         }
 
         return new IRSeq(newStmts);
+    }
+
+    /**
+     * Uses live variable analysis to remove assignments to variables
+     * that are never used.
+     */
+    public static void removeDeadCode(List<AssemblyLine> lines) {
+        // Perform live variable analysis for dead code elimination
+        LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(lines);
+
+        // Remove assignments to variables that aren't used (dead code)
+        for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
+            CFGNodeAssembly assemblyNode = (CFGNodeAssembly) node;
+            AssemblyInstruction instruction = assemblyNode.getInstruction();
+            Set<AssemblyAbstractRegister> outSet = ((LiveVariableSet) node.getOut()).getLiveVars();
+            if (instruction.opCode == AssemblyInstruction.OpCode.MOVQ) {
+                assert instruction.getArgs().size() == 2;
+                if (instruction.getArgs().get(1) instanceof AssemblyAbstractRegister) {
+                    AssemblyAbstractRegister dst = (AssemblyAbstractRegister) instruction.getArgs().get(1);
+                    if (!outSet.contains(dst)) {
+                        for (Iterator<AssemblyLine> it = lines.iterator(); it.hasNext();) {
+                            AssemblyLine line = it.next();
+                            if (line == instruction) {
+                                it.remove();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Removes redundant moves that result from move coalescing.
+     */
+    public static void removeRedundantMoves(List<AssemblyLine> lines) {
+        // Remove duplicate lines
+        int i = 0;
+        while (i < lines.size()) {
+            if (!(lines.get(i) instanceof AssemblyInstruction)) {
+                i++;
+                continue;
+            }
+            AssemblyInstruction instruction = (AssemblyInstruction) lines.get(i);
+            if (!(instruction.getOpCode() == AssemblyInstruction.OpCode.MOVQ)) {
+                i++;
+                continue;
+            }
+
+            List<AssemblyExpression> args = instruction.args;
+            if (args.get(0).equals(args.get(1))){
+                lines.remove(i);
+            } else {
+                i++;
+            }
+        }
+    }
+
+    public static Map<AssemblyAbstractRegister, AssemblyExpression> allocateRegisters(List<AssemblyLine> lines) {
+        // Rerunning live variable analysis after dead code elimination
+        LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(lines);
+
+        // Constructing the interference sets for register allocation
+        List<Set<AssemblyAbstractRegister>> interferenceSets = new LinkedList<>();
+        for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
+            LiveVariableSet out = (LiveVariableSet) node.getOut();
+            interferenceSets.add(out.getLiveVars());
+        }
+
+        Map<AssemblyAbstractRegister, AssemblyExpression> registerMap = new HashMap<>();
+        if (Main.optimizationOn(OptimizationType.REG)) {
+            if (Main.debugOn()) {
+                System.out.println("DEBUG: performing optimization: register allocation");
+            }
+            // Use Kempe's algorithm to allocate physical locations to abstract registers
+            GraphColorer graphColorer = new GraphColorer(interferenceSets, lines);
+            graphColorer.colorGraph();
+            registerMap = graphColorer.getColoring();
+        }
+
+        return registerMap;
     }
 
     private static void writeCFG(DataflowAnalysis analysis, String optName) {

@@ -280,7 +280,6 @@ public class IRFuncDecl extends IRNode {
             if (Main.optimizationOn(OptimizationType.COPY)) {
                 if (Main.debugOn()) {
                     System.out.println("DEBUG: performing optimization: copy propagation");
-
                 }
                 Optimization.propagateCopies(ccp_optimized);
             }
@@ -294,5 +293,4 @@ public class IRFuncDecl extends IRNode {
 
         return new IRFuncDecl(fd.name(), ccp_optimized);
     }
-
 }

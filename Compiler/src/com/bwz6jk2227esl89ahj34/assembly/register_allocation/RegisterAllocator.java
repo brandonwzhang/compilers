@@ -10,6 +10,7 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables
         .LiveVariableSet;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
+import com.bwz6jk2227esl89ahj34.optimization.Optimization;
 import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
@@ -28,55 +29,14 @@ public class RegisterAllocator {
      * Returns a list of instructions with all abstract registers with physical locations
      */
     public static List<AssemblyLine> translate(List<AssemblyLine> lines) {
-        // Perform live variable analysis for dead code elimination
-        LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(lines);
-        Util.writeHelper(
-                "live_variables_",
-                "dot",
-                "./",
-                Collections.singletonList(liveVariables.toString())
-        );
 
-        // Remove assignments to variables that aren't used (dead code)
-        for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
-            CFGNodeAssembly assemblyNode = (CFGNodeAssembly) node;
-            AssemblyInstruction instruction = assemblyNode.getInstruction();
-            Set<AssemblyAbstractRegister> outSet = ((LiveVariableSet) node.getOut()).getLiveVars();
-            if (instruction.opCode == OpCode.MOVQ) {
-                assert instruction.getArgs().size() == 2;
-                if (instruction.getArgs().get(1) instanceof AssemblyAbstractRegister) {
-                    AssemblyAbstractRegister dst = (AssemblyAbstractRegister) instruction.getArgs().get(1);
-                    if (!outSet.contains(dst)) {
-                        for (Iterator<AssemblyLine> it = lines.iterator(); it.hasNext();) {
-                            AssemblyLine line = it.next();
-                            if (line == instruction) {
-                                it.remove();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Rerunning live variable analysis after dead code elimination
-        liveVariables = new LiveVariableAnalysis(lines);
-
-        // Constructing the interference sets for register allocation
-        List<Set<AssemblyAbstractRegister>> interferenceSets = new LinkedList<>();
-        for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
-            LiveVariableSet out = (LiveVariableSet) node.getOut();
-            interferenceSets.add(out.getLiveVars());
+        if (Main.optimizationOn(OptimizationType.COPY)) {
+            Optimization.removeDeadCode(lines);
         }
 
         registerMap = new HashMap<>();
         if (Main.optimizationOn(OptimizationType.REG)) {
-            if (Main.debugOn()) {
-                System.out.println("DEBUG: performing optimization: register allocation");
-            }
-            // Use Kempe's algorithm to allocate physical locations to abstract registers
-            GraphColorer graphColorer = new GraphColorer(interferenceSets, lines);
-            graphColorer.colorGraph();
-            registerMap = graphColorer.getColoring();
+            registerMap = Optimization.allocateRegisters(lines);
         }
 
         // Translate all the instructions
@@ -87,28 +47,8 @@ public class RegisterAllocator {
             translatedLines.addAll(translateInstruction(line));
         }
 
-        if (Main.optimizationOn(OptimizationType.REG)) {
-            // Remove duplicate lines
-            // Does another optimization do this for us?
-            int i = 0;
-            while (i < translatedLines.size()) {
-                if (!(translatedLines.get(i) instanceof AssemblyInstruction)) {
-                    i++;
-                    continue;
-                }
-                AssemblyInstruction instruction = (AssemblyInstruction) translatedLines.get(i);
-                if (!(instruction.getOpCode() == OpCode.MOVQ)) {
-                    i++;
-                    continue;
-                }
-
-                List<AssemblyExpression> args = instruction.args;
-                if (args.get(0).equals(args.get(1))){
-                    translatedLines.remove(i);
-                } else {
-                    i++;
-                }
-            }
+        if (Main.optimizationOn(OptimizationType.MC)) {
+            Optimization.removeRedundantMoves(translatedLines);
         }
 
         return translatedLines;
