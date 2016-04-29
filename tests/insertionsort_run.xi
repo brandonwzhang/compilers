@@ -18,19 +18,14 @@ sort(a: int[]) {
 }
 
 main(args:int[][]) {
-  sortme: int[] = {101,100,104,103,102}  //edhgf
-  metoo: int[] = "fadbgce"
+  sortme: int[] = "fadbgce"
   reverse: int[] = "ponmlkjih"
 
-  println("unsorted: " + sortme)
+  println(sortme)
   sort(sortme)
-  println("sorted:   " + sortme)
+  println(sortme)
 
-  println("unsorted: " + metoo)
-  sort(metoo)
-  println("sorted:   " + metoo)
-
-  println("unsorted: " + reverse)
+  println(reverse)
   sort(reverse)
-  println("sorted:   " + reverse)
+  println(reverse)
 }
