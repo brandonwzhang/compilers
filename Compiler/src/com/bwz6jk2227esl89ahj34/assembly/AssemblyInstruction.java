@@ -11,7 +11,8 @@ import java.util.List;
 public class AssemblyInstruction extends AssemblyLine {
     public enum OpCode {
         ADDQ, SUBQ, ANDQ, CMPQ, DIVQ ,ORQ, MOVQ, MULQ, SETZ, SETNZ, SETL, SETG, SETLE,
-        SETGE, PUSHQ, POPQ, JMP, XORQ, RETQ, JE, JNE, MOVZX, CALLQ, ENTER, LEAVE, LEAQ
+        SETGE, PUSHQ, POPQ, JMP, XORQ, RETQ, JE, JNE, MOVZX, CALLQ, ENTER, LEAVE, LEAQ,
+        IMULQ, IDIVQ
     }
 
     public OpCode opCode;
