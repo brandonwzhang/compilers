@@ -1,13 +1,13 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation;
 
 
+
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
 import com.bwz6jk2227esl89ahj34.ir.IRConst;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
 @AllArgsConstructor

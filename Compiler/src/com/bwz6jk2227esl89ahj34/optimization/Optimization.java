@@ -11,7 +11,11 @@ import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
         .AvailableExpressionSet;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
+        .AvailableExpressionSet.TaggedExpression;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
         .AvailableExpressionsAnalysis;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
+        .AvailableExpressionsAnalysis.ExpressionNodePair;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis
         .conditional_constant_propagation.ConditionalConstantPropagation;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis
@@ -20,14 +24,15 @@ import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.visit.AvailableCopiesVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.CommonSubexpressionVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.ConditionalConstantPropagationVisitor;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions.AvailableExpressionSet.TaggedExpression;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions.AvailableExpressionsAnalysis.ExpressionNodePair;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.util.*;
 
 public class Optimization {
     public static String functionName;
+    // We use a static counter to avoid colliding namespaces when we iterate
+    // CSE multiple times
+    private static long tempCounter = 0;
 
     /**
      * Runs an available expressions analysis and replaces all common subexpressions
@@ -37,7 +42,6 @@ public class Optimization {
         writeCFG(analysis, "cse");
 
         // Create new set of cse temps
-        int tempCounter = 0;
         Map<IRExpr, IRTemp> tempMap = new HashMap<>();
         for (IRExpr expr : analysis.allExprs) {
             tempMap.put(expr, new IRTemp("cse" + tempCounter++));

@@ -1,25 +1,12 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
 import com.bwz6jk2227esl89ahj34.Main;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
-        .AvailableCopies;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
-        .AvailableCopiesSet;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
-        .AvailableExpressionSet;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
-        .AvailableExpressionsAnalysis;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.ConditionalConstantPropagation;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation.UnreachableValueTuplesPair;
 import com.bwz6jk2227esl89ahj34.ir.visit.AggregateVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.InsnMapsBuilder;
 import com.bwz6jk2227esl89ahj34.ir.visit.MIRLowerVisitor;
-import com.bwz6jk2227esl89ahj34.ir.visit.*;
 import com.bwz6jk2227esl89ahj34.optimization.Optimization;
 import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
-import com.bwz6jk2227esl89ahj34.util.Util;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 
 import java.util.*;

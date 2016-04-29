@@ -1,8 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ir;
 
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /** RETURN statement */
 public class IRReturn extends IRStmt {

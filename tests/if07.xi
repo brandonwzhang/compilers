@@ -2,22 +2,21 @@
   use conv
  
   main(args: int[][]) {
-  if (lt(0, 0) & lt(0, 0)) println("true")
-  if (lt(0, 0) & lt(0, -1)) println("true")
-  if (lt(0, 0) & lt(0, 1)) println("true")
-  if (lt(0, -1) & lt(0, 0)) println("true")
-  if (lt(0, -1) & lt(0, -1)) println("true")
- if (lt(0, -1) & lt(0, 1)) println("true")
- if (lt(0, 1) & lt(0, 0)) println("true")
- if (lt(0, 1) & lt(0, -1)) println("true")
- if (lt(0, 1) & lt(0, 1)) println("true")
- println("printed")
+  if (lt(0, 0) & lt(0, 0)) println("t")
+  if (lt(0, 0) & lt(0, -1)) println("t")
+  if (lt(0, 0) & lt(0, 1)) println("t")
+  if (lt(0, -1) & lt(0, 0)) println("t")
+  if (lt(0, -1) & lt(0, -1)) println("t")
+ if (lt(0, -1) & lt(0, 1)) println("t")
+ if (lt(0, 1) & lt(0, 0)) println("t")
+ if (lt(0, 1) & lt(0, -1)) println("t")
+ if (lt(0, 1) & lt(0, 1)) println("t")
  }
 
  lt(x: int, y: int): bool {
- print("lt() called: ")
+ print("lt():")
  print(unparseInt(x))
- print(" < ")
+ print("<")
  println(unparseInt(y))
  return x < y
  }

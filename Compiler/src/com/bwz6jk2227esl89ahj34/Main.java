@@ -3,7 +3,8 @@ package com.bwz6jk2227esl89ahj34;
 import com.bwz6jk2227esl89ahj34.cli.CLI;
 import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
 
 public class Main {
     private static String sourcePath = "./";

@@ -1,13 +1,20 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies;
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
-import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeIR;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.DataflowAnalysis;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
+        .AvailableCopiesSet.TempPair;
+import com.bwz6jk2227esl89ahj34.ir.IRMove;
+import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import com.bwz6jk2227esl89ahj34.ir.IRStmt;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies.AvailableCopiesSet.TempPair;
-
+import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class AvailableCopies extends DataflowAnalysis {
 

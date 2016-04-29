@@ -3,11 +3,11 @@ package com.bwz6jk2227esl89ahj34.ir.visit;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
         .AvailableExpressionSet;
 import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
+        .AvailableExpressionSet.TaggedExpression;
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
         .AvailableExpressionsAnalysis;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions.AvailableExpressionsAnalysis.ExpressionNodePair;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions.AvailableExpressionSet.TaggedExpression;
-
-
+import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
+        .AvailableExpressionsAnalysis.ExpressionNodePair;
 import com.bwz6jk2227esl89ahj34.ir.*;
 
 import java.util.Map;

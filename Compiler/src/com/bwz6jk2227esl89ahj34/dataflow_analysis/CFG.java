@@ -1,7 +1,5 @@
 package com.bwz6jk2227esl89ahj34.dataflow_analysis;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.HashMap;
