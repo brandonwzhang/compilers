@@ -237,10 +237,10 @@ public class ConstantFoldingVisitor implements NodeVisitor {
             } else if (b instanceof WhileStatement && //likewise for whiles
                     ((WhileStatement)b).getGuard() instanceof BooleanLiteral) {
                 boolean bool =  ((BooleanLiteral)((WhileStatement)b).getGuard()).getValue();
-                if (bool) {
-                    blockList.add(((WhileStatement)b).getBlock());
+                if (bool) { // while(true) is always retained...
+                    blockList.add(b);
                 }
-                //else we don't add anything so nothing to do
+                // but while(false) is thrown away
             } else {
                 blockList.add(b);
             }
