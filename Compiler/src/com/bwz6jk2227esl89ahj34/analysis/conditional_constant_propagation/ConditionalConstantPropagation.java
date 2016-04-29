@@ -1,12 +1,11 @@
-package com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation;
+package com.bwz6jk2227esl89ahj34.analysis.conditional_constant_propagation;
 
 
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
+import com.bwz6jk2227esl89ahj34.analysis.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.visit.IRConstantFoldingVisitor;
 
-import java.math.BigInteger;
 import java.util.*;
 
 public class ConditionalConstantPropagation extends DataflowAnalysis {

@@ -1,10 +1,10 @@
-package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions;
+package com.bwz6jk2227esl89ahj34.analysis.available_expressions;
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeIR;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.DataflowAnalysis;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
+import com.bwz6jk2227esl89ahj34.analysis.CFGNode;
+import com.bwz6jk2227esl89ahj34.analysis.CFGNodeIR;
+import com.bwz6jk2227esl89ahj34.analysis.DataflowAnalysis;
+import com.bwz6jk2227esl89ahj34.analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.analysis.available_expressions
         .AvailableExpressionSet.TaggedExpression;
 import com.bwz6jk2227esl89ahj34.ir.*;
 
@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Predicate;
 
-public class AvailableExpressionsAnalysis extends DataflowAnalysis{
+public class AvailableExpressions extends DataflowAnalysis{
     public static class ExpressionNodePair {
         public IRExpr expr;
         public CFGNode node;
@@ -51,7 +51,7 @@ public class AvailableExpressionsAnalysis extends DataflowAnalysis{
 
     public Set<IRExpr> allExprs;
 
-    public AvailableExpressionsAnalysis(IRSeq seq) {
+    public AvailableExpressions(IRSeq seq) {
         // We initialize all nodes to the bottom element, {}
         super(seq, Direction.FORWARD, new AvailableExpressionSet(new LinkedHashSet<>()), false);
         allExprs = allExprs(seq);

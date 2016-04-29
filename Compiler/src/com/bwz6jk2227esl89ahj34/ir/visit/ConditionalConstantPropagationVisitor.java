@@ -1,10 +1,10 @@
 package com.bwz6jk2227esl89ahj34.ir.visit;
 
 import com.bwz6jk2227esl89ahj34.Main;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis
+import com.bwz6jk2227esl89ahj34.analysis.LatticeBottom;
+import com.bwz6jk2227esl89ahj34.analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.analysis.LatticeTop;
+import com.bwz6jk2227esl89ahj34.analysis
         .conditional_constant_propagation.Value;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.optimization.OptimizationType;

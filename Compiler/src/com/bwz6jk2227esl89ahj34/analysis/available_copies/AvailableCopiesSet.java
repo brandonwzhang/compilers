@@ -1,6 +1,6 @@
-package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies;
+package com.bwz6jk2227esl89ahj34.analysis.available_copies;
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.analysis.LatticeElement;
 import lombok.*;
 
 import java.util.LinkedHashSet;

@@ -1,9 +1,9 @@
-package com.bwz6jk2227esl89ahj34.dataflow_analysis.conditional_constant_propagation;
+package com.bwz6jk2227esl89ahj34.analysis.conditional_constant_propagation;
 
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
+import com.bwz6jk2227esl89ahj34.analysis.LatticeBottom;
+import com.bwz6jk2227esl89ahj34.analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.analysis.LatticeTop;
 import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 import lombok.*;

@@ -1,9 +1,8 @@
-package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions;
+package com.bwz6jk2227esl89ahj34.analysis.available_expressions;
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeIR;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.analysis.CFGNodeIR;
+import com.bwz6jk2227esl89ahj34.analysis.LatticeElement;
 import com.bwz6jk2227esl89ahj34.ir.IRExpr;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

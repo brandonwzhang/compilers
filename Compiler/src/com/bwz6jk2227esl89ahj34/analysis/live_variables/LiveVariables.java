@@ -1,18 +1,18 @@
-package com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables;
+package com.bwz6jk2227esl89ahj34.analysis.live_variables;
 
 import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyInstruction.OpCode;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeAssembly;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.DataflowAnalysis;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.analysis.CFGNode;
+import com.bwz6jk2227esl89ahj34.analysis.CFGNodeAssembly;
+import com.bwz6jk2227esl89ahj34.analysis.DataflowAnalysis;
+import com.bwz6jk2227esl89ahj34.analysis.LatticeElement;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class LiveVariableAnalysis extends DataflowAnalysis {
+public class LiveVariables extends DataflowAnalysis {
     public static Set<OpCode> defOpCodes;
 
     static {
@@ -20,7 +20,7 @@ public class LiveVariableAnalysis extends DataflowAnalysis {
         defOpCodes = new LinkedHashSet<>(Arrays.asList(defOpCodesArr));
     }
 
-    public LiveVariableAnalysis(List<AssemblyLine> lines) {
+    public LiveVariables(List<AssemblyLine> lines) {
         super(lines, Direction.BACKWARD, new LiveVariableSet(new LinkedHashSet<>()));
     }
 

@@ -1,15 +1,14 @@
-package com.bwz6jk2227esl89ahj34.dataflow_analysis.tests;
+package com.bwz6jk2227esl89ahj34.analysis.tests;
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
-        .AvailableExpressionsAnalysis;
+import com.bwz6jk2227esl89ahj34.analysis.available_expressions.AvailableExpressions;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AvailableExpressionsAnalysisTest {
-    AvailableExpressionsAnalysis analysis;
+public class AvailableExpressionsTest {
+    AvailableExpressions analysis;
 
     @Before
     public void setup() {

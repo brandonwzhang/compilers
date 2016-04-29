@@ -1,10 +1,10 @@
-package com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies;
+package com.bwz6jk2227esl89ahj34.analysis.available_copies;
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNode;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGNodeIR;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.DataflowAnalysis;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
+import com.bwz6jk2227esl89ahj34.analysis.CFGNode;
+import com.bwz6jk2227esl89ahj34.analysis.CFGNodeIR;
+import com.bwz6jk2227esl89ahj34.analysis.DataflowAnalysis;
+import com.bwz6jk2227esl89ahj34.analysis.LatticeElement;
+import com.bwz6jk2227esl89ahj34.analysis.available_copies
         .AvailableCopiesSet.TempPair;
 import com.bwz6jk2227esl89ahj34.ir.IRMove;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;

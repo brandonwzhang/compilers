@@ -3,30 +3,27 @@ package com.bwz6jk2227esl89ahj34.optimization;
 import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.assembly.*;
 import com.bwz6jk2227esl89ahj34.assembly.register_allocation.GraphColorer;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.*;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
+import com.bwz6jk2227esl89ahj34.analysis.*;
+import com.bwz6jk2227esl89ahj34.analysis.available_copies
         .AvailableCopies;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
+import com.bwz6jk2227esl89ahj34.analysis.available_copies
         .AvailableCopiesSet;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
+import com.bwz6jk2227esl89ahj34.analysis.available_expressions
         .AvailableExpressionSet;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
+import com.bwz6jk2227esl89ahj34.analysis.available_expressions
         .AvailableExpressionSet.TaggedExpression;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
-        .AvailableExpressionsAnalysis;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_expressions
-        .AvailableExpressionsAnalysis.ExpressionNodePair;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis
+import com.bwz6jk2227esl89ahj34.analysis.available_expressions.AvailableExpressions;
+import com.bwz6jk2227esl89ahj34.analysis.available_expressions.AvailableExpressions.ExpressionNodePair;
+import com.bwz6jk2227esl89ahj34.analysis
         .conditional_constant_propagation.ConditionalConstantPropagation;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis
+import com.bwz6jk2227esl89ahj34.analysis
         .conditional_constant_propagation.UnreachableValueTuplesPair;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables.LiveVariableAnalysis;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables.LiveVariableSet;
+import com.bwz6jk2227esl89ahj34.analysis.live_variables.LiveVariables;
+import com.bwz6jk2227esl89ahj34.analysis.live_variables.LiveVariableSet;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.visit.AvailableCopiesVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.CommonSubexpressionVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.ConditionalConstantPropagationVisitor;
-import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.util.*;
 
@@ -40,7 +37,7 @@ public class Optimization {
      * Runs an available expressions analysis and replaces all common subexpressions
      */
     public static void eliminateCommonSubexpressions(IRSeq body) {
-        AvailableExpressionsAnalysis analysis = new AvailableExpressionsAnalysis(body);
+        AvailableExpressions analysis = new AvailableExpressions(body);
 
         // Create new set of cse temps
         Map<IRExpr, IRTemp> tempMap = new LinkedHashMap<>();
@@ -224,17 +221,16 @@ public class Optimization {
         while (!fixpointReached) {
             fixpointReached = true;
             // Perform live variable analysis for dead code elimination
-            LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(lines);
+            LiveVariables analysis = new LiveVariables(lines);
 
             // Remove assignments to variables that aren't used (dead code)
-            for (CFGNode node : liveVariables.getGraph().getNodes().values()) {
+            for (CFGNode node : analysis.getGraph().getNodes().values()) {
                 CFGNodeAssembly assemblyNode = (CFGNodeAssembly) node;
                 AssemblyInstruction instruction = assemblyNode.getInstruction();
                 Set<AssemblyAbstractRegister> outSet = ((LiveVariableSet) node.getOut()).getLiveVars();
                 // We only consider instructions that could define a temp that is unused until its
                 // next definition
-                if (!LiveVariableAnalysis.defOpCodes.contains(instruction
-                        .opCode)) {
+                if (!LiveVariables.defOpCodes.contains(instruction.opCode)) {
                     continue;
                 }
                 assert instruction.getArgs().size() == 2;
@@ -275,7 +271,7 @@ public class Optimization {
                 continue;
             }
             AssemblyInstruction instruction = (AssemblyInstruction) line;
-            if (!LiveVariableAnalysis.defOpCodes.contains(instruction.opCode)) {
+            if (!LiveVariables.defOpCodes.contains(instruction.opCode)) {
                 // Only consider instructions that could define a temp
                 continue;
             }
@@ -293,7 +289,7 @@ public class Optimization {
 
     public static Map<AssemblyAbstractRegister, AssemblyExpression> allocateRegisters(List<AssemblyLine> lines) {
         // Rerunning live variable analysis after dead code elimination
-        LiveVariableAnalysis liveVariables = new LiveVariableAnalysis(lines);
+        LiveVariables liveVariables = new LiveVariables(lines);
 
         // Constructing the interference sets for register allocation
         List<Set<AssemblyAbstractRegister>> interferenceSets = new LinkedList<>();

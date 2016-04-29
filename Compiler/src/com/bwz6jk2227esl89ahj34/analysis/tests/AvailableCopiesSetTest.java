@@ -1,10 +1,10 @@
 //package com.bwz6jk2227esl89ahj34.dataflow_analysis.tests;
 //
-//import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeBottom;
-//import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
-//import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeTop;
-//import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies.AvailableCopies;
-//import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
+//import com.bwz6jk2227esl89ahj34.analysis.LatticeBottom;
+//import com.bwz6jk2227esl89ahj34.analysis.LatticeElement;
+//import com.bwz6jk2227esl89ahj34.analysis.LatticeTop;
+//import com.bwz6jk2227esl89ahj34.analysis.available_copies.AvailableCopies;
+//import com.bwz6jk2227esl89ahj34.analysis.available_copies
 //        .AvailableCopiesSet;
 //import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 //import org.junit.Assert;

@@ -7,7 +7,7 @@ import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
 import com.bwz6jk2227esl89ahj34.ast.FunctionType;
 import com.bwz6jk2227esl89ahj34.ast.parse.ParserSym;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.CFGIR;
+import com.bwz6jk2227esl89ahj34.analysis.CFGIR;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;

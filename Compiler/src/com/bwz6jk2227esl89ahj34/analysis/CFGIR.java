@@ -1,4 +1,4 @@
-package com.bwz6jk2227esl89ahj34.dataflow_analysis;
+package com.bwz6jk2227esl89ahj34.analysis;
 
 import com.bwz6jk2227esl89ahj34.ir.*;
 

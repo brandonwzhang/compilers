@@ -1,9 +1,8 @@
-package com.bwz6jk2227esl89ahj34.dataflow_analysis.live_variables;
+package com.bwz6jk2227esl89ahj34.analysis.live_variables;
 
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyAbstractRegister;
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.LatticeElement;
-import lombok.Data;
+import com.bwz6jk2227esl89ahj34.analysis.LatticeElement;
 import lombok.Getter;
 import lombok.Setter;
 

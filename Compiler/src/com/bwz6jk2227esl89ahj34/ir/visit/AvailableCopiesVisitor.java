@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ir.visit;
 
-import com.bwz6jk2227esl89ahj34.dataflow_analysis.available_copies
+import com.bwz6jk2227esl89ahj34.analysis.available_copies
         .AvailableCopiesSet;
 import com.bwz6jk2227esl89ahj34.ir.IRMem;
 import com.bwz6jk2227esl89ahj34.ir.IRMove;
