@@ -1,4 +1,5 @@
 use io
+use conv
 
 // Return the greatest common divisor of two integers
 gcd(a:int, b:int):int {
@@ -19,6 +20,7 @@ ratadd(p1:int, q1:int, p2:int, q2:int) : int, int {
 
 main(args:int[][]) {
     p:int, q:int = ratadd(2, 5, 1, 3)
-    _, r:int = ratadd(1, 2, 1, 3)
-    print({p + 100, q + 100, r + 100})
+    _, q':int = ratadd(1, 2, 1, 3)
+    println(unparseInt(p + q))
+    println(unparseInt(q'))
 }
