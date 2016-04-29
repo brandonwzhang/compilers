@@ -63,8 +63,8 @@ public class ConstantFoldingVisitor implements NodeVisitor {
 
         if(LHS && ! (node.getIndex() instanceof Binary)
                 && !(node.getIndex() instanceof IntegerLiteral)
-                && !(node.getIndex() instanceof CharacterLiteral)) {
-            assert !assignableStack.isEmpty();
+                && !(node.getIndex() instanceof CharacterLiteral)
+                && !assignableStack.isEmpty()) {
             node.setIndex((Expression)(assignableStack.pop()));
         } else {
             assert !stack.isEmpty();
