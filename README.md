@@ -2,7 +2,7 @@
 Compiler for the Xi Programming Language
 
 ## Building
-With Apache Ant installed and the `JAVA_HOME` environment variable set, run the `xic-build` script.
+With Apache Ant installed and the `JAVA_HOME` environment variable set, run the `xic-build` script:
 ```
 ./xic-build
 ```
