@@ -1,38 +1,33 @@
 # Compilers
 Compiler for the Xi Programming Language
 
-#### Building
-Install Ant
-
-Run "./xic-build"
-
-
-#### Running
-Run "./xic" to see all the options available.
-Simple method: run "./xic --option filename.xi" to execute 
-option on filename.xi.
-
-Options currently supported are --lex, --parse, --typecheck, --irgen, --irrun.
-
--sourcepath specifies a directory to prepend to all of the provided 
-source files
-
--D specifies a directory to prepend to the source file names when writing
-the diagnostics files
-
-If we run:
-./xic --option -sourcepath sp -D dp file
-This script will look for sp/file (file should end in .xi).
-This script will write any diagnostic files at dp/file , 
-where the extension of file is modified accordingly.
-Note that 'file' can include a directory path.
+## Building
+With ant installed and the `JAVA_HOME` environment variable set, run the `xic-build` script.
+```
+./xic-build
+```
 
 
-#### Advanced
-To run our test suite, include the flag --tests. To modify the test mode
+## Running
+To compile a Xi program:
+```
+./xic <filename>
+```
+To specify a folder containing interface `.ixi` files:
+```
+./xic -libpath <path> <filename>
+```
+To view all options:
+```
+./xic --help
+```
+
+
+### Advanced
+To run our test suite, include the flag `--tests`. To modify the test mode
 behaviors, go to the if(tests){} block in Main. These behaviors will
 run regardless of and in addition to any options that you provide normally.
-Test methods will read in all of the .xi files inside their respective 
+Test methods will read in all of the .xi files inside their respective
 directories (for example, irGenTests() will read in all of the Xi files
 in ir/irrgen).
 
@@ -46,7 +41,7 @@ In debug mode, you will receive additional print statements to the console
 that inform you of things like reading and writing files.
 MIR files (extension .mir) are written.
 
-To change irrun to interpret the MIR instead of the LIR, 
+To change irrun to interpret the MIR instead of the LIR,
 go to the method irRun() in Core and change the line:
 Optional<FileReader> reader = Util.getFileReader(diagnosticPath, file.substring(0, file.length() - 2) + "ir");
 to:
