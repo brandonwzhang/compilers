@@ -22,6 +22,7 @@ import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.visit.AvailableCopiesVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.CommonSubexpressionVisitor;
 import com.bwz6jk2227esl89ahj34.ir.visit.ConditionalConstantPropagationVisitor;
+import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.util.*;
 
@@ -317,5 +318,14 @@ public class Optimization {
         }
 
         return registerMap;
+    }
+
+    private static void writeCFG(DataflowAnalysis analysis, String optName) {
+        Util.writeHelper(
+                optName + functionName,
+                "dot",
+                "./",
+                Collections.singletonList(analysis.toString())
+        );
     }
 }

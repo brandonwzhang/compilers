@@ -112,7 +112,7 @@ public class GraphColorer {
             movePairs.clear();
         } else {
             if (Main.debugOn()) {
-                System.out.println("DEBUG: performing optimization: move coalescing");
+                //System.out.println("DEBUG: performing optimization: move coalescing");
             }
         }
     }
@@ -127,8 +127,31 @@ public class GraphColorer {
             List<AssemblyLine> lines,
             Map<AssemblyAbstractRegister, AssemblyPhysicalRegister> precoloring
     ) {
-        this(liveVariableSets, lines);
+        this.coloring = new LinkedHashMap<>();
         this.coloring.putAll(precoloring);
+        this.removedNodes = new ArrayDeque<>();
+        this.activeNodes = new LinkedHashSet<>();
+        this.spillNodes = new LinkedHashSet<>();
+        this.movePairs = new LinkedHashSet<>();
+        this.replacementMap = new LinkedHashMap<>();
+        this.lines = lines;
+
+        this.graph = constructInterferenceGraph(liveVariableSets);
+        this.activeNodes.addAll(graph.keySet());
+
+        addMovePairs();
+        removeAbsentMovePairs();
+        removeImpossibleMovePairs();
+
+        if (!Main.optimizationOn(OptimizationType.MC)) {
+            movePairs.clear();
+        } else {
+            if (Main.debugOn()) {
+                //System.out.println("DEBUG: performing optimization: move coalescing");
+            }
+        }
+
+        //System.out.println(precoloring);
     }
 
     /**
@@ -240,6 +263,10 @@ public class GraphColorer {
             if (graph.get(pair.left).contains(pair.right) || graph.get(pair.right).contains(pair.left)) {
                 removeSet.add(pair);
             }
+            if (coloring.containsKey(pair.left) || coloring.containsKey(pair.right)) {
+                //System.out.println(pair);
+                removeSet.add(pair);
+            }
         }
         movePairs.removeAll(removeSet);
     }
@@ -262,14 +289,14 @@ public class GraphColorer {
         }
         return register;
     }
-    
+
     /**
      * Call this after graph coloring and move coalescing.
      * Removes any move instructions that were coalesced.
      * Mutates the given List of assembly lines.
      */
     private void updateLines() {
-        
+
         for (AssemblyLine line : lines) {
             if (!(line instanceof AssemblyInstruction)) {
                 continue;
@@ -369,6 +396,7 @@ public class GraphColorer {
 
         assert activeNodes.contains(a) && activeNodes.contains(b);
         assert !graph.get(a).contains(b) && !graph.get(b).contains(a);
+        assert !coloring.containsKey(a) && !coloring.containsKey(b);
 
         for (AssemblyAbstractRegister node : graph.get(b)) {
 
@@ -425,7 +453,6 @@ public class GraphColorer {
         for (AssemblyAbstractRegister node : activeNodes) {
             if (
                         graph.get(node).size() < colors.length // insignificant
-                    && !coloring.containsKey(node)             // is not pre-colored
                     && !isMoveRelated(node)                    // is not move-related
                     ) {
                 return Optional.of(node);
@@ -496,6 +523,11 @@ public class GraphColorer {
     private boolean canCoalesce(AssemblyAbstractRegister a, AssemblyAbstractRegister b) {
 
         if (graph.get(a).contains(b) || graph.get(b).contains(a)) {
+            return false;
+        }
+
+        if (coloring.containsKey(a) || coloring.containsKey(b)) {
+            // don't coalesce precolored nodes
             return false;
         }
 
@@ -624,7 +656,9 @@ public class GraphColorer {
 
         //System.out.println("\n========= colorGraph() called =========");
 
-        int numPrecolored = coloring.size();
+        for (AssemblyAbstractRegister precoloredNode : coloring.keySet()) {
+            activeNodes.remove(precoloredNode);
+        }
 
         while (true) {
             boolean frozeNode;
@@ -640,7 +674,7 @@ public class GraphColorer {
                 frozeNode = freeze();
             } while(frozeNode);
 
-            if (activeNodes.size() == numPrecolored) {
+            if (activeNodes.size() == 0) {
                 // TODO: test precolored nodes
                 break;
             }

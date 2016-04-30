@@ -8,6 +8,7 @@ import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;
 import com.bwz6jk2227esl89ahj34.ir.IRStmt;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
+import com.bwz6jk2227esl89ahj34.optimization.Optimization;
 import lombok.Data;
 
 import java.util.LinkedList;
@@ -32,6 +33,7 @@ public class AssemblyFunction {
     public AssemblyFunction(IRFuncDecl func) {
         // Save the function name
         name = func.name();
+        Optimization.functionName = name;
 
         // Reset the space for abstract registers
         AssemblyAbstractRegister.reset();
