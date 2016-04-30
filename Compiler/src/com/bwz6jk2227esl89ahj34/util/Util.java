@@ -97,6 +97,8 @@ public class Util {
         put(ParserSym.error, "error:");
                 put(ParserSym.NEGATIVE_INT_BOUND, "negative_int_bound");
                 put(ParserSym.LENGTH, "length");
+                put(ParserSym.CLASS, "class");
+                put(ParserSym.EXTENDS, "extends");
     }};
 
     /**

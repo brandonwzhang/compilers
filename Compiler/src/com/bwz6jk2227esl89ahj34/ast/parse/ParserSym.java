@@ -8,11 +8,13 @@ package com.bwz6jk2227esl89ahj34.ast.parse;
 /** CUP generated class containing symbol constants. */
 public class ParserSym {
   /* terminals */
+  public static final int EXTENDS = 45;
   public static final int UNDERSCORE = 40;
   public static final int LENGTH = 43;
   public static final int LT = 22;
   public static final int CLOSE_BRACKET = 32;
   public static final int INTEGER_LITERAL = 5;
+  public static final int CLASS = 44;
   public static final int error = 1;
   public static final int INT = 8;
   public static final int NEGATIVE_INT_BOUND = 42;
@@ -96,7 +98,9 @@ public class ParserSym {
   "UNDERSCORE",
   "HIGH_MULT",
   "NEGATIVE_INT_BOUND",
-  "LENGTH"
+  "LENGTH",
+  "CLASS",
+  "EXTENDS"
   };
 }
 

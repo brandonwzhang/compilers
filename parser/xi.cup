@@ -40,7 +40,7 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS;
 
 nonterminal Program program;
 
@@ -318,5 +318,7 @@ use_block ::= USE identifier:id use_block:u {: u.add(0, new UseStatement(id)); R
 
 
 program ::= use_block:u function_declaration_list:l   {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
+          | use_block:u CLASS identifier:id OPEN_BRACE function_declaration_list:l CLOSE_BRACE {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
+          | use_block:u CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE function_declaration_list:l CLOSE_BRACE  {: RESULT = new Program(u,l); :} 
           | error
           ;
