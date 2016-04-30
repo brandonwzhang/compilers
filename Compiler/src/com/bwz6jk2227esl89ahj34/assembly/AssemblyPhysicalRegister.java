@@ -56,7 +56,7 @@ public class AssemblyPhysicalRegister extends AssemblyRegister {
 
     // We use R9 to pass in the pointer to the caller's return space, so it's not available
     public static final AssemblyPhysicalRegister[] availableRegisters = {
-            R10, R11, R12, R13, RDI, RSI, RDX, R8
+            R10, R11, R12, R13, RDI, RSI, RDX, RCX, RCX, R8
     };
 
     public enum Register {
