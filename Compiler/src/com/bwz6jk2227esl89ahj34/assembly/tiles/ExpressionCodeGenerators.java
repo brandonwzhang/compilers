@@ -132,9 +132,18 @@ public class ExpressionCodeGenerators {
                 // mulq t2
                 // movq RAX, t
                 // restore RDX, RAX
-
-                lines.add(new AssemblyInstruction(OpCode.MOVQ, left, t));
-                lines.add(new AssemblyInstruction(OpCode.IMULQ, right, t));
+                AssemblyExpression left_ = left;
+                AssemblyExpression right_ = right;
+                if (!(left instanceof AssemblyRegister)) {
+                    left_ = new AssemblyAbstractRegister();
+                    lines.add(new AssemblyInstruction(OpCode.MOVQ, left, left_));
+                }
+                if (!(right instanceof AssemblyRegister)) {
+                    right_ = new AssemblyAbstractRegister();
+                    lines.add(new AssemblyInstruction(OpCode.MOVQ, right, right_));
+                }
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, left_, t));
+                lines.add(new AssemblyInstruction(OpCode.IMULQ, right_, t));
 
                 return t;
             }
