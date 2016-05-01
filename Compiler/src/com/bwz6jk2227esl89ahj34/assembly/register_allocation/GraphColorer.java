@@ -262,63 +262,6 @@ public class GraphColorer {
         }
         return register;
     }
-    
-    /**
-     * Call this after graph coloring and move coalescing.
-     * Removes any move instructions that were coalesced.
-     * Mutates the given List of assembly lines.
-     */
-    private void updateLines() {
-        
-        for (AssemblyLine line : lines) {
-            if (!(line instanceof AssemblyInstruction)) {
-                continue;
-            }
-            AssemblyInstruction instruction = (AssemblyInstruction) line;
-            List<AssemblyExpression> args = instruction.args;
-
-            for (int i = 0; i < args.size(); i++) {
-                AssemblyAbstractRegister register;
-
-                if (args.get(i) instanceof AssemblyAbstractRegister) {
-                    register = (AssemblyAbstractRegister) args.get(i);
-                    args.set(i, getReplacement(register));
-
-                } else if (args.get(i) instanceof AssemblyMemoryLocation) {
-                    AssemblyMemoryLocation mem = (AssemblyMemoryLocation) args.get(i);
-                    if (mem.offsetRegister instanceof AssemblyAbstractRegister) {
-                        register = (AssemblyAbstractRegister) mem.offsetRegister;
-                        mem.setOffsetRegister(getReplacement(register));
-
-                    } else if (mem.baseRegister instanceof AssemblyAbstractRegister) {
-                        register = (AssemblyAbstractRegister) mem.baseRegister;
-                        mem.setBaseRegister(getReplacement(register));
-
-                    }
-                }
-            }
-        }
-
-        int i = 0;
-        while (i < lines.size()) {
-            if (!(lines.get(i) instanceof AssemblyInstruction)) {
-                i++;
-                continue;
-            }
-            AssemblyInstruction instruction = (AssemblyInstruction) lines.get(i);
-            if (!(instruction.getOpCode() == OpCode.MOVQ)) {
-                i++;
-                continue;
-            }
-
-            List<AssemblyExpression> args = instruction.args;
-            if (args.get(0).equals(args.get(1))){
-                lines.remove(i);
-            } else {
-                i++;
-            }
-        }
-    }
 
     /**
      * A method for selecting a random valid color. Returns null if all of
@@ -715,7 +658,6 @@ public class GraphColorer {
 
         //System.out.println("spill nodes: " + spillNodes.size());
         allocateCoalescedRegisters();
-        //updateLines();
     }
 
     /**
