@@ -43,6 +43,10 @@ public class Core {
         try {
             reader = new FileReader(Main.sourcePath() + file);
         } catch (FileNotFoundException e) {
+            if (!Main.generateAssembly()) {
+                // -a was provided and generateAssembly() will not be called
+                System.out.println(Main.sourcePath() + file + " was not found.");
+            }
             return;
         }
 
