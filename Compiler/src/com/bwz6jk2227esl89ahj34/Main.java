@@ -19,6 +19,7 @@ public class Main {
     private static boolean typecheck;
     private static boolean irgen;
     private static boolean irrun;
+    private static boolean generateAssembly = true;
     private static boolean reportInitialIR = false;
     private static boolean reportFinalIR = false;
     private static boolean reportInitialCFG = false;
@@ -95,6 +96,10 @@ public class Main {
                 "Report the control-flow graph at the specified phase of optimization.",
                 phase -> reportCFG(phase[0]),
                 1);
+        cli.addOption("-a",
+                "Turn off assembly code generation.",
+                Main::turnAssemblyGenerationOff,
+                0);
 
         cli.execute(args);
 
@@ -229,6 +234,10 @@ public class Main {
         irrun = true;
     }
 
+    public static void turnAssemblyGenerationOff(String [] args) {
+        generateAssembly = false;
+    }
+
     public static boolean lex() {
         return lex;
     }
@@ -247,6 +256,10 @@ public class Main {
 
     public static boolean irrun() {
         return irrun;
+    }
+
+    public static boolean generateAssembly() {
+        return generateAssembly;
     }
 
     public static boolean reportInitialIR() { return reportInitialIR; }

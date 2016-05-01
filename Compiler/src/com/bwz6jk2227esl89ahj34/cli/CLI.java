@@ -162,7 +162,9 @@ public class CLI {
         }
 
         // assembly generation
-        Arrays.stream(filesArray).forEach(Core::generateExecutable);
+        if (Main.generateAssembly()) {
+            Arrays.stream(filesArray).forEach(Core::generateExecutable);
+        }
     }
 
     /**
