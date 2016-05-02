@@ -171,9 +171,16 @@ public class CLI {
      * Print all of the options and their descriptions
      */
     public void printOptions() {
+        int maxOptionLenth = 0;
         for (String option : options.keySet()) {
-            System.out.println(option + "\t\t" +
-                    options.get(option).description);
+            if (option.length() > maxOptionLenth) {
+                maxOptionLenth = option.length();
+            }
+        }
+        for (String option : options.keySet()) {
+            String line = String.format("%-" + (maxOptionLenth + 4) + "s %s",
+                    option, options.get(option).description);
+            System.out.println(line);
         }
     }
 
