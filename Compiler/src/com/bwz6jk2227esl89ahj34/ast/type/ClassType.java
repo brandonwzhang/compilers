@@ -10,7 +10,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class ClassType extends Type {
+public class ClassType extends BaseType {
     private Identifier identifier;
     private Identifier parentIdentifier;
     private Map<Identifier, Type> fields;
