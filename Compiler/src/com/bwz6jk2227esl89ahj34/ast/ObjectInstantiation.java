@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class ObjectInstantiation extends Expression implements Assignable {
+public class ObjectInstantiation extends Expression {
     private Identifier classIdentifier;
 
     public void accept(NodeVisitor v){
