@@ -219,7 +219,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      */
     public void visit(BlockList node) {
         List<Block> blockList = new LinkedList<>();
-        for(Block b : node.getBlockList()) {
+        for(Block b : node.getBlocks()) {
             b.accept(this);
             // if an if statement can be reduced to not having the guard
             // then we get rid of the guard
@@ -245,7 +245,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
                 blockList.add(b);
             }
         }
-        node.setBlockList(new LinkedList<>(blockList));
+        node.setBlocks(new LinkedList<>(blockList));
     }
 
     /**
@@ -268,6 +268,10 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         // and make the converted form readily available by pushing it onto
         // the stack
         stack.push(integerLiteral);
+    }
+
+    public void visit(ClassDeclaration node) {
+        // TODO
     }
 
     /**
@@ -356,6 +360,26 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         stack.push(node);
     }
 
+    public void visit(MethodDeclaration node) {
+        // TODO
+    }
+
+    public void visit(ObjectField node) {
+        // TODO
+    }
+
+    public void visit(ObjectFunctionCall node) {
+        // TODO
+    }
+
+    public void visit(ObjectInstantiation node) {
+        // TODO
+    }
+
+    public void visit(ObjectProcedureCall node) {
+        // TODO
+    }
+
     /**
      * visit every argument to the procedure call
      * and add each visited argument to a newArguments list
@@ -383,7 +407,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      */
     public void visit(Program node) {
         for (FunctionDeclaration functionDeclaration :
-                node.getFunctionDeclarationList()) {
+                node.getFunctionDeclarations()) {
             functionDeclaration.accept(this);
         }
     }
@@ -441,12 +465,12 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         // on expressions that represent the size of a particular
         // array
         List<Expression> newArraySizeList = new LinkedList<>();
-        for(Expression e : node.getArraySizeList()) {
+        for(Expression e : node.getArraySizes()) {
             e.accept(this);
             assert !stack.isEmpty();
             newArraySizeList.add(stack.pop());
         }
-        node.setArraySizeList(newArraySizeList);
+        node.setArraySizes(newArraySizeList);
 
         //TODO test
         // then we make the typed declaration available on the stack if it

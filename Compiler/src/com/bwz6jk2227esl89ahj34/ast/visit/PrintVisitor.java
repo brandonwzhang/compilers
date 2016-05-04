@@ -55,7 +55,7 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(BlockList node) {
-        for(Block b : node.getBlockList()){
+        for(Block b : node.getBlocks()){
             b.accept(this);
         }
     }
@@ -66,6 +66,10 @@ public class PrintVisitor implements NodeVisitor {
 
     public void visit(CharacterLiteral node) {
         printer.printAtom("'" + node.getValue() + "'");
+    }
+
+    public void visit(ClassDeclaration node) {
+        // TODO
     }
 
     public void visit(FunctionCall node) {
@@ -81,11 +85,11 @@ public class PrintVisitor implements NodeVisitor {
         printer.startList();
         node.getIdentifier().accept(this);
         printer.startList();
-        List<Identifier> argList = node.getArgList();
-        List<VariableType> argTypeList = node.getFunctionType().getArgTypeList();
+        List<Identifier> argList = node.getArgumentIdentifiers();
+        List<VariableType> argTypeList = node.getFunctionType().getArgTypes();
         List<VariableType> returnTypeList = node.getFunctionType()
                 .getReturnTypeList().getVariableTypeList();
-        for(int i = 0; i < node.getArgList().size(); i++){
+        for(int i = 0; i < node.getArgumentIdentifiers().size(); i++){
             printer.startList();
             argList.get(i).accept(this);
             printType(argTypeList.get(i));
@@ -132,6 +136,26 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom(node.getValue());
     }
 
+    public void visit(MethodDeclaration node) {
+        // TODO
+    }
+
+    public void visit(ObjectField node) {
+        // TODO
+    }
+
+    public void visit(ObjectFunctionCall node) {
+        // TODO
+    }
+
+    public void visit(ObjectInstantiation node) {
+        // TODO
+    }
+
+    public void visit(ObjectProcedureCall node) {
+        // TODO
+    }
+
     public void visit(ProcedureCall node) {
         printer.startList();
         node.getIdentifier().accept(this);
@@ -149,7 +173,7 @@ public class PrintVisitor implements NodeVisitor {
         }
         printer.endList();
         printer.startList();
-        for (FunctionDeclaration funcDec : node.getFunctionDeclarationList()) {
+        for (FunctionDeclaration funcDec : node.getFunctionDeclarations()) {
             funcDec.accept(this);
         }
         printer.endList();
@@ -192,13 +216,13 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom(node.getDeclarationType().getPrimitiveType().toString());
 
         int numArrayEmpty = node.getDeclarationType().getNumBrackets() -
-                node.getArraySizeList().size();
+                node.getArraySizes().size();
         for(int j = 0; j < numArrayEmpty; j++) {
             printer.endList();
         }
 
-        for(int k = node.getArraySizeList().size()-1; k >= 0; k--) {
-            node.getArraySizeList().get(k).accept(this);
+        for(int k = node.getArraySizes().size()-1; k >= 0; k--) {
+            node.getArraySizes().get(k).accept(this);
             printer.endList();
         }
 

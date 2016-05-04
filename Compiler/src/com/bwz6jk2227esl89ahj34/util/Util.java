@@ -4,7 +4,8 @@ import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyComment;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
 import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
-import com.bwz6jk2227esl89ahj34.ast.FunctionType;
+import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
+import com.bwz6jk2227esl89ahj34.ast.MethodDeclaration;
 import com.bwz6jk2227esl89ahj34.ast.parse.ParserSym;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.analysis.CFGIR;
@@ -373,12 +374,16 @@ public class Util {
         }
 
         String arg = "";
-        List<VariableType> argList = funcType.getArgTypeList();
+        List<VariableType> argList = funcType.getArgTypes();
         for (VariableType type : argList) {
             arg += getTypeString(type);
         }
         irName += ret + arg;
         return irName;
+    }
+
+    public static String getIRMethodName(MethodDeclaration node) {
+        return node.getClassIdentifier() + "$" + getIRFunctionName(node.getFunctionDeclaration());
     }
 
     public static List<AssemblyLine> removeComments(List<AssemblyLine> lst) {

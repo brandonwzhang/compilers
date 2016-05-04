@@ -261,7 +261,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public void visit(BlockList node) {
         contexts.push(new Context(contexts.peek()));
-        List<Block> blockList = node.getBlockList();
+        List<Block> blockList = node.getBlocks();
         for (Block block : blockList) {
             block.accept(this);
         }
@@ -291,13 +291,17 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new VariableType(PrimitiveType.INT, 0));
     }
 
+    public void visit(ClassDeclaration node) {
+        // TODO
+    }
+
     /**
      * Checks that the given BlockList is guaranteed to return by the end
      * @param blockList
      * @return
      */
     public static boolean checkFunctionBlockList(BlockList blockList) {
-        Block lastBlock = blockList.getBlockList().get(blockList.getBlockList().size() - 1);
+        Block lastBlock = blockList.getBlocks().get(blockList.getBlocks().size() - 1);
 
         if (lastBlock instanceof ReturnStatement) {
             // Guaranteed to return at the end
@@ -346,7 +350,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @return
      */
     public static boolean checkProcedureBlockList(BlockList blockList) {
-        List<Block> blocks = blockList.getBlockList();
+        List<Block> blocks = blockList.getBlocks();
         // Iterate until last element to make sure none of them are return statements
         for (int i = 0; i < blocks.size() - 1; i++) {
             if (blocks.get(i) instanceof ReturnStatement) {
@@ -410,8 +414,8 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public void visit(FunctionDeclaration node) {
         currentFunctionType = node.getFunctionType();
-        List<Identifier> argList = node.getArgList();
-        List<VariableType> argTypeList = currentFunctionType.getArgTypeList();
+        List<Identifier> argList = node.getArgumentIdentifiers();
+        List<VariableType> argTypeList = currentFunctionType.getArgTypes();
         assert argList.size() == argTypeList.size();
 
         Context newContext = new Context(contexts.peek());
@@ -515,6 +519,26 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new VariableType(PrimitiveType.INT, 0));
     }
 
+    public void visit(MethodDeclaration node) {
+        // TODO
+    }
+
+    public void visit(ObjectField node) {
+        // TODO
+    }
+
+    public void visit(ObjectFunctionCall node) {
+        // TODO
+    }
+
+    public void visit(ObjectInstantiation node) {
+        // TODO
+    }
+
+    public void visit(ObjectProcedureCall node) {
+        // TODO
+    }
+
     /**
      * The method called must exist in the context and the types of the
      * given arguments must match the argument types of the method.
@@ -529,7 +553,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException("Procedure " + id.getName() + " not defined", id.getRow(), id.getCol());
         }
 
-        List<VariableType> argumentTypes = ((FunctionType) context.get(id)).getArgTypeList();
+        List<VariableType> argumentTypes = ((FunctionType) context.get(id)).getArgTypes();
         List<Expression> passedArguments = node.getArguments();
         if (passedArguments.size() != argumentTypes.size()) {
             throw new TypeException("Too many arguments passed to " + id, id.getRow(), id.getCol());
@@ -569,7 +593,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public void visit(Program node) {
         // First pass collects all function types, adds to context
-        for (FunctionDeclaration funcDec : node.getFunctionDeclarationList()) {
+        for (FunctionDeclaration funcDec : node.getFunctionDeclarations()) {
             Identifier funcName = funcDec.getIdentifier();
             // Disallow overloading and shadowing
             if (contexts.peek().get(funcName) != null) {
@@ -588,7 +612,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         // Second pass typechecks all the function bodies
-        for (FunctionDeclaration functionDeclaration : node.getFunctionDeclarationList()) {
+        for (FunctionDeclaration functionDeclaration : node.getFunctionDeclarations()) {
             functionDeclaration.accept(this);
         }
 
@@ -654,7 +678,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
         context.put(identifier, node.getDeclarationType());
         identifier.accept(this);
-        for (Expression expression : node.getArraySizeList()) {
+        for (Expression expression : node.getArraySizes()) {
             expression.accept(this);
         }
         node.setType(new VariableType(PrimitiveType.UNIT, 0));
