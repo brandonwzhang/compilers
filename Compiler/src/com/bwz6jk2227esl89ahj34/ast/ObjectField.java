@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class ObjectField extends Expression {
+public class ObjectField extends Expression implements Assignable {
     private Expression object;
     private Identifier field;
 
