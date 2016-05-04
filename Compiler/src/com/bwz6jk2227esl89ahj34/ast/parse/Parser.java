@@ -6,6 +6,7 @@
 package com.bwz6jk2227esl89ahj34.ast.parse;
 
 import com.bwz6jk2227esl89ahj34.ast.*;
+import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
 import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
@@ -1940,7 +1941,7 @@ class CUP$Parser$actions {
                 int blleft = CUP$Parser$stack.peek().left;
                 int blright = CUP$Parser$stack.peek().right;
                 BlockList bl = CUP$Parser$stack.peek().<BlockList> value();
-                 bl.getBlockList().add(0, b); RESULT = bl; RESULT.setLocation(b); 
+                 bl.getBlocks().add(0, b); RESULT = bl; RESULT.setLocation(b);
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("block_list",37, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2081,7 +2082,7 @@ class CUP$Parser$actions {
                 int fbleft = CUP$Parser$stack.elementAt(CUP$Parser$top-1).left;
                 int fbright = CUP$Parser$stack.elementAt(CUP$Parser$top-1).right;
                 BlockList fb = CUP$Parser$stack.elementAt(CUP$Parser$top-1).<BlockList> value();
-                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(t)), args, fb); RESULT.setLocation(id); 
+                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(t)), args, fb); RESULT.setLocation(id);
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("function_declaration",45, CUP$Parser$stack.elementAt(CUP$Parser$top-8), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;

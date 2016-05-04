@@ -6,7 +6,7 @@
 package com.bwz6jk2227esl89ahj34.ast.parse;
 
 import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
-import com.bwz6jk2227esl89ahj34.ast.FunctionType;
+import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
 import com.bwz6jk2227esl89ahj34.ast.Identifier;
 import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;

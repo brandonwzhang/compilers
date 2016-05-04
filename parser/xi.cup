@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34.ast.parse;
 
 import com.bwz6jk2227esl89ahj34.ast.*;
+import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
 import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
@@ -276,7 +277,7 @@ block ::= block_scope:bl {: RESULT = bl; RESULT.setLocation(bl); :}
         | statement:s {: RESULT = s; RESULT.setLocation(s); :}
         ;
 
-block_list ::= block:b block_list:bl {: bl.getBlockList().add(0, b); RESULT = bl; RESULT.setLocation(b); :}
+block_list ::= block:b block_list:bl {: bl.getBlocks().add(0, b); RESULT = bl; RESULT.setLocation(b); :}
              | RETURN {: List<Block> bl = new LinkedList<>(); bl.add(0,new ReturnStatement(new LinkedList<>())); RESULT = new BlockList(bl); :}
              | empty  {: List<Block> bl = new LinkedList<>(); RESULT = new BlockList(bl); :}
              ;
@@ -319,6 +320,6 @@ use_block ::= USE identifier:id use_block:u {: u.add(0, new UseStatement(id)); R
 
 program ::= use_block:u function_declaration_list:l   {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
           | use_block:u CLASS identifier:id OPEN_BRACE function_declaration_list:l CLOSE_BRACE {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
-          | use_block:u CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE function_declaration_list:l CLOSE_BRACE  {: RESULT = new Program(u,l); :} 
+          | use_block:u CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE function_declaration_list:l CLOSE_BRACE  {: RESULT = new Program(u,l); :}
           | error
           ;

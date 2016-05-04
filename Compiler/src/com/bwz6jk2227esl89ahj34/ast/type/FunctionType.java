@@ -1,4 +1,4 @@
-package com.bwz6jk2227esl89ahj34.ast;
+package com.bwz6jk2227esl89ahj34.ast.type;
 
 import com.bwz6jk2227esl89ahj34.ast.type.Type;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
@@ -13,6 +13,6 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class FunctionType extends Type {
-    List<VariableType> argTypeList;
+    List<VariableType> argTypes;
     VariableTypeList returnTypeList;
 }
