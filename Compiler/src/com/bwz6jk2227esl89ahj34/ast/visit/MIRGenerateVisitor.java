@@ -76,51 +76,34 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrTemp,
                 new IRConst(Configuration.WORD_SIZE)), IRMem.MemType.IMMUTABLE);
 
+        IRExpr result = new IRMem( new IRBinOp(
+                OpType.ADD,
+                new IRBinOp(OpType.MUL, indexTemp, new IRConst(Configuration.WORD_SIZE)),
+                arrTemp
+        ));
+
         // Check for out of bounds index
-        IRTemp result = new IRTemp(getFreshVariable());
         IRLabel trueLabel = new IRLabel(getFreshVariable());
         IRLabel falseLabel = new IRLabel(getFreshVariable());
         IRLabel exitLabel = new IRLabel(getFreshVariable());
 
-        // Make a copy of these so we don't end up with duplicate labels
-        IRTemp indexCopyTemp = new IRTemp(getFreshVariable());
-        IRMove moveIndexCopyToTemp = new IRMove(indexCopyTemp, indexTemp);
-
         IRCJump cjump = new IRCJump( // index < length && index >= 0
                 new IRBinOp(OpType.AND,
                         new IRBinOp(OpType.LT, indexTemp, length),
-                        new IRBinOp(OpType.GEQ, indexCopyTemp, new IRConst(0))),
+                        new IRBinOp(OpType.GEQ, indexTemp, new IRConst(0))),
                 trueLabel.name(),
                 falseLabel.name()
         );
 
-        // Make a copy of these so we don't end up with duplicate labels
-        IRTemp arrayCopyTemp = new IRTemp(getFreshVariable());
-        IRMove moveArrayCopyToTemp = new IRMove(arrayCopyTemp, arrTemp);
-
-        IRTemp indexCopyCopyTemp = new IRTemp(getFreshVariable());
-        IRMove moveIndexCopyCopyToTemp = new IRMove(indexCopyCopyTemp, indexTemp);
-
-        // Get mem location
         IRSeq trueBody = new IRSeq(
-                // get actual element
-                new IRMove(result, new IRMem( new IRBinOp(
-                        OpType.ADD,
-                        new IRBinOp(OpType.MUL, indexCopyCopyTemp, new IRConst(Configuration.WORD_SIZE)),
-                        arrayCopyTemp//arrayCopy
-                ))),
-                // Jump to exit
                 new IRJump(new IRName(exitLabel.name()))
         );
 
-        IRMove outOfBoundsCall = new IRMove(result, new IRCall(new IRName("_I_outOfBounds_p")));
+        IRExp outOfBoundsCall = new IRExp(new IRCall(new IRName("_I_outOfBounds_p")));
 
         IRSeq seq = new IRSeq(
                 moveArrToTemp,
-                moveArrayCopyToTemp,
                 moveIndexToTemp,
-                moveIndexCopyToTemp,
-                moveIndexCopyCopyToTemp,
                 cjump,
                 trueLabel,
                 trueBody,
@@ -157,12 +140,12 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // Call to malloc
         IRCall malloc = new IRCall(new IRName("_I_alloc_i"), new IRConst(Configuration.WORD_SIZE * (length + 1)));
         IRMove storeArrayPtr = new IRMove(new IRTemp(array), malloc);
-        // TODO make first index of malloc's return IMMUTABLE IRMem
 
         // Save length in MEM(array)
         IRMove saveLength = new IRMove(new IRMem(new IRTemp(array)), new IRConst(length));
         // Shift array up to 0th index
-        IRMove shift = new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD, new IRTemp(array), new IRConst(Configuration.WORD_SIZE)));
+        IRMove shift = new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD,
+                new IRTemp(array), new IRConst(Configuration.WORD_SIZE)));
 
         stmts.add(storeArrayPtr);
         stmts.add(saveLength);
@@ -171,11 +154,13 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // Put elements into array spaces
         for (IRExpr e : arrayElements) {
             stmts.add(new IRMove(new IRMem(new IRTemp(array)), e)); // put array element in
-            stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD, new IRTemp(array), new IRConst(Configuration.WORD_SIZE)))); // add 8 to array pointer
+            stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD,
+                    new IRTemp(array), new IRConst(Configuration.WORD_SIZE)))); // add 8 to array pointer
         }
 
         // Move array pointer back to index 0
-        stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.SUB, new IRTemp(array), new IRConst(Configuration.WORD_SIZE * length))));
+        stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.SUB,
+                new IRTemp(array), new IRConst(Configuration.WORD_SIZE * length))));
 
         IRSeq seq = new IRSeq(stmts);
         IRESeq eseq = new IRESeq(seq, new IRTemp(array));
@@ -201,77 +186,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRMove move = new IRMove(temp, expr);
             statements.add(move);
             return new IRSeq(statements);
-        } else if (variable instanceof ArrayIndex) {
-            // If arrayindex on LHS, we need to handle out of bounds setting
-            ((ArrayIndex) variable).getArrayRef().accept(this);
-            assert generatedNodes.peek() instanceof IRExpr;
-            IRExpr array = (IRExpr)generatedNodes.pop();
-
-            IRTemp arrTemp = new IRTemp(getFreshVariable());
-            IRMove moveArrToTemp = new IRMove(arrTemp, array);
-
-            ((ArrayIndex) variable).getIndex().accept(this);
-            assert generatedNodes.peek() instanceof IRExpr;
-            IRExpr index = (IRExpr)generatedNodes.pop();
-
-            IRTemp indexTemp = new IRTemp(getFreshVariable());
-            IRMove moveIndexToTemp = new IRMove(indexTemp, index);
-
-            IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrTemp, new IRConst(Configuration.WORD_SIZE)));
-
-            // Check for out of bounds index
-            IRLabel trueLabel = new IRLabel(getFreshVariable());
-            IRLabel falseLabel = new IRLabel(getFreshVariable());
-            IRLabel exitLabel = new IRLabel(getFreshVariable());
-
-            // Make a copy of these so we don't end up with duplicate labels
-            IRTemp indexCopyTemp = new IRTemp(getFreshVariable());
-            IRMove moveIndexCopyToTemp = new IRMove(indexCopyTemp, indexTemp);
-
-            IRCJump cjump = new IRCJump( // index < length && index >= 0
-                    new IRBinOp(OpType.AND,
-                            new IRBinOp(OpType.LT, indexTemp, length),
-                            new IRBinOp(OpType.GEQ, indexCopyTemp, new IRConst(0))),
-                    trueLabel.name(),
-                    falseLabel.name()
-            );
-
-            // Make a copy of these so we don't end up with duplicate labels
-            IRTemp arrCopyTemp = new IRTemp(getFreshVariable());
-            IRMove moveArrCopyToTemp = new IRMove(arrCopyTemp, arrTemp);
-
-            IRTemp indexCopyCopyTemp = new IRTemp(getFreshVariable());
-            IRMove moveIndexCopyCopyToTemp = new IRMove(indexCopyCopyTemp, indexCopyTemp);
-
-            // move expr into location
-            IRMem location = new IRMem(new IRBinOp(OpType.ADD,
-                    arrCopyTemp,
-                    new IRBinOp(OpType.MUL, indexCopyCopyTemp, new IRConst(Configuration.WORD_SIZE))
-            ));
-            IRSeq trueBody = new IRSeq(
-                    // get actual element
-                    new IRMove(location, expr),
-                    // jump to exit
-                    new IRJump(new IRName(exitLabel.name()))
-            );
-
-            IRExp outOfBoundsCall = new IRExp(new IRCall(new IRName("_I_outOfBounds_p")));
-
-            IRSeq seq = new IRSeq(
-                    moveArrToTemp,
-                    moveArrCopyToTemp,
-                    moveIndexToTemp,
-                    moveIndexCopyToTemp,
-                    moveIndexCopyCopyToTemp,
-                    cjump,
-                    trueLabel,
-                    trueBody,
-                    falseLabel,
-                    outOfBoundsCall,
-                    exitLabel
-            );
-
-            return seq;
         }
         variable.accept(this);
         assert generatedNodes.peek() instanceof IRExpr;
