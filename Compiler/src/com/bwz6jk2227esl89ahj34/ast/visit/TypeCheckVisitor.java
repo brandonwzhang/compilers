@@ -4,6 +4,7 @@ import com.bwz6jk2227esl89ahj34.ast.*;
 import com.bwz6jk2227esl89ahj34.ast.parse.InterfaceParser;
 import com.bwz6jk2227esl89ahj34.ast.type.*;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class TypeCheckVisitor implements NodeVisitor {
@@ -27,7 +28,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         // initialize first context with length function, int[] -> int
         // when it should take bool[]. We handle this later below
         Context initContext = new Context();
-        List<VariableType> lengthArgType = Collections.singletonList(ArrayType.intArray(1));
+        List<VariableType> lengthArgType = Collections.singletonList(new ArrayType(new IntType(), 1));
         VariableTypeList lengthReturnType =
                 new VariableTypeList(Collections.singletonList(new IntType()));
         initContext.put(new Identifier("length"), new FunctionType(lengthArgType, lengthReturnType));
@@ -53,12 +54,17 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         Type type = arrayRef.getType();
-        // TODO: throw TypeException if not array
-        VariableType arrayType = (ArrayType) type;
-        if(arrayType.getNumBrackets() < 1) {
-            throw new TypeException("Indexed element must be an array of at least dimension 1", arrayRef.getRow(), arrayRef.getCol());
+        if (!(type instanceof ArrayType)) {
+            throw new TypeException("Indexed element must be an array of at least dimension 1",
+                    arrayRef.getRow(), arrayRef.getCol());
         }
-        node.setType(new VariableType(arrayType.getPrimitiveType(), arrayType.getNumBrackets() - 1));
+        ArrayType arrayType = (ArrayType) type;
+        int newNumBrackets = arrayType.getNumBrackets() - 1;
+        if (newNumBrackets == 0) {
+            node.setType(arrayType.getBaseType());
+            return;
+        }
+        node.setType(new ArrayType(arrayType.getBaseType(), newNumBrackets));
     }
 
     /**
@@ -70,7 +76,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(ArrayLiteral node) {
         // Empty array case ({})
         if (node.getValues().size() == 0) {
-            node.setType(ArrayType.intArray(1));
+            node.setType(new ArrayType(new IntType(), 1));
             return;
         }
 
@@ -111,7 +117,13 @@ public class TypeCheckVisitor implements NodeVisitor {
         assert firstType instanceof VariableType;
 
         VariableType type = (VariableType) firstType;
-        node.setType(new VariableType(type.getPrimitiveType(), type.getNumBrackets() + 1));
+        if (type instanceof ArrayType) {
+            // If we have an array of arrays, we increment numBrackets by 1
+            ArrayType arrayType = (ArrayType) type;
+            node.setType(new ArrayType(arrayType.getBaseType(), arrayType.getNumBrackets() + 1));
+            return;
+        }
+        node.setType(new ArrayType((BaseType) type, 1));
     }
 
     /**
@@ -387,7 +399,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         // Not a valid length call...
         if (!thisFuncType.equals(funcType) && 
                 !(id.getName().equals("length")
-                && argumentTypes.size() == 1 && argumentTypes.get(0).getNumBrackets() > 0)) {
+                && argumentTypes.size() == 1 && argumentTypes.get(0) instanceof ArrayType)) {
             throw new TypeException("Argument types do not match with function definition", id.getRow(), id.getCol());
         }
         
