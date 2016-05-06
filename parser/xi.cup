@@ -175,6 +175,7 @@ I ::= boolean_literal:b {: RESULT = b; RESULT.setLocation(b); :}
     | STRING_LITERAL:s {: RESULT = new StringLiteral(s); RESULT.setLocation(parser.stack.peek()); :}
     | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); RESULT.setLocation(parser.stack.peek()); :}
     | array_literal:al {: RESULT = al; RESULT.setLocation(al); :}
+    | NEW identifier:i {: RESULT = new ObjectInstantiation(i); :}
     ;
 
 
