@@ -48,7 +48,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         arrayRef.accept(this);
         index.accept(this);
 
-        if (!index.getType().equals(new IntType())) {
+        if (!index.getType().isInt()) {
             throw new TypeException("Index is not an integer", index.getRow(), index.getCol());
         }
 
@@ -224,8 +224,8 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException("Operands must be the same valid type", left.getRow(), left.getCol());
         }
         BinaryOperator binop = node.getOp();
-        boolean isInteger = lefttype.equals(new IntType());
-        boolean isBool = lefttype.equals(new IntType());
+        boolean isInteger = lefttype.isInt();
+        boolean isBool = lefttype.isBool();
 
         boolean valid_int_binary_operator_int = BinarySymbol.INT_BINARY_OPERATOR_INT.contains(binop) && isInteger;
         boolean valid_int_binary_operator_bool = BinarySymbol.INT_BINARY_OPERATOR_BOOL.contains(binop) && isInteger;
@@ -390,7 +390,7 @@ public class TypeCheckVisitor implements NodeVisitor {
                 && argumentTypes.size() == 1 && argumentTypes.get(0).getNumBrackets() > 0)) {
             throw new TypeException("Argument types do not match with function definition", id.getRow(), id.getCol());
         }
-
+        
         if (thisFuncType.getReturnTypeList().getVariableTypeList().size() > 1) {
             node.setType(thisFuncType.getReturnTypeList());
         } else if (thisFuncType.getReturnTypeList().getVariableTypeList().size() == 0) {
@@ -464,7 +464,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(IfStatement node) {
         Expression guard = node.getGuard();
         guard.accept(this);
-        if (!guard.getType().equals(new BoolType())) {
+        if (!guard.getType().isBool()) {
             throw new TypeException("If statement guard must be of type bool", guard.getRow(), guard.getCol());
         }
 
