@@ -6,4 +6,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class UnitType extends Type {
+
+    @Override
+    public boolean isUnit() {
+        return true;
+    }
 }

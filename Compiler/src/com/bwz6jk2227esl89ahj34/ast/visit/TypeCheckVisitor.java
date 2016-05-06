@@ -496,12 +496,12 @@ public class TypeCheckVisitor implements NodeVisitor {
             if (falseBlockIsStatement) {
                 contexts.pop();
             }
-            PrimitiveType r1 = ((VariableType) trueBlock.getType()).getPrimitiveType();
-            PrimitiveType r2 = ((VariableType) falseBlock.get().getType()).getPrimitiveType();
+            Type r1 = trueBlock.getType();
+            Type r2 = falseBlock.get().getType();
             // If has type void iff both blocks have type void
-            node.setType(new VariableType(lub(r1,r2), 0));
+            node.setType(lub(r1, r2));
         } else {
-            node.setType(new VariableType(PrimitiveType.UNIT, 0));
+            node.setType(new UnitType());
         }
     }
 
@@ -510,7 +510,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(IntegerLiteral node) {
-        node.setType(new VariableType(PrimitiveType.INT, 0));
+        node.setType(new IntType());
     }
 
     public void visit(MethodDeclaration node) {
@@ -568,7 +568,7 @@ public class TypeCheckVisitor implements NodeVisitor {
                     "value as a procedure.", id.getRow(), id.getCol());
         }
 
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /***
@@ -610,7 +610,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             functionDeclaration.accept(this);
         }
 
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /***
@@ -645,7 +645,7 @@ public class TypeCheckVisitor implements NodeVisitor {
                         expression.getRow(), expression.getCol());
             }
         }
-        node.setType(new VariableType(PrimitiveType.VOID, 0));
+        node.setType(new VoidType());
     }
 
     /***
@@ -653,7 +653,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(StringLiteral node) {
-        node.setType(new VariableType(PrimitiveType.INT, 1));
+        node.setType(new ArrayType(new IntType(), 1));
     }
 
     /***
@@ -675,7 +675,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         for (Expression expression : node.getArraySizes()) {
             expression.accept(this);
         }
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /***
@@ -692,12 +692,12 @@ public class TypeCheckVisitor implements NodeVisitor {
         expression.accept(this);
 
         UnaryOperator unop = node.getOp();
-        if (expression.getType().equals(INT_TYPE) && unop ==
+        if (expression.getType().isInt() && unop ==
                 UnaryOperator.MINUS) {
-            node.setType(new VariableType(PrimitiveType.INT, 0));
-        } else if (expression.getType().equals(BOOL_TYPE) && unop ==
+            node.setType(new IntType());
+        } else if (expression.getType().isBool() && unop ==
                 UnaryOperator.NOT) {
-            node.setType(new VariableType(PrimitiveType.BOOL, 0));
+            node.setType(new BoolType());
         } else {
             throw new TypeException("Invalid unary operator",
                     node.getRow(), node.getCol());
@@ -709,7 +709,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Underscore node) {
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /***
@@ -726,7 +726,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (error != null) {
             throw new TypeException(error, node.getRow(), node.getCol());
         }
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /**
@@ -740,7 +740,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(WhileStatement node) {
         Expression guard = node.getGuard();
         guard.accept(this);
-        if (!guard.getType().equals(BOOL_TYPE)) {
+        if (!guard.getType().isBool()) {
             throw new TypeException("While statement guard must be of type bool",
                     guard.getRow(), guard.getCol());
         }
@@ -753,14 +753,14 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
         block.accept(this);
         // Blocks should only have either unit or void type
-        assert block.getType().equals(UNIT_TYPE) ||
-                block.getType().equals(VOID_TYPE);
+        assert block.getType().isUnit() ||
+                block.getType().isVoid();
         if (blockIsStatement) {
             // Pop off the context for the statement
             contexts.pop();
         }
 
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /**
@@ -803,14 +803,14 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @return the output of the function lub as specified in the Xi Type Spec
      *
      */
-    public PrimitiveType lub(PrimitiveType one, PrimitiveType two) {
-        assert one == PrimitiveType.UNIT || one == PrimitiveType.VOID;
-        assert two == PrimitiveType.UNIT || two == PrimitiveType.VOID;
+    public Type lub(Type one, Type two) {
+        assert one.isUnit() || one.isVoid();
+        assert two.isUnit() || two.isVoid();
 
-        if (one == PrimitiveType.UNIT || two == PrimitiveType.UNIT) {
-            return PrimitiveType.UNIT;
+        if (one.isUnit() || two.isVoid()) {
+            return new UnitType();
         } else {
-            return PrimitiveType.VOID;
+            return new VoidType();
         }
     }
 }
