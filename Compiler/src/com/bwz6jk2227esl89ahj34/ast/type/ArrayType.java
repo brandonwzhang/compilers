@@ -14,12 +14,4 @@ public class ArrayType extends VariableType {
         this.baseType = t;
         this.numBrackets = numBrackets;
     }
-
-    public static ArrayType intArray(int numBrackets) {
-        return new ArrayType(new IntType(), numBrackets);
-    }
-
-    public static ArrayType boolArray(int numBrackets) {
-        return new ArrayType(new BoolType(), numBrackets);
-    }
 }
