@@ -9,6 +9,7 @@ package com.bwz6jk2227esl89ahj34.ast.parse;
 public class ParserSym {
   /* terminals */
   public static final int EXTENDS = 45;
+  public static final int NEW = 46;
   public static final int UNDERSCORE = 40;
   public static final int LENGTH = 43;
   public static final int LT = 22;
@@ -100,7 +101,8 @@ public class ParserSym {
   "NEGATIVE_INT_BOUND",
   "LENGTH",
   "CLASS",
-  "EXTENDS"
+  "EXTENDS",
+  "NEW"
   };
 }
 

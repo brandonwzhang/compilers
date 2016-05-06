@@ -100,6 +100,7 @@ public class Util {
                 put(ParserSym.LENGTH, "length");
                 put(ParserSym.CLASS, "class");
                 put(ParserSym.EXTENDS, "extends");
+                put(ParserSym.NEW,"new");
     }};
 
     /**
