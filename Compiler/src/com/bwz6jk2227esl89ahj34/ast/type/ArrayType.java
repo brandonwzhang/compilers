@@ -14,9 +14,6 @@ public class ArrayType extends VariableType {
         this.numBrackets = numBrackets;
     }
 
-    public static final ArrayType INT = new ArrayType(new IntType(), 0);
-    public static final ArrayType BOOL = new ArrayType(new BoolType(), 0);
-
     public static ArrayType intArray(int numBrackets) {
         return new ArrayType(new IntType(), numBrackets);
     }
