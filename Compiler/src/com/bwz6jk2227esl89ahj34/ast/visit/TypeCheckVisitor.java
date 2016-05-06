@@ -18,12 +18,6 @@ public class TypeCheckVisitor implements NodeVisitor {
     // Local variable that stores current function in scope with a stack, used for return statements
     private FunctionType currentFunctionType;
 
-    // Final types, for ease of checking equality
-    private final VariableType UNIT_TYPE = new VariableType(PrimitiveType.UNIT, 0);
-    private final VariableType VOID_TYPE = new VariableType(PrimitiveType.VOID, 0);
-    private final VariableType INT_TYPE = new VariableType(PrimitiveType.INT, 0);
-    private final VariableType BOOL_TYPE = new VariableType(PrimitiveType.BOOL, 0);
-
     /**
      * Constructor for TypeCheckVisitor
      * @param libPath the directory for where to find the interface files.
@@ -54,7 +48,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         arrayRef.accept(this);
         index.accept(this);
 
-        if (!index.getType().equals(INT_TYPE)) {
+        if (!index.getType().equals(Type.INT)) {
             throw new TypeException("Index is not an integer", index.getRow(), index.getCol());
         }
 
