@@ -27,9 +27,9 @@ public class TypeCheckVisitor implements NodeVisitor {
         // initialize first context with length function, int[] -> int
         // when it should take bool[]. We handle this later below
         Context initContext = new Context();
-        List<VariableType> lengthArgType = Collections.singletonList(new VariableType(PrimitiveType.INT, 1));
+        List<VariableType> lengthArgType = Collections.singletonList(ArrayType.intArray(1));
         VariableTypeList lengthReturnType =
-                new VariableTypeList(Collections.singletonList(new VariableType(PrimitiveType.INT, 0)));
+                new VariableTypeList(Collections.singletonList(new IntType()));
         initContext.put(new Identifier("length"), new FunctionType(lengthArgType, lengthReturnType));
         contexts.push(initContext);
 
@@ -48,13 +48,13 @@ public class TypeCheckVisitor implements NodeVisitor {
         arrayRef.accept(this);
         index.accept(this);
 
-        if (!index.getType().equals(Type.INT)) {
+        if (!index.getType().equals(new IntType())) {
             throw new TypeException("Index is not an integer", index.getRow(), index.getCol());
         }
 
         Type type = arrayRef.getType();
-        assert type instanceof VariableType;
-        VariableType arrayType = (VariableType) type;
+        // TODO: throw TypeException if not array
+        VariableType arrayType = (ArrayType) type;
         if(arrayType.getNumBrackets() < 1) {
             throw new TypeException("Indexed element must be an array of at least dimension 1", arrayRef.getRow(), arrayRef.getCol());
         }
@@ -153,7 +153,7 @@ public class TypeCheckVisitor implements NodeVisitor {
 
                 assert leftType instanceof VariableType;
 
-                if (!leftType.equals(UNIT_TYPE) && !leftType.equals(rightType)) {
+                if (!leftType.equals(new UnitType()) && !leftType.equals(rightType)) {
                     throw new TypeException("Type on left hand must match type on right hand", expression.getRow(), expression.getCol());
                 }
             }
@@ -178,7 +178,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException("Expected Function Call", expression.getRow(), expression.getCol());
         }
 
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /**
@@ -224,21 +224,21 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException("Operands must be the same valid type", left.getRow(), left.getCol());
         }
         BinaryOperator binop = node.getOp();
-        boolean isInteger = lefttype.equals(INT_TYPE);
-        boolean isBool = lefttype.equals(BOOL_TYPE);
+        boolean isInteger = lefttype.equals(new IntType());
+        boolean isBool = lefttype.equals(new IntType());
 
         boolean valid_int_binary_operator_int = BinarySymbol.INT_BINARY_OPERATOR_INT.contains(binop) && isInteger;
         boolean valid_int_binary_operator_bool = BinarySymbol.INT_BINARY_OPERATOR_BOOL.contains(binop) && isInteger;
         boolean valid_bool_binary_operator_bool = BinarySymbol.BOOL_BINARY_OPERATOR_BOOL.contains(binop) && isBool;
 
         if (valid_int_binary_operator_int) {
-            node.setType(new VariableType(PrimitiveType.INT, 0));
+            node.setType(new IntType());
         } else if (valid_int_binary_operator_bool) {
-            node.setType(new VariableType(PrimitiveType.BOOL, 0));
+            node.setType(new BoolType());
         } else if (valid_bool_binary_operator_bool) {
-            node.setType(new VariableType(PrimitiveType.BOOL, 0));
+            node.setType(new BoolType());
         } else if (BinarySymbol.ARRAY_BINARY_OPERATOR_BOOL.contains(binop) && !isBool && !isInteger) {
-            node.setType(new VariableType(PrimitiveType.BOOL, 0));
+            node.setType(new BoolType());
         } else if (binop.equals(BinaryOperator.PLUS) && !isBool && !isInteger) {
             assert lefttype instanceof VariableType;
             node.setType(new VariableType(lefttype.getPrimitiveType(), lefttype.getNumBrackets()));
@@ -261,7 +261,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
         int size = blockList.size();
         if (size == 0) {
-            node.setType(new VariableType(PrimitiveType.UNIT, 0));
+            node.setType(new UnitType());
         } else {
             Type lastType = blockList.get(size - 1).getType();
             node.setType(lastType);
@@ -274,7 +274,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(BooleanLiteral node) {
-        node.setType(new VariableType(PrimitiveType.BOOL, 0));
+        node.setType(new BoolType());
     }
 
     /**
@@ -282,7 +282,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(CharacterLiteral node) {
-        node.setType(new VariableType(PrimitiveType.INT, 0));
+        node.setType(new IntType());
     }
 
     public void visit(ClassDeclaration node) {
@@ -435,8 +435,8 @@ public class TypeCheckVisitor implements NodeVisitor {
             }
         }
 
-        assert blockList.getType().equals(UNIT_TYPE) || blockList.getType().equals(VOID_TYPE);
-        node.setType(UNIT_TYPE);
+        assert blockList.getType().equals(new UnitType()) || blockList.getType().equals(new VoidType());
+        node.setType(new UnitType());
     }
 
     /**
@@ -464,7 +464,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(IfStatement node) {
         Expression guard = node.getGuard();
         guard.accept(this);
-        if (!guard.getType().equals(BOOL_TYPE)) {
+        if (!guard.getType().equals(new BoolType())) {
             throw new TypeException("If statement guard must be of type bool", guard.getRow(), guard.getCol());
         }
 
