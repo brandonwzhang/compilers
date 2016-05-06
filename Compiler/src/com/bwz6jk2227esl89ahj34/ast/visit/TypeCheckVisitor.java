@@ -70,7 +70,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(ArrayLiteral node) {
         // Empty array case ({})
         if (node.getValues().size() == 0) {
-            node.setType(new VariableType(PrimitiveType.INT, 1));
+            node.setType(ArrayType.intArray(1));
             return;
         }
 
@@ -241,7 +241,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             node.setType(new BoolType());
         } else if (binop.equals(BinaryOperator.PLUS) && !isBool && !isInteger) {
             assert lefttype instanceof VariableType;
-            node.setType(new VariableType(lefttype.getPrimitiveType(), lefttype.getNumBrackets()));
+            node.setType(lefttype);
         } else {
             throw new TypeException("Invalid binary operation", left.getRow(), left.getCol());
         }
