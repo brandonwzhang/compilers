@@ -105,7 +105,8 @@ nonterminal FunctionDeclaration function_declaration;
 nonterminal List<FunctionDeclaration> function_declaration_list;
 
 nonterminal ProcedureCall procedure_call;
-nonterminal List<TypedDeclaration> fields; 
+nonterminal List<TypedDeclaration> typed_declaration_list; 
+nonterminal List<TypedDeclaration> field; 
 
 precedence nonassoc ELSE;
 precedence nonassoc SEMICOLON;
@@ -282,7 +283,13 @@ block ::= block_scope:bl {: RESULT = bl; RESULT.setLocation(bl); :}
         | statement:s {: RESULT = s; RESULT.setLocation(s); :}
         ;
 
+// x,y:int 
+typed_declaration_list ::= identifier:id COMMA typed_declaration:td {: List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(0, new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())) RESULT = f; RESULT.setLocation(id); :}
+              | identifier:id COMMA typed_declaration_list:f {: TypedDeclaration temp = f.getLast(); f.add(0, new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = ids; RESULT.setLocation(id); :} 
+              ; 
+
 block_list ::= block:b block_list:bl {: bl.getBlocks().add(0, b); RESULT = bl; RESULT.setLocation(b); :}
+             | typed_declaration_list:f block_list:bl {: for(TypedDeclaration td : f) { bl.getBlocks().add(0, td); } RESULT = bl; RESULT.setLocation(f); :}
              | RETURN {: List<Block> bl = new LinkedList<>(); bl.add(0,new ReturnStatement(new LinkedList<>())); RESULT = new BlockList(bl); :}
              | empty  {: List<Block> bl = new LinkedList<>(); RESULT = new BlockList(bl); :}
              ;
@@ -322,12 +329,11 @@ use_block ::= USE identifier:id use_block:u {: u.add(0, new UseStatement(id)); R
             | empty   {: RESULT = new LinkedList<UseStatement>(); :}
             ;
 
-fields ::= typed_declaration:td {: List<TypedDeclaration> f = new LinkedList<>(); f.add(td); RESULT = f; :}
-              | identifier:id COMMA fields:f {: TypedDeclaration temp = f.getLast(); f.add(0, new TypedDeclaration(id, temp.getDeclarationType, temp.getArraySizes())); RESULT = ids; :} 
-              ; 
+field ::= typed_declaration_list:td {: RESULT = td; RESULT.setLocation(td); :}
+         | typed_declaration:td {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(td); RESULT = lst; RESULT.setLocation(td); :}
+         ;
 
 program ::= use_block:u function_declaration_list:l   {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
-          | use_block:u CLASS identifier:id OPEN_BRACE fields:f function_declaration_list:l CLOSE_BRACE {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
           | use_block:u CLASS identifier:id OPEN_BRACE function_declaration_list:l CLOSE_BRACE {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
           | use_block:u CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE function_declaration_list:l CLOSE_BRACE  {: RESULT = new Program(u,l); :}
           | error
