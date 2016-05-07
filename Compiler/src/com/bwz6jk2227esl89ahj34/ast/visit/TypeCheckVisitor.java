@@ -174,6 +174,39 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     /**
+     * Checks if type is a subtype of superType
+     */
+    private boolean isSubtype(Type type, Type superType) {
+        if (superType instanceof UnitType) {
+            return true;
+        }
+        if (type.equals(superType)) {
+            return true;
+        }
+        if (!(type instanceof ClassType && superType instanceof ClassType)) {
+            // Only a class can be a subtype of another class
+            return false;
+        }
+        // At this point we need to check if type is a strict subtype of superType
+        ClassType classType = (ClassType) type;
+        ClassType superClassType = (ClassType) superType;
+        ClassDeclaration classDecl = classes.get(classType.getIdentifier());
+        ClassDeclaration superClassDecl = classes.get(superClassType.getIdentifier());
+
+        while (!classDecl.getIdentifier().equals(superClassDecl.getIdentifier())) {
+            if (!classDecl.getParentIdentifier().isPresent()) {
+                return false;
+            }
+            Identifier parentIdentifier = classDecl.getParentIdentifier().get();
+            classDecl = classes.get(parentIdentifier);
+            if (classDecl.getIdentifier().equals(superClassDecl.getIdentifier())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Visits an Assignment node. The number of elements in the node's Variables
      * (LHS) must equal the number of elements on the RHS (VariableTypeList if
      * there's more than one). Then, each type on the LHS must be the same as
@@ -212,7 +245,7 @@ public class TypeCheckVisitor implements NodeVisitor {
 
                 assert leftType instanceof VariableType || leftType.equals(new UnitType());
 
-                if (!leftType.equals(new UnitType()) && !leftType.equals(rightType)) {
+                if (!isSubtype(rightType, leftType)) {
                     throw new TypeException("Type on left hand must match type on right hand", expression.getRow(), expression.getCol());
                 }
             }
@@ -228,7 +261,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             if (leftExpression instanceof TypedDeclaration) {
                 leftType = ((TypedDeclaration) leftExpression).getDeclarationType();
             }
-            if (!leftType.equals(expression.getType())) {
+            if (!isSubtype(expression.getType(), leftType)) {
                 throw new TypeException("Types on LHS and RHS must match", expression.getRow(), expression.getCol());
             }
         } else if (variables.size() == 1 && variables.get(0) instanceof Underscore
