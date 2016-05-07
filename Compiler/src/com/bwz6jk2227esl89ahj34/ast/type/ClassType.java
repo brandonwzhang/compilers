@@ -14,22 +14,4 @@ import java.util.Optional;
 @EqualsAndHashCode(callSuper=false)
 public class ClassType extends BaseType {
     private Identifier identifier;
-    private Optional<Identifier> parentIdentifier;
-    private Map<Identifier, Type> fields;
-    private Map<Identifier, FunctionType> methods;
-
-    public static ClassType construct(ClassDeclaration cd) {
-        Identifier identifier = cd.getIdentifier();
-        Optional<Identifier> parentIdentifier = cd.getParentIdentifier();
-        Map<Identifier, Type> fields = new HashMap<>();
-        for (TypedDeclaration field : cd.getFields()) {
-            fields.put(field.getIdentifier(), field.getDeclarationType());
-        }
-        Map<Identifier, FunctionType> methods = new HashMap<>();
-        for (MethodDeclaration method : cd.getMethods()) {
-            FunctionDeclaration fd = method.getFunctionDeclaration();
-            methods.put(fd.getIdentifier(), fd.getFunctionType());
-        }
-        return new ClassType(identifier, parentIdentifier, fields, methods);
-    }
 }

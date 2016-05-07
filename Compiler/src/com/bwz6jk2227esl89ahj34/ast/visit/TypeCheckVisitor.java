@@ -12,7 +12,9 @@ public class TypeCheckVisitor implements NodeVisitor {
     private String libPath;
 
     // Maintain a stack of contexts (identifier -> type map) for scoping
-    private Stack<Context> contexts;
+    private Stack<Context> contexts = new Stack<>();
+
+    private Map<Identifier, ClassDeclaration> classes = new HashMap<>();
 
     // Local variable that stores current function in scope with a stack, used for return statements
     private FunctionType currentFunctionType;
@@ -22,7 +24,6 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param libPath the directory for where to find the interface files.
      */
     public TypeCheckVisitor(String libPath) {
-        contexts = new Stack<>();
         // initialize first context with length function, int[] -> int
         // when it should take bool[]. We handle this later below
         Context initContext = new Context();
@@ -390,22 +391,22 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException(id + " is not a function", id.getRow(), id.getCol());
         }
 
-        FunctionType thisFuncType = (FunctionType) type;
-        FunctionType funcType = new FunctionType(argumentTypes, thisFuncType.getReturnTypeList());
+        FunctionType funcType = (FunctionType) type;
+        FunctionType callFuncType = new FunctionType(argumentTypes, funcType.getReturnTypeList());
         // Function call don't match arguments AND
         // Not a valid length call...
-        if (!thisFuncType.equals(funcType) && 
+        if (!funcType.equals(callFuncType) &&
                 !(id.getName().equals("length")
                 && argumentTypes.size() == 1 && argumentTypes.get(0) instanceof ArrayType)) {
             throw new TypeException("Argument types do not match with function definition", id.getRow(), id.getCol());
         }
         
-        if (thisFuncType.getReturnTypeList().getVariableTypeList().size() > 1) {
-            node.setType(thisFuncType.getReturnTypeList());
-        } else if (thisFuncType.getReturnTypeList().getVariableTypeList().size() == 0) {
+        if (funcType.getReturnTypeList().getVariableTypeList().size() > 1) {
+            node.setType(funcType.getReturnTypeList());
+        } else if (funcType.getReturnTypeList().getVariableTypeList().size() == 0) {
             throw new TypeException("Procedure calls cannot be used as an expression", id.getRow(), id.getCol());
         } else {
-            node.setType(thisFuncType.getReturnTypeList().getVariableTypeList().get(0));
+            node.setType(funcType.getReturnTypeList().getVariableTypeList().get(0));
         }
     }
 
@@ -524,23 +525,140 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(MethodDeclaration node) {
-        // TODO
+        // Check that the function declaration wrapped in this method is typed
+        FunctionDeclaration fd = node.getFunctionDeclaration();
+        fd.accept(this);
+        node.setType(fd.getType());
+    }
+
+    /**
+     * Returns the type of the field in a given class. Returns null if field
+     * cannot be found.
+     */
+    private VariableType getObjectFieldType(Identifier fieldName, ClassDeclaration cd) {
+        for (TypedDeclaration td : cd.getFields()) {
+            if (td.getIdentifier().equals(fieldName)) {
+                return td.getDeclarationType();
+            }
+        }
+        // At this point the field was not found in this class, so we look in
+        // parent classes
+        if (!cd.getParentIdentifier().isPresent()) {
+            // There is no parent, so this field does not exist
+            return null;
+        }
+        return getObjectFieldType(fieldName, classes.get(cd.getParentIdentifier().get()));
+    }
+
+    /**
+     * Returns the type of the method in a given class. Returns null if method
+     * cannot be found.
+     */
+    private FunctionType getObjectMethodType(Identifier methodName, ClassDeclaration cd) {
+        for (MethodDeclaration md : cd.getMethods()) {
+            if (md.getFunctionDeclaration().getIdentifier().equals(methodName)) {
+                return md.getFunctionDeclaration().getFunctionType();
+            }
+        }
+        // At this point the method was not found in this class, so we look in
+        // parent classes
+        if (!cd.getParentIdentifier().isPresent()) {
+            // There is no parent, so this method does not exist
+            return null;
+        }
+        return getObjectMethodType(methodName, classes.get(cd.getParentIdentifier().get()));
     }
 
     public void visit(ObjectField node) {
-        // TODO
+        node.getObject().accept(this);
+        Identifier className = ((ClassType) node.getObject().getType()).getIdentifier();
+        ClassDeclaration cd = classes.get(className);
+        Identifier fieldName = node.getField();
+        // Get the type for this field
+        VariableType type = getObjectFieldType(fieldName, cd);
+        if (type == null) {
+            throw new TypeException("Class " + className.getName() + " does not contain method " + fieldName.getName(),
+                    fieldName.getRow(), fieldName.getCol());
+        }
+        node.setType(type);
     }
 
     public void visit(ObjectFunctionCall node) {
-        // TODO
+        node.getObject().accept(this);
+        Identifier className = ((ClassType) node.getObject().getType()).getIdentifier();
+        ClassDeclaration cd = classes.get(className);
+
+        // Extract the types for tha passed arguments
+        List<VariableType> argumentTypes = new ArrayList<>();
+        for (Expression argument : node.getArguments()) {
+            argument.accept(this);
+            assert argument.getType() instanceof VariableType;
+            VariableType argType = (VariableType) argument.getType();
+            argumentTypes.add(argType);
+        }
+
+        Identifier methodName = node.getIdentifier();
+        FunctionType funcType = getObjectMethodType(methodName, cd);
+        if (funcType == null) {
+            throw new TypeException("Class " + className.getName() + " does not contain method " + methodName.getName(),
+                    methodName.getRow(), methodName.getCol());
+        }
+        // Construct a dummy function type for the call
+        FunctionType callFuncType = new FunctionType(argumentTypes, funcType.getReturnTypeList());
+        // Function call don't match arguments
+        if (!funcType.equals(callFuncType)) {
+            throw new TypeException("Argument types do not match with function definition",
+                    methodName.getRow(), methodName.getCol());
+        }
+
+        if (funcType.getReturnTypeList().getVariableTypeList().size() > 1) {
+            node.setType(funcType.getReturnTypeList());
+        } else if (funcType.getReturnTypeList().getVariableTypeList().size() == 0) {
+            throw new TypeException("Procedure calls cannot be used as an expression",
+                    methodName.getRow(), methodName.getCol());
+        } else {
+            node.setType(funcType.getReturnTypeList().getVariableTypeList().get(0));
+        }
     }
 
     public void visit(ObjectInstantiation node) {
-        // TODO
+        // Set the type to the class
+        node.setType(new ClassType(node.getClassIdentifier()));
     }
 
     public void visit(ObjectProcedureCall node) {
-        // TODO
+        Identifier className = ((ClassType) node.getObject().getType()).getIdentifier();
+        ClassDeclaration cd = classes.get(className);
+
+        // Extract the types for tha passed arguments
+        List<VariableType> argumentTypes = new ArrayList<>();
+        for (Expression argument : node.getArguments()) {
+            argument.accept(this);
+            assert argument.getType() instanceof VariableType;
+            VariableType argType = (VariableType) argument.getType();
+            argumentTypes.add(argType);
+        }
+
+        Identifier methodName = node.getIdentifier();
+        FunctionType funcType = getObjectMethodType(methodName, cd);
+        if (funcType == null) {
+            throw new TypeException("Class " + className.getName() + " does not contain method " + methodName.getName(),
+                    methodName.getRow(), methodName.getCol());
+        }
+        // Construct a dummy function type for the call
+        FunctionType callFuncType = new FunctionType(argumentTypes, funcType.getReturnTypeList());
+        // Function call don't match arguments
+        if (!funcType.equals(callFuncType)) {
+            throw new TypeException("Argument types do not match with function definition",
+                    methodName.getRow(), methodName.getCol());
+        }
+
+        if (funcType.getReturnTypeList().getVariableTypeList().size() > 0) {
+            throw new TypeException("You cannot call a function with a return " +
+                    "value as a procedure.", methodName.getRow(), methodName.getCol());
+        } else {
+            node.setType(new UnitType());
+        }
     }
 
     /**
@@ -574,7 +692,7 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         FunctionType funcType = new FunctionType(argumentTypes, new VariableTypeList(new ArrayList<>()));
         if (!funcType.equals(context.get(id))) {
-            throw new TypeException("You cannot call a method with a return " +
+            throw new TypeException("You cannot call a function with a return " +
                     "value as a procedure.", id.getRow(), id.getCol());
         }
 
@@ -608,6 +726,12 @@ public class TypeCheckVisitor implements NodeVisitor {
             contexts.peek().put(funcName, funcType);
             //funcName.accept(this);
             funcName.setType(funcType);
+        }
+
+        // Populate the classes map
+        for (ClassDeclaration classDec : node.getClassDeclarations()) {
+            Identifier className = classDec.getIdentifier();
+            classes.put(className, classDec);
         }
 
         // Add function declarations from interface files
