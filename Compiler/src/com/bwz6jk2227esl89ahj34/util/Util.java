@@ -95,11 +95,11 @@ public class Util {
         put(ParserSym.USE, "use");
         put(ParserSym.UNDERSCORE, "_");
         put(ParserSym.error, "error:");
-                put(ParserSym.NEGATIVE_INT_BOUND, "negative_int_bound");
-                put(ParserSym.LENGTH, "length");
-                put(ParserSym.CLASS, "class");
-                put(ParserSym.EXTENDS, "extends");
-                put(ParserSym.NEW,"new");
+        put(ParserSym.NEGATIVE_INT_BOUND, "negative_int_bound");
+        put(ParserSym.LENGTH, "length");
+        put(ParserSym.CLASS, "class");
+        put(ParserSym.EXTENDS, "extends");
+        put(ParserSym.NEW,"new");
     }};
 
     /**
@@ -339,23 +339,25 @@ public class Util {
         }
     }
 
-    public static String getTypeString(VariableType type) {
+    private static String getBaseTypeString(BaseType type) {
         if (type instanceof IntType) {
             return "i";
-        }
-        if (type instanceof BoolType) {
+        } else if (type instanceof BoolType) {
             return "b";
+        } else {
+            ClassType classType = (ClassType) type;
+            String className = classType.getIdentifier().getName();
+            return "o" + className.length() + className;
+        }
+    }
+
+    private static String getTypeString(VariableType type) {
+        if (!(type instanceof ArrayType)) {
+            return getBaseTypeString((BaseType) type);
         }
 
         ArrayType arrayType = (ArrayType) type;
-        VariableType baseType = arrayType.getBaseType();
-        String typeString = "";
-        if (baseType instanceof IntType) {
-            typeString += "i";
-        }
-        if (baseType instanceof BoolType) {
-            typeString += "b";
-        }
+        String typeString = getBaseTypeString(arrayType.getBaseType());
         for (int i = 0; i < arrayType.getNumBrackets(); i++) {
             typeString = "a" + typeString;
         }
