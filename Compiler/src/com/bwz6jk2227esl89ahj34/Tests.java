@@ -192,6 +192,7 @@ public class Tests {
         Util.getDirectoryFiles("typecheck/passtests/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .forEach(filename -> {
+                    System.out.println(filename);
                     Optional<Program> program = Core.parseFile(filename);
                     if (!program.isPresent()) {
                         return;
@@ -205,6 +206,7 @@ public class Tests {
         Util.getDirectoryFiles("typecheck/failtests/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .forEach(filename -> {
+                    System.out.println(filename);
                     Optional<Program> program = Core.parseFile(filename);
                     if (!program.isPresent()) {
                         return;

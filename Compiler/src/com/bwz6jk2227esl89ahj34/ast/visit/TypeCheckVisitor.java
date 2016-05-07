@@ -497,7 +497,8 @@ public class TypeCheckVisitor implements NodeVisitor {
             // We need create and pop a new context if the block is just a statement
             if (falseBlockIsStatement) {
                 if (falseBlock.get() instanceof ReturnStatement) {
-                    throw new TypeException("Single return statement encountered in false block", falseBlock.get().getRow(), falseBlock.get().getCol());
+                    throw new TypeException("Single return statement encountered in false block",
+                            falseBlock.get().getRow(), falseBlock.get().getCol());
                 }
                 contexts.push(new Context(contexts.peek()));
             }
