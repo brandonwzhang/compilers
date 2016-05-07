@@ -6,12 +6,12 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class IntType extends PrimitiveType {
-
     public boolean isInt() {
         return true;
     }
 
-    public boolean isBool() {
-        return true;
+    @Override
+    public String toString() {
+        return "int";
     }
 }

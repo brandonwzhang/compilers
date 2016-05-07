@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34.ast.visit;
 
 import com.bwz6jk2227esl89ahj34.ast.*;
+import com.bwz6jk2227esl89ahj34.ast.type.ArrayType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 
@@ -195,12 +196,18 @@ public class PrintVisitor implements NodeVisitor {
 
 
     public void printType(VariableType node) {
-        for(int i = 0; i < node.getNumBrackets(); i++) {
+        if (!(node instanceof ArrayType)) {
+            printer.printAtom(node.toString());
+            return;
+        }
+
+        ArrayType arrayType = (ArrayType) node;
+        for(int i = 0; i < arrayType.getNumBrackets(); i++) {
             printer.startList();
             printer.printAtom("[]");
         }
-        printer.printAtom(node.getPrimitiveType().toString());
-        for(int j = 0; j < node.getNumBrackets(); j++) {
+        printer.printAtom(arrayType.getBaseType().toString());
+        for(int j = 0; j < arrayType.getNumBrackets(); j++) {
             printer.endList();
         }
     }
@@ -208,14 +215,23 @@ public class PrintVisitor implements NodeVisitor {
     public void visit(TypedDeclaration node) {
         printer.startList();
         node.getIdentifier().accept(this);
-        for(int i = 0; i < node.getDeclarationType().getNumBrackets(); i++) {
+
+        VariableType type = node.getDeclarationType();
+
+        if (!(type instanceof ArrayType)) {
+            printer.printAtom(type.toString());
+            return;
+        }
+
+        ArrayType arrayType = (ArrayType) type;
+        for(int i = 0; i < arrayType.getNumBrackets(); i++) {
             printer.startList();
             printer.printAtom("[]");
         }
 
-        printer.printAtom(node.getDeclarationType().getPrimitiveType().toString());
+        printer.printAtom(arrayType.getBaseType().toString());
 
-        int numArrayEmpty = node.getDeclarationType().getNumBrackets() -
+        int numArrayEmpty = arrayType.getNumBrackets() -
                 node.getArraySizes().size();
         for(int j = 0; j < numArrayEmpty; j++) {
             printer.endList();
