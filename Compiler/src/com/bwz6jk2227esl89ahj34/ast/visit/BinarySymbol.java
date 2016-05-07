@@ -32,9 +32,6 @@ public class BinarySymbol {
     static final Set<BinaryOperator> BOOL_BINARY_OPERATOR_BOOL = new LinkedHashSet<>(Arrays.asList(bool_binary_operator_bool));
     static final Set<BinaryOperator> ARRAY_BINARY_OPERATOR_BOOL = new LinkedHashSet<>(Arrays.asList(array_binary_operator_bool));
 
-    private static final VariableType INT_TYPE = new VariableType(PrimitiveType.INT, 0);
-    private static final VariableType BOOL_TYPE = new VariableType(PrimitiveType.BOOL, 0);
-
     /**
      * precondition: the code has already gone through the
      * typechecking phase, so we know that b is a valid Binary object
