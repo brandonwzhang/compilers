@@ -4,7 +4,6 @@ import com.bwz6jk2227esl89ahj34.ast.*;
 import com.bwz6jk2227esl89ahj34.ast.parse.InterfaceParser;
 import com.bwz6jk2227esl89ahj34.ast.type.*;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class TypeCheckVisitor implements NodeVisitor {
@@ -34,6 +33,55 @@ public class TypeCheckVisitor implements NodeVisitor {
         contexts.push(initContext);
 
         this.libPath = libPath;
+    }
+
+    /**
+     * Check if a given type is a valid function type
+     */
+    private boolean isValidFunctionType(Type type) {
+        if (!(type instanceof FunctionType)) {
+            return false;
+        }
+        FunctionType functionType = (FunctionType) type;
+        for (VariableType variableType : functionType.getArgTypes()) {
+            if (!isValidVariableType(variableType)) {
+                return false;
+            }
+        }
+        for (VariableType variableType : functionType.getReturnTypeList().getVariableTypeList()) {
+            if (!isValidVariableType(variableType)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if a given type is either an int, bool, unit, void or a class
+     * that has been declared
+     */
+    private boolean isValidVariableType(Type type) {
+        if (!(type instanceof VariableType)) {
+            return false;
+        }
+
+        if (!(type instanceof ClassType || type instanceof ArrayType)) {
+            return true;
+        }
+        ClassType classType;
+        if (type instanceof ClassType) {
+            classType = (ClassType) type;
+        } else {
+            ArrayType arrayType = (ArrayType) type;
+            if (!(arrayType.getBaseType() instanceof ClassType)) {
+                return true;
+            }
+            classType = (ClassType) arrayType.getBaseType();
+        }
+        if (!classes.containsKey(classType.getIdentifier())) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -295,14 +343,96 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new IntType());
     }
 
+    /**
+     * Returns the type of the field in a given class. Returns null if field
+     * cannot be found.
+     */
+    private VariableType getFieldType(Identifier fieldName, ClassDeclaration cd) {
+        for (TypedDeclaration td : cd.getFields()) {
+            if (td.getIdentifier().equals(fieldName)) {
+                return td.getDeclarationType();
+            }
+        }
+        // At this point the field was not found in this class, so we look in
+        // parent classes
+        if (!cd.getParentIdentifier().isPresent()) {
+            // There is no parent, so this field does not exist
+            return null;
+        }
+        return getFieldType(fieldName, classes.get(cd.getParentIdentifier().get()));
+    }
+
+    /**
+     * Returns the type of the method in a given class. Returns null if method
+     * cannot be found.
+     */
+    private FunctionType getMethodType(Identifier methodName, ClassDeclaration cd) {
+        assert cd != null;
+        for (MethodDeclaration md : cd.getMethods()) {
+            if (md.getFunctionDeclaration().getIdentifier().equals(methodName)) {
+                return md.getFunctionDeclaration().getFunctionType();
+            }
+        }
+        // At this point the method was not found in this class, so we look in
+        // parent classes
+        if (!cd.getParentIdentifier().isPresent()) {
+            // There is no parent, so this method does not exist
+            return null;
+        }
+        return getMethodType(methodName, classes.get(cd.getParentIdentifier().get()));
+    }
+
     public void visit(ClassDeclaration node) {
-        // TODO
+        for (TypedDeclaration td : node.getFields()) {
+            if (!isValidVariableType(td.getDeclarationType())) {
+                throw new TypeException("Invalid type", td.getRow(), td.getCol());
+            }
+            if (node.getParentIdentifier().isPresent()) {
+                Identifier parentName = node.getParentIdentifier().get();
+                ClassDeclaration parentClass = classes.get(parentName);
+                if (parentClass == null) {
+                    throw new TypeException("Class " + parentName.getName() + " does not exist",
+                            parentName.getRow(), parentName.getCol());
+                }
+                VariableType parentFieldType = getFieldType(td.getIdentifier(), parentClass);
+                // If parent contains the field, we have the make sure types match
+                if (parentFieldType != null) {
+                    if (!td.getDeclarationType().equals(parentFieldType)) {
+                        throw new TypeException("Type of " + td.getIdentifier() + " does not match parent",
+                                td.getRow(), td.getCol());
+                    }
+                }
+            }
+        }
+        for (MethodDeclaration md : node.getMethods()) {
+            FunctionDeclaration fd = md.getFunctionDeclaration();
+
+            if (node.getParentIdentifier().isPresent()) {
+                Identifier parentName = node.getParentIdentifier().get();
+                ClassDeclaration parentClass = classes.get(parentName);
+                if (parentClass == null) {
+                    throw new TypeException("Class " + parentName.getName() + " does not exist",
+
+                            parentName.getRow(), parentName.getCol());
+                }
+                FunctionType parentMethodType = getMethodType(fd.getIdentifier(), parentClass);
+                // If parent contains the method, we have the make sure types match
+                if (parentMethodType != null) {
+                    if (!fd.getFunctionType().equals(parentMethodType)) {
+                        throw new TypeException("Type of method " + fd.getIdentifier() + " does not match parent",
+                                fd.getRow(), fd.getCol());
+                    }
+                }
+            }
+
+            // Check that the method block is well typed and the function type is a valid type
+            md.accept(this);
+        }
+        node.setType(new UnitType());
     }
 
     /**
      * Checks that the given BlockList is guaranteed to return by the end
-     * @param blockList
-     * @return
      */
     public static boolean checkFunctionBlockList(BlockList blockList) {
         Block lastBlock = blockList.getBlocks().get(blockList.getBlocks().size() - 1);
@@ -350,8 +480,6 @@ public class TypeCheckVisitor implements NodeVisitor {
 
     /**
      * Checks that top level return statements only occur at the end of the BlockList
-     * @param blockList
-     * @return
      */
     public static boolean checkProcedureBlockList(BlockList blockList) {
         List<Block> blocks = blockList.getBlocks();
@@ -417,6 +545,9 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(FunctionDeclaration node) {
+        if (!isValidFunctionType(node.getFunctionType())) {
+            throw new TypeException("Invalid function type", node.getRow(), node.getCol());
+        }
         currentFunctionType = node.getFunctionType();
         List<Identifier> argList = node.getArgumentIdentifiers();
         List<VariableType> argTypeList = currentFunctionType.getArgTypes();
@@ -531,51 +662,14 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(fd.getType());
     }
 
-    /**
-     * Returns the type of the field in a given class. Returns null if field
-     * cannot be found.
-     */
-    private VariableType getObjectFieldType(Identifier fieldName, ClassDeclaration cd) {
-        for (TypedDeclaration td : cd.getFields()) {
-            if (td.getIdentifier().equals(fieldName)) {
-                return td.getDeclarationType();
-            }
-        }
-        // At this point the field was not found in this class, so we look in
-        // parent classes
-        if (!cd.getParentIdentifier().isPresent()) {
-            // There is no parent, so this field does not exist
-            return null;
-        }
-        return getObjectFieldType(fieldName, classes.get(cd.getParentIdentifier().get()));
-    }
-
-    /**
-     * Returns the type of the method in a given class. Returns null if method
-     * cannot be found.
-     */
-    private FunctionType getObjectMethodType(Identifier methodName, ClassDeclaration cd) {
-        for (MethodDeclaration md : cd.getMethods()) {
-            if (md.getFunctionDeclaration().getIdentifier().equals(methodName)) {
-                return md.getFunctionDeclaration().getFunctionType();
-            }
-        }
-        // At this point the method was not found in this class, so we look in
-        // parent classes
-        if (!cd.getParentIdentifier().isPresent()) {
-            // There is no parent, so this method does not exist
-            return null;
-        }
-        return getObjectMethodType(methodName, classes.get(cd.getParentIdentifier().get()));
-    }
-
     public void visit(ObjectField node) {
         node.getObject().accept(this);
+        assert node.getObject().getType() instanceof ClassType;
         Identifier className = ((ClassType) node.getObject().getType()).getIdentifier();
         ClassDeclaration cd = classes.get(className);
         Identifier fieldName = node.getField();
         // Get the type for this field
-        VariableType type = getObjectFieldType(fieldName, cd);
+        VariableType type = getFieldType(fieldName, cd);
         if (type == null) {
             throw new TypeException("Class " + className.getName() + " does not contain method " + fieldName.getName(),
                     fieldName.getRow(), fieldName.getCol());
@@ -585,6 +679,7 @@ public class TypeCheckVisitor implements NodeVisitor {
 
     public void visit(ObjectFunctionCall node) {
         node.getObject().accept(this);
+        assert node.getObject().getType() instanceof ClassType;
         Identifier className = ((ClassType) node.getObject().getType()).getIdentifier();
         ClassDeclaration cd = classes.get(className);
 
@@ -598,7 +693,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         Identifier methodName = node.getIdentifier();
-        FunctionType funcType = getObjectMethodType(methodName, cd);
+        FunctionType funcType = getMethodType(methodName, cd);
         if (funcType == null) {
             throw new TypeException("Class " + className.getName() + " does not contain method " + methodName.getName(),
                     methodName.getRow(), methodName.getCol());
@@ -627,6 +722,8 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(ObjectProcedureCall node) {
+        node.getObject().accept(this);
+        assert node.getObject().getType() instanceof ClassType;
         Identifier className = ((ClassType) node.getObject().getType()).getIdentifier();
         ClassDeclaration cd = classes.get(className);
 
@@ -640,7 +737,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         Identifier methodName = node.getIdentifier();
-        FunctionType funcType = getObjectMethodType(methodName, cd);
+        FunctionType funcType = getMethodType(methodName, cd);
         if (funcType == null) {
             throw new TypeException("Class " + className.getName() + " does not contain method " + methodName.getName(),
                     methodName.getRow(), methodName.getCol());
@@ -714,7 +811,16 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Program node) {
-        // First pass collects all function types, adds to context
+        // Populate the classes map first incase any functions use objects
+        for (ClassDeclaration classDec : node.getClassDeclarations()) {
+            Identifier className = classDec.getIdentifier();
+            if (classes.containsKey(className)) {
+                throw new TypeException("Class " + className.getName() + "declared multiple times");
+            }
+            classes.put(className, classDec);
+        }
+
+        // Add all functions to the initial context
         for (FunctionDeclaration funcDec : node.getFunctionDeclarations()) {
             Identifier funcName = funcDec.getIdentifier();
             // Disallow overloading and shadowing
@@ -726,12 +832,6 @@ public class TypeCheckVisitor implements NodeVisitor {
             contexts.peek().put(funcName, funcType);
             //funcName.accept(this);
             funcName.setType(funcType);
-        }
-
-        // Populate the classes map
-        for (ClassDeclaration classDec : node.getClassDeclarations()) {
-            Identifier className = classDec.getIdentifier();
-            classes.put(className, classDec);
         }
 
         // Add function declarations from interface files
@@ -803,6 +903,10 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (context.containsKey(identifier)) {
             throw new TypeException("Variable " + identifier.getName() +
                     " already declared in scope", node.getRow(), node.getCol());
+        }
+        VariableType type = node.getDeclarationType();
+        if (!isValidVariableType(type)) {
+            throw new TypeException("Invalid type", node.getRow(), node.getCol());
         }
         context.put(identifier, node.getDeclarationType());
         identifier.accept(this);
