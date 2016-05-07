@@ -105,6 +105,7 @@ nonterminal FunctionDeclaration function_declaration;
 nonterminal List<FunctionDeclaration> function_declaration_list;
 
 nonterminal ProcedureCall procedure_call;
+nonterminal List<TypedDeclaration> fields; 
 
 precedence nonassoc ELSE;
 precedence nonassoc SEMICOLON;
@@ -321,8 +322,12 @@ use_block ::= USE identifier:id use_block:u {: u.add(0, new UseStatement(id)); R
             | empty   {: RESULT = new LinkedList<UseStatement>(); :}
             ;
 
+fields ::= typed_declaration:td {: List<TypedDeclaration> f = new LinkedList<>(); f.add(td); RESULT = f; :}
+              | identifier:id COMMA fields:f {: TypedDeclaration temp = f.getLast(); f.add(0, new TypedDeclaration(id, temp.getDeclarationType, temp.getArraySizes())); RESULT = ids; :} 
+              ; 
 
 program ::= use_block:u function_declaration_list:l   {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
+          | use_block:u CLASS identifier:id OPEN_BRACE fields:f function_declaration_list:l CLOSE_BRACE {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
           | use_block:u CLASS identifier:id OPEN_BRACE function_declaration_list:l CLOSE_BRACE {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
           | use_block:u CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE function_declaration_list:l CLOSE_BRACE  {: RESULT = new Program(u,l); :}
           | error
