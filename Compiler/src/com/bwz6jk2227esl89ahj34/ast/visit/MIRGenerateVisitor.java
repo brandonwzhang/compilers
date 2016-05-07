@@ -1,9 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ast.visit;
 import com.bwz6jk2227esl89ahj34.ast.*;
-import com.bwz6jk2227esl89ahj34.ast.type.ClassType;
-import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
-import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
-import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
+import com.bwz6jk2227esl89ahj34.ast.type.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
@@ -287,8 +284,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRMove moveRightToTemp = new IRMove(rightTemp, right);
 
         // array addition case
-        if (optype == OpType.ADD && ((VariableType)node.getLeft().getType()).getNumBrackets() > 0) {
-            assert ((VariableType)node.getRight().getType()).getNumBrackets() > 0;
+        if (optype == OpType.ADD && node.getLeft().getType() instanceof ArrayType) {
+            assert node.getRight().getType() instanceof ArrayType;
             // get length of operands
             IRMem leftLength = new IRMem(new IRBinOp(OpType.SUB, leftTemp, new IRConst(Configuration.WORD_SIZE)));
             IRMem rightLength = new IRMem(new IRBinOp(OpType.SUB, rightTemp, new IRConst(Configuration.WORD_SIZE)));
