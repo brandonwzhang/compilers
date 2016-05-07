@@ -8,6 +8,8 @@ package com.bwz6jk2227esl89ahj34.ast.parse;
 import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
 import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
 import com.bwz6jk2227esl89ahj34.ast.Identifier;
+import com.bwz6jk2227esl89ahj34.ast.type.IntType;
+import com.bwz6jk2227esl89ahj34.ast.type.BoolType;
 import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
@@ -234,7 +236,7 @@ class CUP$InterfaceParser$actions {
         case 2: // primitive_type ::= INT 
             {
                 PrimitiveType RESULT = null;
-                 RESULT = PrimitiveType.INT; 
+                 RESULT = new IntType(); 
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("primitive_type",1, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
@@ -243,7 +245,7 @@ class CUP$InterfaceParser$actions {
         case 3: // primitive_type ::= BOOL 
             {
                 PrimitiveType RESULT = null;
-                 RESULT = PrimitiveType.BOOL; 
+                 RESULT = new BoolType(); 
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("primitive_type",1, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
@@ -279,7 +281,7 @@ class CUP$InterfaceParser$actions {
                 int anstleft = CUP$InterfaceParser$stack.peek().left;
                 int anstright = CUP$InterfaceParser$stack.peek().right;
                 Integer anst = CUP$InterfaceParser$stack.peek().<Integer> value();
-                 RESULT = new VariableType(pt, anst); 
+                 RESULT = VariableType.construct(pt, anst); 
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("var_type",2, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;

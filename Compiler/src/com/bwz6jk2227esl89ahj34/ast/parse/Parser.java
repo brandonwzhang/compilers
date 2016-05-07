@@ -7,7 +7,10 @@ package com.bwz6jk2227esl89ahj34.ast.parse;
 
 import com.bwz6jk2227esl89ahj34.ast.*;
 import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
+import com.bwz6jk2227esl89ahj34.ast.type.IntType;
+import com.bwz6jk2227esl89ahj34.ast.type.BoolType;
 import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
+import com.bwz6jk2227esl89ahj34.ast.type.ArrayType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.util.Util;
@@ -1418,7 +1421,7 @@ class CUP$Parser$actions {
         case 52: // primitive_type ::= INT 
             {
                 PrimitiveType RESULT = null;
-                 RESULT = PrimitiveType.INT; 
+                 RESULT = new IntType(); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("primitive_type",20, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1427,7 +1430,7 @@ class CUP$Parser$actions {
         case 53: // primitive_type ::= BOOL 
             {
                 PrimitiveType RESULT = null;
-                 RESULT = PrimitiveType.BOOL; 
+                 RESULT = new BoolType(); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("primitive_type",20, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1490,7 +1493,7 @@ class CUP$Parser$actions {
                 int anstleft = CUP$Parser$stack.peek().left;
                 int anstright = CUP$Parser$stack.peek().right;
                 Integer anst = CUP$Parser$stack.peek().<Integer> value();
-                 RESULT = new VariableType(pt, anst); 
+                 RESULT = VariableType.construct(pt, anst); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("var_type",21, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1508,7 +1511,7 @@ class CUP$Parser$actions {
                 int astleft = CUP$Parser$stack.peek().left;
                 int astright = CUP$Parser$stack.peek().right;
                 Integer ast = CUP$Parser$stack.peek().<Integer> value();
-                 RESULT = new TypedDeclaration(id, new VariableType(t, ast), new LinkedList<Expression>()); RESULT.setLocation(parser.cur_token); 
+                 RESULT = new TypedDeclaration(id, VariableType.construct(t, ast), new LinkedList<Expression>()); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("typed_declaration_no_size",25, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1526,7 +1529,7 @@ class CUP$Parser$actions {
                 int astleft = CUP$Parser$stack.peek().left;
                 int astright = CUP$Parser$stack.peek().right;
                 SimpleEntry<List<Expression>,Integer> ast = CUP$Parser$stack.peek().<SimpleEntry<List<Expression>,Integer>> value();
-                 RESULT = new TypedDeclaration(id, new VariableType(t, ast.getKey().size() + ast.getValue()), ast.getKey()); RESULT.setLocation(parser.cur_token); 
+                 RESULT = new TypedDeclaration(id, VariableType.construct(t, ast.getKey().size() + ast.getValue()), ast.getKey()); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("typed_declaration",24, CUP$Parser$stack.elementAt(CUP$Parser$top-3), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;

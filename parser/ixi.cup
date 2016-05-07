@@ -86,15 +86,15 @@ nonterminal List<FunctionDeclaration> function_declaration_list;
 start with function_declaration_list;
 empty ::= ;
 
-primitive_type ::= INT {: RESULT = PrimitiveType.INT; :}
-                 | BOOL {: RESULT = PrimitiveType.BOOL; :}
+primitive_type ::= INT {: RESULT = new IntType(); :}
+                 | BOOL {: RESULT = new BoolType(); :}
                  ;
 
 array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type:anst {: RESULT = anst + 1; :}
                      | empty {: RESULT = 0; :}
                      ;
 
-var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new VariableType(pt, anst); :}
+var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = VariableType.construct(pt, anst); :}
        ;
 
 function_declaration_return_types ::= var_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :}
