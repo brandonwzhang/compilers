@@ -13,8 +13,6 @@ public class TypeCheckVisitor implements NodeVisitor {
     // Maintain a stack of contexts (identifier -> type map) for scoping
     private Stack<Context> contexts;
 
-    private Context lastPoppedContext;
-
     // Local variable that stores current function in scope with a stack, used for return statements
     private FunctionType currentFunctionType;
 
@@ -272,7 +270,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             Type lastType = blockList.get(size - 1).getType();
             node.setType(lastType);
         }
-        lastPoppedContext = contexts.pop();
+        contexts.pop();
     }
 
     /**
