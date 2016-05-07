@@ -4,10 +4,9 @@ import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyComment;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
 import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
-import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
+import com.bwz6jk2227esl89ahj34.ast.type.*;
 import com.bwz6jk2227esl89ahj34.ast.MethodDeclaration;
 import com.bwz6jk2227esl89ahj34.ast.parse.ParserSym;
-import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.analysis.CFGIR;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;
@@ -341,18 +340,23 @@ public class Util {
     }
 
     public static String getTypeString(VariableType type) {
-        String typeString = "";
-        switch (type.getPrimitiveType()) {
-            case BOOL:
-                typeString = "b";
-                break;
-            case INT:
-                typeString = "i";
-                break;
-            default:
-                throw new RuntimeException("Invalid type");
+        if (type instanceof IntType) {
+            return "i";
         }
-        for (int i = 0; i < type.getNumBrackets(); i++) {
+        if (type instanceof BoolType) {
+            return "b";
+        }
+
+        ArrayType arrayType = (ArrayType) type;
+        VariableType baseType = arrayType.getBaseType();
+        String typeString = "";
+        if (baseType instanceof IntType) {
+            typeString += "i";
+        }
+        if (baseType instanceof BoolType) {
+            typeString += "b";
+        }
+        for (int i = 0; i < arrayType.getNumBrackets(); i++) {
             typeString = "a" + typeString;
         }
         return typeString;

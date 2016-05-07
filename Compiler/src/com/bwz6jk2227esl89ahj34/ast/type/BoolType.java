@@ -6,4 +6,12 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class BoolType extends PrimitiveType {
+    public boolean isBool() {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "bool";
+    }
 }

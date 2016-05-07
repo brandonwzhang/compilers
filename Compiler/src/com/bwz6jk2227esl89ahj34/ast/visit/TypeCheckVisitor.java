@@ -161,7 +161,7 @@ public class TypeCheckVisitor implements NodeVisitor {
 
                 Type rightType = rhs.getVariableTypeList().get(i);
 
-                assert leftType instanceof VariableType;
+                assert leftType instanceof VariableType || leftType.equals(new UnitType());
 
                 if (!leftType.equals(new UnitType()) && !leftType.equals(rightType)) {
                     throw new TypeException("Type on left hand must match type on right hand", expression.getRow(), expression.getCol());
@@ -170,7 +170,6 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         } else if (variables.size() > 1) {
             throw new TypeException("Expression only evaluates to single value", expression.getRow(), expression.getCol());
-
         } else if (variables.size() == 1 &&
                 !(variables.get(0) instanceof Underscore)) {
             Assignable leftExpression = variables.get(0);
