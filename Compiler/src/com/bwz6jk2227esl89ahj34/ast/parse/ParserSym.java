@@ -47,6 +47,7 @@ public class ParserSym {
   public static final int OPEN_PAREN = 33;
   public static final int BOOL = 9;
   public static final int AND = 26;
+  public static final int PERIOD = 47;
   public static final int NOT_EQUAL = 29;
   public static final int LEQ = 23;
   public static final int STRING_LITERAL = 3;
@@ -102,7 +103,8 @@ public class ParserSym {
   "LENGTH",
   "CLASS",
   "EXTENDS",
-  "NEW"
+  "NEW",
+  "PERIOD"
   };
 }
 

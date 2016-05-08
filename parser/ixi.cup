@@ -3,16 +3,18 @@ package com.bwz6jk2227esl89ahj34.ast.parse;
 import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
 import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
 import com.bwz6jk2227esl89ahj34.ast.Identifier;
+import com.bwz6jk2227esl89ahj34.ast.type.IntType;
+import com.bwz6jk2227esl89ahj34.ast.type.BoolType;
 import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import java_cup.runtime.Symbol;
-
 import java.io.FileReader;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.LinkedList;
 import java.util.List;
+
 
 class InterfaceParser;
 
@@ -66,7 +68,7 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW, PERIOD;
 
 nonterminal empty;
 

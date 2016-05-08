@@ -114,6 +114,7 @@ HexChar = \\x[2-7][0-9A-E]
  "&"      { return symbol(ParserSym.AND); }
  "|"      { return symbol(ParserSym.OR); }
  "="        { return symbol(ParserSym.GETS); }
+ "."      { return symbol(ParserSym.PERIOD); }
 
 
     /* comments */

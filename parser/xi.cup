@@ -9,6 +9,7 @@ import com.bwz6jk2227esl89ahj34.ast.type.ArrayType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.util.Util;
+import com.bwz6jk2227esl89ahj34.util.prettyprint.Pair;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
@@ -44,7 +45,7 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW, PERIOD;
 
 nonterminal Program program;
 
@@ -102,11 +103,13 @@ nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_arg
 nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_argument;
 
 nonterminal FunctionDeclaration function_declaration;
-nonterminal List<FunctionDeclaration> function_declaration_list;
 
 nonterminal ProcedureCall procedure_call;
 nonterminal List<TypedDeclaration> typed_declaration_list; 
 nonterminal List<TypedDeclaration> field; 
+nonterminal Pair<List<TypedDeclaration>, List<FunctionDeclaration>> class_declaration_body;
+nonterminal ClassDeclaration class_declaration; 
+nonterminal Pair<List<FunctionDeclaration>, List<ClassDeclaration>> program_body;
 
 precedence nonassoc ELSE;
 precedence nonassoc SEMICOLON;
@@ -227,7 +230,6 @@ function_call ::= identifier:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RE
                 | LENGTH:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier("length"), lst); RESULT.setLocation(parser.cur_token); :}
                 ;
 
-
 assignment_lhs_array_brackets ::= assignment_lhs_array:a OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayIndex(a,e); RESULT.setLocation(a); :}
                                 ;
 
@@ -284,12 +286,12 @@ block ::= block_scope:bl {: RESULT = bl; RESULT.setLocation(bl); :}
         ;
 
 // x,y:int 
-typed_declaration_list ::= identifier:id COMMA typed_declaration:td {: List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(0, new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())) RESULT = f; RESULT.setLocation(id); :}
-              | identifier:id COMMA typed_declaration_list:f {: TypedDeclaration temp = f.getLast(); f.add(0, new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = ids; RESULT.setLocation(id); :} 
+typed_declaration_list ::= identifier:id COMMA typed_declaration:td {: List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(0, new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())); RESULT = f; :}
+              | identifier:id COMMA typed_declaration_list:f {: TypedDeclaration temp = f.get(f.size()-1); f.add(0, new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = f; :} 
               ; 
 
 block_list ::= block:b block_list:bl {: bl.getBlocks().add(0, b); RESULT = bl; RESULT.setLocation(b); :}
-             | typed_declaration_list:f block_list:bl {: for(TypedDeclaration td : f) { bl.getBlocks().add(0, td); } RESULT = bl; RESULT.setLocation(f); :}
+             | typed_declaration_list:f block_list:bl {: for(TypedDeclaration td : f) { bl.getBlocks().add(0, td); } RESULT = bl; :}
              | RETURN {: List<Block> bl = new LinkedList<>(); bl.add(0,new ReturnStatement(new LinkedList<>())); RESULT = new BlockList(bl); :}
              | empty  {: List<Block> bl = new LinkedList<>(); RESULT = new BlockList(bl); :}
              ;
@@ -316,10 +318,6 @@ function_declaration ::= identifier:id OPEN_PAREN function_declaration_argument:
                        | identifier:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN OPEN_BRACE block_list:fb CLOSE_BRACE {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, fb); RESULT.setLocation(id); :}
                        ;
 
-function_declaration_list ::= function_declaration:fd function_declaration_list:lst {: lst.add(0, fd); RESULT = lst; :}
-                            | function_declaration:fd {: List<FunctionDeclaration> lst = new LinkedList<FunctionDeclaration>(); lst.add(0,fd); RESULT = lst; :}
-                            ;
-
 procedure_call ::= identifier:id OPEN_PAREN expression_list:elist CLOSE_PAREN {: RESULT = new ProcedureCall(id, elist); RESULT.setLocation(id); :} //f(x,y,z,...)
                  | identifier:id OPEN_PAREN CLOSE_PAREN {: RESULT = new ProcedureCall(id, new LinkedList<Expression>()); RESULT.setLocation(id); :}// f()
                  ;
@@ -329,12 +327,24 @@ use_block ::= USE identifier:id use_block:u {: u.add(0, new UseStatement(id)); R
             | empty   {: RESULT = new LinkedList<UseStatement>(); :}
             ;
 
-field ::= typed_declaration_list:td {: RESULT = td; RESULT.setLocation(td); :}
-         | typed_declaration:td {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(td); RESULT = lst; RESULT.setLocation(td); :}
+field ::= typed_declaration_list:td {: RESULT = td; :}
+         | typed_declaration:td {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(td); RESULT = lst; :}
          ;
 
-program ::= use_block:u function_declaration_list:l   {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
-          | use_block:u CLASS identifier:id OPEN_BRACE function_declaration_list:l CLOSE_BRACE {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
-          | use_block:u CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE function_declaration_list:l CLOSE_BRACE  {: RESULT = new Program(u,l); :}
+class_declaration_body ::= field:f class_declaration_body:c {: c.part1().addAll(f); RESULT = c ; :}
+                       | function_declaration:f class_declaration_body:c {: c.part2().add(f); RESULT = c; :}
+                       | empty {: Pair<List<TypedDeclaration>, List<FunctionDeclaration>> pair = new Pair<>(new LinkedList<>(), new LinkedList<>()); RESULT = pair; :}
+                       ; 
+
+class_declaration ::= CLASS identifier:id OPEN_BRACE class_declaration_body:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body.part2()) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, body.part1(), methods, Optional.empty()); :}
+                    | CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE class_declaration_body:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body.part2()) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, body.part1(), methods, Optional.of(id2)); :}
+                    ;
+
+program_body ::= class_declaration:c program_body:p {: p.part2().add(c); RESULT = p; :}
+               | function_declaration:fd program_body:p {: p.part1().add(fd); RESULT = p; :} 
+               | empty {: Pair<List<FunctionDeclaration>, List<ClassDeclaration>> body = new Pair<>(new LinkedList<>(), new LinkedList<>()); RESULT = body; :}
+               ; 
+
+program ::= use_block:u program_body:b   {: RESULT = new Program(u,b.part1(), b.part2()); RESULT.setLocation(parser.cur_token); :}
           | error
           ;

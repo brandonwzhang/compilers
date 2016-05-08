@@ -5,6 +5,7 @@ import com.bwz6jk2227esl89ahj34.ast.type.ArrayType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class PrintVisitor implements NodeVisitor {
@@ -69,8 +70,19 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom("'" + node.getValue() + "'");
     }
 
+    // TODO: i keep getting mismatched blocks....
     public void visit(ClassDeclaration node) {
-        // TODO
+        printer.startList();
+        printer.printAtom("class");
+        node.getIdentifier().accept(this);
+       // for (TypedDeclaration field : node.getFields()) {
+       //     field.accept(this);
+       // }
+       // for (MethodDeclaration method : node.getMethods()) {
+       //     method.accept(this);
+       // }
+        printer.endList();
+
     }
 
     public void visit(FunctionCall node) {
@@ -138,7 +150,7 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(MethodDeclaration node) {
-        // TODO
+        node.getFunctionDeclaration().accept(this);
     }
 
     public void visit(ObjectField node) {
@@ -173,6 +185,13 @@ public class PrintVisitor implements NodeVisitor {
             useStatement.accept(this);
         }
         printer.endList();
+        // adding this in to parse classes as well
+        printer.startList();
+        for (ClassDeclaration classDec : node.getClassDeclarations()) {
+            classDec.accept(this);
+        }
+        printer.endList();
+        // end parsing class declarations
         printer.startList();
         for (FunctionDeclaration funcDec : node.getFunctionDeclarations()) {
             funcDec.accept(this);
