@@ -70,6 +70,7 @@ HexChar = \\x[2-7][0-9A-E]
 "class"                             { return symbol(ParserSym.CLASS); }
 "extends"                           { return symbol(ParserSym.EXTENDS); }
 "new"                               { return symbol(ParserSym.NEW); }
+"null"                              { return symbol(ParserSym.NULL); }
  {Identifier}                       { return symbol(ParserSym.IDENTIFIER, yytext()); }
 
  /* literals */

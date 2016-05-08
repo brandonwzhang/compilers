@@ -102,6 +102,7 @@ public class Util {
         put(ParserSym.EXTENDS, "extends");
         put(ParserSym.NEW,"new");
                 put(ParserSym.PERIOD, ".");
+                put(ParserSym.NULL, "null");
     }};
 
     /**

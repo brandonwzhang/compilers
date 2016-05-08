@@ -45,7 +45,7 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW, PERIOD;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW, PERIOD, NULL;
 
 nonterminal Program program;
 
@@ -369,6 +369,10 @@ program_body ::= class_declaration:c program_body:p {: p.part2().add(c); RESULT 
                | empty {: Pair<List<FunctionDeclaration>, List<ClassDeclaration>> body = new Pair<>(new LinkedList<>(), new LinkedList<>()); RESULT = body; :}
                ; 
 
+global_variable ::= typed_declaration_list 
+                  | assignment
+                  | typed_declaration
+                  ; 
 program ::= use_block:u program_body:b   {: RESULT = new Program(u,b.part1(), b.part2()); RESULT.setLocation(parser.cur_token); :}
           | error
           ;
