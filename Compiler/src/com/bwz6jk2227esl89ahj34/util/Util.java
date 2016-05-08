@@ -4,6 +4,7 @@ import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyComment;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
 import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
+import com.bwz6jk2227esl89ahj34.ast.parse.Parser;
 import com.bwz6jk2227esl89ahj34.ast.type.*;
 import com.bwz6jk2227esl89ahj34.ast.MethodDeclaration;
 import com.bwz6jk2227esl89ahj34.ast.parse.ParserSym;
@@ -100,6 +101,7 @@ public class Util {
         put(ParserSym.CLASS, "class");
         put(ParserSym.EXTENDS, "extends");
         put(ParserSym.NEW,"new");
+                put(ParserSym.PERIOD, ".");
     }};
 
     /**

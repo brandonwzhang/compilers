@@ -65,6 +65,7 @@ nonterminal Expression F;
 nonterminal Expression G;
 nonterminal Expression H;
 nonterminal Expression I;
+nonterminal Expression K;
 
 nonterminal BooleanLiteral boolean_literal;
 nonterminal ArrayLiteral array_literal;
@@ -110,6 +111,9 @@ nonterminal List<TypedDeclaration> field;
 nonterminal Pair<List<TypedDeclaration>, List<FunctionDeclaration>> class_declaration_body;
 nonterminal ClassDeclaration class_declaration; 
 nonterminal Pair<List<FunctionDeclaration>, List<ClassDeclaration>> program_body;
+nonterminal Expression object_expression; 
+nonterminal ObjectFunctionCall object_function_call; 
+nonterminal ObjectField object_field; 
 
 precedence nonassoc ELSE;
 precedence nonassoc SEMICOLON;
@@ -176,7 +180,12 @@ H ::= I:i {: RESULT = i; RESULT.setLocation(i); :}
     | H:h OPEN_BRACKET A:a CLOSE_BRACKET {: RESULT = new ArrayIndex(h,a); RESULT.setLocation(h); :}
     ;
 
-I ::= boolean_literal:b {: RESULT = b; RESULT.setLocation(b); :}
+I ::= K:k {: RESULT = k; RESULT.setLocation(k); :}
+    | I:i PERIOD function_call:fc {: RESULT = new ObjectFunctionCall(fc.getIdentifier(), i, fc.getArguments()); RESULT.setLocation(i); :}
+    | I:i PERIOD identifier:id {: RESULT = new ObjectField(i, id); RESULT.setLocation(i); :}
+    ;
+
+K ::= boolean_literal:b {: RESULT = b; RESULT.setLocation(b); :}
     | INTEGER_LITERAL:i {: RESULT = new IntegerLiteral(i); RESULT.setLocation(parser.stack.peek()); :}
     | OPEN_PAREN A:a CLOSE_PAREN {: RESULT = a; RESULT.setLocation(parser.cur_token); :}
     | identifier: i {: RESULT = i; RESULT.setLocation(parser.cur_token); :}
@@ -239,12 +248,27 @@ assignment_lhs_array ::= function_call:fc {: RESULT = fc; RESULT.setLocation(fc)
                        | assignment_lhs_array_brackets:a {: RESULT = a; RESULT.setLocation(a); :}
                        ;
 
+object_expression ::= identifier:id {: RESULT = id; :}
+                    | NEW identifier:id {: RESULT = new ObjectInstantiation(id); :}
+                    | function_call:fc {: RESULT = fc; :}
+                    | object_function_call:ofc {: RESULT = ofc;:}
+                    | assignment_lhs_array_brackets:ai {: RESULT = ai; :} 
+                    | object_field:of {: RESULT = of; :}
+                    ;
+
+object_function_call ::= object_expression:e PERIOD function_call:fc {: RESULT = new ObjectFunctionCall(fc.getIdentifier(), e, fc.getArguments()); :}
+                       ; 
+
+object_field ::= object_expression:e PERIOD identifier:id {: RESULT = new ObjectField(e, id); :}
+               ; 
 
 assignment_lhs ::= identifier:id {: RESULT = id; RESULT.setLocation(parser.cur_token); :}
                  | assignment_lhs_array_brackets:a {: RESULT = a; RESULT.setLocation(parser.cur_token); :}
                  | typed_declaration_no_size:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
                  | function_call:fc {: RESULT = fc; RESULT.setLocation(parser.cur_token); :}
                  | UNDERSCORE {: RESULT = new Underscore(); RESULT.setLocation(parser.cur_token); :}
+                 | object_function_call:ofc {: RESULT = ofc; RESULT.setLocation(parser.cur_token); :}
+                 | object_field:o {: RESULT = o; :}
                  ;
 
 declaration_assignment_lhs ::= typed_declaration_no_size:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
