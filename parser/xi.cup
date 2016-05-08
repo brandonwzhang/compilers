@@ -10,6 +10,7 @@ import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.Pair;
+import com.bwz6jk2227esl89ahj34.util.Triple;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
@@ -110,10 +111,13 @@ nonterminal List<TypedDeclaration> typed_declaration_list;
 nonterminal List<TypedDeclaration> field; 
 nonterminal Pair<List<TypedDeclaration>, List<FunctionDeclaration>> class_declaration_body;
 nonterminal ClassDeclaration class_declaration; 
-nonterminal Pair<List<FunctionDeclaration>, List<ClassDeclaration>> program_body;
+nonterminal Triple<List<Assignment>, List<FunctionDeclaration>, List<ClassDeclaration>> program_body;
 nonterminal Expression object_expression; 
 nonterminal ObjectFunctionCall object_function_call; 
 nonterminal ObjectField object_field; 
+nonterminal List<Assignment> global_variable; 
+nonterminal Assignable global_variable_assignable;
+nonterminal Assignment global_variable_assignment;
 
 precedence nonassoc ELSE;
 precedence nonassoc SEMICOLON;
@@ -193,6 +197,7 @@ K ::= boolean_literal:b {: RESULT = b; RESULT.setLocation(b); :}
     | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); RESULT.setLocation(parser.stack.peek()); :}
     | array_literal:al {: RESULT = al; RESULT.setLocation(al); :}
     | NEW identifier:i {: RESULT = new ObjectInstantiation(i); :}
+    | NULL {: RESULT = new Null(); :}
     ;
 
 
@@ -356,6 +361,7 @@ field ::= typed_declaration_list:td {: RESULT = td; :}
          ;
 
 class_declaration_body ::= field:f class_declaration_body:c {: c.part1().addAll(f); RESULT = c ; :}
+                       | field:f SEMICOLON class_declaration_body:c {: c.part1().addAll(f); RESULT = c ; :}
                        | function_declaration:f class_declaration_body:c {: c.part2().add(f); RESULT = c; :}
                        | empty {: Pair<List<TypedDeclaration>, List<FunctionDeclaration>> pair = new Pair<>(new LinkedList<>(), new LinkedList<>()); RESULT = pair; :}
                        ; 
@@ -364,15 +370,26 @@ class_declaration ::= CLASS identifier:id OPEN_BRACE class_declaration_body:body
                     | CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE class_declaration_body:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body.part2()) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, body.part1(), methods, Optional.of(id2)); :}
                     ;
 
-program_body ::= class_declaration:c program_body:p {: p.part2().add(c); RESULT = p; :}
-               | function_declaration:fd program_body:p {: p.part1().add(fd); RESULT = p; :} 
-               | empty {: Pair<List<FunctionDeclaration>, List<ClassDeclaration>> body = new Pair<>(new LinkedList<>(), new LinkedList<>()); RESULT = body; :}
+program_body ::= global_variable:g program_body:p {: p.getA().addAll(g); RESULT = p; :}
+               | global_variable:g SEMICOLON program_body:p {: p.getA().addAll(g); RESULT = p; :}
+               | function_declaration:fd program_body:p {: p.getB().add(fd); RESULT = p; :} 
+               | class_declaration:c program_body:p {: p.getC().add(c); RESULT = p; :}
+               | empty {: Triple<List<Assignment>, List<FunctionDeclaration>, List<ClassDeclaration>> body = new Triple<>(new LinkedList<>(), new LinkedList<>(), new LinkedList<>()); RESULT = body; :}
                ; 
 
-global_variable ::= typed_declaration_list 
-                  | assignment
-                  | typed_declaration
+
+global_variable_assignable ::= identifier:id {: RESULT = id; RESULT.setLocation(parser.cur_token); :}
+                 | typed_declaration_no_size:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
+                 ;
+
+global_variable_assignment ::= global_variable_assignable:a GETS expression:e {:  RESULT = new Assignment(a, e); RESULT.setLocation(parser.cur_token); :}// x = expression
+                             ; 
+
+global_variable ::= typed_declaration_list:lst {: List<Assignment> assignments = new LinkedList<>(); for (TypedDeclaration td : lst) { assignments.add(new Assignment(td.getIdentifier(), new Null())); } RESULT = assignments; :} 
+                  | global_variable_assignment:a {: List<Assignment> assignables = new LinkedList<>(); assignables.add(a); RESULT = assignables; :}
+                  | typed_declaration:td {:  List<Assignment> assignments = new LinkedList<>(); assignments.add(new Assignment(td.getIdentifier(), new Null())); RESULT = assignments; :}
                   ; 
-program ::= use_block:u program_body:b   {: RESULT = new Program(u,b.part1(), b.part2()); RESULT.setLocation(parser.cur_token); :}
+
+program ::= use_block:u program_body:b {: RESULT = new Program(u, b.getA(), b.getB(), b.getC()); RESULT.setLocation(parser.cur_token); :}
           | error
           ;

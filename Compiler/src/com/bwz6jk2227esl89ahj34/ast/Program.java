@@ -13,14 +13,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class Program extends Node {
     private List<UseStatement> useBlock;
+    private List<Assignment> globalVariables;
     private List<FunctionDeclaration> functionDeclarations;
     private List<ClassDeclaration> classDeclarations;
-
-    public Program(List<UseStatement> useBlock, List<FunctionDeclaration> functionDeclarations) {
-        this.useBlock = useBlock;
-        this.functionDeclarations = functionDeclarations;
-        classDeclarations = new LinkedList<>();
-    }
 
     public void accept(NodeVisitor v){ v.visit(this); }
 

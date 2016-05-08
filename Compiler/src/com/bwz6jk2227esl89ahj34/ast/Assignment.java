@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -13,6 +14,12 @@ import java.util.List;
 public class Assignment extends Statement {
     private List<Assignable> variables;
     private Expression expression;
+
+    public Assignment(Assignable variable, Expression expression) {
+        variables = new LinkedList<>();
+        variables.add(variable);
+        this.expression = expression;
+    }
 
     public void accept(NodeVisitor v){
         v.visit(this);

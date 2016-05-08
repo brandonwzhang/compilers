@@ -364,6 +364,10 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         // TODO
     }
 
+    public void visit(Null node) {
+        // TODO
+    }
+
     public void visit(ObjectField node) {
         // TODO
     }

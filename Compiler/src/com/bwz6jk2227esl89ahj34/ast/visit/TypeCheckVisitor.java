@@ -695,6 +695,10 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(fd.getType());
     }
 
+    public void visit(Null node) {
+
+    }
+
     public void visit(ObjectField node) {
         node.getObject().accept(this);
         assert node.getObject().getType() instanceof ClassType;

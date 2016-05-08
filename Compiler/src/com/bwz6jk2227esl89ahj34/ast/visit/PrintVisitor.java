@@ -153,6 +153,10 @@ public class PrintVisitor implements NodeVisitor {
         node.getFunctionDeclaration().accept(this);
     }
 
+    public void visit(Null node) {
+        printer.printAtom("null");
+    }
+
     public void visit(ObjectField node) {
         // TODO
     }

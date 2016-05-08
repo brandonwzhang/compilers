@@ -17,6 +17,7 @@ public interface NodeVisitor {
     void visit(IfStatement node);
     void visit(IntegerLiteral node);
     void visit(MethodDeclaration node);
+    void visit(Null node);
     void visit(ObjectField node);
     void visit(ObjectFunctionCall node);
     void visit(ObjectInstantiation node);

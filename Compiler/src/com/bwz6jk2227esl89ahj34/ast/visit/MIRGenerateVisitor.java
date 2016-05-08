@@ -600,6 +600,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
         generatedNodes.push(methodDecl);
     }
 
+    public void visit(Null node) {
+        // TODO:
+    }
+
     public void visit(ObjectField node) {
         // Find the index of this field in the object
         Identifier objectClass = ((ClassType) node.getObject().getType()).getIdentifier();
