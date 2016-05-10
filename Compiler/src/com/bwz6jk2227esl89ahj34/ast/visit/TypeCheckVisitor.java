@@ -177,10 +177,16 @@ public class TypeCheckVisitor implements NodeVisitor {
      * Checks if type is a subtype of superType
      */
     private boolean isSubtype(Type type, Type superType) {
+        // Unit is a supertype of everything
         if (superType instanceof UnitType) {
             return true;
         }
+        // Reflexivity of subtype
         if (type.equals(superType)) {
+            return true;
+        }
+        // Null is a subtype of everything but int and bool
+        if (type.equals(new NullType()) && !(superType.isBool() || superType.isInt())) {
             return true;
         }
         if (!(type instanceof ClassType && superType instanceof ClassType)) {
