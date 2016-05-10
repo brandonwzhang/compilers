@@ -1,10 +1,10 @@
-class a {
+class A {
     x:int
     y:int
     b:bool
 }
 
-class b extends a{
+class B extends A {
     x:int
     y:int
     b:int

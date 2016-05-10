@@ -1,10 +1,10 @@
-class a {
+class A {
     f():int {
         return 1
     }
 }
 
-class b extends a {
+class B extends A {
     f():bool {
         return false
     }

@@ -1,13 +1,7 @@
 package com.bwz6jk2227esl89ahj34.ast.parse;
 
 import com.bwz6jk2227esl89ahj34.ast.*;
-import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
-import com.bwz6jk2227esl89ahj34.ast.type.IntType;
-import com.bwz6jk2227esl89ahj34.ast.type.BoolType;
-import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
-import com.bwz6jk2227esl89ahj34.ast.type.ArrayType;
-import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
-import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
+import com.bwz6jk2227esl89ahj34.ast.type.*;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.Pair;
 import com.bwz6jk2227esl89ahj34.util.Triple;
@@ -234,9 +228,11 @@ var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = VariableType
 
 
 typed_declaration_no_size ::= identifier:id COLON primitive_type:t array_no_size_type:ast {: RESULT = new TypedDeclaration(id, VariableType.construct(t, ast), new LinkedList<Expression>()); RESULT.setLocation(parser.cur_token); :} //x:int
+                            | identifier:id COLON identifier:class_name array_no_size_type:ast {: RESULT = new TypedDeclaration(id, VariableType.construct(new ClassType(class_name), ast), new LinkedList<Expression>()); RESULT.setLocation(parser.cur_token); :}
                     ;
 
 typed_declaration ::= identifier:id COLON primitive_type:t array_size_type:ast {: RESULT = new TypedDeclaration(id, VariableType.construct(t, ast.getKey().size() + ast.getValue()), ast.getKey()); RESULT.setLocation(parser.cur_token); :} //x:int
+                    | identifier:id COLON identifier:class_name array_size_type:ast {: RESULT = new TypedDeclaration(id, VariableType.construct(new ClassType(class_name), ast.getKey().size() + ast.getValue()), ast.getKey()); RESULT.setLocation(parser.cur_token); :} //x:int
                     ;
 
 function_call ::= identifier:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(id, lst); RESULT.setLocation(id); :}//f(x,y,z,...)
