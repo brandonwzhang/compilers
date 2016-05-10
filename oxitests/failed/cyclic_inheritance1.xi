@@ -1,8 +1,8 @@
-class a extends b {
+class A extends B {
     x:int
     f() {
     }
 }
 
-class b extends a {
+class B extends A {
 }

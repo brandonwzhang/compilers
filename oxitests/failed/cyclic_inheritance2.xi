@@ -1,14 +1,14 @@
-class a extends b {
+class A extends B {
     x:int
     f() {
     }
 }
 
-class c {
+class C {
 }
 
-class b extends a {
+class B extends A {
 }
 
-class d extends c {
+class D extends C {
 }

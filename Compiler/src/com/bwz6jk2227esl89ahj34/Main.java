@@ -115,12 +115,12 @@ public class Main {
                 ef.printStackTrace();
             }
 
-            //Tests.typeCheckTests();
+            Tests.typeCheckTests();
             //Tests.constantFoldTests();
             //Tests.mirGenTests();
             //Tests.irGenTests();
             //Tests.irRunTests();
-            Tests.regressionTest();
+            //Tests.regressionTest();
         }
     }
 
