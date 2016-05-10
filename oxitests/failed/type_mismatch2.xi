@@ -11,9 +11,9 @@ class C extends B {
 }
 
 f() {
-    C c = new C
-    B b = new B
-    A a = new A
+    c:C = new C
+    b:B = new B
+    a:A = new A
     c = b
     b = a
 }
