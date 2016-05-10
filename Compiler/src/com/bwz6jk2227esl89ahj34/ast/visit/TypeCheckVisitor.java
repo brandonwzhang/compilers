@@ -882,6 +882,7 @@ public class TypeCheckVisitor implements NodeVisitor {
                         className.getRow(), className.getCol());
             }
             seenClasses.add(className);
+            currentClassDec = classes.get(currentClassDec.getParentIdentifier().get());
         }
     }
 
