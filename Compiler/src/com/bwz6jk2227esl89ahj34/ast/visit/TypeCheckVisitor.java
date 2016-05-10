@@ -881,6 +881,7 @@ public class TypeCheckVisitor implements NodeVisitor {
                 throw new TypeException("Encountered cyclic inheritance in class " + className.getName(),
                         className.getRow(), className.getCol());
             }
+            seenClasses.add(className);
         }
     }
 
