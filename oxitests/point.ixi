@@ -1,0 +1,11 @@
+class Point{
+    move(dx:int, dy:int)
+    add(p: Point): Point
+    coords():int, int
+    clone(): Point
+
+
+    initPoint(p:Point, x:int, y:int): Point
+}
+
+createPoint(x:int, y:int): Point
