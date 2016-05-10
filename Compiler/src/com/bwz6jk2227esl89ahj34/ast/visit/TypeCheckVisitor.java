@@ -688,6 +688,9 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new IntType());
     }
 
+    /**
+     * MethodDeclaration has the type of its wrapped FunctionDeclaration
+     */
     public void visit(MethodDeclaration node) {
         // Check that the function declaration wrapped in this method is typed
         FunctionDeclaration fd = node.getFunctionDeclaration();
@@ -695,10 +698,16 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(fd.getType());
     }
 
+    /**
+     * Null always has NullType
+     */
     public void visit(Null node) {
-
+        node.setType(new NullType());
     }
 
+    /**
+     * The type of an object's field is specified in the object's ClassDeclaration
+     */
     public void visit(ObjectField node) {
         node.getObject().accept(this);
         assert node.getObject().getType() instanceof ClassType;
@@ -714,6 +723,9 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(type);
     }
 
+    /**
+     * The dispatch vector is used to find the location of the method
+     */
     public void visit(ObjectFunctionCall node) {
         node.getObject().accept(this);
         assert node.getObject().getType() instanceof ClassType;
@@ -753,11 +765,17 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
     }
 
+    /**
+     * Has the type of the class that was specified
+     */
     public void visit(ObjectInstantiation node) {
         // Set the type to the class
         node.setType(new ClassType(node.getClassIdentifier()));
     }
 
+    /**
+     * Dispatch vector is used to find location of the method
+     */
     public void visit(ObjectProcedureCall node) {
         node.getObject().accept(this);
         assert node.getObject().getType() instanceof ClassType;
@@ -833,6 +851,21 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new UnitType());
     }
 
+    /**
+     * Throws a TypeException if it encounters a cyclic inheritance
+     */
+    private void checkCyclicInheritance(ClassDeclaration cd) {
+        Set<Identifier> seenClasses = new HashSet<>();
+        ClassDeclaration currentClassDec = cd;
+        while (currentClassDec.getParentIdentifier().isPresent()) {
+            Identifier className = currentClassDec.getIdentifier();
+            if (seenClasses.contains(className)) {
+                throw new TypeException("Encountered cyclic inheritance in class " + className.getName(),
+                        className.getRow(), className.getCol());
+            }
+        }
+    }
+
     /***
      * First, we sweep through the program and put all of the function
      * names in the context with its associated return type into the context
@@ -855,6 +888,11 @@ public class TypeCheckVisitor implements NodeVisitor {
                 throw new TypeException("Class " + className.getName() + "declared multiple times");
             }
             classes.put(className, classDec);
+        }
+
+        // Make sure there's no cyclic inheritance
+        for (ClassDeclaration classDec : node.getClassDeclarations()) {
+            checkCyclicInheritance(classDec);
         }
 
         // Add all functions to the initial context
