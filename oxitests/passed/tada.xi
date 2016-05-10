@@ -25,9 +25,9 @@ createB() : B {
 
 
 main(args:int[][]) {
-    B b = createB()
+    b:B = createB()
     b.foo();
 
-    A a = new A.make(0,0,0)
+    a:A = new A.make(0,0,0)
     a.foo();
 }

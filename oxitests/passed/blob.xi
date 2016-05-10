@@ -22,7 +22,7 @@ class Glob extends Cob {
 }
 
 main(args:int[][]) {
-    Glob g = new Glob;
+    g:Glob = new Glob;
     g.set(6)
     println(unparseInt(g.getz()))
     println(unparseInt(g.gety()))
