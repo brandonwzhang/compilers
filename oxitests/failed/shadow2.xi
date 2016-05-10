@@ -1,6 +1,6 @@
 class A {
     x:int
-    fun(x:int, y:int b:bool):int {
+    fun(x:int, y:int, b:bool):int {
         return x;
     }
 }
