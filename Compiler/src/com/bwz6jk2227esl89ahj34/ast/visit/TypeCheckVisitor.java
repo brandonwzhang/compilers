@@ -15,8 +15,10 @@ public class TypeCheckVisitor implements NodeVisitor {
 
     private Map<Identifier, ClassDeclaration> classes = new HashMap<>();
 
-    // Local variable that stores current function in scope with a stack, used for return statements
+    // Type of the function we're currently type checking
     private FunctionType currentFunctionType;
+    // Type of current class we're type checking
+    private Optional<ClassType> currentClassType = Optional.empty();
 
     /**
      * Constructor for TypeCheckVisitor
@@ -199,10 +201,8 @@ public class TypeCheckVisitor implements NodeVisitor {
         ClassDeclaration classDecl = classes.get(classType.getIdentifier());
         ClassDeclaration superClassDecl = classes.get(superClassType.getIdentifier());
 
-        while (!classDecl.getIdentifier().equals(superClassDecl.getIdentifier())) {
-            if (!classDecl.getParentIdentifier().isPresent()) {
-                return false;
-            }
+        // Check if any ancestors of type equals superType
+        while (classDecl.getParentIdentifier().isPresent()) {
             Identifier parentIdentifier = classDecl.getParentIdentifier().get();
             classDecl = classes.get(parentIdentifier);
             if (classDecl.getIdentifier().equals(superClassDecl.getIdentifier())) {
@@ -285,6 +285,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Binary node) {
+        // TODO: Handle NullType
         Expression left = node.getLeft();
         Expression right = node.getRight();
         left.accept(this);
@@ -422,6 +423,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(ClassDeclaration node) {
+        currentClassType = Optional.of(new ClassType(node.getIdentifier()));
         for (TypedDeclaration td : node.getFields()) {
             if (!isValidVariableType(td.getDeclarationType())) {
                 throw new TypeException("Invalid type", td.getRow(), td.getCol());
@@ -468,6 +470,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             md.accept(this);
         }
         node.setType(new UnitType());
+        currentClassType = Optional.empty();
     }
 
     /**
@@ -626,6 +629,15 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Identifier node) {
+        // "this" variable always has the type of the class it's used in
+        // If "this" is used outside of a class, we throw an exception
+        if (node.getName().equals("this")) {
+            if (!currentClassType.isPresent()) {
+                throw new TypeException("'this' cannot be used outside of a class declaration",
+                        node.getRow(), node.getCol());
+            }
+            node.setType(currentClassType.get());
+        }
         // Check if identifier is in context
         Type type = contexts.peek().get(node);
         if (type == null) {

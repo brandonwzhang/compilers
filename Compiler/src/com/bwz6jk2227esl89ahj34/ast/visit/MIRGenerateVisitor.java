@@ -174,11 +174,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
             // handle them separately
             TypedDeclaration typedDeclaration = (TypedDeclaration) variable;
             List<IRStmt> statements = new ArrayList<>();
-            if (typedDeclaration.getArraySizes().size() > 0) {
-                variable.accept(this);
-                assert generatedNodes.peek() instanceof IRStmt;
-                statements.add((IRStmt) generatedNodes.pop());
-            }
+            variable.accept(this);
+            assert generatedNodes.peek() instanceof IRStmt;
+            statements.add((IRStmt) generatedNodes.pop());
             IRTemp temp = new IRTemp(typedDeclaration.getIdentifier().getName());
             IRMove move = new IRMove(temp, expr);
             statements.add(move);
@@ -942,8 +940,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
     public void visit(TypedDeclaration node) {
         if (node.getArraySizes().size() == 0) {
-            // If we don't need to initialize an array, do nothing
-            generatedNodes.push(new IRExp(new IRConst(0)));
+            // Initialize the variable to 0
+            generatedNodes.push(new IRMove(new IRTemp(node.getIdentifier().getName()), new IRConst(0)));
             return;
         }
         // In the case where TypedDeclaration is part of an assignment, it will be handled separately
