@@ -583,15 +583,30 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         FunctionType funcType = (FunctionType) type;
-        FunctionType callFuncType = new FunctionType(argumentTypes, funcType.getReturnTypeList());
         // Function call don't match arguments AND
-        // Not a valid length call...
-        if (!funcType.equals(callFuncType) &&
-                !(id.getName().equals("length")
-                && argumentTypes.size() == 1 && argumentTypes.get(0) instanceof ArrayType)) {
-            throw new TypeException("Argument types do not match with function definition", id.getRow(), id.getCol());
+
+        // Check call arguments to make sure they match
+        // We need to handle length calls as a special case since they can take multiple types
+        if (id.getName().equals("length")) {
+            if (!(argumentTypes.size() == 1 && argumentTypes.get(0) instanceof ArrayType)) {
+                throw new TypeException("Argument types do not match with function definition", id.getRow(), id.getCol());
+            }
+        } else {
+            // Check that the correct number of arguments are passed
+            if (argumentTypes.size() != funcType.getArgTypes().size()) {
+                throw new TypeException("Too many arguments passed to " + node.getIdentifier().getName(),
+                        node.getRow(), node.getCol());
+            }
+            for (int i = 0; i < argumentTypes.size(); i++) {
+                VariableType callArgumentType = argumentTypes.get(i);
+                VariableType argumentType = funcType.getArgTypes().get(i);
+                if (!isSubtype(callArgumentType, argumentType)) {
+                    throw new TypeException("Argument types do not match with function definition",
+                            id.getRow(), id.getCol());
+                }
+            }
         }
-        
+
         if (funcType.getReturnTypeList().getVariableTypeList().size() > 1) {
             node.setType(funcType.getReturnTypeList());
         } else if (funcType.getReturnTypeList().getVariableTypeList().size() == 0) {
@@ -788,12 +803,21 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException("Class " + className.getName() + " does not contain method " + methodName.getName(),
                     methodName.getRow(), methodName.getCol());
         }
-        // Construct a dummy function type for the call
-        FunctionType callFuncType = new FunctionType(argumentTypes, funcType.getReturnTypeList());
-        // Function call don't match arguments
-        if (!funcType.equals(callFuncType)) {
-            throw new TypeException("Argument types do not match with function definition",
-                    methodName.getRow(), methodName.getCol());
+
+        // Check that the correct number of arguments are passed
+        if (argumentTypes.size() != funcType.getArgTypes().size()) {
+            throw new TypeException("Too many arguments passed to " + node.getIdentifier().getName(),
+                    node.getRow(), node.getCol());
+        }
+
+        // Check call arguments to make sure they match
+        for (int i = 0; i < argumentTypes.size(); i++) {
+            VariableType callArgumentType = argumentTypes.get(i);
+            VariableType argumentType = funcType.getArgTypes().get(i);
+            if (!isSubtype(callArgumentType, argumentType)) {
+                throw new TypeException("Argument types do not match with function definition",
+                        methodName.getRow(), methodName.getCol());
+            }
         }
 
         if (funcType.getReturnTypeList().getVariableTypeList().size() > 1) {
@@ -838,12 +862,21 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException("Class " + className.getName() + " does not contain method " + methodName.getName(),
                     methodName.getRow(), methodName.getCol());
         }
-        // Construct a dummy function type for the call
-        FunctionType callFuncType = new FunctionType(argumentTypes, funcType.getReturnTypeList());
-        // Function call don't match arguments
-        if (!funcType.equals(callFuncType)) {
-            throw new TypeException("Argument types do not match with function definition",
-                    methodName.getRow(), methodName.getCol());
+
+        // Check that the correct number of arguments are passed
+        if (argumentTypes.size() != funcType.getArgTypes().size()) {
+            throw new TypeException("Too many arguments passed to " + node.getIdentifier().getName(),
+                    node.getRow(), node.getCol());
+        }
+
+        // Check call arguments to make sure they match
+        for (int i = 0; i < argumentTypes.size(); i++) {
+            VariableType callArgumentType = argumentTypes.get(i);
+            VariableType argumentType = funcType.getArgTypes().get(i);
+            if (!isSubtype(callArgumentType, argumentType)) {
+                throw new TypeException("Argument types do not match with function definition",
+                        methodName.getRow(), methodName.getCol());
+            }
         }
 
         if (funcType.getReturnTypeList().getVariableTypeList().size() > 0) {
@@ -868,23 +901,25 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException("Procedure " + id.getName() + " not defined", id.getRow(), id.getCol());
         }
 
-        List<VariableType> argumentTypes = ((FunctionType) context.get(id)).getArgTypes();
+        FunctionType funcType = (FunctionType) context.get(id);
+
+        List<VariableType> argumentTypes = funcType.getArgTypes();
         List<Expression> passedArguments = node.getArguments();
         if (passedArguments.size() != argumentTypes.size()) {
             throw new TypeException("Too many arguments passed to " + id, id.getRow(), id.getCol());
         }
+
         for (int i = 0; i < passedArguments.size(); i++) {
             Expression argument = passedArguments.get(i);
             argument.accept(this);
             assert argument.getType() instanceof VariableType;
             VariableType argType = (VariableType) argument.getType();
-            if (!argType.equals(argumentTypes.get(i))) {
+            if (!isSubtype(argType, argumentTypes.get(i))) {
                 throw new TypeException("Argument types do not match procedure definition", id.getRow(), id.getCol());
             }
         }
 
-        FunctionType funcType = new FunctionType(argumentTypes, new VariableTypeList(new ArrayList<>()));
-        if (!funcType.equals(context.get(id))) {
+        if (funcType.getReturnTypeList().getVariableTypeList().size() > 0) {
             throw new TypeException("You cannot call a function with a return " +
                     "value as a procedure.", id.getRow(), id.getCol());
         }
