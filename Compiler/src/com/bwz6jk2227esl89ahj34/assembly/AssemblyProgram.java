@@ -37,7 +37,7 @@ public class AssemblyProgram {
     }
 
     /**
-     * Returns the number of return values for a given function
+     * Returns the number of arguments for a given function
      */
     public static int numArguments(String functionName) {
         int numArguments = 0;
@@ -76,7 +76,20 @@ public class AssemblyProgram {
                 i++;
             }
             numArguments++;
-            i++;
+
+            if (types.charAt(i) == 'o') {
+                i++;
+                int classNameLength = 0;
+                while (Character.isDigit(types.charAt(i))) {
+                    classNameLength *= 10;
+                    classNameLength += Integer.parseInt("" + types.charAt(i));
+                    i++;
+                }
+                i += classNameLength;
+
+            } else {
+                i++;
+            }
         }
 
         return numArguments;
@@ -90,11 +103,11 @@ public class AssemblyProgram {
         int lastUnderscore = functionName.lastIndexOf('_');
         String returnTypes = functionName.substring(lastUnderscore + 1);
 
-        if (returnTypes.contains("p")) {
+        if (returnTypes.charAt(0) == 'p') {
             // example: main(args: int[][]) -> _Imain_paai
             numReturnValues = 0;
 
-        } else if (!returnTypes.contains("t")) {
+        } else if (!(returnTypes.charAt(0) == 't')) {
             // example: unparseInt(n: int): int[] -> _IunparseInt_aii
             numReturnValues = 1;
 
