@@ -441,16 +441,8 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(ClassDeclaration node) {
-        // Check if declared parent class actually exists
+        contexts.push(new Context(contexts.peek()));
         currentClassType = Optional.of(new ClassType(node.getIdentifier()));
-        if (node.getParentIdentifier().isPresent()) {
-            Identifier parentName = node.getParentIdentifier().get();
-            ClassDeclaration parentClass = classes.get(parentName);
-            if (parentClass == null) {
-                throw new TypeException("Class " + parentName.getName() + " does not exist",
-                        parentName.getRow(), parentName.getCol());
-            }
-        }
         // Check if any fields are incorrectly shadowed
         for (TypedDeclaration td : node.getFields()) {
             if (!isValidVariableType(td.getDeclarationType())) {
@@ -468,6 +460,9 @@ public class TypeCheckVisitor implements NodeVisitor {
                     }
                 }
             }
+
+            // Accept the typed declaration to add it to the context
+            td.accept(this);
         }
         // Check if any methods are overridden incorrectly
         for (MethodDeclaration md : node.getMethods()) {
@@ -490,6 +485,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
         node.setType(new UnitType());
         currentClassType = Optional.empty();
+        contexts.pop();
     }
 
     /**
@@ -674,11 +670,13 @@ public class TypeCheckVisitor implements NodeVisitor {
                         node.getRow(), node.getCol());
             }
             node.setType(currentClassType.get());
+            return;
         }
         // Check if identifier is in context
         Type type = contexts.peek().get(node);
         if (type == null) {
-            throw new TypeException("Identifier does not exist in context", node.getRow(), node.getCol());
+            throw new TypeException("Identifier " + node.getName() + " does not exist in context",
+                    node.getRow(), node.getCol());
         }
         node.setType(type);
     }
@@ -968,6 +966,17 @@ public class TypeCheckVisitor implements NodeVisitor {
             classes.put(className, classDec);
         }
 
+        // Check that all class parents are valid classes
+        for (ClassDeclaration classDec : node.getClassDeclarations()) {
+            if (classDec.getParentIdentifier().isPresent()) {
+                Identifier parentIdentifier = classDec.getParentIdentifier().get();
+                if (!classes.containsKey(parentIdentifier)) {
+                    throw new TypeException("Class " + parentIdentifier.getName() + " does not exist",
+                            parentIdentifier.getRow(), parentIdentifier.getCol());
+                }
+            }
+        }
+
         // Make sure there's no cyclic inheritance
         for (ClassDeclaration classDec : node.getClassDeclarations()) {
             checkCyclicInheritance(classDec);
@@ -1031,7 +1040,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             // Expression must have a VariableType
             assert expression.getType() instanceof VariableType;
             VariableType type = (VariableType) expression.getType();
-            if (!functionReturnTypes.get(i).equals(type)) {
+            if (!isSubtype(type, functionReturnTypes.get(i))) {
                 throw new TypeException("Return values do not match types in function declaration",
                         expression.getRow(), expression.getCol());
             }
