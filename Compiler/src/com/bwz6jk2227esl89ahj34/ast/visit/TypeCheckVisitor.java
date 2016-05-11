@@ -411,13 +411,9 @@ public class TypeCheckVisitor implements NodeVisitor {
                 return td.getDeclarationType();
             }
         }
-        // At this point the field was not found in this class, so we look in
-        // parent classes
-        if (!cd.getParentIdentifier().isPresent()) {
-            // There is no parent, so this field does not exist
-            return null;
-        }
-        return getFieldType(fieldName, classes.get(cd.getParentIdentifier().get()));
+        // Since all fields are private, if we don't find it in this class, we
+        // cannot look in parent classes
+        return null;
     }
 
     /**
