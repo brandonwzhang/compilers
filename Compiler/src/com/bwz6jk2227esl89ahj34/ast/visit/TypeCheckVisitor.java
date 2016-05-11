@@ -440,6 +440,14 @@ public class TypeCheckVisitor implements NodeVisitor {
 
     public void visit(ClassDeclaration node) {
         currentClassType = Optional.of(new ClassType(node.getIdentifier()));
+        if (node.getParentIdentifier().isPresent()) {
+            Identifier parentName = node.getParentIdentifier().get();
+            ClassDeclaration parentClass = classes.get(parentName);
+            if (parentClass == null) {
+                throw new TypeException("Class " + parentName.getName() + " does not exist",
+                        parentName.getRow(), parentName.getCol());
+            }
+        }
         for (TypedDeclaration td : node.getFields()) {
             if (!isValidVariableType(td.getDeclarationType())) {
                 throw new TypeException("Invalid type", td.getRow(), td.getCol());
@@ -447,15 +455,12 @@ public class TypeCheckVisitor implements NodeVisitor {
             if (node.getParentIdentifier().isPresent()) {
                 Identifier parentName = node.getParentIdentifier().get();
                 ClassDeclaration parentClass = classes.get(parentName);
-                if (parentClass == null) {
-                    throw new TypeException("Class " + parentName.getName() + " does not exist",
-                            parentName.getRow(), parentName.getCol());
-                }
                 VariableType parentFieldType = getFieldType(td.getIdentifier(), parentClass);
                 // If parent contains the field, we have the make sure types match
                 if (parentFieldType != null) {
+                    System.out.println("Parent field type: " + parentFieldType);
                     if (!td.getDeclarationType().equals(parentFieldType)) {
-                        throw new TypeException("Type of " + td.getIdentifier() + " does not match parent",
+                        throw new TypeException("Type of field " + td.getIdentifier().getName() + " does not match parent",
                                 td.getRow(), td.getCol());
                     }
                 }
@@ -463,20 +468,14 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
         for (MethodDeclaration md : node.getMethods()) {
             FunctionDeclaration fd = md.getFunctionDeclaration();
-
             if (node.getParentIdentifier().isPresent()) {
                 Identifier parentName = node.getParentIdentifier().get();
                 ClassDeclaration parentClass = classes.get(parentName);
-                if (parentClass == null) {
-                    throw new TypeException("Class " + parentName.getName() + " does not exist",
-
-                            parentName.getRow(), parentName.getCol());
-                }
                 FunctionType parentMethodType = getMethodType(fd.getIdentifier(), parentClass);
                 // If parent contains the method, we have the make sure types match
                 if (parentMethodType != null) {
                     if (!fd.getFunctionType().equals(parentMethodType)) {
-                        throw new TypeException("Type of method " + fd.getIdentifier() + " does not match parent",
+                        throw new TypeException("Type of method " + fd.getIdentifier().getName() + " does not match parent",
                                 fd.getRow(), fd.getCol());
                     }
                 }

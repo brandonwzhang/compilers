@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class FunctionCall extends Expression {
+public class FunctionCall extends Expression implements Assignable {
     private Identifier identifier;
     private List<Expression> arguments;
 
