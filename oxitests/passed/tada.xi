@@ -1,7 +1,7 @@
 use io
 use conv
 
-Class B extends A {
+class B extends A {
 
 }
 
