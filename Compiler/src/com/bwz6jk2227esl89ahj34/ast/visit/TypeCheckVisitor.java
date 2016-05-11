@@ -458,7 +458,6 @@ public class TypeCheckVisitor implements NodeVisitor {
                 VariableType parentFieldType = getFieldType(td.getIdentifier(), parentClass);
                 // If parent contains the field, we have the make sure types match
                 if (parentFieldType != null) {
-                    System.out.println("Parent field type: " + parentFieldType);
                     if (!td.getDeclarationType().equals(parentFieldType)) {
                         throw new TypeException("Type of field " + td.getIdentifier().getName() + " does not match parent",
                                 td.getRow(), td.getCol());
@@ -952,6 +951,10 @@ public class TypeCheckVisitor implements NodeVisitor {
         // Second pass typechecks all the function bodies
         for (FunctionDeclaration functionDeclaration : node.getFunctionDeclarations()) {
             functionDeclaration.accept(this);
+        }
+
+        for (ClassDeclaration classDeclaration : node.getClassDeclarations()) {
+            classDeclaration.accept(this);
         }
 
         node.setType(new UnitType());
