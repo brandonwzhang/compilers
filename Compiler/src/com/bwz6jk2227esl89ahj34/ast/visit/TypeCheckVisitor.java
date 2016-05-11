@@ -325,12 +325,11 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (binop == BinaryOperator.EQUAL || binop == BinaryOperator.NOT_EQUAL) {
             if (lefttype instanceof ClassType || lefttype instanceof NullType) {
                 if (righttype instanceof ClassType || righttype instanceof NullType) {
+                    node.setType(new BoolType());
+                }
+                else {
                     throw new TypeException("Both operands for == or != need to be Objects or Null", left.getRow(), left.getCol());
                 }
-            }
-            else {
-                node.setType(new BoolType());
-                return;
             }
         }
 
