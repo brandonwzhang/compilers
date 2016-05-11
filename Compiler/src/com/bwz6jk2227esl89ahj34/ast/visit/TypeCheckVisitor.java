@@ -44,12 +44,14 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (!(type instanceof FunctionType)) {
             return false;
         }
+        // check if all args are valid variableTypes
         FunctionType functionType = (FunctionType) type;
         for (VariableType variableType : functionType.getArgTypes()) {
             if (!isValidVariableType(variableType)) {
                 return false;
             }
         }
+        // check if all return types are valid variableTypes
         for (VariableType variableType : functionType.getReturnTypeList().getVariableTypeList()) {
             if (!isValidVariableType(variableType)) {
                 return false;
@@ -93,6 +95,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(ArrayIndex node) {
+        // visit subExpressions
         Expression arrayRef = node.getArrayRef();
         Expression index = node.getIndex();
         arrayRef.accept(this);
@@ -285,7 +288,6 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Binary node) {
-        // TODO: Handle NullType
         Expression left = node.getLeft();
         Expression right = node.getRight();
         left.accept(this);
@@ -333,13 +335,12 @@ public class TypeCheckVisitor implements NodeVisitor {
             }
         }
 
+        // Check that left and right types are cooperative
         if (!lefttype.equals(righttype)) {
             throw new TypeException("Operands must be the same valid type", left.getRow(), left.getCol());
         }
         boolean isInteger = lefttype.isInt();
         boolean isBool = lefttype.isBool();
-
-
 
         boolean valid_int_binary_operator_int = BinarySymbol.INT_BINARY_OPERATOR_INT.contains(binop) && isInteger;
         boolean valid_int_binary_operator_bool = BinarySymbol.INT_BINARY_OPERATOR_BOOL.contains(binop) && isInteger;
@@ -368,6 +369,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(BlockList node) {
+        // create new context (copy of current)
         contexts.push(new Context(contexts.peek()));
         List<Block> blockList = node.getBlocks();
         for (Block block : blockList) {
@@ -439,6 +441,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(ClassDeclaration node) {
+        // Check if declared parent class actually exists
         currentClassType = Optional.of(new ClassType(node.getIdentifier()));
         if (node.getParentIdentifier().isPresent()) {
             Identifier parentName = node.getParentIdentifier().get();
@@ -448,6 +451,7 @@ public class TypeCheckVisitor implements NodeVisitor {
                         parentName.getRow(), parentName.getCol());
             }
         }
+        // Check if any fields are incorrectly shadowed
         for (TypedDeclaration td : node.getFields()) {
             if (!isValidVariableType(td.getDeclarationType())) {
                 throw new TypeException("Invalid type", td.getRow(), td.getCol());
@@ -465,6 +469,7 @@ public class TypeCheckVisitor implements NodeVisitor {
                 }
             }
         }
+        // Check if any methods are overridden incorrectly
         for (MethodDeclaration md : node.getMethods()) {
             FunctionDeclaration fd = md.getFunctionDeclaration();
             if (node.getParentIdentifier().isPresent()) {
@@ -556,12 +561,14 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public void visit(FunctionCall node) {
         Context context = contexts.peek();
+        // Check that the function exists in the context
         Identifier id = node.getIdentifier();
         if (!context.containsKey(id)) {
             throw new TypeException("Function not defined", id.getRow(), id.getCol());
         }
         id.accept(this);
 
+        // Gather argument types
         List<VariableType> argumentTypes = new ArrayList<>();
         for (Expression argument : node.getArguments()) {
             argument.accept(this);
@@ -609,6 +616,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         List<VariableType> argTypeList = currentFunctionType.getArgTypes();
         assert argList.size() == argTypeList.size();
 
+        // create new context containing arguments
         Context newContext = new Context(contexts.peek());
         for (int i = 0; i < argList.size(); i++) {
             newContext.put(argList.get(i), argTypeList.get(i));
@@ -668,6 +676,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(IfStatement node) {
+        // check guard
         Expression guard = node.getGuard();
         guard.accept(this);
         if (!guard.getType().isBool()) {
