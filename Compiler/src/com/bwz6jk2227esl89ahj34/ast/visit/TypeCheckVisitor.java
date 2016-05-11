@@ -445,22 +445,6 @@ public class TypeCheckVisitor implements NodeVisitor {
         currentClassType = Optional.of(new ClassType(node.getIdentifier()));
         // Check if any fields are incorrectly shadowed
         for (TypedDeclaration td : node.getFields()) {
-            if (!isValidVariableType(td.getDeclarationType())) {
-                throw new TypeException("Invalid type", td.getRow(), td.getCol());
-            }
-            if (node.getParentIdentifier().isPresent()) {
-                Identifier parentName = node.getParentIdentifier().get();
-                ClassDeclaration parentClass = classes.get(parentName);
-                VariableType parentFieldType = getFieldType(td.getIdentifier(), parentClass);
-                // If parent contains the field, we have the make sure types match
-                if (parentFieldType != null) {
-                    if (!td.getDeclarationType().equals(parentFieldType)) {
-                        throw new TypeException("Type of field " + td.getIdentifier().getName() + " does not match parent",
-                                td.getRow(), td.getCol());
-                    }
-                }
-            }
-
             // Accept the typed declaration to add it to the context
             td.accept(this);
         }
