@@ -2882,7 +2882,7 @@ class CUP$Parser$actions {
                 int lstleft = CUP$Parser$stack.peek().left;
                 int lstright = CUP$Parser$stack.peek().right;
                 List<TypedDeclaration> lst = CUP$Parser$stack.peek().<List<TypedDeclaration>> value();
-                 List<Assignment> assignments = new LinkedList<>(); for (TypedDeclaration td : lst) { assignments.add(new Assignment(td.getIdentifier(), new Null())); } RESULT = assignments; 
+                 List<Assignment> assignments = new LinkedList<>(); for (TypedDeclaration td : lst) { if (td.getDeclarationType() instanceof IntType) { assignments.add(new Assignment(td.getIdentifier(), new IntegerLiteral("0"))); } else if (td.getDeclarationType() instanceof BoolType) { assignments.add(new Assignment(td.getIdentifier(), new BooleanLiteral(false))); } else { assignments.add(new Assignment(td.getIdentifier(), new Null())); } } RESULT = assignments; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("global_variable",56, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
