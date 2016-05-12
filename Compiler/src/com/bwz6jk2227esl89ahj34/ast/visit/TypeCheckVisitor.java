@@ -736,6 +736,18 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(MethodDeclaration node) {
         // Check that the function declaration wrapped in this method is typed
         FunctionDeclaration fd = node.getFunctionDeclaration();
+
+        // Make sure no argument names clash with class fields
+        Identifier className = node.getClassIdentifier();
+        assert classes.containsKey(className);
+        ClassDeclaration cd = classes.get(className);
+        List<Identifier> args = fd.getArgumentIdentifiers();
+        for (TypedDeclaration td : cd.getFields()) {
+            if (args.contains(td.getIdentifier())) {
+                throw new TypeException("Method arguments may not shadow class fields", node.getRow(), node.getCol());
+            }
+        }
+
         fd.accept(this);
         node.setType(fd.getType());
     }
