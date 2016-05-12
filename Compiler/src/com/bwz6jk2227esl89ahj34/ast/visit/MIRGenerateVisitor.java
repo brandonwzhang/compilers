@@ -620,6 +620,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
     public void visit(ObjectField node) {
         // Find the index of this field in the object
+        // from typechecking, we are guaranteed that the object class is correct, and
+        // that the field is a valid field in the object
         Identifier objectClass = ((ClassType) node.getObject().getType()).getIdentifier();
         List<Identifier> fields = classFields.get(objectClass);
         int fieldIndex = fields.indexOf(node.getField());
