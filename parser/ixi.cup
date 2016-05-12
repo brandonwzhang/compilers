@@ -10,12 +10,15 @@ import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.ast.parse.Interface;
 import com.bwz6jk2227esl89ahj34.util.Util;
+import com.bwz6jk2227esl89ahj34.util.prettyprint.Pair;
 import com.bwz6jk2227esl89ahj34.ast.type.*;
 import java_cup.runtime.Symbol;
 import java.io.FileReader;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+
 
 
 class InterfaceParser;
@@ -91,6 +94,9 @@ nonterminal List<FunctionDeclaration> function_declaration_list;
 
 nonterminal List<UseStatement> use_block;
 
+nonterminal ClassDeclaration class_declaration; 
+nonterminal Pair<List<FunctionDeclaration>, List<ClassDeclaration>> interface_body;
+
 nonterminal Interface interface;
 
 start with interface;
@@ -142,7 +148,16 @@ use_block ::= USE identifier:id use_block:u {: u.add(0, new UseStatement(id)); R
             | empty   {: RESULT = new LinkedList<UseStatement>(); :}
             ;
 
-interface ::= use_block:u function_declaration_list:lst {: RESULT = new Interface(u, lst); :}
+class_declaration ::= CLASS identifier:id OPEN_BRACE function_declaration_list:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, new LinkedList<TypedDeclaration>(), methods, Optional.empty()); :}
+                    | CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE function_declaration_list:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, new LinkedList<TypedDeclaration>(), methods, Optional.of(id2)); :}
+                    ;
+
+interface_body ::= function_declaration_line:fd interface_body:p {: p.part1().add(fd); RESULT = p; :} 
+               | class_declaration:c interface_body:p {: p.part2().add(c); RESULT = p; :}
+               | empty {: Pair<List<FunctionDeclaration>, List<ClassDeclaration>> body = new Pair<>(new LinkedList<>(), new LinkedList<>()); RESULT = body; :}
+               ; 
+               
+interface ::= use_block:u interface_body:ib {: RESULT = new Interface(u, ib.part1(), ib.part2()); :}
           ;
 
 

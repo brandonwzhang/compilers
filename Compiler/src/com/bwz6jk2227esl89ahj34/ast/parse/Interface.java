@@ -15,5 +15,5 @@ import java.util.List;
 public class Interface {
     private List<UseStatement> useBlock;
     private List<FunctionDeclaration> functionDeclarations;
-    //private List<ClassDeclaration> classDeclarations;
+    private List<ClassDeclaration> classDeclarations;
 }
