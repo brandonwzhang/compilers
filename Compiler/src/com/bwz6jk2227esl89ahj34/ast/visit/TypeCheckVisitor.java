@@ -444,6 +444,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             // Accept the typed declaration to add it to the context
             td.accept(this);
         }
+
         // Check if any methods are overridden incorrectly
         Set<Identifier> seenMethods = new HashSet<>();
         for (MethodDeclaration md : node.getMethods()) {
@@ -999,57 +1000,67 @@ public class TypeCheckVisitor implements NodeVisitor {
             assert global.getVariables().get(0) instanceof TypedDeclaration;
             Expression expression = global.getExpression();
             TypedDeclaration td = (TypedDeclaration) global.getVariables().get(0);
+
+            // Check to ensure a global has not been declared already
             if (contexts.peek().containsKey(td.getIdentifier())) {
                 throw new TypeException("Global variable " + td.getIdentifier().getName() + " already declared",
                         td.getRow(), td.getCol());
             }
+            // Check integer globals
             if (td.getDeclarationType().equals(new IntType())) {
                 if (!(expression instanceof IntegerLiteral)) {
                     throw new TypeException("Global integer variables can only be initialized to literals",
                             expression.getRow(), expression.getCol());
                 }
             }
+            // Check boolean globals
             if (td.getDeclarationType().equals(new BoolType())) {
                 if (!(expression instanceof BooleanLiteral)) {
                     throw new TypeException("Global boolean variables can only be initialized to literals",
                             expression.getRow(), expression.getCol());
                 }
             }
+            // Check object globals initialized to null
             if (td.getDeclarationType() instanceof ClassType) {
                 if (!(expression instanceof Null)) {
                     throw new TypeException("Global object variables can only be initialized to null",
                             expression.getRow(), expression.getCol());
                 }
             }
-            // We have an ArrayType at this point
-            if (!(expression instanceof Null)) {
-                throw new TypeException("Global array variables can only be initialized to null",
-                        expression.getRow(), expression.getCol());
-            }
-            for (Expression size : td.getArraySizes()) {
-                if (size instanceof IntegerLiteral) {
-                    continue;
+            // Check arraytype has valid init
+            // Size is either a integer, or another global
+            if (td.getDeclarationType() instanceof ArrayType) {
+                if (!(expression instanceof Null)) {
+                    throw new TypeException("Global array variables can only be initialized to null",
+                            expression.getRow(), expression.getCol());
                 }
-                if (size instanceof Identifier) {
-                    Identifier sizeIdentifier = (Identifier) size;
-                    for (Assignment otherGlobal : node.getGlobalVariables()) {
-                        assert otherGlobal.getVariables().size() == 1;
-                        assert otherGlobal.getVariables().get(0) instanceof TypedDeclaration;
-                        TypedDeclaration otherTd = (TypedDeclaration) otherGlobal.getVariables().get(0);
-                        if (otherTd.getIdentifier().equals(sizeIdentifier)) {
-                            if (!otherTd.getDeclarationType().equals(new IntType())) {
-                                throw new TypeException("Array size must be an int",
-                                        sizeIdentifier.getRow(), sizeIdentifier.getCol());
-                            }
-                            break;
-                        }
-
+                // Check each size init is an integer or another global that is an integer
+                for (Expression size : td.getArraySizes()) {
+                    if (size instanceof IntegerLiteral) {
+                        continue;
                     }
-                    continue;
+                    if (size instanceof Identifier) {
+                        Identifier sizeIdentifier = (Identifier) size;
+                        for (Assignment otherGlobal : node.getGlobalVariables()) {
+                            assert otherGlobal.getVariables().size() == 1;
+                            assert otherGlobal.getVariables().get(0) instanceof TypedDeclaration;
+                            TypedDeclaration otherTd = (TypedDeclaration) otherGlobal.getVariables().get(0);
+                            if (otherTd.getIdentifier().equals(sizeIdentifier)) {
+                                if (!otherTd.getDeclarationType().equals(new IntType())) {
+                                    throw new TypeException("Array size must be an int",
+                                            sizeIdentifier.getRow(), sizeIdentifier.getCol());
+                                }
+                                break;
+                            }
+
+                        }
+                        continue;
+                    }
+                    throw new TypeException("Array sizes can only be initialized to integer literals or other global variables",
+                            size.getRow(), size.getCol());
                 }
-                throw new TypeException("Array sizes can only be initialized to integer literals or other global variables",
-                        size.getRow(), size.getCol());
             }
+
             contexts.peek().put(td.getIdentifier(), td.getDeclarationType());
         }
 
