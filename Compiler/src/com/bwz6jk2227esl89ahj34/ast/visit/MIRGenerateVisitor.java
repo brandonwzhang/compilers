@@ -17,6 +17,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
     private Stack<IRNode> generatedNodes;
     // The name of the program
     private String name;
+    // Current class we're inside of
+    private Optional<Identifier> currentClassID;
     // Counter to append to label strings.
     private long labelCounter = 0;
     // Map from class name to dispatch vector
@@ -529,6 +531,19 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(Identifier node) {
+        // if we're inside a class, check if there's a local variable
+        if (currentClassID.isPresent()) {
+            // if classFields contains the field, simplify to "this.field", and visit
+            Identifier className = currentClassID.get();
+            List<Identifier> fields = classFields.get(className);
+            int index = fields.indexOf(node);
+            if (index != -1) {
+                ObjectField thisdot = new ObjectField(new Identifier("this"), node);
+                thisdot.accept(this);
+                return;
+            }
+        }
+        // else we could be 1) not inside a class 2) using a variable that's not an instance var
         // use the identifier as the name of the temp
         generatedNodes.push(new IRTemp(node.getName()));
     }
@@ -838,11 +853,14 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
         // Add methods to functions map
         for (ClassDeclaration cd : node.getClassDeclarations()) {
+            // set the currentClassID in case we use instance variables later
+            currentClassID = Optional.of(cd.getIdentifier());
             for (MethodDeclaration md : cd.getMethods()) {
                 md.accept(this);
                 assert generatedNodes.peek() instanceof IRFuncDecl;
                 functions.put(Util.getIRMethodName(md), (IRFuncDecl) generatedNodes.pop());
             }
+            currentClassID = Optional.empty();
         }
 
         // Add functions to functions map
