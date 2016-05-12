@@ -2381,7 +2381,7 @@ class CUP$Parser$actions {
                 int tdleft = CUP$Parser$stack.peek().left;
                 int tdright = CUP$Parser$stack.peek().right;
                 TypedDeclaration td = CUP$Parser$stack.peek().<TypedDeclaration> value();
-                 List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(0, new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())); RESULT = f; 
+                 List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(0, new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("typed_declaration_list",48, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2396,7 +2396,7 @@ class CUP$Parser$actions {
                 int fleft = CUP$Parser$stack.peek().left;
                 int fright = CUP$Parser$stack.peek().right;
                 List<TypedDeclaration> f = CUP$Parser$stack.peek().<List<TypedDeclaration>> value();
-                 TypedDeclaration temp = f.get(f.size()-1); f.add(0, new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = f; 
+                 TypedDeclaration temp = f.get(f.size()-1); f.add(0, new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("typed_declaration_list",48, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2411,7 +2411,7 @@ class CUP$Parser$actions {
                 int blleft = CUP$Parser$stack.peek().left;
                 int blright = CUP$Parser$stack.peek().right;
                 BlockList bl = CUP$Parser$stack.peek().<BlockList> value();
-                 bl.getBlocks().add(0, b); RESULT = bl; RESULT.setLocation(b); 
+                 bl.getBlocks().add(0, b); RESULT = bl; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("block_list",38, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;

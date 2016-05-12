@@ -313,11 +313,11 @@ block ::= block_scope:bl {: RESULT = bl; RESULT.setLocation(bl); :}
         ;
 
 // x,y:int 
-typed_declaration_list ::= identifier:id COMMA typed_declaration:td {: List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(0, new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())); RESULT = f; :}
-              | identifier:id COMMA typed_declaration_list:f {: TypedDeclaration temp = f.get(f.size()-1); f.add(0, new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = f; :} 
+typed_declaration_list ::= identifier:id COMMA typed_declaration:td {: List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(0, new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); :}
+              | identifier:id COMMA typed_declaration_list:f {: TypedDeclaration temp = f.get(f.size()-1); f.add(0, new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); :} 
               ; 
 
-block_list ::= block:b block_list:bl {: bl.getBlocks().add(0, b); RESULT = bl; RESULT.setLocation(b); :}
+block_list ::= block:b block_list:bl {: bl.getBlocks().add(0, b); RESULT = bl; :}
              | typed_declaration_list:f block_list:bl {: for(TypedDeclaration td : f) { bl.getBlocks().add(0, td); } RESULT = bl; :}
              | RETURN {: List<Block> bl = new LinkedList<>(); bl.add(0,new ReturnStatement(new LinkedList<>())); RESULT = new BlockList(bl); :}
              | empty  {: List<Block> bl = new LinkedList<>(); RESULT = new BlockList(bl); :}
