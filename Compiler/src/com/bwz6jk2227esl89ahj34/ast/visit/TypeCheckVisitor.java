@@ -445,8 +445,15 @@ public class TypeCheckVisitor implements NodeVisitor {
             td.accept(this);
         }
         // Check if any methods are overridden incorrectly
+        Set<Identifier> seenMethods = new HashSet<>();
         for (MethodDeclaration md : node.getMethods()) {
             FunctionDeclaration fd = md.getFunctionDeclaration();
+            // Make sure methods aren't declared multiple times in same class
+            if (seenMethods.contains(fd.getIdentifier())) {
+                throw new TypeException("Method " + fd.getIdentifier().getName() + " declared multiple times in class",
+                        fd.getRow(), fd.getCol());
+            }
+            seenMethods.add(fd.getIdentifier());
             if (node.getParentIdentifier().isPresent()) {
                 Identifier parentName = node.getParentIdentifier().get();
                 ClassDeclaration parentClass = classes.get(parentName);
@@ -745,13 +752,18 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(ObjectField node) {
         node.getObject().accept(this);
         assert node.getObject().getType() instanceof ClassType;
-        Identifier className = ((ClassType) node.getObject().getType()).getIdentifier();
+        ClassType classType = (ClassType) node.getObject().getType();
+        // We can only access private fields from methods in the class
+        if (!currentClassType.isPresent() || !currentClassType.get().equals(classType)) {
+            throw new TypeException("Cannot access private field", node.getRow(), node.getCol());
+        }
+        Identifier className = classType.getIdentifier();
         ClassDeclaration cd = classes.get(className);
         Identifier fieldName = node.getField();
         // Get the type for this field
         VariableType type = getFieldType(fieldName, cd);
         if (type == null) {
-            throw new TypeException("Class " + className.getName() + " does not contain method " + fieldName.getName(),
+            throw new TypeException("Class " + className.getName() + " does not contain field " + fieldName.getName(),
                     fieldName.getRow(), fieldName.getCol());
         }
         node.setType(type);
@@ -979,6 +991,66 @@ public class TypeCheckVisitor implements NodeVisitor {
         // Add function declarations from interface files
         for (UseStatement useStatement : node.getUseBlock()) {
             useStatement.accept(this);
+        }
+
+        // Add all global variables to context
+        for (Assignment global : node.getGlobalVariables()) {
+            assert global.getVariables().size() == 1;
+            assert global.getVariables().get(0) instanceof TypedDeclaration;
+            Expression expression = global.getExpression();
+            TypedDeclaration td = (TypedDeclaration) global.getVariables().get(0);
+            if (contexts.peek().containsKey(td.getIdentifier())) {
+                throw new TypeException("Global variable " + td.getIdentifier().getName() + " already declared",
+                        td.getRow(), td.getCol());
+            }
+            if (td.getDeclarationType().equals(new IntType())) {
+                if (!(expression instanceof IntegerLiteral)) {
+                    throw new TypeException("Global integer variables can only be initialized to literals",
+                            expression.getRow(), expression.getCol());
+                }
+            }
+            if (td.getDeclarationType().equals(new BoolType())) {
+                if (!(expression instanceof BooleanLiteral)) {
+                    throw new TypeException("Global boolean variables can only be initialized to literals",
+                            expression.getRow(), expression.getCol());
+                }
+            }
+            if (td.getDeclarationType() instanceof ClassType) {
+                if (!(expression instanceof Null)) {
+                    throw new TypeException("Global object variables can only be initialized to null",
+                            expression.getRow(), expression.getCol());
+                }
+            }
+            // We have an ArrayType at this point
+            if (!(expression instanceof Null)) {
+                throw new TypeException("Global array variables can only be initialized to null",
+                        expression.getRow(), expression.getCol());
+            }
+            for (Expression size : td.getArraySizes()) {
+                if (size instanceof IntegerLiteral) {
+                    continue;
+                }
+                if (size instanceof Identifier) {
+                    Identifier sizeIdentifier = (Identifier) size;
+                    for (Assignment otherGlobal : node.getGlobalVariables()) {
+                        assert otherGlobal.getVariables().size() == 1;
+                        assert otherGlobal.getVariables().get(0) instanceof TypedDeclaration;
+                        TypedDeclaration otherTd = (TypedDeclaration) otherGlobal.getVariables().get(0);
+                        if (otherTd.getIdentifier().equals(sizeIdentifier)) {
+                            if (!otherTd.getDeclarationType().equals(new IntType())) {
+                                throw new TypeException("Array size must be an int",
+                                        sizeIdentifier.getRow(), sizeIdentifier.getCol());
+                            }
+                            break;
+                        }
+
+                    }
+                    continue;
+                }
+                throw new TypeException("Array sizes can only be initialized to integer literals or other global variables",
+                        size.getRow(), size.getCol());
+            }
+            contexts.peek().put(td.getIdentifier(), td.getDeclarationType());
         }
 
         // Second pass typechecks all the function bodies
