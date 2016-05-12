@@ -17,4 +17,8 @@ public abstract class Type {
     public boolean isBool() {
         return false;
     }
+
+    public boolean isNullable() {
+        return false;
+    }
 }

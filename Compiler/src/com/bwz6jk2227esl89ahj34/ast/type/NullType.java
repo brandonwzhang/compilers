@@ -6,4 +6,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class NullType extends VariableType {
+
+    @Override
+    public boolean isNullable() {
+        return true;
+    }
 }

@@ -14,4 +14,9 @@ import java.util.Optional;
 @EqualsAndHashCode(callSuper=false)
 public class ClassType extends BaseType {
     private Identifier identifier;
+
+    @Override
+    public boolean isNullable() {
+        return true;
+    }
 }

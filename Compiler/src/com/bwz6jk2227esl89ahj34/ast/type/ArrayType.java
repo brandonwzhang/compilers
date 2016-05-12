@@ -14,4 +14,9 @@ public class ArrayType extends VariableType {
         this.baseType = t;
         this.numBrackets = numBrackets;
     }
+
+    @Override
+    public boolean isNullable() {
+        return true;
+    }
 }

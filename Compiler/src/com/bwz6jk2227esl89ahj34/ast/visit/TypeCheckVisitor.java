@@ -320,13 +320,13 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         /*
-            For ==, both sides can be ClassType OR NullType
-            And !=
+            For == and !=, both sides can be nullable (arraytype, classtype, nulltype),
+            but we can't have only one be nullable.
          */
         BinaryOperator binop = node.getOp();
         if (binop == BinaryOperator.EQUAL || binop == BinaryOperator.NOT_EQUAL) {
-            if (lefttype instanceof ClassType || lefttype instanceof NullType) {
-                if (righttype instanceof ClassType || righttype instanceof NullType) {
+            if (lefttype.isNullable()) {
+                if (righttype.isNullable()) {
                     node.setType(new BoolType());
                 }
                 else {
