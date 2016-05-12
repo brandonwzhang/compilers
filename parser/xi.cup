@@ -174,13 +174,13 @@ G ::= H:h {: RESULT = h; RESULT.setLocation(h); :}
     ;
 
 H ::= I:i {: RESULT = i; RESULT.setLocation(i); :}
-    | function_call:fc {: RESULT = fc; RESULT.setLocation(fc); :}
-    | H:h OPEN_BRACKET A:a CLOSE_BRACKET {: RESULT = new ArrayIndex(h,a); RESULT.setLocation(h); :}
+    | H:i PERIOD function_call:fc {: RESULT = new ObjectFunctionCall(fc.getIdentifier(), i, fc.getArguments()); RESULT.setLocation(i); :}
+    | H:i PERIOD identifier:id {: RESULT = new ObjectField(i, id); RESULT.setLocation(i); :}
     ;
 
 I ::= K:k {: RESULT = k; RESULT.setLocation(k); :}
-    | I:i PERIOD function_call:fc {: RESULT = new ObjectFunctionCall(fc.getIdentifier(), i, fc.getArguments()); RESULT.setLocation(i); :}
-    | I:i PERIOD identifier:id {: RESULT = new ObjectField(i, id); RESULT.setLocation(i); :}
+    | function_call:fc {: RESULT = fc; RESULT.setLocation(fc); :}
+    | I:h OPEN_BRACKET A:a CLOSE_BRACKET {: RESULT = new ArrayIndex(h,a); RESULT.setLocation(h); :}
     ;
 
 K ::= boolean_literal:b {: RESULT = b; RESULT.setLocation(b); :}
