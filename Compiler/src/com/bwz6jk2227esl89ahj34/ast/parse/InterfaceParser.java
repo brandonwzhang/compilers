@@ -6,13 +6,8 @@
 package com.bwz6jk2227esl89ahj34.ast.parse;
 
 import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
-import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
+import com.bwz6jk2227esl89ahj34.ast.type.*;
 import com.bwz6jk2227esl89ahj34.ast.Identifier;
-import com.bwz6jk2227esl89ahj34.ast.type.IntType;
-import com.bwz6jk2227esl89ahj34.ast.type.BoolType;
-import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
-import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
-import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import java_cup.runtime.Symbol;
 import java.io.FileReader;
@@ -44,13 +39,13 @@ public class InterfaceParser
   /** Production table. */
   protected static final short _production_table[][] = 
     unpackFromStrings(new String[] {
-    "\000\024\000\002\002\004\000\002\002\002\000\002\003" +
-    "\003\000\002\003\003\000\002\005\005\000\002\005\003" +
-    "\000\002\004\004\000\002\006\005\000\002\006\003\000" +
-    "\002\007\005\000\002\010\005\000\002\010\003\000\002" +
-    "\011\003\000\002\011\003\000\002\012\010\000\002\012" +
-    "\006\000\002\013\003\000\002\013\004\000\002\014\004" +
-    "\000\002\014\003" });
+    "\000\026\000\002\002\004\000\002\002\002\000\002\003" +
+    "\003\000\002\003\003\000\002\006\003\000\002\005\005" +
+    "\000\002\005\003\000\002\004\004\000\002\004\004\000" +
+    "\002\007\005\000\002\007\003\000\002\010\005\000\002" +
+    "\011\005\000\002\011\003\000\002\012\003\000\002\012" +
+    "\003\000\002\013\010\000\002\013\006\000\002\014\003" +
+    "\000\002\014\004\000\002\015\004\000\002\015\003" });
 
   /** Access to production table. */
   @Override
@@ -59,29 +54,34 @@ public class InterfaceParser
   /** Parse-action table. */
   protected static final short[][] _action_table = 
     unpackFromStrings(new String[] {
-    "\000\040\000\004\004\006\001\002\000\004\002\042\001" +
-    "\002\000\006\002\uffee\004\006\001\002\000\004\043\011" +
-    "\001\002\000\010\002\ufff1\004\ufff1\051\010\001\002\000" +
-    "\006\002\ufff0\004\ufff0\001\002\000\006\004\014\044\000" +
-    "\001\002\000\004\044\033\001\002\000\004\044\ufff5\001" +
-    "\002\000\004\047\021\001\002\000\006\044\ufff6\050\017" +
-    "\001\002\000\004\044\ufff4\001\002\000\004\004\014\001" +
-    "\002\000\004\044\ufff7\001\002\000\006\012\025\013\023" +
-    "\001\002\000\006\044\ufff8\050\ufff8\001\002\000\016\002" +
-    "\ufffe\004\ufffe\041\ufffe\044\ufffe\050\ufffe\051\ufffe\001\002" +
-    "\000\016\002\000\004\000\041\027\044\000\050\000\051" +
-    "\000\001\002\000\016\002\uffff\004\uffff\041\uffff\044\uffff" +
-    "\050\uffff\051\uffff\001\002\000\014\002\ufffb\004\ufffb\044" +
-    "\ufffb\050\ufffb\051\ufffb\001\002\000\004\042\031\001\002" +
-    "\000\014\002\ufffc\004\ufffc\044\ufffc\050\ufffc\051\ufffc\001" +
-    "\002\000\016\002\000\004\000\041\027\044\000\050\000" +
-    "\051\000\001\002\000\014\002\ufffd\004\ufffd\044\ufffd\050" +
-    "\ufffd\051\ufffd\001\002\000\012\002\ufff2\004\ufff2\047\034" +
-    "\051\ufff2\001\002\000\006\012\025\013\023\001\002\000" +
-    "\012\002\ufff9\004\ufff9\050\037\051\ufff9\001\002\000\010" +
-    "\002\ufff3\004\ufff3\051\ufff3\001\002\000\006\012\025\013" +
-    "\023\001\002\000\010\002\ufffa\004\ufffa\051\ufffa\001\002" +
-    "\000\004\002\uffef\001\002\000\004\002\001\001\002" });
+    "\000\043\000\004\004\007\001\002\000\004\002\045\001" +
+    "\002\000\004\043\013\001\002\000\006\002\uffec\004\007" +
+    "\001\002\000\022\002\ufffd\004\ufffd\041\ufffd\043\ufffd\044" +
+    "\ufffd\047\ufffd\050\ufffd\051\ufffd\001\002\000\010\002\uffef" +
+    "\004\uffef\051\011\001\002\000\006\002\uffee\004\uffee\001" +
+    "\002\000\004\002\uffed\001\002\000\006\004\007\044\000" +
+    "\001\002\000\004\047\043\001\002\000\004\044\023\001" +
+    "\002\000\004\044\ufff3\001\002\000\006\044\ufff4\050\021" +
+    "\001\002\000\004\044\ufff2\001\002\000\004\004\007\001" +
+    "\002\000\004\044\ufff5\001\002\000\012\002\ufff0\004\ufff0" +
+    "\047\024\051\ufff0\001\002\000\010\004\007\012\032\013" +
+    "\030\001\002\000\016\002\000\004\000\041\034\044\000" +
+    "\050\000\051\000\001\002\000\012\002\ufff7\004\ufff7\050" +
+    "\040\051\ufff7\001\002\000\010\002\ufff1\004\ufff1\051\ufff1" +
+    "\001\002\000\016\002\ufffe\004\ufffe\041\ufffe\044\ufffe\050" +
+    "\ufffe\051\ufffe\001\002\000\016\002\000\004\000\041\034" +
+    "\044\000\050\000\051\000\001\002\000\016\002\uffff\004" +
+    "\uffff\041\uffff\044\uffff\050\uffff\051\uffff\001\002\000\014" +
+    "\002\ufffa\004\ufffa\044\ufffa\050\ufffa\051\ufffa\001\002\000" +
+    "\004\042\036\001\002\000\014\002\ufffb\004\ufffb\044\ufffb" +
+    "\050\ufffb\051\ufffb\001\002\000\016\002\000\004\000\041" +
+    "\034\044\000\050\000\051\000\001\002\000\014\002\ufffc" +
+    "\004\ufffc\044\ufffc\050\ufffc\051\ufffc\001\002\000\010\004" +
+    "\007\012\032\013\030\001\002\000\010\002\ufff8\004\ufff8" +
+    "\051\ufff8\001\002\000\014\002\ufff9\004\ufff9\044\ufff9\050" +
+    "\ufff9\051\ufff9\001\002\000\010\004\007\012\032\013\030" +
+    "\001\002\000\006\044\ufff6\050\ufff6\001\002\000\004\002" +
+    "\001\001\002" });
 
   /** Access to parse-action table. */
   @Override
@@ -90,20 +90,23 @@ public class InterfaceParser
   /** {@code reduce_goto} table. */
   protected static final short[][] _reduce_table = 
     unpackFromStrings(new String[] {
-    "\000\040\000\010\012\006\013\004\014\003\001\001\000" +
-    "\002\001\001\000\010\012\006\013\004\014\040\001\001" +
-    "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
-    "\012\002\015\007\014\010\012\011\011\001\001\000\002" +
-    "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
-    "\001\000\002\001\001\000\006\007\014\010\017\001\001" +
-    "\000\002\001\001\000\006\003\023\004\021\001\001\000" +
-    "\002\001\001\000\002\001\001\000\006\002\027\005\025" +
-    "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
-    "\001\000\002\001\001\000\006\002\027\005\031\001\001" +
-    "\000\002\001\001\000\002\001\001\000\010\003\023\004" +
-    "\034\006\035\001\001\000\002\001\001\000\002\001\001" +
-    "\000\010\003\023\004\034\006\037\001\001\000\002\001" +
-    "\001\000\002\001\001\000\002\001\001" });
+    "\000\043\000\012\006\004\013\007\014\005\015\003\001" +
+    "\001\000\002\001\001\000\002\001\001\000\012\006\004" +
+    "\013\007\014\005\015\011\001\001\000\002\001\001\000" +
+    "\002\001\001\000\002\001\001\000\002\001\001\000\014" +
+    "\002\017\006\013\010\016\011\015\012\014\001\001\000" +
+    "\002\001\001\000\002\001\001\000\002\001\001\000\002" +
+    "\001\001\000\002\001\001\000\010\006\013\010\016\011" +
+    "\021\001\001\000\002\001\001\000\002\001\001\000\012" +
+    "\003\030\004\025\006\024\007\026\001\001\000\006\002" +
+    "\034\005\041\001\001\000\002\001\001\000\002\001\001" +
+    "\000\002\001\001\000\006\002\034\005\032\001\001\000" +
+    "\002\001\001\000\002\001\001\000\002\001\001\000\002" +
+    "\001\001\000\006\002\034\005\036\001\001\000\002\001" +
+    "\001\000\012\003\030\004\025\006\024\007\040\001\001" +
+    "\000\002\001\001\000\002\001\001\000\010\003\030\004" +
+    "\043\006\024\001\001\000\002\001\001\000\002\001\001" +
+    "" });
 
   /** Access to {@code reduce_goto} table. */
   @Override
@@ -197,7 +200,7 @@ class CUP$InterfaceParser$actions {
         this.parser = parser;
     }
 
-    /** Method with the actual generated action code for actions 0 to 19. */
+    /** Method with the actual generated action code for actions 0 to 21. */
     public final java_cup.runtime.Symbol CUP$InterfaceParser$do_action_part00000000(
             int                        CUP$InterfaceParser$act_num,
             java_cup.runtime.lr_parser CUP$InterfaceParser$parser,
@@ -251,7 +254,19 @@ class CUP$InterfaceParser$actions {
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 4: // array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type 
+        case 4: // identifier ::= IDENTIFIER 
+            {
+                Identifier RESULT = null;
+                int idleft = CUP$InterfaceParser$stack.peek().left;
+                int idright = CUP$InterfaceParser$stack.peek().right;
+                String id = CUP$InterfaceParser$stack.peek().<String> value();
+                 RESULT = new Identifier(id); RESULT.setLocation(parser.stack.peek()); 
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("identifier",4, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+            }
+            return CUP$InterfaceParser$result;
+
+        /*. . . . . . . . . . . . . . . . . . . .*/
+        case 5: // array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type 
             {
                 Integer RESULT = null;
                 int anstleft = CUP$InterfaceParser$stack.peek().left;
@@ -263,7 +278,7 @@ class CUP$InterfaceParser$actions {
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 5: // array_no_size_type ::= empty 
+        case 6: // array_no_size_type ::= empty 
             {
                 Integer RESULT = null;
                  RESULT = 0; 
@@ -272,7 +287,7 @@ class CUP$InterfaceParser$actions {
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 6: // var_type ::= primitive_type array_no_size_type 
+        case 7: // var_type ::= primitive_type array_no_size_type 
             {
                 VariableType RESULT = null;
                 int ptleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
@@ -287,7 +302,22 @@ class CUP$InterfaceParser$actions {
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 7: // function_declaration_return_types ::= var_type COMMA function_declaration_return_types 
+        case 8: // var_type ::= identifier array_no_size_type 
+            {
+                VariableType RESULT = null;
+                int class_nameleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
+                int class_nameright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).right;
+                Identifier class_name = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).<Identifier> value();
+                int anstleft = CUP$InterfaceParser$stack.peek().left;
+                int anstright = CUP$InterfaceParser$stack.peek().right;
+                Integer anst = CUP$InterfaceParser$stack.peek().<Integer> value();
+                 RESULT = VariableType.construct(new ClassType(class_name), anst);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("var_type",2, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
+            }
+            return CUP$InterfaceParser$result;
+
+        /*. . . . . . . . . . . . . . . . . . . .*/
+        case 9: // function_declaration_return_types ::= var_type COMMA function_declaration_return_types 
             {
                 List<VariableType> RESULT = null;
                 int tleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).left;
@@ -297,39 +327,39 @@ class CUP$InterfaceParser$actions {
                 int lstright = CUP$InterfaceParser$stack.peek().right;
                 List<VariableType> lst = CUP$InterfaceParser$stack.peek().<List<VariableType>> value();
                  lst.add(0,t); RESULT = lst; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_return_types",4, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_return_types",5, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 8: // function_declaration_return_types ::= var_type 
+        case 10: // function_declaration_return_types ::= var_type 
             {
                 List<VariableType> RESULT = null;
                 int tleft = CUP$InterfaceParser$stack.peek().left;
                 int tright = CUP$InterfaceParser$stack.peek().right;
                 VariableType t = CUP$InterfaceParser$stack.peek().<VariableType> value();
                  List<VariableType> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_return_types",4, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_return_types",5, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 9: // function_declaration_argument_single ::= IDENTIFIER COLON var_type 
+        case 11: // function_declaration_argument_single ::= identifier COLON var_type 
             {
                 SimpleEntry<Identifier,VariableType> RESULT = null;
                 int ileft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).left;
                 int iright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).right;
-                String i = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).<String> value();
+                Identifier i = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).<Identifier> value();
                 int tleft = CUP$InterfaceParser$stack.peek().left;
                 int tright = CUP$InterfaceParser$stack.peek().right;
                 VariableType t = CUP$InterfaceParser$stack.peek().<VariableType> value();
-                 RESULT = new SimpleEntry<Identifier, VariableType>(new Identifier(i), t); 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_single",5, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
+                 RESULT = new SimpleEntry<Identifier, VariableType>(i, t); 
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_single",6, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 10: // function_declaration_argument_list ::= function_declaration_argument_single COMMA function_declaration_argument_list 
+        case 12: // function_declaration_argument_list ::= function_declaration_argument_single COMMA function_declaration_argument_list 
             {
                 List<SimpleEntry<Identifier,VariableType>> RESULT = null;
                 int fdasleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).left;
@@ -339,102 +369,102 @@ class CUP$InterfaceParser$actions {
                 int lstright = CUP$InterfaceParser$stack.peek().right;
                 List<SimpleEntry<Identifier,VariableType>> lst = CUP$InterfaceParser$stack.peek().<List<SimpleEntry<Identifier,VariableType>>> value();
                  lst.add(0, fdas); RESULT = lst; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_list",6, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_list",7, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 11: // function_declaration_argument_list ::= function_declaration_argument_single 
+        case 13: // function_declaration_argument_list ::= function_declaration_argument_single 
             {
                 List<SimpleEntry<Identifier,VariableType>> RESULT = null;
                 int fdasleft = CUP$InterfaceParser$stack.peek().left;
                 int fdasright = CUP$InterfaceParser$stack.peek().right;
                 SimpleEntry<Identifier,VariableType> fdas = CUP$InterfaceParser$stack.peek().<SimpleEntry<Identifier,VariableType>> value();
                  List<SimpleEntry<Identifier, VariableType>> lst = new LinkedList<>(); lst.add(0, fdas); RESULT = lst; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_list",6, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument_list",7, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 12: // function_declaration_argument ::= function_declaration_argument_list 
+        case 14: // function_declaration_argument ::= function_declaration_argument_list 
             {
                 List<SimpleEntry<Identifier,VariableType>> RESULT = null;
                 int lstleft = CUP$InterfaceParser$stack.peek().left;
                 int lstright = CUP$InterfaceParser$stack.peek().right;
                 List<SimpleEntry<Identifier,VariableType>> lst = CUP$InterfaceParser$stack.peek().<List<SimpleEntry<Identifier,VariableType>>> value();
                  RESULT = lst; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument",7, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument",8, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 13: // function_declaration_argument ::= empty 
+        case 15: // function_declaration_argument ::= empty 
             {
                 List<SimpleEntry<Identifier,VariableType>> RESULT = null;
                  RESULT = new LinkedList<>(); 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument",7, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_argument",8, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 14: // function_declaration ::= IDENTIFIER OPEN_PAREN function_declaration_argument CLOSE_PAREN COLON function_declaration_return_types 
+        case 16: // function_declaration ::= identifier OPEN_PAREN function_declaration_argument CLOSE_PAREN COLON function_declaration_return_types 
             {
                 FunctionDeclaration RESULT = null;
                 int idleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-5).left;
                 int idright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-5).right;
-                String id = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-5).<String> value();
+                Identifier id = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-5).<Identifier> value();
                 int argPairsleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3).left;
                 int argPairsright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3).right;
                 List<SimpleEntry<Identifier,VariableType>> argPairs = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3).<List<SimpleEntry<Identifier,VariableType>>> value();
                 int tleft = CUP$InterfaceParser$stack.peek().left;
                 int tright = CUP$InterfaceParser$stack.peek().right;
                 List<VariableType> t = CUP$InterfaceParser$stack.peek().<List<VariableType>> value();
-                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, null); 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",8, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-5), CUP$InterfaceParser$stack.peek(), RESULT);
+                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(t)), args, null); 
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",9, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-5), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 15: // function_declaration ::= IDENTIFIER OPEN_PAREN function_declaration_argument CLOSE_PAREN 
+        case 17: // function_declaration ::= identifier OPEN_PAREN function_declaration_argument CLOSE_PAREN 
             {
                 FunctionDeclaration RESULT = null;
                 int idleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3).left;
                 int idright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3).right;
-                String id = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3).<String> value();
+                Identifier id = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3).<Identifier> value();
                 int argPairsleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
                 int argPairsright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).right;
                 List<SimpleEntry<Identifier,VariableType>> argPairs = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).<List<SimpleEntry<Identifier,VariableType>>> value();
-                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, null); 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",8, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3), CUP$InterfaceParser$stack.peek(), RESULT);
+                 List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, null); 
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration",9, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 16: // function_declaration_line ::= function_declaration 
+        case 18: // function_declaration_line ::= function_declaration 
             {
                 FunctionDeclaration RESULT = null;
                 int fdleft = CUP$InterfaceParser$stack.peek().left;
                 int fdright = CUP$InterfaceParser$stack.peek().right;
                 FunctionDeclaration fd = CUP$InterfaceParser$stack.peek().<FunctionDeclaration> value();
                  RESULT = fd; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_line",9, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_line",10, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 17: // function_declaration_line ::= function_declaration SEMICOLON 
+        case 19: // function_declaration_line ::= function_declaration SEMICOLON 
             {
                 FunctionDeclaration RESULT = null;
                 int fdleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
                 int fdright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).right;
                 FunctionDeclaration fd = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).<FunctionDeclaration> value();
                  RESULT = fd; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_line",9, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_line",10, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 18: // function_declaration_list ::= function_declaration_line function_declaration_list 
+        case 20: // function_declaration_list ::= function_declaration_line function_declaration_list 
             {
                 List<FunctionDeclaration> RESULT = null;
                 int fdleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
@@ -444,19 +474,19 @@ class CUP$InterfaceParser$actions {
                 int lstright = CUP$InterfaceParser$stack.peek().right;
                 List<FunctionDeclaration> lst = CUP$InterfaceParser$stack.peek().<List<FunctionDeclaration>> value();
                  lst.add(0, fd); RESULT = lst; 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",10, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",11, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 19: // function_declaration_list ::= function_declaration_line 
+        case 21: // function_declaration_list ::= function_declaration_line 
             {
                 List<FunctionDeclaration> RESULT = null;
                 int fdleft = CUP$InterfaceParser$stack.peek().left;
                 int fdright = CUP$InterfaceParser$stack.peek().right;
                 FunctionDeclaration fd = CUP$InterfaceParser$stack.peek().<FunctionDeclaration> value();
                  RESULT = new LinkedList<FunctionDeclaration>(); RESULT.add(fd); 
-                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",10, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",11, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 

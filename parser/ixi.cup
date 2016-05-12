@@ -9,6 +9,7 @@ import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
 import com.bwz6jk2227esl89ahj34.util.Util;
+import com.bwz6jk2227esl89ahj34.ast.type.*;
 import java_cup.runtime.Symbol;
 import java.io.FileReader;
 import java.util.AbstractMap.SimpleEntry;
@@ -75,6 +76,7 @@ nonterminal empty;
 nonterminal PrimitiveType primitive_type;
 nonterminal VariableType var_type;
 nonterminal Integer array_no_size_type;
+nonterminal Identifier identifier;
 
 nonterminal List<VariableType> function_declaration_return_types;
 nonterminal SimpleEntry<Identifier, VariableType> function_declaration_argument_single;
@@ -92,18 +94,22 @@ primitive_type ::= INT {: RESULT = new IntType(); :}
                  | BOOL {: RESULT = new BoolType(); :}
                  ;
 
+identifier ::= IDENTIFIER:id {: RESULT = new Identifier(id); RESULT.setLocation(parser.stack.peek()); :}
+             ;
+
 array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type:anst {: RESULT = anst + 1; :}
                      | empty {: RESULT = 0; :}
                      ;
 
 var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = VariableType.construct(pt, anst); :}
+           | identifier:class_name array_no_size_type:anst {: RESULT = VariableType.construct(new ClassType(class_name), anst); :}
        ;
 
 function_declaration_return_types ::= var_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :}
        | var_type:t  {: List<VariableType> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; :}
        ;
 
-function_declaration_argument_single ::= IDENTIFIER:i COLON var_type:t {: RESULT = new SimpleEntry<Identifier, VariableType>(new Identifier(i), t); :}
+function_declaration_argument_single ::= identifier:i COLON var_type:t {: RESULT = new SimpleEntry<Identifier, VariableType>(i, t); :}
                                        ;
 
 function_declaration_argument_list ::= function_declaration_argument_single:fdas COMMA function_declaration_argument_list:lst {: lst.add(0, fdas); RESULT = lst; :}
@@ -114,8 +120,8 @@ function_declaration_argument ::= function_declaration_argument_list:lst {: RESU
                                 | empty {: RESULT = new LinkedList<>(); :}
                                 ;
 
-function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, null); :}
-                       | IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, null); :}
+function_declaration ::= identifier:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(t)), args, null); :}
+                       | identifier:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, null); :}
                        ;
 
 function_declaration_line ::= function_declaration:fd {: RESULT = fd; :}
