@@ -1,6 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ast.parse;
 
-import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
+import com.bwz6jk2227esl89ahj34.ast.*;
 import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
 import com.bwz6jk2227esl89ahj34.ast.Identifier;
 import com.bwz6jk2227esl89ahj34.ast.type.IntType;
@@ -8,6 +8,7 @@ import com.bwz6jk2227esl89ahj34.ast.type.BoolType;
 import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
+import com.bwz6jk2227esl89ahj34.ast.parse.Interface;
 import com.bwz6jk2227esl89ahj34.util.Util;
 import com.bwz6jk2227esl89ahj34.ast.type.*;
 import java_cup.runtime.Symbol;
@@ -38,7 +39,8 @@ parser code {:
                 // Encountered parsing error, return error message
                 return parser.syntaxErrMessage;
             }
-            declarations.addAll((List<FunctionDeclaration>) result.value);
+            Interface i = (Interface) result.value; 
+            declarations.addAll(i.getFunctionDeclarations());
         } catch(Exception e) {
             return "Interface " + interfaceName + " not found";
         }
@@ -87,7 +89,11 @@ nonterminal FunctionDeclaration function_declaration;
 nonterminal FunctionDeclaration function_declaration_line;
 nonterminal List<FunctionDeclaration> function_declaration_list;
 
-start with function_declaration_list;
+nonterminal List<UseStatement> use_block;
+
+nonterminal Interface interface;
+
+start with interface;
 empty ::= ;
 
 primitive_type ::= INT {: RESULT = new IntType(); :}
@@ -130,3 +136,14 @@ function_declaration_line ::= function_declaration:fd {: RESULT = fd; :}
 function_declaration_list ::= function_declaration_line:fd function_declaration_list:lst {: lst.add(0, fd); RESULT = lst; :}
                             | function_declaration_line:fd {: RESULT = new LinkedList<FunctionDeclaration>(); RESULT.add(fd); :}
                             ;
+
+use_block ::= USE identifier:id use_block:u {: u.add(0, new UseStatement(id)); RESULT = u; RESULT.get(0).setLocation(id); :}
+            | USE identifier:id SEMICOLON use_block:u {: u.add(0, new UseStatement(id)); RESULT = u; RESULT.get(0).setLocation(id); :}
+            | empty   {: RESULT = new LinkedList<UseStatement>(); :}
+            ;
+
+interface ::= use_block:u function_declaration_list:lst {: RESULT = new Interface(u, lst); :}
+          ;
+
+
+

@@ -5,10 +5,17 @@
 
 package com.bwz6jk2227esl89ahj34.ast.parse;
 
-import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
-import com.bwz6jk2227esl89ahj34.ast.type.*;
+import com.bwz6jk2227esl89ahj34.ast.*;
+import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
 import com.bwz6jk2227esl89ahj34.ast.Identifier;
+import com.bwz6jk2227esl89ahj34.ast.type.IntType;
+import com.bwz6jk2227esl89ahj34.ast.type.BoolType;
+import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
+import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
+import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
+import com.bwz6jk2227esl89ahj34.ast.parse.Interface;
 import com.bwz6jk2227esl89ahj34.util.Util;
+import com.bwz6jk2227esl89ahj34.ast.type.*;
 import java_cup.runtime.Symbol;
 import java.io.FileReader;
 import java.util.AbstractMap.SimpleEntry;
@@ -39,13 +46,15 @@ public class InterfaceParser
   /** Production table. */
   protected static final short _production_table[][] = 
     unpackFromStrings(new String[] {
-    "\000\026\000\002\002\004\000\002\002\002\000\002\003" +
+    "\000\032\000\002\002\004\000\002\002\002\000\002\003" +
     "\003\000\002\003\003\000\002\006\003\000\002\005\005" +
     "\000\002\005\003\000\002\004\004\000\002\004\004\000" +
     "\002\007\005\000\002\007\003\000\002\010\005\000\002" +
     "\011\005\000\002\011\003\000\002\012\003\000\002\012" +
     "\003\000\002\013\010\000\002\013\006\000\002\014\003" +
-    "\000\002\014\004\000\002\015\004\000\002\015\003" });
+    "\000\002\014\004\000\002\015\004\000\002\015\003\000" +
+    "\002\016\005\000\002\016\006\000\002\016\003\000\002" +
+    "\017\004" });
 
   /** Access to production table. */
   @Override
@@ -54,34 +63,38 @@ public class InterfaceParser
   /** Parse-action table. */
   protected static final short[][] _action_table = 
     unpackFromStrings(new String[] {
-    "\000\043\000\004\004\007\001\002\000\004\002\045\001" +
-    "\002\000\004\043\013\001\002\000\006\002\uffec\004\007" +
-    "\001\002\000\022\002\ufffd\004\ufffd\041\ufffd\043\ufffd\044" +
-    "\ufffd\047\ufffd\050\ufffd\051\ufffd\001\002\000\010\002\uffef" +
-    "\004\uffef\051\011\001\002\000\006\002\uffee\004\uffee\001" +
-    "\002\000\004\002\uffed\001\002\000\006\004\007\044\000" +
-    "\001\002\000\004\047\043\001\002\000\004\044\023\001" +
-    "\002\000\004\044\ufff3\001\002\000\006\044\ufff4\050\021" +
-    "\001\002\000\004\044\ufff2\001\002\000\004\004\007\001" +
-    "\002\000\004\044\ufff5\001\002\000\012\002\ufff0\004\ufff0" +
-    "\047\024\051\ufff0\001\002\000\010\004\007\012\032\013" +
-    "\030\001\002\000\016\002\000\004\000\041\034\044\000" +
-    "\050\000\051\000\001\002\000\012\002\ufff7\004\ufff7\050" +
-    "\040\051\ufff7\001\002\000\010\002\ufff1\004\ufff1\051\ufff1" +
-    "\001\002\000\016\002\ufffe\004\ufffe\041\ufffe\044\ufffe\050" +
-    "\ufffe\051\ufffe\001\002\000\016\002\000\004\000\041\034" +
-    "\044\000\050\000\051\000\001\002\000\016\002\uffff\004" +
-    "\uffff\041\uffff\044\uffff\050\uffff\051\uffff\001\002\000\014" +
-    "\002\ufffa\004\ufffa\044\ufffa\050\ufffa\051\ufffa\001\002\000" +
-    "\004\042\036\001\002\000\014\002\ufffb\004\ufffb\044\ufffb" +
-    "\050\ufffb\051\ufffb\001\002\000\016\002\000\004\000\041" +
-    "\034\044\000\050\000\051\000\001\002\000\014\002\ufffc" +
-    "\004\ufffc\044\ufffc\050\ufffc\051\ufffc\001\002\000\010\004" +
-    "\007\012\032\013\030\001\002\000\010\002\ufff8\004\ufff8" +
-    "\051\ufff8\001\002\000\014\002\ufff9\004\ufff9\044\ufff9\050" +
-    "\ufff9\051\ufff9\001\002\000\010\004\007\012\032\013\030" +
-    "\001\002\000\006\044\ufff6\050\ufff6\001\002\000\004\002" +
-    "\001\001\002" });
+    "\000\053\000\006\004\000\021\005\001\002\000\004\004" +
+    "\012\001\002\000\004\004\012\001\002\000\004\002\010" +
+    "\001\002\000\004\004\uffe9\001\002\000\004\002\001\001" +
+    "\002\000\010\004\000\021\005\051\014\001\002\000\024" +
+    "\002\ufffd\004\ufffd\021\ufffd\041\ufffd\043\ufffd\044\ufffd\047" +
+    "\ufffd\050\ufffd\051\ufffd\001\002\000\004\004\uffeb\001\002" +
+    "\000\006\004\000\021\005\001\002\000\004\004\uffea\001" +
+    "\002\000\004\043\024\001\002\000\004\002\uffe8\001\002" +
+    "\000\006\002\uffec\004\012\001\002\000\010\002\uffef\004" +
+    "\uffef\051\022\001\002\000\006\002\uffee\004\uffee\001\002" +
+    "\000\004\002\uffed\001\002\000\006\004\012\044\000\001" +
+    "\002\000\004\047\054\001\002\000\004\044\034\001\002" +
+    "\000\004\044\ufff3\001\002\000\006\044\ufff4\050\032\001" +
+    "\002\000\004\044\ufff2\001\002\000\004\004\012\001\002" +
+    "\000\004\044\ufff5\001\002\000\012\002\ufff0\004\ufff0\047" +
+    "\035\051\ufff0\001\002\000\010\004\012\012\043\013\041" +
+    "\001\002\000\016\002\000\004\000\041\045\044\000\050" +
+    "\000\051\000\001\002\000\012\002\ufff7\004\ufff7\050\051" +
+    "\051\ufff7\001\002\000\010\002\ufff1\004\ufff1\051\ufff1\001" +
+    "\002\000\016\002\ufffe\004\ufffe\041\ufffe\044\ufffe\050\ufffe" +
+    "\051\ufffe\001\002\000\016\002\000\004\000\041\045\044" +
+    "\000\050\000\051\000\001\002\000\016\002\uffff\004\uffff" +
+    "\041\uffff\044\uffff\050\uffff\051\uffff\001\002\000\014\002" +
+    "\ufffa\004\ufffa\044\ufffa\050\ufffa\051\ufffa\001\002\000\004" +
+    "\042\047\001\002\000\014\002\ufffb\004\ufffb\044\ufffb\050" +
+    "\ufffb\051\ufffb\001\002\000\016\002\000\004\000\041\045" +
+    "\044\000\050\000\051\000\001\002\000\014\002\ufffc\004" +
+    "\ufffc\044\ufffc\050\ufffc\051\ufffc\001\002\000\010\004\012" +
+    "\012\043\013\041\001\002\000\010\002\ufff8\004\ufff8\051" +
+    "\ufff8\001\002\000\014\002\ufff9\004\ufff9\044\ufff9\050\ufff9" +
+    "\051\ufff9\001\002\000\010\004\012\012\043\013\041\001" +
+    "\002\000\006\044\ufff6\050\ufff6\001\002" });
 
   /** Access to parse-action table. */
   @Override
@@ -90,23 +103,26 @@ public class InterfaceParser
   /** {@code reduce_goto} table. */
   protected static final short[][] _reduce_table = 
     unpackFromStrings(new String[] {
-    "\000\043\000\012\006\004\013\007\014\005\015\003\001" +
-    "\001\000\002\001\001\000\002\001\001\000\012\006\004" +
-    "\013\007\014\005\015\011\001\001\000\002\001\001\000" +
+    "\000\053\000\010\002\006\016\003\017\005\001\001\000" +
+    "\012\006\015\013\020\014\017\015\016\001\001\000\004" +
+    "\006\010\001\001\000\002\001\001\000\002\001\001\000" +
+    "\002\001\001\000\006\002\006\016\012\001\001\000\002" +
+    "\001\001\000\002\001\001\000\006\002\006\016\014\001" +
+    "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
+    "\000\012\006\015\013\020\014\017\015\022\001\001\000" +
     "\002\001\001\000\002\001\001\000\002\001\001\000\014" +
-    "\002\017\006\013\010\016\011\015\012\014\001\001\000" +
+    "\002\030\006\024\010\027\011\026\012\025\001\001\000" +
     "\002\001\001\000\002\001\001\000\002\001\001\000\002" +
-    "\001\001\000\002\001\001\000\010\006\013\010\016\011" +
-    "\021\001\001\000\002\001\001\000\002\001\001\000\012" +
-    "\003\030\004\025\006\024\007\026\001\001\000\006\002" +
-    "\034\005\041\001\001\000\002\001\001\000\002\001\001" +
-    "\000\002\001\001\000\006\002\034\005\032\001\001\000" +
+    "\001\001\000\002\001\001\000\010\006\024\010\027\011" +
+    "\032\001\001\000\002\001\001\000\002\001\001\000\012" +
+    "\003\041\004\036\006\035\007\037\001\001\000\006\002" +
+    "\045\005\052\001\001\000\002\001\001\000\002\001\001" +
+    "\000\002\001\001\000\006\002\045\005\043\001\001\000" +
     "\002\001\001\000\002\001\001\000\002\001\001\000\002" +
-    "\001\001\000\006\002\034\005\036\001\001\000\002\001" +
-    "\001\000\012\003\030\004\025\006\024\007\040\001\001" +
-    "\000\002\001\001\000\002\001\001\000\010\003\030\004" +
-    "\043\006\024\001\001\000\002\001\001\000\002\001\001" +
-    "" });
+    "\001\001\000\006\002\045\005\047\001\001\000\002\001" +
+    "\001\000\012\003\041\004\036\006\035\007\051\001\001" +
+    "\000\002\001\001\000\002\001\001\000\010\003\041\004" +
+    "\054\006\035\001\001\000\002\001\001" });
 
   /** Access to {@code reduce_goto} table. */
   @Override
@@ -170,7 +186,8 @@ public class InterfaceParser
                 // Encountered parsing error, return error message
                 return parser.syntaxErrMessage;
             }
-            declarations.addAll((List<FunctionDeclaration>) result.value);
+            Interface i = (Interface) result.value; 
+            declarations.addAll(i.getFunctionDeclarations());
         } catch(Exception e) {
             return "Interface " + interfaceName + " not found";
         }
@@ -200,7 +217,7 @@ class CUP$InterfaceParser$actions {
         this.parser = parser;
     }
 
-    /** Method with the actual generated action code for actions 0 to 21. */
+    /** Method with the actual generated action code for actions 0 to 25. */
     public final java_cup.runtime.Symbol CUP$InterfaceParser$do_action_part00000000(
             int                        CUP$InterfaceParser$act_num,
             java_cup.runtime.lr_parser CUP$InterfaceParser$parser,
@@ -213,12 +230,12 @@ class CUP$InterfaceParser$actions {
         /* select the action based on the action number */
         switch (CUP$InterfaceParser$act_num) {
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 0: // $START ::= function_declaration_list EOF 
+        case 0: // $START ::= interface EOF 
             {
                 Object RESULT = null;
                 int start_valleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
                 int start_valright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).right;
-                List<FunctionDeclaration> start_val = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).<List<FunctionDeclaration>> value();
+                Interface start_val = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).<Interface> value();
                 RESULT = start_val;
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("$START",0, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
             }
@@ -311,7 +328,7 @@ class CUP$InterfaceParser$actions {
                 int anstleft = CUP$InterfaceParser$stack.peek().left;
                 int anstright = CUP$InterfaceParser$stack.peek().right;
                 Integer anst = CUP$InterfaceParser$stack.peek().<Integer> value();
-                 RESULT = VariableType.construct(new ClassType(class_name), anst);
+                 RESULT = VariableType.construct(new ClassType(class_name), anst); 
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("var_type",2, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
@@ -487,6 +504,60 @@ class CUP$InterfaceParser$actions {
                 FunctionDeclaration fd = CUP$InterfaceParser$stack.peek().<FunctionDeclaration> value();
                  RESULT = new LinkedList<FunctionDeclaration>(); RESULT.add(fd); 
                 CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("function_declaration_list",11, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+            }
+            return CUP$InterfaceParser$result;
+
+        /*. . . . . . . . . . . . . . . . . . . .*/
+        case 22: // use_block ::= USE identifier use_block 
+            {
+                List<UseStatement> RESULT = null;
+                int idleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
+                int idright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).right;
+                Identifier id = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).<Identifier> value();
+                int uleft = CUP$InterfaceParser$stack.peek().left;
+                int uright = CUP$InterfaceParser$stack.peek().right;
+                List<UseStatement> u = CUP$InterfaceParser$stack.peek().<List<UseStatement>> value();
+                 u.add(0, new UseStatement(id)); RESULT = u; RESULT.get(0).setLocation(id); 
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("use_block",12, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2), CUP$InterfaceParser$stack.peek(), RESULT);
+            }
+            return CUP$InterfaceParser$result;
+
+        /*. . . . . . . . . . . . . . . . . . . .*/
+        case 23: // use_block ::= USE identifier SEMICOLON use_block 
+            {
+                List<UseStatement> RESULT = null;
+                int idleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).left;
+                int idright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).right;
+                Identifier id = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).<Identifier> value();
+                int uleft = CUP$InterfaceParser$stack.peek().left;
+                int uright = CUP$InterfaceParser$stack.peek().right;
+                List<UseStatement> u = CUP$InterfaceParser$stack.peek().<List<UseStatement>> value();
+                 u.add(0, new UseStatement(id)); RESULT = u; RESULT.get(0).setLocation(id); 
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("use_block",12, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3), CUP$InterfaceParser$stack.peek(), RESULT);
+            }
+            return CUP$InterfaceParser$result;
+
+        /*. . . . . . . . . . . . . . . . . . . .*/
+        case 24: // use_block ::= empty 
+            {
+                List<UseStatement> RESULT = null;
+                 RESULT = new LinkedList<UseStatement>(); 
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("use_block",12, CUP$InterfaceParser$stack.peek(), CUP$InterfaceParser$stack.peek(), RESULT);
+            }
+            return CUP$InterfaceParser$result;
+
+        /*. . . . . . . . . . . . . . . . . . . .*/
+        case 25: // interface ::= use_block function_declaration_list 
+            {
+                Interface RESULT = null;
+                int uleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
+                int uright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).right;
+                List<UseStatement> u = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).<List<UseStatement>> value();
+                int lstleft = CUP$InterfaceParser$stack.peek().left;
+                int lstright = CUP$InterfaceParser$stack.peek().right;
+                List<FunctionDeclaration> lst = CUP$InterfaceParser$stack.peek().<List<FunctionDeclaration>> value();
+                 RESULT = new Interface(u, lst);
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("interface",13, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1), CUP$InterfaceParser$stack.peek(), RESULT);
             }
             return CUP$InterfaceParser$result;
 
