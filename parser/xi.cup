@@ -383,9 +383,9 @@ global_variable_assignable ::= identifier:id {: RESULT = id; RESULT.setLocation(
 global_variable_assignment ::= global_variable_assignable:a GETS expression:e {:  RESULT = new Assignment(a, e); RESULT.setLocation(parser.cur_token); :}// x = expression
                              ; 
 
-global_variable ::= typed_declaration_list:lst {: List<Assignment> assignments = new LinkedList<>(); for (TypedDeclaration td : lst) { if (td.getDeclarationType() instanceof IntType) { assignments.add(new Assignment(td.getIdentifier(), new IntegerLiteral("0"))); } else if (td.getDeclarationType() instanceof BoolType) { assignments.add(new Assignment(td.getIdentifier(), new BooleanLiteral(false))); } else { assignments.add(new Assignment(td.getIdentifier(), new Null())); } } RESULT = assignments; :} 
+global_variable ::= typed_declaration_list:lst {: List<Assignment> assignments = new LinkedList<>(); for (TypedDeclaration td : lst) { if (td.getDeclarationType() instanceof IntType) { assignments.add(new Assignment(td, new IntegerLiteral("0"))); } else if (td.getDeclarationType() instanceof BoolType) { assignments.add(new Assignment(td, new BooleanLiteral(false))); } else { assignments.add(new Assignment(td, new Null())); } } RESULT = assignments; :} 
                   | global_variable_assignment:a {: List<Assignment> assignables = new LinkedList<>(); assignables.add(a); RESULT = assignables; :}
-                  | typed_declaration:td {:  List<Assignment> assignments = new LinkedList<>(); assignments.add(new Assignment(td.getIdentifier(), new Null())); RESULT = assignments; :}
+                  | typed_declaration:td {:  List<Assignment> assignments = new LinkedList<>(); assignments.add(new Assignment(td, new Null())); RESULT = assignments; :}
                   ; 
 
 program ::= use_block:u program_body:b {: RESULT = new Program(u, b.getA(), b.getB(), b.getC()); RESULT.setLocation(parser.cur_token); :}

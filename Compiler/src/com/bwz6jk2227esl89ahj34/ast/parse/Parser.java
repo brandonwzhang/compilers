@@ -2882,7 +2882,7 @@ class CUP$Parser$actions {
                 int lstleft = CUP$Parser$stack.peek().left;
                 int lstright = CUP$Parser$stack.peek().right;
                 List<TypedDeclaration> lst = CUP$Parser$stack.peek().<List<TypedDeclaration>> value();
-                 List<Assignment> assignments = new LinkedList<>(); for (TypedDeclaration td : lst) { if (td.getDeclarationType() instanceof IntType) { assignments.add(new Assignment(td.getIdentifier(), new IntegerLiteral("0"))); } else if (td.getDeclarationType() instanceof BoolType) { assignments.add(new Assignment(td.getIdentifier(), new BooleanLiteral(false))); } else { assignments.add(new Assignment(td.getIdentifier(), new Null())); } } RESULT = assignments; 
+                 List<Assignment> assignments = new LinkedList<>(); for (TypedDeclaration td : lst) { if (td.getDeclarationType() instanceof IntType) { assignments.add(new Assignment(td, new IntegerLiteral("0"))); } else if (td.getDeclarationType() instanceof BoolType) { assignments.add(new Assignment(td, new BooleanLiteral(false))); } else { assignments.add(new Assignment(td, new Null())); } } RESULT = assignments; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("global_variable",56, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2906,7 +2906,7 @@ class CUP$Parser$actions {
                 int tdleft = CUP$Parser$stack.peek().left;
                 int tdright = CUP$Parser$stack.peek().right;
                 TypedDeclaration td = CUP$Parser$stack.peek().<TypedDeclaration> value();
-                  List<Assignment> assignments = new LinkedList<>(); assignments.add(new Assignment(td.getIdentifier(), new Null())); RESULT = assignments; 
+                  List<Assignment> assignments = new LinkedList<>(); assignments.add(new Assignment(td, new Null())); RESULT = assignments; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("global_variable",56, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
