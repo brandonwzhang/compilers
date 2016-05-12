@@ -689,33 +689,15 @@ public class MIRGenerateVisitor implements NodeVisitor {
         generatedNodes.push(eseq);
     }
 
-    private IRExpr createDispatchVector(Identifier classIdentifier) {
-        List<MethodDeclaration> dispatchVector = dispatchVectors.get(classIdentifier);
-        IRCall malloc = new IRCall(new IRName("_I_alloc_i"),
-                new IRConst(Configuration.WORD_SIZE * dispatchVector.size()));
-        IRTemp vectorTemp = new IRTemp(getFreshVariable());
-        List<IRStmt> stmts = new LinkedList<>();
-        for (int i = 0; i < dispatchVector.size(); i++) {
-            IRMem functionLocation = new IRMem(new IRBinOp(OpType.ADD, vectorTemp,
-                    new IRConst(Configuration.WORD_SIZE * i)));
-            // Move the function into the dispatch vector
-            stmts.add(new IRMove(functionLocation,
-                    new IRName(Util.getIRMethodName(dispatchVector.get(i)))));
-        }
-        return new IRESeq(new IRSeq(stmts), vectorTemp);
-    }
-
     public void visit(ObjectInstantiation node) {
         Identifier classIdentifier = node.getClassIdentifier();
-        // The size of an object is the number of fields plus one for the dispatch vector pointer
-        int objectSize = Configuration.WORD_SIZE * (classFields.get(classIdentifier).size() + 1);
-        IRCall malloc = new IRCall(new IRName("_I_alloc_i"), new IRConst(objectSize));
+        IRCall malloc = new IRCall(new IRName("_I_alloc_i"), new IRName("_I_size_" + classIdentifier.getName()));
         List<IRStmt> stmts = new LinkedList<>();
         // Move the result of the call into a temp
         IRTemp objectTemp = new IRTemp(getFreshVariable());
         stmts.add(new IRMove(objectTemp, malloc));
-        // Initialize dispatch vector
-        stmts.add(new IRMove(new IRMem(objectTemp), createDispatchVector(classIdentifier)));
+        // Add dispatch vector to first slot of object
+        stmts.add(new IRMove(new IRMem(objectTemp), new IRName("_I_vt_" + classIdentifier.getName())));
         generatedNodes.push(new IRESeq(new IRSeq(stmts), objectTemp));
     }
 
@@ -784,18 +766,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
         }
         List<Identifier> fields = new LinkedList<>();
 
-        if (cd.getParentIdentifier().isPresent()) {
-            Identifier parentIdentifier = cd.getParentIdentifier().get();
-            addDispatchVector(classes.get(parentIdentifier));
-            // Add all the parent class's fields
-            fields.addAll(classFields.get(parentIdentifier));
-        }
-
         for (TypedDeclaration td : cd.getFields()) {
             Identifier field = td.getIdentifier();
-            if (!fields.contains(field)) {
-                fields.add(field);
-            }
+            fields.add(field);
         }
 
         // Add this class's fields to the map

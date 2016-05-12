@@ -14,9 +14,8 @@ public class AssemblyProgram {
     private List<String> global;
 
     /**
-     * Generate abstract assembly code for a program
+     * Generate assembly code for a program
      * @param root IRCompUnit of program
-     * @return
      */
     public AssemblyProgram(IRCompUnit root, List<String> global, String target) {
 
