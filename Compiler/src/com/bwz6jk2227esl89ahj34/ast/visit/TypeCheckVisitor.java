@@ -20,6 +20,9 @@ public class TypeCheckVisitor implements NodeVisitor {
     // Type of current class we're type checking
     private Optional<ClassType> currentClassType = Optional.empty();
 
+    // Keep a set of parsed interfaces so we don't double-parse
+    private Set<String> parsedInterfaces = new HashSet<>();
+
     /**
      * Constructor for TypeCheckVisitor
      * @param libPath the directory for where to find the interface files.
@@ -1261,9 +1264,13 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public String addInterface(String libPath, String interfaceName,
                                Context context) {
+        if (parsedInterfaces.contains(interfaceName)) {
+            return "";
+        }
         List<FunctionDeclaration> declarations = new LinkedList<>();
         String error = InterfaceParser.parseInterface(libPath,
                 interfaceName, declarations);
+        // Read in each function declaration
         for (FunctionDeclaration declaration : declarations) {
             // Error if function already exists in context with different type
             FunctionType existingDeclarationType =
