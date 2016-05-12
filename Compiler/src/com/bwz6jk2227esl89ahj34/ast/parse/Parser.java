@@ -1526,7 +1526,7 @@ class CUP$Parser$actions {
                 int ileft = CUP$Parser$stack.peek().left;
                 int iright = CUP$Parser$stack.peek().right;
                 Identifier i = CUP$Parser$stack.peek().<Identifier> value();
-                 RESULT = new ObjectInstantiation(i); 
+                 RESULT = new ObjectInstantiation(i); RESULT.setLocation(i); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("K",15, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1535,7 +1535,7 @@ class CUP$Parser$actions {
         case 47: // K ::= NULL 
             {
                 Expression RESULT = null;
-                 RESULT = new Null(); 
+                 RESULT = new Null(); RESULT.setLocation(parser.stack.peek()); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("K",15, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1691,7 +1691,7 @@ class CUP$Parser$actions {
                 int anstleft = CUP$Parser$stack.peek().left;
                 int anstright = CUP$Parser$stack.peek().right;
                 Integer anst = CUP$Parser$stack.peek().<Integer> value();
-                 RESULT = anst + 1; 
+                 RESULT = anst + 1;
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("array_no_size_type",24, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1919,7 +1919,7 @@ class CUP$Parser$actions {
                 int idleft = CUP$Parser$stack.peek().left;
                 int idright = CUP$Parser$stack.peek().right;
                 Identifier id = CUP$Parser$stack.peek().<Identifier> value();
-                 RESULT = id; 
+                 RESULT = id; RESULT.setLocation(id); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("object_expression",53, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1931,7 +1931,7 @@ class CUP$Parser$actions {
                 int idleft = CUP$Parser$stack.peek().left;
                 int idright = CUP$Parser$stack.peek().right;
                 Identifier id = CUP$Parser$stack.peek().<Identifier> value();
-                 RESULT = new ObjectInstantiation(id); 
+                 RESULT = new ObjectInstantiation(id); RESULT.setLocation(id); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("object_expression",53, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1943,7 +1943,7 @@ class CUP$Parser$actions {
                 int fcleft = CUP$Parser$stack.peek().left;
                 int fcright = CUP$Parser$stack.peek().right;
                 FunctionCall fc = CUP$Parser$stack.peek().<FunctionCall> value();
-                 RESULT = fc; 
+                 RESULT = fc;  RESULT.setLocation(fc); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("object_expression",53, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1955,7 +1955,7 @@ class CUP$Parser$actions {
                 int ofcleft = CUP$Parser$stack.peek().left;
                 int ofcright = CUP$Parser$stack.peek().right;
                 ObjectFunctionCall ofc = CUP$Parser$stack.peek().<ObjectFunctionCall> value();
-                 RESULT = ofc;
+                 RESULT = ofc;RESULT.setLocation(ofc); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("object_expression",53, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1967,7 +1967,7 @@ class CUP$Parser$actions {
                 int aileft = CUP$Parser$stack.peek().left;
                 int airight = CUP$Parser$stack.peek().right;
                 ArrayIndex ai = CUP$Parser$stack.peek().<ArrayIndex> value();
-                 RESULT = ai; 
+                 RESULT = ai; RESULT.setLocation(ai); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("object_expression",53, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1979,7 +1979,7 @@ class CUP$Parser$actions {
                 int ofleft = CUP$Parser$stack.peek().left;
                 int ofright = CUP$Parser$stack.peek().right;
                 ObjectField of = CUP$Parser$stack.peek().<ObjectField> value();
-                 RESULT = of; 
+                 RESULT = of; RESULT.setLocation(of); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("object_expression",53, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -1994,7 +1994,7 @@ class CUP$Parser$actions {
                 int fcleft = CUP$Parser$stack.peek().left;
                 int fcright = CUP$Parser$stack.peek().right;
                 FunctionCall fc = CUP$Parser$stack.peek().<FunctionCall> value();
-                 RESULT = new ObjectFunctionCall(fc.getIdentifier(), e, fc.getArguments()); 
+                 RESULT = new ObjectFunctionCall(fc.getIdentifier(), e, fc.getArguments()); RESULT.setLocation(e); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("object_function_call",54, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2009,7 +2009,7 @@ class CUP$Parser$actions {
                 int idleft = CUP$Parser$stack.peek().left;
                 int idright = CUP$Parser$stack.peek().right;
                 Identifier id = CUP$Parser$stack.peek().<Identifier> value();
-                 RESULT = new ObjectField(e, id); 
+                 RESULT = new ObjectField(e, id); RESULT.setLocation(e); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("object_field",55, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2318,7 +2318,7 @@ class CUP$Parser$actions {
                 int pcleft = CUP$Parser$stack.peek().left;
                 int pcright = CUP$Parser$stack.peek().right;
                 ProcedureCall pc = CUP$Parser$stack.peek().<ProcedureCall> value();
-                 RESULT = new ObjectProcedureCall(pc.getIdentifier(), e, pc.getArguments()); 
+                 RESULT = new ObjectProcedureCall(pc.getIdentifier(), e, pc.getArguments()); RESULT.setLocation(e); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("statement_no_semicolon",41, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;

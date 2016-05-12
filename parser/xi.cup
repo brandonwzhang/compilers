@@ -190,8 +190,8 @@ K ::= boolean_literal:b {: RESULT = b; RESULT.setLocation(b); :}
     | STRING_LITERAL:s {: RESULT = new StringLiteral(s); RESULT.setLocation(parser.stack.peek()); :}
     | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); RESULT.setLocation(parser.stack.peek()); :}
     | array_literal:al {: RESULT = al; RESULT.setLocation(al); :}
-    | NEW identifier:i {: RESULT = new ObjectInstantiation(i); :}
-    | NULL {: RESULT = new Null(); :}
+    | NEW identifier:i {: RESULT = new ObjectInstantiation(i); RESULT.setLocation(i); :}
+    | NULL {: RESULT = new Null(); RESULT.setLocation(parser.stack.peek()); :}
     ;
 
 
@@ -219,7 +219,7 @@ array_size_type ::= OPEN_BRACKET expression:e CLOSE_BRACKET array_size_type:ast 
                   | array_no_size_type:anst {: RESULT = new SimpleEntry<List<Expression>, Integer>(new LinkedList<>(), anst); :}
                   ;
 
-array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type:anst {: RESULT = anst + 1; :}
+array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type:anst {: RESULT = anst + 1;:}
                      | empty {: RESULT = 0; :}
                      ;
 
@@ -250,18 +250,18 @@ assignment_lhs_array ::= function_call:fc {: RESULT = fc; RESULT.setLocation(fc)
                        | assignment_lhs_array_brackets:a {: RESULT = a; RESULT.setLocation(a); :}
                        ;
 
-object_expression ::= identifier:id {: RESULT = id; :}
-                    | NEW identifier:id {: RESULT = new ObjectInstantiation(id); :}
-                    | function_call:fc {: RESULT = fc; :}
-                    | object_function_call:ofc {: RESULT = ofc;:}
-                    | assignment_lhs_array_brackets:ai {: RESULT = ai; :} 
-                    | object_field:of {: RESULT = of; :}
+object_expression ::= identifier:id {: RESULT = id; RESULT.setLocation(id); :}
+                    | NEW identifier:id {: RESULT = new ObjectInstantiation(id); RESULT.setLocation(id); :}
+                    | function_call:fc {: RESULT = fc;  RESULT.setLocation(fc); :}
+                    | object_function_call:ofc {: RESULT = ofc;RESULT.setLocation(ofc); :}
+                    | assignment_lhs_array_brackets:ai {: RESULT = ai; RESULT.setLocation(ai); :} 
+                    | object_field:of {: RESULT = of; RESULT.setLocation(of); :}
                     ;
 
-object_function_call ::= object_expression:e PERIOD function_call:fc {: RESULT = new ObjectFunctionCall(fc.getIdentifier(), e, fc.getArguments()); :}
+object_function_call ::= object_expression:e PERIOD function_call:fc {: RESULT = new ObjectFunctionCall(fc.getIdentifier(), e, fc.getArguments()); RESULT.setLocation(e); :}
                        ; 
 
-object_field ::= object_expression:e PERIOD identifier:id {: RESULT = new ObjectField(e, id); :}
+object_field ::= object_expression:e PERIOD identifier:id {: RESULT = new ObjectField(e, id); RESULT.setLocation(e); :}
                ; 
 
 assignment_lhs ::= identifier:id {: RESULT = id; RESULT.setLocation(parser.cur_token); :}
@@ -300,7 +300,7 @@ statement_no_semicolon ::= if_statement:s {: RESULT = s; RESULT.setLocation(s); 
                          | typed_declaration:td {: RESULT = td; RESULT.setLocation(td); :}
                          | assignment:a {: RESULT = a; RESULT.setLocation(a); :}
                          | return_statement:r {: RESULT = r; RESULT.setLocation(r); :}
-                         | object_expression:e PERIOD procedure_call:pc {: RESULT = new ObjectProcedureCall(pc.getIdentifier(), e, pc.getArguments()); :}
+                         | object_expression:e PERIOD procedure_call:pc {: RESULT = new ObjectProcedureCall(pc.getIdentifier(), e, pc.getArguments()); RESULT.setLocation(e); :}
                          ;
 
 //this should be okay since semicolon doesn't actually matter
