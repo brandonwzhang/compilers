@@ -668,16 +668,6 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Identifier node) {
-        // "this" variable always has the type of the class it's used in
-        // If "this" is used outside of a class, we throw an exception
-        if (node.getName().equals("this")) {
-            if (!currentClassType.isPresent()) {
-                throw new TypeException("'this' cannot be used outside of a class declaration",
-                        node.getRow(), node.getCol());
-            }
-            node.setType(currentClassType.get());
-            return;
-        }
         // Check if identifier is in context
         Type type = contexts.peek().get(node);
         if (type == null) {
@@ -1190,7 +1180,14 @@ public class TypeCheckVisitor implements NodeVisitor {
 
     // TODO
     public void visit(This node) {
-     // TODO
+        // "this" variable always has the type of the class it's used in
+        // If "this" is used outside of a class, we throw an exception
+        if (!currentClassType.isPresent()) {
+            throw new TypeException("'this' cannot be used outside of a class declaration",
+                    node.getRow(), node.getCol());
+        }
+        node.setType(currentClassType.get());
+        return;
     }
 
     /***
