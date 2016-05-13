@@ -22,8 +22,8 @@ public class Program extends Node {
 
     public List<FunctionDeclaration> getFunctionsFromUseStatement(String libPath) {
         List<FunctionDeclaration> declarations = new LinkedList<>();
+        Interface interf = new Interface();
         for (UseStatement useStatement : useBlock) {
-            Interface interf = new Interface();
             String error = InterfaceParser.parseInterface(libPath,
                     useStatement.getIdentifier().getName(), interf);
             declarations.addAll(interf.getFunctionDeclarations());
