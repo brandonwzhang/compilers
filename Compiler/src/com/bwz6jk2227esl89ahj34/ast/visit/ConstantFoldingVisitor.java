@@ -257,6 +257,10 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         stack.push(node);
     }
 
+    public void visit(Break node) {
+        // TODO
+    }
+
     /**
      * cast the character literal into its corresponding int value,
      * and add the int value to the list
@@ -458,6 +462,9 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         stack.push(arr);
     }
 
+    public void visit(This node) {
+        // TODO
+    }
     /**
      * for a typed declaration, if the declaration involves a fixed size
      * arrays, then we visit each expression that specifies the size of

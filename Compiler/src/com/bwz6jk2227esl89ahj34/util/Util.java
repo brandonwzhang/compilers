@@ -103,6 +103,8 @@ public class Util {
         put(ParserSym.NEW,"new");
                 put(ParserSym.PERIOD, ".");
                 put(ParserSym.NULL, "null");
+                put(ParserSym.THIS, "this");
+                put(ParserSym.BREAK, "break");
     }};
 
     /**

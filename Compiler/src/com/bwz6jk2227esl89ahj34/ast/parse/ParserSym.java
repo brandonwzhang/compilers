@@ -30,6 +30,7 @@ public class ParserSym {
   public static final int OPEN_PAREN = 33;
   public static final int AND = 26;
   public static final int PERIOD = 47;
+  public static final int THIS = 49;
   public static final int CLOSE_PAREN = 34;
   public static final int PLUS = 16;
   public static final int LENGTH = 43;
@@ -106,7 +107,8 @@ public class ParserSym {
   "EXTENDS",
   "NEW",
   "PERIOD",
-  "NULL"
+  "NULL",
+  "THIS"
   };
 }
 

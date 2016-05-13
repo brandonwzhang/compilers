@@ -40,7 +40,7 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW, PERIOD, NULL;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW, PERIOD, NULL, THIS;
 
 nonterminal Program program;
 
@@ -192,6 +192,7 @@ K ::= boolean_literal:b {: RESULT = b; RESULT.setLocation(b); :}
     | array_literal:al {: RESULT = al; RESULT.setLocation(al); :}
     | NEW identifier:i {: RESULT = new ObjectInstantiation(i); RESULT.setLocation(i); :}
     | NULL {: RESULT = new Null(); RESULT.setLocation(parser.stack.peek()); :}
+    | THIS {: RESULT = new This(); RESULT.setLocation(parser.stack.peek()); :}
     ;
 
 
@@ -256,6 +257,7 @@ object_expression ::= identifier:id {: RESULT = id; RESULT.setLocation(id); :}
                     | object_function_call:ofc {: RESULT = ofc;RESULT.setLocation(ofc); :}
                     | assignment_lhs_array_brackets:ai {: RESULT = ai; RESULT.setLocation(ai); :} 
                     | object_field:of {: RESULT = of; RESULT.setLocation(of); :}
+                    | THIS {: RESULT = new This(); RESULT.setLocation(parser.stack.peek()); :}
                     ;
 
 object_function_call ::= object_expression:e PERIOD function_call:fc {: RESULT = new ObjectFunctionCall(fc.getIdentifier(), e, fc.getArguments()); RESULT.setLocation(e); :}
@@ -301,6 +303,7 @@ statement_no_semicolon ::= if_statement:s {: RESULT = s; RESULT.setLocation(s); 
                          | assignment:a {: RESULT = a; RESULT.setLocation(a); :}
                          | return_statement:r {: RESULT = r; RESULT.setLocation(r); :}
                          | object_expression:e PERIOD procedure_call:pc {: RESULT = new ObjectProcedureCall(pc.getIdentifier(), e, pc.getArguments()); RESULT.setLocation(e); :}
+                         | BREAK {: RESULT = new Break(); RESULT.setLocation(parser.cur_token); :}
                          ;
 
 //this should be okay since semicolon doesn't actually matter

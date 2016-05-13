@@ -393,6 +393,11 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new BoolType());
     }
 
+    // TODO: check if it occurs inside loop?
+    public void visit(Break node) {
+
+    }
+
     /**
      * CharacterLiteral has type int.
      * @param node
@@ -1129,6 +1134,11 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public void visit(StringLiteral node) {
         node.setType(new ArrayType(new IntType(), 1));
+    }
+
+    // TODO
+    public void visit(This node) {
+     // TODO
     }
 
     /***

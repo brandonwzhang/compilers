@@ -66,6 +66,10 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom(node.getValue().toString());
     }
 
+    public void visit(Break node) {
+        // TODO
+    }
+
     public void visit(CharacterLiteral node) {
         printer.printAtom("'" + node.getValue() + "'");
     }
@@ -217,6 +221,9 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom("\"" + node.getValue() + "\"");
     }
 
+    public void visit(This node) {
+        //TODO
+    }
 
     public void printType(VariableType node) {
         if (!(node instanceof ArrayType)) {

@@ -9,6 +9,7 @@ public interface NodeVisitor {
     void visit(Binary node);
     void visit(BlockList node);
     void visit(BooleanLiteral node);
+    void visit(Break node);
     void visit(CharacterLiteral node);
     void visit(ClassDeclaration node);
     void visit(FunctionCall node);
@@ -26,6 +27,7 @@ public interface NodeVisitor {
     void visit(Program node);
     void visit(ReturnStatement node);
     void visit(StringLiteral node);
+    void visit(This node);
     void visit(TypedDeclaration node);
     void visit(Unary node);
     void visit(Underscore node);

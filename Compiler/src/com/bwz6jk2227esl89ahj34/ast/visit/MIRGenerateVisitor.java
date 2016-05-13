@@ -456,6 +456,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
         generatedNodes.push(new IRConst(node.getValue() ? 1l : 0l));
     }
 
+    public void visit(Break node) {
+        // TODO:
+    }
+
     public void visit(CharacterLiteral node) {
         generatedNodes.push(new IRConst((long) node.getValue()));
     }
@@ -929,6 +933,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
         loopStatements.add(exitLabel);
         statements.add(new IRSeq(loopStatements));
         return statements;
+    }
+
+    public void visit(This node) {
+        // TODO
     }
 
     public void visit(TypedDeclaration node) {
