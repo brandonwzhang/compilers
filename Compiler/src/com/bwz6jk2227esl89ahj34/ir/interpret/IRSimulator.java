@@ -104,7 +104,7 @@ public class IRSimulator {
         indexToInsn = imb.indexToInsn();
         insnToIndex = imb.insnToIndex();
         nameToIndex = imb.nameToIndex();
-        ctors = imb.ctors();
+        ctors = compUnit.ctors();
 
         for (int i = 0; i < ctors.size(); ++i)
             call(ctors.get(i), new long[] {});

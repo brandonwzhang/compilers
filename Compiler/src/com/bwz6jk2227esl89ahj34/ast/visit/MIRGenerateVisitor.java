@@ -27,6 +27,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
     private Map<Identifier, List<Identifier>> classFields = new HashMap<>();
     // Map from class name to class
     private Map<Identifier, ClassDeclaration> classes = new HashMap<>();
+    // Set of all global variables
+    private Map<Identifier, VariableType> globalVariables = new HashMap<>();
 
     public MIRGenerateVisitor(String name) {
         this.name = name;
@@ -561,6 +563,12 @@ public class MIRGenerateVisitor implements NodeVisitor {
         }
         // else we could be 1) not inside a class 2) using a variable that's not an instance var
         // use the identifier as the name of the temp
+        // If the identifier is a global variable, we have to return its memory location
+        if (globalVariables.containsKey(node)) {
+            generatedNodes.push(new IRMem(
+                    new IRName(Util.getIRGlobalVariableName(node, globalVariables.get(node)))));
+            return;
+        }
         generatedNodes.push(new IRTemp(node.getName()));
     }
     public void visit(IfStatement node) {
@@ -791,10 +799,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     private void addFields(ClassDeclaration cd) {
-        if (classFields.containsKey(cd.getIdentifier())) {
-            // The fields for this class have already been computed
-            return;
-        }
         List<Identifier> fields = new LinkedList<>();
 
         for (TypedDeclaration td : cd.getFields()) {
@@ -843,6 +847,95 @@ public class MIRGenerateVisitor implements NodeVisitor {
         dispatchVectors.put(cd.getIdentifier(), dispatchVector);
     }
 
+    /**
+     * Constructs an adjacency list representing the class hierarchy. Parent
+     * classes point to their subclasses.
+     */
+    private Map<Identifier, List<Identifier>> constructClassHierarchyGraph(List<ClassDeclaration> cds) {
+        Map<Identifier, List<Identifier>> graph = new HashMap<>();
+        // First, populate the map with empty lists for each class
+        for (ClassDeclaration cd : cds) {
+            graph.put(cd.getIdentifier(), new LinkedList<>());
+        }
+        // Then, determine the direct subclasses for each class by adding each
+        // class to its parent's adjacency list
+        for (ClassDeclaration cd : cds) {
+            if (cd.getParentIdentifier().isPresent()) {
+                graph.get(cd.getParentIdentifier().get()).add(cd.getIdentifier());
+            }
+        }
+        return graph;
+    }
+
+    /**
+     * Construct the functions to initialize the size of each class.
+     * Each class calls the initialization for its subclasses after it has been
+     * initialized.
+     */
+    private List<IRFuncDecl> constructClassInitializationFunctions(List<ClassDeclaration> cds) {
+        // We need the class hierarchy to determine the order in which we call functions
+        Map<Identifier, List<Identifier>> hierarchyGraph = constructClassHierarchyGraph(cds);
+
+        List<IRFuncDecl> functions = new LinkedList<>();
+        for (ClassDeclaration cd : cds) {
+            List<IRStmt> stmts = new LinkedList<>();
+            // If the class has a parent class, we add the number of fields * WORD_SIZE to
+            // the size of the parent class.
+            // Otherwise, we add it to 1.
+            Identifier identifier = cd.getIdentifier();
+            IRExpr fieldSize = new IRConst(classFields.get(identifier).size() * Configuration.WORD_SIZE);
+            // Either the size of the parent or 1 for the base size of the object
+            IRExpr baseSize = cd.getParentIdentifier().isPresent() ?
+                    new IRMem(new IRName("_I_size_" + cd.getParentIdentifier().get().getName())) : new IRConst(1);
+            IRExpr size = new IRBinOp(OpType.ADD, fieldSize, baseSize);
+            stmts.add(new IRMove(new IRMem(new IRName("_I_size_" + identifier.getName())), size));
+
+            // We need to call the initialization functions for subclasses
+            List<Identifier> subclasses = hierarchyGraph.get(identifier);
+            for (Identifier subclass : subclasses) {
+                stmts.add(new IRExp(new IRCall(new IRName("_I_init_" + subclass.getName()))));
+            }
+            functions.add(new IRFuncDecl("_I_init_" + identifier.getName(), new IRSeq(stmts)));
+        }
+
+        return functions;
+    }
+
+    /**
+     * Construct the function to initialize all global variables
+     */
+    private IRFuncDecl constructGlobalInitializationFunction(List<Assignment> assignments) {
+        List<IRStmt> stmts = new LinkedList<>();
+        // First initialize all ints, bools, and classes
+        for (Assignment assignment : assignments) {
+            assert assignment.getVariables().size() == 1;
+            assert assignment.getVariables().get(0) instanceof TypedDeclaration;
+            TypedDeclaration td = (TypedDeclaration) assignment.getVariables().get(0);
+            if (td.getDeclarationType() instanceof ArrayType) {
+                // Ignore arrays for now
+                continue;
+            }
+            assignment.accept(this);
+            assert generatedNodes.peek() instanceof IRStmt;
+            stmts.add((IRStmt) generatedNodes.pop());
+        }
+        // Initialize all arrays after in case they rely on values of ints
+        for (Assignment assignment : assignments) {
+            assert assignment.getVariables().size() == 1;
+            assert assignment.getVariables().get(0) instanceof TypedDeclaration;
+            TypedDeclaration td = (TypedDeclaration) assignment.getVariables().get(0);
+            if (!(td.getDeclarationType() instanceof ArrayType)) {
+                // All other types have been initialized already
+                continue;
+            }
+            assignment.accept(this);
+            assert generatedNodes.peek() instanceof IRStmt;
+            stmts.add((IRStmt) generatedNodes.pop());
+        }
+        return new IRFuncDecl("_I_init_" + name, new IRSeq(stmts));
+    }
+
+
     public void visit(Program node) {
         Map<String, IRFuncDecl> functions = new LinkedHashMap<>();
 
@@ -855,6 +948,14 @@ public class MIRGenerateVisitor implements NodeVisitor {
         for (ClassDeclaration cd : node.getClassDeclarations()) {
             addDispatchVector(cd);
             addFields(cd);
+        }
+
+        // Add all global variables to the globalVariables set
+        for (Assignment global : node.getGlobalVariables()) {
+            assert global.getVariables().size() == 1;
+            assert global.getVariables().get(0) instanceof TypedDeclaration;
+            TypedDeclaration td = (TypedDeclaration) global.getVariables().get(0);
+            globalVariables.put(td.getIdentifier(), td.getDeclarationType());
         }
 
         // Add methods to functions map
@@ -876,7 +977,35 @@ public class MIRGenerateVisitor implements NodeVisitor {
             functions.put(Util.getIRFunctionName(fd), (IRFuncDecl) generatedNodes.pop());
         }
 
-        root = new IRCompUnit(name, functions);
+        // Construct all of the initialization functions
+        List<IRFuncDecl> classInitializationFunctions = constructClassInitializationFunctions(node.getClassDeclarations());
+        for (IRFuncDecl funcDecl : classInitializationFunctions) {
+            functions.put(funcDecl.name(), funcDecl);
+        }
+        IRFuncDecl globalInitializationFunction = constructGlobalInitializationFunction(node.getGlobalVariables());
+        functions.put(globalInitializationFunction.name(), globalInitializationFunction);
+
+        // Add initializtion functions to the ctors list
+        List<String> ctors = new LinkedList<>();
+        // We always need to call the global initialization function
+        ctors.add(globalInitializationFunction.name());
+        // We only need to call the class initialization functions that won't be
+        // called by other initialization functions (the roots of the class hierarchy).
+        Map<Identifier, List<Identifier>> classHierarchy = constructClassHierarchyGraph(node.getClassDeclarations());
+        for (ClassDeclaration cd : node.getClassDeclarations()) {
+            Identifier identifier = cd.getIdentifier();
+            boolean isRoot = true;
+            for (List<Identifier> subclasses : classHierarchy.values()) {
+                if (subclasses.contains(identifier)) {
+                    isRoot = false;
+                }
+            }
+            if (isRoot) {
+                ctors.add("_I_init_" + identifier.getName());
+            }
+        }
+
+        root = new IRCompUnit(name, functions, ctors);
         assert generatedNodes.empty();
     }
 

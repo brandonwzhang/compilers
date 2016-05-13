@@ -370,6 +370,10 @@ public class Util {
         return typeString;
     }
 
+    public static String getIRGlobalVariableName(Identifier identifier, VariableType type) {
+        return "_I_g_" + identifier.getName() + "_" + getTypeString(type);
+    }
+
     public static String getIRFunctionName(FunctionDeclaration node) {
         String funcName = node.getIdentifier().getName();
         FunctionType funcType = node.getFunctionType();

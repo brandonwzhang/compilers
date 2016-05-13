@@ -5,6 +5,8 @@ import com.bwz6jk2227esl89ahj34.ir.visit.IRVisitor;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.SExpPrinter;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,15 +15,24 @@ import java.util.Map;
 public class IRCompUnit extends IRNode {
     private String name;
     private Map<String, IRFuncDecl> functions;
+    private List<String> ctors;
 
     public IRCompUnit(String name) {
         this.name = name;
         functions = new LinkedHashMap<>();
+        ctors = new LinkedList<>();
     }
 
     public IRCompUnit(String name, Map<String, IRFuncDecl> functions) {
         this.name = name;
         this.functions = functions;
+        ctors = new LinkedList<>();
+    }
+
+    public IRCompUnit(String name, Map<String, IRFuncDecl> functions, List<String> ctors) {
+        this.name = name;
+        this.functions = functions;
+        this.ctors = ctors;
     }
 
     /**
@@ -47,6 +58,10 @@ public class IRCompUnit extends IRNode {
 
     public IRFuncDecl getFunction(String name) {
         return functions.get(name);
+    }
+
+    public List<String> ctors() {
+        return ctors;
     }
 
     @Override
