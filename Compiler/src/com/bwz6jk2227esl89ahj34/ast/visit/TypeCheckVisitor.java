@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34.ast.visit;
 
 import com.bwz6jk2227esl89ahj34.ast.*;
+import com.bwz6jk2227esl89ahj34.ast.parse.Interface;
 import com.bwz6jk2227esl89ahj34.ast.parse.InterfaceParser;
 import com.bwz6jk2227esl89ahj34.ast.type.*;
 
@@ -1264,12 +1265,16 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public String addInterface(String libPath, String interfaceName,
                                Context context) {
+        // If we already parsed this interface, ignore
         if (parsedInterfaces.contains(interfaceName)) {
             return "";
         }
-        List<FunctionDeclaration> declarations = new LinkedList<>();
+        // TODO: traverse use statements
+        Interface interface69 = new Interface();
         String error = InterfaceParser.parseInterface(libPath,
-                interfaceName, declarations);
+                interfaceName, interface69);
+        List<FunctionDeclaration> declarations = interface69.getFunctionDeclarations();
+
         // Read in each function declaration
         for (FunctionDeclaration declaration : declarations) {
             // Error if function already exists in context with different type

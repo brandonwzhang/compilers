@@ -31,7 +31,7 @@ public class InterfaceParser
 
   @Override
   public final Class<?> getSymbolContainer() {
-    return ParserSym.class;
+    return InterfaceParserSym.class;
   }
 
   /** Default constructor. */
@@ -201,10 +201,10 @@ public class InterfaceParser
      * Parses an interface file and adds the declarations to a given list
      * @param libPath       a String of the path to the interface files
      * @param interfaceName a String of the name of the interface
-     * @param declarations  a List<FunctionDeclaration> to store the parsed function declarations that must be empty
+     * @param inter A reference to an interface that gets set by this function 
      * @return              a String of the error or null if no error
      */
-    public static String parseInterface(String libPath, String interfaceName, List<FunctionDeclaration> declarations) {
+    public static String parseInterface(String libPath, String interfaceName, Interface inter) {
         try {
             FileReader reader = new FileReader(libPath + interfaceName + ".ixi");
             Lexer lexer = new Lexer(reader);
@@ -214,9 +214,7 @@ public class InterfaceParser
                 // Encountered parsing error, return error message
                 return parser.syntaxErrMessage;
             }
-            Interface i = (Interface) result.value;
-            // TODO: DON'T USE FUNCTION DECLARATION LIST
-            declarations.addAll(i.getFunctionDeclarations());
+            inter = (Interface) result.value; 
         } catch(Exception e) {
             return "Interface " + interfaceName + " not found";
         }
