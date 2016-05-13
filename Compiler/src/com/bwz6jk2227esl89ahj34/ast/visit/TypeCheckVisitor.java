@@ -1269,13 +1269,24 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (parsedInterfaces.contains(interfaceName)) {
             return "";
         }
-        // TODO: traverse use statements
+        parsedInterfaces.add(interfaceName);
+
         Interface interface69 = new Interface();
         String error = InterfaceParser.parseInterface(libPath,
                 interfaceName, interface69);
-        List<FunctionDeclaration> declarations = interface69.getFunctionDeclarations();
+        if (error != null) {
+            return error;
+        }
 
-        // Read in each function declaration
+        // Read in each interface's use blocks recursively
+        for(UseStatement use : interface69.getUseBlock()) {
+            if (addInterface(libPath, use.getIdentifier().getName(), context) != null) {
+                throw new TypeException(error); // TODO: minorly sketched out by these 3 lines
+            }
+        }
+
+        // Read in each function declaration, add to context
+        List<FunctionDeclaration> declarations = interface69.getFunctionDeclarations();
         for (FunctionDeclaration declaration : declarations) {
             // Error if function already exists in context with different type
             FunctionType existingDeclarationType =
@@ -1291,6 +1302,12 @@ public class TypeCheckVisitor implements NodeVisitor {
             // Add the declaration to the context otherwise
             context.put(declaration.getIdentifier(), declaration.getFunctionType());
         }
+
+        // Save all classes
+        for (ClassDeclaration cd : interface69.getClassDeclarations()) {
+            classes.put(cd.getIdentifier(), cd);
+        }
+
         return error;
     }
 
