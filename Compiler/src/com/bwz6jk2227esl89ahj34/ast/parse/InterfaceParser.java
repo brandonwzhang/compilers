@@ -214,7 +214,8 @@ public class InterfaceParser
                 // Encountered parsing error, return error message
                 return parser.syntaxErrMessage;
             }
-            Interface i = (Interface) result.value; 
+            Interface i = (Interface) result.value;
+            // TODO: DON'T USE FUNCTION DECLARATION LIST
             declarations.addAll(i.getFunctionDeclarations());
         } catch(Exception e) {
             return "Interface " + interfaceName + " not found";
