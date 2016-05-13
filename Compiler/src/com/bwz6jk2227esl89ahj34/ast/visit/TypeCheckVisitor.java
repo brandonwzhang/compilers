@@ -1027,7 +1027,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             // No error, so we'll check that the class declarations match the ones in this module
             for (ClassDeclaration cd : interface4120.getClassDeclarations()) {
                 if (!classes.containsKey(cd.getIdentifier())) {
-                    throw new TypeException("Interface does not match class declarations in this file"); // TODO
+                    continue;
                 }
                 ClassDeclaration cd_ = classes.get(cd.getIdentifier());
 
