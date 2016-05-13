@@ -26,6 +26,9 @@ public class Program extends Node {
         for (UseStatement useStatement : useBlock) {
             String error = InterfaceParser.parseInterface(libPath,
                     useStatement.getIdentifier().getName(), interf);
+            if (error != null) {
+                throw new RuntimeException(error);
+            }
             declarations.addAll(interf.getFunctionDeclarations());
         }
         return declarations;
