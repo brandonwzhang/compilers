@@ -469,6 +469,18 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(FunctionCall node) {
+        // If we're inside a class, check if the function called is a method
+        if (currentClassID.isPresent()) {
+            Identifier className = currentClassID.get();
+            int methodIndex = getMethodIndex(className, node.getIdentifier());
+            if (methodIndex >= 0) {
+                // Generate a ObjectFunctionCall if we're calling a method
+                ObjectFunctionCall objectFunctionCall =
+                        new ObjectFunctionCall(node.getIdentifier(), new Identifier("this"), node.getArguments());
+                objectFunctionCall.accept(this);
+                return;
+            }
+        }
         List<IRExpr> arguments = new ArrayList<>();
         List<VariableType> argTypeList = new ArrayList<>();
         // Store all arguments in a list
@@ -641,6 +653,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
         generatedNodes.push(new IRMem(fieldAddress));
     }
 
+    /**
+     * Returns the index of the method in the dispatch vector. Returns -1 if not found.
+     */
     private int getMethodIndex(Identifier objectClass, Identifier methodIdentifier) {
         int methodIndex = -1;
         List<MethodDeclaration> dispatchVector = dispatchVectors.get(objectClass);
@@ -652,7 +667,6 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 break;
             }
         }
-        assert methodIndex >= 0;
         return methodIndex;
     }
 
@@ -683,6 +697,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         assert node.getObject().getType() instanceof ClassType;
         Identifier objectClass = ((ClassType) node.getObject().getType()).getIdentifier();
         int methodIndex = getMethodIndex(objectClass, node.getIdentifier());
+        assert methodIndex >= 0;
         IRExpr method = new IRMem(new IRBinOp(OpType.ADD, dispatchVectorLocation,
                 new IRConst(Configuration.WORD_SIZE * methodIndex)));
 
@@ -742,6 +757,18 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(ProcedureCall node) {
+        // If we're inside a class, check if the procedure called is a method
+        if (currentClassID.isPresent()) {
+            Identifier className = currentClassID.get();
+            int methodIndex = getMethodIndex(className, node.getIdentifier());
+            if (methodIndex >= 0) {
+                // Generate a ObjectProcedureCall if we're calling a method
+                ObjectProcedureCall objectProcedureCall =
+                        new ObjectProcedureCall(node.getIdentifier(), new Identifier("this"), node.getArguments());
+                objectProcedureCall.accept(this);
+                return;
+            }
+        }
         List<IRExpr> arguments = new ArrayList<>();
         List<VariableType> argTypeList = new ArrayList<>();
         // Store all arguments in a list

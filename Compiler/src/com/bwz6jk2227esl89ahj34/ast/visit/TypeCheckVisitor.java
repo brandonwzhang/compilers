@@ -457,16 +457,22 @@ public class TypeCheckVisitor implements NodeVisitor {
             td.accept(this);
         }
 
-        // Check if any methods are overridden incorrectly
+        // Make sure there are no duplicate methods and add them to the context
         Set<Identifier> seenMethods = new HashSet<>();
         for (MethodDeclaration md : node.getMethods()) {
             FunctionDeclaration fd = md.getFunctionDeclaration();
-            // Make sure methods aren't declared multiple times in same class
             if (seenMethods.contains(fd.getIdentifier())) {
                 throw new TypeException("Method " + fd.getIdentifier().getName() + " declared multiple times in class",
                         fd.getRow(), fd.getCol());
             }
             seenMethods.add(fd.getIdentifier());
+            contexts.peek().put(fd.getIdentifier(), fd.getFunctionType());
+        }
+
+        // Check if any methods are overridden incorrectly
+        for (MethodDeclaration md : node.getMethods()) {
+            FunctionDeclaration fd = md.getFunctionDeclaration();
+            // Make sure methods aren't declared multiple times in same class
             if (node.getParentIdentifier().isPresent()) {
                 Identifier parentName = node.getParentIdentifier().get();
                 ClassDeclaration parentClass = classes.get(parentName);
