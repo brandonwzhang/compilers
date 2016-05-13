@@ -1037,6 +1037,10 @@ public class TypeCheckVisitor implements NodeVisitor {
                     throw new TypeException("Interface contains class whose parent does not match"); // TODO loc
                 }
                 // Ignore fields
+
+
+                // Checks pass, so overwrite our existing definition with the interface one (to use that order)
+                classes.put(cd.getIdentifier(), cd);
             }
 
             // TODO: also check that the function declarations match?
