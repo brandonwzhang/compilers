@@ -10,6 +10,8 @@ import java.util.*;
 public class TypeCheckVisitor implements NodeVisitor {
     // Path to interface files
     private String libPath;
+    // Name of the current file
+    private String moduleName;
 
     // Maintain a stack of contexts (identifier -> type map) for scoping
     private Stack<Context> contexts = new Stack<>();
@@ -28,7 +30,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      * Constructor for TypeCheckVisitor
      * @param libPath the directory for where to find the interface files.
      */
-    public TypeCheckVisitor(String libPath) {
+    public TypeCheckVisitor(String libPath, String fileName) {
         // initialize first context with length function, int[] -> int
         // when it should take bool[]. We handle this later below
         Context initContext = new Context();
@@ -39,6 +41,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         contexts.push(initContext);
 
         this.libPath = libPath;
+        this.moduleName = fileName;
     }
 
     /**
@@ -1009,6 +1012,41 @@ public class TypeCheckVisitor implements NodeVisitor {
             //funcName.accept(this);
             funcName.setType(funcType);
         }
+
+
+        // Look for an interface file for this file, doesn't need to exist
+        Interface interface4120 = new Interface();
+        String err = InterfaceParser.parseInterface(libPath, moduleName, interface4120);
+        if (err == null) {
+            // No error, so we'll check that the class declarations match the ones in this module
+            for (ClassDeclaration cd : interface4120.getClassDeclarations()) {
+                if (!classes.containsKey(cd.getIdentifier())) {
+                    throw new TypeException("Interface does not match class declarations in this file"); // TODO
+                }
+                ClassDeclaration cd_ = classes.get(cd.getIdentifier());
+
+                // Check Method Declarations match
+                for (MethodDeclaration m : cd.getMethods()) {
+                    if (!cd_.getMethods().contains(m)) {
+                        throw new TypeException("Interface contains class methods that do not match"); // TODO loc
+                    }
+                }
+
+                // Check inheritance matches
+                if (!cd.getParentIdentifier().equals(cd_.getParentIdentifier())) {
+                    throw new TypeException("Interface contains class whose parent does not match"); // TODO loc
+                }
+                // Ignore fields
+            }
+
+            // TODO: also check that the function declarations match?
+        }
+        if (!err.contains("not found")) {
+            // Some error other than interface file not found
+            throw new TypeException(err);
+        }
+        // Else interface file was not found, ignore and continue
+
 
         // Add function declarations from interface files
         for (UseStatement useStatement : node.getUseBlock()) {

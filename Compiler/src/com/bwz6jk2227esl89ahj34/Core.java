@@ -148,7 +148,7 @@ public class Core {
     public static Optional<Program> typeCheck(String file, Program program) {
 
         List<String> lines = new ArrayList<>();
-        NodeVisitor visitor = new TypeCheckVisitor(Main.libPath());
+        NodeVisitor visitor = new TypeCheckVisitor(Main.libPath(), file);
         boolean typed = false;
         try {
             program.accept(visitor);
@@ -190,7 +190,7 @@ public class Core {
             NodeVisitor cfv = new ConstantFoldingVisitor();
             program.accept(cfv);
             // annotate the new nodes with types
-            NodeVisitor tcv = new TypeCheckVisitor(Main.libPath());
+            NodeVisitor tcv = new TypeCheckVisitor(Main.libPath(), file);
             program.accept(tcv);
         }
 
