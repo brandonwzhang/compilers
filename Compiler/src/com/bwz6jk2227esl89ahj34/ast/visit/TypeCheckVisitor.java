@@ -985,6 +985,11 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Program node) {
+        // Add function declarations from interface files
+        for (UseStatement useStatement : node.getUseBlock()) {
+            useStatement.accept(this);
+        }
+
         // Populate the classes map first incase any functions use objects
         for (ClassDeclaration classDec : node.getClassDeclarations()) {
             Identifier className = classDec.getIdentifier();
@@ -1068,11 +1073,6 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
         // Else interface file was not found, ignore and continue
 
-
-        // Add function declarations from interface files
-        for (UseStatement useStatement : node.getUseBlock()) {
-            useStatement.accept(this);
-        }
 
         // Add all global variables to context
         for (Assignment global : node.getGlobalVariables()) {
