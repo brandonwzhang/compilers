@@ -59,7 +59,7 @@ public class AssemblyMemoryLocation extends AssemblyExpression {
 
     @Override
     public String toString() {
-        assert !((displacement == 0) && (offsetName == null)); // can't have both available
+        assert !((displacement != 0) && (offsetName != null)); // can't have both available
 
         // syntax is displacement(base register, offset register, scalar multiplier)
         String s = "";

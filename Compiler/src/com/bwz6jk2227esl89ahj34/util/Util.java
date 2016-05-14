@@ -401,7 +401,7 @@ public class Util {
     }
 
     public static String getIRMethodName(MethodDeclaration node) {
-        return node.getClassIdentifier() + "$" + getIRFunctionName(node.getFunctionDeclaration());
+        return node.getClassIdentifier().getName() + "$" + getIRFunctionName(node.getFunctionDeclaration());
     }
 
     public static List<AssemblyLine> removeComments(List<AssemblyLine> lst) {
