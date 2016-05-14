@@ -1,0 +1,9 @@
+match(t:int[], p:int[]) : int
+
+begin(t:int[], p:int[]) : int[]
+
+next(t:int[], p:int[], pi:int[], i:int):int
+
+matcher(t:int[], p:int[], pi:int[], i_:int) : int
+
+prefix(p:int[]) : int[]
