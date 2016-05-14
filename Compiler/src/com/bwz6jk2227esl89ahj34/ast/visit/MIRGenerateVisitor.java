@@ -906,6 +906,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
             for (Identifier subclass : subclasses) {
                 stmts.add(new IRExp(new IRCall(new IRName("_I_init_" + subclass.getName()))));
             }
+            stmts.add(new IRReturn());
+
+            // Add the function to the list
             functions.add(new IRFuncDecl("_I_init_" + identifier.getName(), new IRSeq(stmts)));
         }
 
@@ -950,6 +953,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             assert generatedNodes.peek() instanceof IRStmt;
             stmts.add((IRStmt) generatedNodes.pop());
         }
+        stmts.add(new IRReturn());
         return new IRFuncDecl("_I_init_" + name, new IRSeq(stmts));
     }
 
