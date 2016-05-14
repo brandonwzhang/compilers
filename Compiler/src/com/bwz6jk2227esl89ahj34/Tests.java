@@ -45,9 +45,9 @@ public class Tests {
             String fileName = file.substring(0, file.lastIndexOf('.'));
 
             String[] irNoOptCommand = {Util.rootPath + "/xic", "-libpath",
-                    Util.rootPath + "/lib", "--irrun", "-O", "tests/" + file};
+                    Util.rootPath + "/lib", "--irrun", "-target", "macos", "-O", "tests/" + file};
             String[] optCommand = {Util.rootPath + "/xic", "-libpath",
-                    Util.rootPath + "/lib", "tests/" + file};
+                    Util.rootPath + "/lib", "-target", "macos", "tests/" + file};
             String[] assemblyCommand = {"./tests/" + fileName};
             // Run the IR and executable and print the outputs
             System.out.println("***************" + file + "***************");

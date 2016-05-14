@@ -98,7 +98,7 @@ public class IRCompUnit extends IRNode {
             results.put(newFunc.name(), newFunc);
         }
 
-        if (modified) return new IRCompUnit(name, results);
+        if (modified) return new IRCompUnit(name, results, ctors, data);
 
         return this;
     }
