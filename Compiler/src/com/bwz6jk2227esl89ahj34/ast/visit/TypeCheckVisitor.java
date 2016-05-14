@@ -342,6 +342,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             if (lefttype.isNullable()) {
                 if (righttype.isNullable()) {
                     node.setType(new BoolType());
+                    return;
                 }
                 else {
                     throw new TypeException("Both operands for == or != need to be Objects or Null", left.getRow(), left.getCol());
