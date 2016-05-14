@@ -3,18 +3,14 @@ use io
 delay() {
     frame_length:int = 100000
 
-    i:int = 0;
-    while(i < frame_length * 1000) {
-        i = i + 1
+    for(i:int = 0; i < frame_length * 1000; i = i + 1) {
     }
 }
 
 clear() {
     lines:int = 50
-    i:int = 0
-    while(i < lines){
+    for(i:int = 0; i < lines; i = i + 1) {
         println("")
-        i = i + 1
     }
 }
 

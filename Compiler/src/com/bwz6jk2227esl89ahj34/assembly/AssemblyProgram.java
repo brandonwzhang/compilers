@@ -28,6 +28,9 @@ public class AssemblyProgram {
 
         // Get the maximum number of return values and arguments in all functions
         for (String functionName : root.functions().keySet()) {
+            if (functionName.startsWith("_I_init")) {
+                continue;
+            }
             AssemblyFunction.maxNumReturnValues =
                     Math.max(AssemblyFunction.maxNumReturnValues, numReturnValues(functionName));
             AssemblyFunction.maxNumArguments =

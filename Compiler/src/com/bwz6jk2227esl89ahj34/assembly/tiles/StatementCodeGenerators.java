@@ -397,15 +397,14 @@ public class StatementCodeGenerators {
             }
         }
 
-         // Get function name
-        AssemblyExpression name = translateExpression(castedNode.target(), lines, true);
-        assert name instanceof AssemblyName;
+         // Get function
+        AssemblyExpression target = translateExpression(castedNode.target(), lines, true);
 
         // Add the call instruction to lines
         lines.add(
                 new AssemblyInstruction(
                         OpCode.CALLQ,
-                        name
+                        target
                 )
         );
     }
