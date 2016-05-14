@@ -711,13 +711,13 @@ public class MIRGenerateVisitor implements NodeVisitor {
             arguments.add(argument);
         }
 
-        IRMem dispatchVectorAddress = new IRMem(new IRMem(objectTemp));
+        IRMem dispatchVectorAddress = new IRMem(objectTemp);
         assert node.getObject().getType() instanceof ClassType;
         Identifier objectClass = ((ClassType) node.getObject().getType()).getIdentifier();
         int methodIndex = getMethodIndex(objectClass, node.getIdentifier());
         assert methodIndex >= 0;
-        IRExpr method = new IRBinOp(OpType.ADD, dispatchVectorAddress,
-                new IRConst(Configuration.WORD_SIZE * methodIndex));
+        IRExpr method = new IRMem(new IRBinOp(OpType.ADD, dispatchVectorAddress,
+                new IRConst(Configuration.WORD_SIZE * methodIndex)));
 
 
         // Pass the function name and arguments to an IRCall
@@ -761,11 +761,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
             arguments.add(argument);
         }
 
-        IRMem dispatchVectorAddress = new IRMem(new IRMem(objectTemp));
+        IRMem dispatchVectorAddress = new IRMem(objectTemp);
         Identifier objectClass = ((ClassType) node.getObject().getType()).getIdentifier();
         int methodIndex = getMethodIndex(objectClass, node.getIdentifier());
-        IRExpr method = new IRBinOp(OpType.ADD, dispatchVectorAddress,
-                new IRConst(Configuration.WORD_SIZE * methodIndex));
+        IRExpr method = new IRMem(new IRBinOp(OpType.ADD, dispatchVectorAddress,
+                new IRConst(Configuration.WORD_SIZE * methodIndex)));
 
 
         // Pass the function name and arguments to an IRCall
