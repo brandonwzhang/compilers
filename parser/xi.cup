@@ -40,7 +40,7 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW, PERIOD, NULL, THIS;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW, PERIOD, NULL, THIS, FOR;
 
 nonterminal Program program;
 
@@ -87,6 +87,7 @@ nonterminal Assignment assignment;
 nonterminal IfStatement if_statement;
 nonterminal WhileStatement while_statement;
 nonterminal ReturnStatement return_statement;
+nonterminal BlockList for_loop; 
 nonterminal Block block;
 nonterminal BlockList block_list;
 nonterminal BlockList block_scope;
@@ -296,6 +297,10 @@ while_statement ::= WHILE OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT 
 return_statement ::= RETURN expression_list:lst {: RESULT = new ReturnStatement(lst); RESULT.setLocation(parser.cur_token); :}
                    ;
 
+for_loop ::= FOR OPEN_PAREN assignment_lhs:al GETS expression:e SEMICOLON expression:t SEMICOLON statement:s CLOSE_PAREN  block:b {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); List<Block> blocks = new LinkedList<Block>(); blocks.add(new Assignment(lst, e)); blocks.add(new WhileStatement(t, b)); blocks.add(s); RESULT = new BlockList(blocks); RESULT.setLocation(parser.cur_token); :}
+                     | FOR OPEN_PAREN assignment_lhs:al GETS expression:e SEMICOLON expression:t CLOSE_PAREN  block:b {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); List<Block> blocks = new LinkedList<Block>(); blocks.add(new Assignment(lst, e)); blocks.add(new WhileStatement(t, b)); RESULT = new BlockList(blocks); RESULT.setLocation(parser.cur_token); :}
+                     ; 
+
 statement_no_semicolon ::= if_statement:s {: RESULT = s; RESULT.setLocation(s); :}
                          | while_statement:s {: RESULT = s; RESULT.setLocation(s); :}
                          | procedure_call:pc {: RESULT = pc; RESULT.setLocation(pc); :}
@@ -323,6 +328,7 @@ typed_declaration_list ::= identifier:id COMMA typed_declaration:td {: List<Type
 block_list ::= block:b block_list:bl {: bl.getBlocks().add(0, b); RESULT = bl; :}
              | typed_declaration_list:f block_list:bl {: for(TypedDeclaration td : f) { bl.getBlocks().add(0, td); } RESULT = bl; :}
              | RETURN {: List<Block> bl = new LinkedList<>(); bl.add(0,new ReturnStatement(new LinkedList<>())); RESULT = new BlockList(bl); :}
+             | for_loop:f block_list:bl {: bl.getBlocks().add(0, f); RESULT = f; :}
              | empty  {: List<Block> bl = new LinkedList<>(); RESULT = new BlockList(bl); :}
              ;
 

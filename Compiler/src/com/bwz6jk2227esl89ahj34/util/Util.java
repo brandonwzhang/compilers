@@ -106,6 +106,7 @@ public class Util {
                 put(ParserSym.NULL, "null");
                 put(ParserSym.THIS, "this");
                 put(ParserSym.BREAK, "break");
+                put(ParserSym.FOR, "for");
     }};
 
     /**

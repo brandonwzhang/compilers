@@ -24,6 +24,7 @@ public class ParserSym {
   public static final int CHARACTER_LITERAL = 4;
   public static final int HIGH_MULT = 41;
   public static final int MODULO = 20;
+  public static final int FOR = 50;
   public static final int TRUE = 6;
   public static final int NOT = 21;
   public static final int GEQ = 25;
@@ -108,7 +109,8 @@ public class ParserSym {
   "NEW",
   "PERIOD",
   "NULL",
-  "THIS"
+  "THIS",
+  "FOR"
   };
 }
 
