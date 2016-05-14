@@ -408,12 +408,13 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new BoolType());
     }
 
-    // TODO: check if it occurs inside loop?
+    /**
+     * Set to unit if it's inside a loop.
+     */
     public void visit(Break node) {
         if (insideLoops <= 0) {
             throw new TypeException("Break must be inside a loop", node.getRow(), node.getCol());
         }
-
         node.setType(new VoidType());
     }
 
