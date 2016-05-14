@@ -1,5 +1,5 @@
+use io
 use conv
-use test
 
 class C {
 	foo() {

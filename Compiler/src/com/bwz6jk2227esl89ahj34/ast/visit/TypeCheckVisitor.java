@@ -957,6 +957,19 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
     }
 
+    public boolean containsMethodDeclaration(List<MethodDeclaration> methods, MethodDeclaration m_) {
+        for (MethodDeclaration m : methods) {
+            FunctionDeclaration fd = m.getFunctionDeclaration();
+            FunctionDeclaration fd_ = m_.getFunctionDeclaration();
+            if (m.getClassIdentifier().equals(m_.getClassIdentifier())
+                    && fd.getFunctionType().equals(fd_.getFunctionType())
+                    && fd.getIdentifier().equals(fd_.getIdentifier())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /***
      * First, we sweep through the program and put all of the function
      * names in the context with its associated return type into the context
@@ -1025,13 +1038,13 @@ public class TypeCheckVisitor implements NodeVisitor {
 
                 // Check Method Declarations match
                 for (MethodDeclaration m : cd.getMethods()) {
-                    if (!cd_.getMethods().contains(m)) {
+                    if (!containsMethodDeclaration(cd_.getMethods(), m)) {
                         throw new TypeException("Module does not define a class method declared in the interface.", node.getRow(), node.getCol()); // TODO loc
                     }
                 }
 
                 for (MethodDeclaration m_ : cd_.getMethods()) {
-                    if (!cd.getMethods().contains(m_)) {
+                    if (!containsMethodDeclaration(cd.getMethods(), m_)) {
                         throw new TypeException("Module contains a class method not declared in the interface.", node.getRow(), node.getCol()); // TODO loc
                     }
                 }
