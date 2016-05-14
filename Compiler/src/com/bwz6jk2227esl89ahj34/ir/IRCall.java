@@ -128,9 +128,8 @@ public class IRCall extends IRExpr {
         }
 
         t = new IRTemp(MIRLowerVisitor.getFreshVariable());
-        assert og.expr() instanceof IRName;
-            addStatements(stmtList,
-                    new IRMove(t, new IRCall((IRName)(og.expr()), tempList)));
+        addStatements(stmtList,
+                new IRMove(t, new IRCall((og.expr()), tempList)));
         return new IRESeq(new IRSeq(stmtList), t);
     }
 }

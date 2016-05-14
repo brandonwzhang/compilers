@@ -486,7 +486,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
             if (methodIndex >= 0) {
                 // Generate a ObjectFunctionCall if we're calling a method
                 ObjectFunctionCall objectFunctionCall =
-                        new ObjectFunctionCall(node.getIdentifier(), new Identifier("this"), node.getArguments());
+                        new ObjectFunctionCall(node.getIdentifier(),
+                                new This(new ClassType(currentClassID.get())), node.getArguments());
                 objectFunctionCall.accept(this);
                 return;
             }
@@ -564,7 +565,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             List<Identifier> fields = classFields.get(className);
             int index = fields.indexOf(node);
             if (index != -1) {
-                ObjectField thisdot = new ObjectField(new Identifier("this"), node);
+                ObjectField thisdot = new ObjectField(new This(new ClassType(currentClassID.get())), node);
                 thisdot.accept(this);
                 return;
             }
@@ -780,7 +781,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
             if (methodIndex >= 0) {
                 // Generate a ObjectProcedureCall if we're calling a method
                 ObjectProcedureCall objectProcedureCall =
-                        new ObjectProcedureCall(node.getIdentifier(), new Identifier("this"), node.getArguments());
+                        new ObjectProcedureCall(node.getIdentifier(),
+                                new This(new ClassType(currentClassID.get())), node.getArguments());
                 objectProcedureCall.accept(this);
                 return;
             }
@@ -1132,7 +1134,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(This node) {
-        // TODO
+        generatedNodes.push(new IRTemp("this"));
     }
 
     public void visit(TypedDeclaration node) {

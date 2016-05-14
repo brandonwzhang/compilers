@@ -1223,7 +1223,6 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new ArrayType(new IntType(), 1));
     }
 
-    // TODO
     public void visit(This node) {
         // "this" variable always has the type of the class it's used in
         // If "this" is used outside of a class, we throw an exception
