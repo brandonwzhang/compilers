@@ -1120,7 +1120,8 @@ public class TypeCheckVisitor implements NodeVisitor {
                 }
             }
 
-            contexts.peek().put(td.getIdentifier(), td.getDeclarationType());
+            //contexts.peek().put(td.getIdentifier(), td.getDeclarationType());
+            global.accept(this);
         }
 
         // Second pass typechecks all the function bodies

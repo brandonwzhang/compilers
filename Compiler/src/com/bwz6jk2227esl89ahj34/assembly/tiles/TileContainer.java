@@ -26,6 +26,7 @@ public class TileContainer {
         add(new ExpressionTile(ExpressionPatterns.mem3, ExpressionCodeGenerators.mem234));
         add(new ExpressionTile(ExpressionPatterns.mem4, ExpressionCodeGenerators.mem234));
         add(new ExpressionTile(ExpressionPatterns.mem5, ExpressionCodeGenerators.mem5));
+        add(new ExpressionTile(ExpressionPatterns.mem6, ExpressionCodeGenerators.mem6));
 
         add(new StatementTile(StatementPatterns.move1, StatementCodeGenerators.move1));
         add(new StatementTile(StatementPatterns.move2, StatementCodeGenerators.move2));
