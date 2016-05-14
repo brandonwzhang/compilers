@@ -1,9 +1,9 @@
-class Point{
+class Point {
     move(dx:int, dy:int)
     add(p: Point): Point
     coords():int, int
     clone(): Point
-
+    equals(p: Point): bool
 
     initPoint(x:int, y:int): Point
 }

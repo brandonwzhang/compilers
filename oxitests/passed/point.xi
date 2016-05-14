@@ -1,6 +1,6 @@
 use io
 
-class Point{
+class Point {
     x,y:int
     move(dx:int, dy:int) {
         x = x + dx
