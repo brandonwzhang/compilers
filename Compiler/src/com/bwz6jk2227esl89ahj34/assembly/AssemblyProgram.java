@@ -145,10 +145,11 @@ public class AssemblyProgram {
         // Add the .ctors section
         if (target.equals("linux")) {
             s += "\t\t.section\t.ctors\n";
-        } else if (target.equals("osx")) {
+        } else if (target.equals("macos")) {
             s += "\t\t.mod_init_func";
         } else {
             throw new RuntimeException("Target " + target + " not supported");
+
         }
         s += "\t\t.align 4\n";
         for (String functionName : compUnit.ctors()) {
