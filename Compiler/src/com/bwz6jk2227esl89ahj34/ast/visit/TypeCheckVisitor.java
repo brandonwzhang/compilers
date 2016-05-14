@@ -596,7 +596,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         } else {
             // Check that the correct number of arguments are passed
             if (argumentTypes.size() != funcType.getArgTypes().size()) {
-                throw new TypeException("Too many arguments passed to " + node.getIdentifier().getName(),
+                throw new TypeException("Incorrect number of arguments passed to " + node.getIdentifier().getName(),
                         node.getRow(), node.getCol());
             }
             for (int i = 0; i < argumentTypes.size(); i++) {
@@ -817,7 +817,7 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         // Check that the correct number of arguments are passed
         if (argumentTypes.size() != funcType.getArgTypes().size()) {
-            throw new TypeException("Too many arguments passed to " + node.getIdentifier().getName(),
+            throw new TypeException("Incorrect number of arguments passed to " + node.getIdentifier().getName(),
                     node.getRow(), node.getCol());
         }
 
@@ -876,7 +876,7 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         // Check that the correct number of arguments are passed
         if (argumentTypes.size() != funcType.getArgTypes().size()) {
-            throw new TypeException("Too many arguments passed to " + node.getIdentifier().getName(),
+            throw new TypeException("Incorrect number of arguments passed to " + node.getIdentifier().getName(),
                     node.getRow(), node.getCol());
         }
 
@@ -917,7 +917,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         List<VariableType> argumentTypes = funcType.getArgTypes();
         List<Expression> passedArguments = node.getArguments();
         if (passedArguments.size() != argumentTypes.size()) {
-            throw new TypeException("Too many arguments passed to " + id, id.getRow(), id.getCol());
+            throw new TypeException("Incorrect number of arguments passed to " + id, id.getRow(), id.getCol());
         }
 
         for (int i = 0; i < passedArguments.size(); i++) {
