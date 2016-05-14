@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34.assembly;
 
+import com.bwz6jk2227esl89ahj34.ir.DataSegment;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
 import lombok.Data;
@@ -9,17 +10,21 @@ import java.util.List;
 
 @Data
 public class AssemblyProgram {
+    private IRCompUnit compUnit;
     private List<AssemblyFunction> functions = new ArrayList<>();
     // Holds the names of functions in the interfaces used by this program
     private List<String> global;
+    private String target;
+
 
     /**
      * Generate assembly code for a program
      * @param root IRCompUnit of program
      */
     public AssemblyProgram(IRCompUnit root, List<String> global, String target) {
-
+        compUnit = root;
         this.global = global;
+        this.target = target;
 
         // Get the maximum number of return values and arguments in all functions
         for (String functionName : root.functions().keySet()) {
@@ -124,12 +129,27 @@ public class AssemblyProgram {
     @Override
     public String toString() {
         String s = "";
+        // Add the data segment
+        s += compUnit.data();
+        // Add the functions
         s += "\t\t.text\n";
         for (AssemblyFunction function : functions) {
             for(String globalName : global) {
                 s+= "\t\t.globl\t" + globalName + "\n";
             }
             s += function + "\n";
+        }
+        // Add the .ctors section
+        if (target.equals("linux")) {
+            s += "\t\t.section\t.ctors\n";
+        } else if (target.equals("osx")) {
+            s += "\t\t.mod_init_func";
+        } else {
+            throw new RuntimeException("Target " + target + " not supported");
+        }
+        s += "\t\t.align 4\n";
+        for (String functionName : compUnit.ctors()) {
+            s += "\t\t.quad\t" + functionName + "\n";
         }
         return s;
     }

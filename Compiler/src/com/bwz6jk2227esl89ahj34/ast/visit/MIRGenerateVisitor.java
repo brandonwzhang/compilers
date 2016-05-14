@@ -3,6 +3,7 @@ import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.ast.*;
 import com.bwz6jk2227esl89ahj34.ast.type.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.ir.DataSegment;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 import com.bwz6jk2227esl89ahj34.util.Util;
@@ -33,6 +34,12 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
     public MIRGenerateVisitor(String name) {
         this.name = name;
+        generatedNodes = new Stack<>();
+    }
+
+    public MIRGenerateVisitor(String name, Map<Identifier, ClassDeclaration> classes) {
+        this.name = name;
+        this.classes = classes;
         generatedNodes = new Stack<>();
     }
 
@@ -882,10 +889,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
             List<IRStmt> stmts = new LinkedList<>();
             // If the class has a parent class, we add the number of fields * WORD_SIZE to
             // the size of the parent class.
-            // Otherwise, we add it to 1.
+            // Otherwise, we add it to WORD_SIZE.
             Identifier identifier = cd.getIdentifier();
             IRExpr fieldSize = new IRConst(classFields.get(identifier).size() * Configuration.WORD_SIZE);
-            // Either the size of the parent or 1 for the base size of the object
+            // Either the size of the parent or WORD_SIZE for the base size of the object
             IRExpr baseSize = cd.getParentIdentifier().isPresent() ?
                     new IRMem(new IRName("_I_size_" + cd.getParentIdentifier().get().getName(), true)) :
                     new IRConst(Configuration.WORD_SIZE);
@@ -1019,7 +1026,26 @@ public class MIRGenerateVisitor implements NodeVisitor {
             }
         }
 
-        root = new IRCompUnit(name, functions, ctors);
+        // Construct the data segment
+        DataSegment data = new DataSegment();
+        for (Identifier classIdentifier : classes.keySet()) {
+            // Add the dispatch vector
+            List<MethodDeclaration> dispatchVector = dispatchVectors.get(classIdentifier);
+            List<IRNode> names = new LinkedList<>();
+            for (MethodDeclaration md : dispatchVector) {
+                names.add(new IRName(Util.getIRMethodName(md)));
+            }
+            data.put("_I_vt_" + classIdentifier.getName(), names);
+            // Add the object size
+            data.put("_I_size_" + classIdentifier.getName(), Collections.singletonList(new IRConst(0)));
+        }
+        // Add global variables
+        for (Identifier globalVariable : globalVariables.keySet()) {
+            data.put(Util.getIRGlobalVariableName(globalVariable, globalVariables.get(globalVariable)),
+                    Collections.singletonList(new IRConst(0)));
+        }
+
+        root = new IRCompUnit(name, functions, ctors, data);
         assert generatedNodes.empty();
     }
 

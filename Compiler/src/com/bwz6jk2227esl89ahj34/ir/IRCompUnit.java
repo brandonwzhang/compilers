@@ -78,6 +78,10 @@ public class IRCompUnit extends IRNode {
         return ctors;
     }
 
+    public DataSegment data() {
+        return data;
+    }
+
     @Override
     public String label() {
         return "COMPUNIT";
