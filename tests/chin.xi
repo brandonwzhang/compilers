@@ -22,6 +22,6 @@ frame1() {
 main(args:int[][]) {
     while(true){
         println("hello")
-        delay()
+        delay(500)
     }
 }

@@ -18,7 +18,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
     // The name of the program
     private String name;
     // Current class we're inside of
-    private Optional<Identifier> currentClassID;
+    private Optional<Identifier> currentClassID = Optional.empty();
     // Counter to append to label strings.
     private long labelCounter = 0;
     // Map from class name to dispatch vector
