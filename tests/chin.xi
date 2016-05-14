@@ -41,33 +41,34 @@ frame(space:int) {
 
 
 main(args:int[][]) {
+    println("CHUGGA CHUGGA")
     while(true){
         delay()
-//        clear()
+        clear()
         frame(60)
         delay()
 
-//        clear()
+        clear()
         frame(50)
         delay()
 
-//        clear()
+        clear()
         frame(40)
         delay()
 
-//        clear()
+        clear()
         frame(30)
         delay() 
         
-//        clear()
+        clear()
         frame(20)
         delay()
 
-//        clear()
+        clear()
         frame(10)
         delay()
 
-//        clear()
+        clear()
         frame(0)
         delay()
     }

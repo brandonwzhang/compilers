@@ -27,4 +27,5 @@ main(args:int[][]) {
     println(unparseInt(g.getz()))
     println(unparseInt(g.gety()))
     println(unparseInt(g.getx()))
+    // 6 0 0
 }

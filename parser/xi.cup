@@ -297,7 +297,7 @@ while_statement ::= WHILE OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT 
 return_statement ::= RETURN expression_list:lst {: RESULT = new ReturnStatement(lst); RESULT.setLocation(parser.cur_token); :}
                    ;
 
-for_loop ::= FOR OPEN_PAREN assignment_lhs:al GETS expression:e SEMICOLON expression:t SEMICOLON statement:s CLOSE_PAREN  block:b {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); List<Block> blocks = new LinkedList<Block>(); blocks.add(new Assignment(lst, e)); blocks.add(new WhileStatement(t, b)); blocks.add(s); RESULT = new BlockList(blocks); RESULT.setLocation(parser.cur_token); :}
+for_loop ::= FOR OPEN_PAREN assignment_lhs:al GETS expression:e SEMICOLON expression:t SEMICOLON statement:s CLOSE_PAREN  block:b {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); List<Block> blocks = new LinkedList<Block>(); blocks.add(new Assignment(lst, e)); List<Block> body_blocks = new LinkedList<>(); body_blocks.add(b); body_blocks.add(s); BlockList body = new BlockList(body_blocks); blocks.add(new WhileStatement(t, body)); RESULT = new BlockList(blocks); RESULT.setLocation(parser.cur_token); :}
                      | FOR OPEN_PAREN assignment_lhs:al GETS expression:e SEMICOLON expression:t CLOSE_PAREN  block:b {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); List<Block> blocks = new LinkedList<Block>(); blocks.add(new Assignment(lst, e)); blocks.add(new WhileStatement(t, b)); RESULT = new BlockList(blocks); RESULT.setLocation(parser.cur_token); :}
                      ; 
 

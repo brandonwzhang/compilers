@@ -2394,7 +2394,7 @@ class CUP$Parser$actions {
                 int bleft = CUP$Parser$stack.peek().left;
                 int bright = CUP$Parser$stack.peek().right;
                 Block b = CUP$Parser$stack.peek().<Block> value();
-                 List<Assignable> lst = new LinkedList<>(); lst.add(0, al); List<Block> blocks = new LinkedList<Block>(); blocks.add(new Assignment(lst, e)); blocks.add(new WhileStatement(t, b)); blocks.add(s); RESULT = new BlockList(blocks); RESULT.setLocation(parser.cur_token); 
+                 List<Assignable> lst = new LinkedList<>(); lst.add(0, al); List<Block> blocks = new LinkedList<Block>(); blocks.add(new Assignment(lst, e)); List<Block> body_blocks = new LinkedList<>(); body_blocks.add(b); body_blocks.add(s); BlockList body = new BlockList(body_blocks); blocks.add(new WhileStatement(t, body)); RESULT = new BlockList(blocks); RESULT.setLocation(parser.cur_token); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("for_loop",37, CUP$Parser$stack.elementAt(CUP$Parser$top-10), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
