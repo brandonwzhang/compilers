@@ -1,18 +1,27 @@
 use io
-use conv
+
+delay(time:int) {
+    i:int = 0;
+    while(i < time * 1000) {
+        a:int[1000]
+        i = i + 1
+    }
+}
+
+frame1() {
+    println("ALL ABOARD THE CHIN MOBILE");
+    println("")
+    println("")
+    println("")
+    println("    o O___ _________");
+    println("  _][__|o| |O O O O|");
+    println(" <_______|-|_______|");
+    println(" /O-O-O     o   o");
+}
 
 main(args:int[][]) {
-  x1:int, b1:bool = parseInt("47")
-  if (b1) {
-    print("Valid int: ")
-    println(unparseInt(x1))
-  }
-  else println ("Invalid int")
- 
-  x2:int, b2:bool = parseInt("hex")
-  if (b2) {
-    print("Valid int: ")
-    println(unparseInt(x2))
-  }
-  else println ("Invalid int")
+    while(true){
+        println("hello")
+        delay()
+    }
 }

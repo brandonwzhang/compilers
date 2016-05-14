@@ -26,4 +26,10 @@ public class Interface {
         this.classDeclarations = new LinkedList<>();
     }
 
+    public void set(Interface i) {
+        this.useBlock = i.getUseBlock();
+        this.functionDeclarations = i.getFunctionDeclarations();
+        this.classDeclarations = i.getClassDeclarations();
+    }
+
 }
