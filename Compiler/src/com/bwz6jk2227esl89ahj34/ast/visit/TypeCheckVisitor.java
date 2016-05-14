@@ -568,7 +568,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (!context.getFunctionContext().containsKey(id)) {
             throw new TypeException("Function not defined", id.getRow(), id.getCol());
         }
-        id.accept(this);
+        id.setType(context.getFunctionContext().get(id));
 
         // Gather argument types
         List<VariableType> argumentTypes = new ArrayList<>();
@@ -670,10 +670,12 @@ public class TypeCheckVisitor implements NodeVisitor {
         // Check if identifier is in context
         Type type = contexts.peek().getVariableContext().get(node);
         if (type == null) {
-            throw new TypeException("Identifier " + node.getName() + " does not exist in context",
-                    node.getRow(), node.getCol());
+                throw new TypeException("Identifier " + node.getName() + " does not exist in context",
+                        node.getRow(), node.getCol());
+
         }
         node.setType(type);
+
     }
 
     /**
