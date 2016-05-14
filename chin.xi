@@ -57,8 +57,8 @@ main(args:int[][]) {
 
     clear()
     frame(30)
-    delay() 
-    
+    delay()
+
     clear()
     frame(20)
     delay()
