@@ -14,7 +14,7 @@ class D extends C {
 
 }
 
-fun() {
+main(args:int[][]) {
     a:A = new A
     b:B = new B
     c:C = new C
