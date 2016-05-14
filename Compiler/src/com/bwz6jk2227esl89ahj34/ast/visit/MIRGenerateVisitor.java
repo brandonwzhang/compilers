@@ -566,7 +566,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // If the identifier is a global variable, we have to return its memory location
         if (globalVariables.containsKey(node)) {
             generatedNodes.push(new IRMem(
-                    new IRName(Util.getIRGlobalVariableName(node, globalVariables.get(node)))));
+                    new IRName(Util.getIRGlobalVariableName(node, globalVariables.get(node)), true)));
             return;
         }
         generatedNodes.push(new IRTemp(node.getName()));
@@ -718,13 +718,13 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
     public void visit(ObjectInstantiation node) {
         Identifier classIdentifier = node.getClassIdentifier();
-        IRCall malloc = new IRCall(new IRName("_I_alloc_i"), new IRName("_I_size_" + classIdentifier.getName()));
+        IRCall malloc = new IRCall(new IRName("_I_alloc_i"), new IRMem(new IRName("_I_size_" + classIdentifier.getName(), true)));
         List<IRStmt> stmts = new LinkedList<>();
         // Move the result of the call into a temp
         IRTemp objectTemp = new IRTemp(getFreshVariable());
         stmts.add(new IRMove(objectTemp, malloc));
         // Add dispatch vector to first slot of object
-        stmts.add(new IRMove(new IRMem(objectTemp), new IRName("_I_vt_" + classIdentifier.getName())));
+        stmts.add(new IRMove(new IRMem(objectTemp), new IRName("_I_vt_" + classIdentifier.getName(), true)));
         generatedNodes.push(new IRESeq(new IRSeq(stmts), objectTemp));
     }
 
@@ -886,9 +886,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRExpr fieldSize = new IRConst(classFields.get(identifier).size() * Configuration.WORD_SIZE);
             // Either the size of the parent or 1 for the base size of the object
             IRExpr baseSize = cd.getParentIdentifier().isPresent() ?
-                    new IRMem(new IRName("_I_size_" + cd.getParentIdentifier().get().getName())) : new IRConst(Configuration.WORD_SIZE);
+                    new IRMem(new IRName("_I_size_" + cd.getParentIdentifier().get().getName(), true)) :
+                    new IRConst(Configuration.WORD_SIZE);
             IRExpr size = new IRBinOp(OpType.ADD, fieldSize, baseSize);
-            stmts.add(new IRMove(new IRMem(new IRName("_I_size_" + identifier.getName())), size));
+            stmts.add(new IRMove(new IRMem(new IRName("_I_size_" + identifier.getName(), true)), size));
 
             // We need to call the initialization functions for subclasses
             List<Identifier> subclasses = hierarchyGraph.get(identifier);

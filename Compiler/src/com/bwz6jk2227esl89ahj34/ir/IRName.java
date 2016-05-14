@@ -11,6 +11,7 @@ import java.util.LinkedList;
  */
 public class IRName extends IRExpr {
     private String name;
+    private boolean isData = false;
 
     /**
      *
@@ -18,6 +19,11 @@ public class IRName extends IRExpr {
      */
     public IRName(String name) {
         this.name = name;
+    }
+
+    public IRName(String name, boolean isData) {
+        this.name = name;
+        this.isData = isData;
     }
 
     /**
@@ -30,6 +36,10 @@ public class IRName extends IRExpr {
 
     public String name() {
         return name;
+    }
+
+    public boolean isData() {
+        return isData;
     }
 
     @Override
