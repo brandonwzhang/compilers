@@ -102,7 +102,7 @@ class LinkedList {
 	contains(o: Object): bool {
 		current: Node = head
 		while (current != null) {
-			if (current.getData.equals(o)) {
+			if (current.getData().equals(o)) {
 				return true
 			}
 			current = current.getNext()
