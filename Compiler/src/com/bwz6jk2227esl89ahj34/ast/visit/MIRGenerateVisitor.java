@@ -1046,10 +1046,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             for (MethodDeclaration md : dispatchVector) {
                 names.add(new IRName(Util.getIRMethodName(md)));
             }
-            // If dispatch vector is empty, we don't add it in
-            if (!names.isEmpty()) {
-                data.put("_I_vt_" + classIdentifier.getName(), names);
-            }
+            data.put("_I_vt_" + classIdentifier.getName(), names);
             // Add the object size
             data.put("_I_size_" + classIdentifier.getName(), Collections.singletonList(new IRConst(0)));
         }
