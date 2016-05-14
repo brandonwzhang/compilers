@@ -214,7 +214,7 @@ public class InterfaceParser
                 // Encountered parsing error, return error message
                 return parser.syntaxErrMessage;
             }
-            inter = (Interface) result.value; 
+            inter.set((Interface) result.value); 
         } catch(Exception e) {
             return "Interface " + interfaceName + " not found";
         }
