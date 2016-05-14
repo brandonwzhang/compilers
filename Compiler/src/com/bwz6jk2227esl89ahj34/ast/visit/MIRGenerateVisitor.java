@@ -580,6 +580,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         }
         generatedNodes.push(new IRTemp(node.getName()));
     }
+
     public void visit(IfStatement node) {
         node.getGuard().accept(this);
         assert generatedNodes.peek() instanceof IRExpr;
