@@ -13,14 +13,6 @@ createDatBoi(): DatBoi {
 	return new DatBoi.init()
 }
 
-jihun(): bool {
-	return true
-}
-
-hereCome(): DatBoi {
-	return createDatBoi()
-}
-
 main(args: int[][]) {
 	println("nice")
 	println(unparseInt(420))

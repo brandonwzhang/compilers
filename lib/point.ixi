@@ -5,7 +5,7 @@ class Point{
     clone(): Point
 
 
-    initPoint(p:Point, x:int, y:int): Point
+    initPoint(x:int, y:int): Point
 }
 
 createPoint(x:int, y:int): Point

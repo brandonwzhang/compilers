@@ -455,44 +455,79 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(ClassDeclaration node) {
         contexts.push(new Context(contexts.peek()));
         currentClassType = Optional.of(new ClassType(node.getIdentifier()));
-        // Check if any fields are incorrectly shadowed
+
         for (TypedDeclaration td : node.getFields()) {
             // Accept the typed declaration to add it to the context
             td.accept(this);
         }
 
-        // Make sure there are no duplicate methods and add them to the context
-        Set<Identifier> seenMethods = new HashSet<>();
-        for (MethodDeclaration md : node.getMethods()) {
-            FunctionDeclaration fd = md.getFunctionDeclaration();
-            if (seenMethods.contains(fd.getIdentifier())) {
-                throw new TypeException("Method " + fd.getIdentifier().getName() + " declared multiple times in class",
-                        fd.getRow(), fd.getCol());
+        ClassDeclaration currentClass = node;
+        Map<Identifier, FunctionType> seenMethods = new HashMap<>();
+        Set<Identifier> currentClassMethods = new HashSet<>();
+        while (true) {
+            for (MethodDeclaration md : currentClass.getMethods()) {
+                FunctionDeclaration fd = md.getFunctionDeclaration();
+                Identifier id = fd.getIdentifier();
+                if (currentClassMethods.contains(id)) {
+                    throw new TypeException("Method " + fd.getIdentifier().getName() + " declared multiple times in class",
+                            fd.getRow(), fd.getCol());
+                }
+                if (seenMethods.containsKey(id) && !fd.getFunctionType().equals(seenMethods.get(id))) {
+                    throw new TypeException("Overloading method " + id.getName() + " does not have the proper type.",
+                            fd.getRow(), fd.getCol());
+                }
+                currentClassMethods.add(id);
+                seenMethods.put(id, fd.getFunctionType());
             }
-            seenMethods.add(fd.getIdentifier());
-            contexts.peek().put(fd.getIdentifier(), fd.getFunctionType());
+            currentClassMethods.clear();
+            if (currentClass.getParentIdentifier().isPresent()) {
+                currentClass = classes.get(currentClass.getParentIdentifier().get());
+            } else {
+                break;
+            }
         }
 
-        // Check if any methods are overridden incorrectly
-        for (MethodDeclaration md : node.getMethods()) {
-            FunctionDeclaration fd = md.getFunctionDeclaration();
-            // Make sure methods aren't declared multiple times in same class
-            if (node.getParentIdentifier().isPresent()) {
-                Identifier parentName = node.getParentIdentifier().get();
-                ClassDeclaration parentClass = classes.get(parentName);
-                FunctionType parentMethodType = getMethodType(fd.getIdentifier(), parentClass);
-                // If parent contains the method, we have the make sure types match
-                if (parentMethodType != null) {
-                    if (!fd.getFunctionType().equals(parentMethodType)) {
-                        throw new TypeException("Type of method " + fd.getIdentifier().getName() + " does not match parent",
-                                fd.getRow(), fd.getCol());
-                    }
-                }
-            }
+        for (Identifier id : seenMethods.keySet()) {
+            contexts.peek().put(id, seenMethods.get(id));
+        }
 
-            // Check that the method block is well typed and the function type is a valid type
+        for (MethodDeclaration md : node.getMethods()) {
             md.accept(this);
         }
+
+//        // Make sure there are no duplicate methods and add them to the context
+//        Set<Identifier> seenMethods = new HashSet<>();
+//        for (MethodDeclaration md : node.getMethods()) {
+//            FunctionDeclaration fd = md.getFunctionDeclaration();
+//            if (seenMethods.contains(fd.getIdentifier())) {
+//                throw new TypeException("Method " + fd.getIdentifier().getName() + " declared multiple times in class",
+//                        fd.getRow(), fd.getCol());
+//            }
+//            seenMethods.add(fd.getIdentifier());
+//            contexts.peek().put(fd.getIdentifier(), fd.getFunctionType());
+//        }
+//
+//        // Check if any methods are overridden incorrectly
+//        for (MethodDeclaration md : node.getMethods()) {
+//            FunctionDeclaration fd = md.getFunctionDeclaration();
+//            // Make sure methods aren't declared multiple times in same class
+//            if (node.getParentIdentifier().isPresent()) {
+//                Identifier parentName = node.getParentIdentifier().get();
+//                ClassDeclaration parentClass = classes.get(parentName);
+//                FunctionType parentMethodType = getMethodType(fd.getIdentifier(), parentClass);
+//                // If parent contains the method, we have the make sure types match
+//                if (parentMethodType != null) {
+//                    if (!fd.getFunctionType().equals(parentMethodType)) {
+//                        throw new TypeException("Type of method " + fd.getIdentifier().getName() + " does not match parent",
+//                                fd.getRow(), fd.getCol());
+//                    }
+//                }
+//            }
+//
+//            // Check that the method block is well typed and the function type is a valid type
+//            md.accept(this);
+//        }
+
         node.setType(new UnitType());
         currentClassType = Optional.empty();
         contexts.pop();
@@ -1004,7 +1039,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         // Check that all class parents are valid classes
-        for (ClassDeclaration classDec : node.getClassDeclarations()) {
+        for (ClassDeclaration classDec : classes.values()) {
             if (classDec.getParentIdentifier().isPresent()) {
                 Identifier parentIdentifier = classDec.getParentIdentifier().get();
                 if (!classes.containsKey(parentIdentifier)) {
