@@ -10,7 +10,7 @@ public class VariableContext extends LinkedHashMap<Identifier, Type> {
         super();
     }
 
-    public VariableContext(Context c) {
+    public VariableContext(VariableContext c) {
         super(c);
     }
 }
