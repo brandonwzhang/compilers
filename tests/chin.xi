@@ -1,8 +1,8 @@
 use io
 
-frame_length:int = 5000
-
 delay() {
+    frame_length:int = 100000
+
     i:int = 0;
     while(i < frame_length * 1000) {
         i = i + 1
@@ -18,23 +18,60 @@ clear() {
     }
 }
 
-frame1() {
+frame(space:int) {
     println("ALL ABOARD THE CHIN MOBILE");
     println("")
     println("")
     println("")
-    println("    o O___ _________");
-    println("  _][__|o| |O O O O|");
-    println("<________|-|_______|");
-    println(" /O-O-O     o   o");
+
+    gap:int[space]
+    i:int = 0
+    while(i < space) {
+        gap[i] = ' '
+        i = i + 1
+    }
+
+    print(gap)
+    println("     ooOOOO");
+    print(gap)
+    println("    oo      _____");
+    print(gap)
+    println("   _I__n_n__||_|| ________");
+    print(gap)
+    println(" >(_________|_7_|-|______|");
+    print(gap)
+    println("  /o ()() ()() o   oo  oo");
 }
+
 
 main(args:int[][]) {
     while(true){
-        frame1()
-        delay()
         clear()
-        println("hello")
+        frame(60)
+        delay()
+
+        clear()
+        frame(50)
+        delay()
+
+        clear()
+        frame(40)
+        delay()
+
+        clear()
+        frame(30)
+        delay() 
+        
+        clear()
+        frame(20)
+        delay()
+
+        clear()
+        frame(10)
+        delay()
+
+        clear()
+        frame(0)
         delay()
     }
 }
