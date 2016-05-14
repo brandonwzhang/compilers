@@ -464,29 +464,39 @@ public class TypeCheckVisitor implements NodeVisitor {
         ClassDeclaration currentClass = node;
         Map<Identifier, FunctionType> seenMethods = new HashMap<>();
         Set<Identifier> currentClassMethods = new HashSet<>();
+        
         while (true) {
             for (MethodDeclaration md : currentClass.getMethods()) {
                 FunctionDeclaration fd = md.getFunctionDeclaration();
                 Identifier id = fd.getIdentifier();
+
+                // check for duplicate methods in a single class
                 if (currentClassMethods.contains(id)) {
                     throw new TypeException("Method " + fd.getIdentifier().getName() + " declared multiple times in class",
                             fd.getRow(), fd.getCol());
                 }
+
+                // check for overriding methods and make sure the types match
                 if (seenMethods.containsKey(id) && !fd.getFunctionType().equals(seenMethods.get(id))) {
                     throw new TypeException("Overloading method " + id.getName() + " does not have the proper type.",
                             fd.getRow(), fd.getCol());
                 }
+
                 currentClassMethods.add(id);
                 seenMethods.put(id, fd.getFunctionType());
             }
-            currentClassMethods.clear();
+
+            currentClassMethods.clear();    // reset before next superclass
+
             if (currentClass.getParentIdentifier().isPresent()) {
+                // repeat for the next superclass
                 currentClass = classes.get(currentClass.getParentIdentifier().get());
             } else {
                 break;
             }
         }
 
+        // add all the methods seen in this class and superclasses to the context
         for (Identifier id : seenMethods.keySet()) {
             contexts.peek().put(id, seenMethods.get(id));
         }
@@ -494,39 +504,6 @@ public class TypeCheckVisitor implements NodeVisitor {
         for (MethodDeclaration md : node.getMethods()) {
             md.accept(this);
         }
-
-//        // Make sure there are no duplicate methods and add them to the context
-//        Set<Identifier> seenMethods = new HashSet<>();
-//        for (MethodDeclaration md : node.getMethods()) {
-//            FunctionDeclaration fd = md.getFunctionDeclaration();
-//            if (seenMethods.contains(fd.getIdentifier())) {
-//                throw new TypeException("Method " + fd.getIdentifier().getName() + " declared multiple times in class",
-//                        fd.getRow(), fd.getCol());
-//            }
-//            seenMethods.add(fd.getIdentifier());
-//            contexts.peek().put(fd.getIdentifier(), fd.getFunctionType());
-//        }
-//
-//        // Check if any methods are overridden incorrectly
-//        for (MethodDeclaration md : node.getMethods()) {
-//            FunctionDeclaration fd = md.getFunctionDeclaration();
-//            // Make sure methods aren't declared multiple times in same class
-//            if (node.getParentIdentifier().isPresent()) {
-//                Identifier parentName = node.getParentIdentifier().get();
-//                ClassDeclaration parentClass = classes.get(parentName);
-//                FunctionType parentMethodType = getMethodType(fd.getIdentifier(), parentClass);
-//                // If parent contains the method, we have the make sure types match
-//                if (parentMethodType != null) {
-//                    if (!fd.getFunctionType().equals(parentMethodType)) {
-//                        throw new TypeException("Type of method " + fd.getIdentifier().getName() + " does not match parent",
-//                                fd.getRow(), fd.getCol());
-//                    }
-//                }
-//            }
-//
-//            // Check that the method block is well typed and the function type is a valid type
-//            md.accept(this);
-//        }
 
         node.setType(new UnitType());
         currentClassType = Optional.empty();
