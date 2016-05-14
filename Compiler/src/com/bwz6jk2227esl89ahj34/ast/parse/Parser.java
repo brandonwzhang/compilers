@@ -2643,7 +2643,7 @@ class CUP$Parser$actions {
                 int blleft = CUP$Parser$stack.peek().left;
                 int blright = CUP$Parser$stack.peek().right;
                 BlockList bl = CUP$Parser$stack.peek().<BlockList> value();
-                 bl.getBlocks().add(0, f); RESULT = f; 
+                 bl.getBlocks().add(0, f); RESULT = bl; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("block_list",39, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
