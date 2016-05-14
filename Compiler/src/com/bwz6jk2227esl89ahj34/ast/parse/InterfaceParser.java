@@ -31,7 +31,7 @@ public class InterfaceParser
 
   @Override
   public final Class<?> getSymbolContainer() {
-    return InterfaceParserSym.class;
+    return ParserSym.class;
   }
 
   /** Default constructor. */
