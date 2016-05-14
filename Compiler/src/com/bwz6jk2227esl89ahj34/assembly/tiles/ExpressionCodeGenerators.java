@@ -35,17 +35,6 @@ public class ExpressionCodeGenerators {
         return new AssemblyMemoryLocation((AssemblyAbstractRegister)e);
     };
 
-    public static ExpressionTile.CodeGenerator mem6 = (root, lines) -> {
-        /*
-            MEM(NAME(e))
-        */
-        IRMem castedRoot = (IRMem) root;
-        IRName name = (IRName) castedRoot.expr();
-        AssemblyAbstractRegister temp = new AssemblyAbstractRegister();
-
-        lines.add(new AssemblyInstruction(OpCode.MOVQ, new AssemblyName(name.name()), temp));
-        return temp;
-    };
 
     public static ExpressionTile.CodeGenerator name1 = (root, lines) -> {
         /*
