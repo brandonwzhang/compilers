@@ -886,7 +886,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             IRExpr fieldSize = new IRConst(classFields.get(identifier).size() * Configuration.WORD_SIZE);
             // Either the size of the parent or 1 for the base size of the object
             IRExpr baseSize = cd.getParentIdentifier().isPresent() ?
-                    new IRMem(new IRName("_I_size_" + cd.getParentIdentifier().get().getName())) : new IRConst(1);
+                    new IRMem(new IRName("_I_size_" + cd.getParentIdentifier().get().getName())) : new IRConst(Configuration.WORD_SIZE);
             IRExpr size = new IRBinOp(OpType.ADD, fieldSize, baseSize);
             stmts.add(new IRMove(new IRMem(new IRName("_I_size_" + identifier.getName())), size));
 
