@@ -928,7 +928,14 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 // All other types have been initialized already
                 continue;
             }
-            assignment.accept(this);
+            if (td.getArraySizes().size() > 0) {
+                // We only accept the TypedDeclaration since we don't want to set it
+                // to null
+                td.accept(this);
+            } else {
+                // Otherwise, we set it to null
+                assignment.accept(this);
+            }
             assert generatedNodes.peek() instanceof IRStmt;
             stmts.add((IRStmt) generatedNodes.pop());
         }

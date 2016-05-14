@@ -16,23 +16,37 @@ public class IRCompUnit extends IRNode {
     private String name;
     private Map<String, IRFuncDecl> functions;
     private List<String> ctors;
+    private DataSegment data;
 
     public IRCompUnit(String name) {
         this.name = name;
         functions = new LinkedHashMap<>();
         ctors = new LinkedList<>();
+        data = new DataSegment();
     }
 
     public IRCompUnit(String name, Map<String, IRFuncDecl> functions) {
         this.name = name;
         this.functions = functions;
         ctors = new LinkedList<>();
+        data = new DataSegment();
     }
 
     public IRCompUnit(String name, Map<String, IRFuncDecl> functions, List<String> ctors) {
         this.name = name;
         this.functions = functions;
         this.ctors = ctors;
+        data = new DataSegment();
+    }
+
+    public IRCompUnit(String name,
+                      Map<String, IRFuncDecl> functions,
+                      List<String> ctors,
+                      DataSegment data) {
+        this.name = name;
+        this.functions = functions;
+        this.ctors = ctors;
+        this.data = data;
     }
 
     /**
