@@ -33,7 +33,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public TypeCheckVisitor(String libPath, String fileName) {
         // initialize first context with length function, int[] -> int
         // when it should take bool[]. We handle this later below
-        Context initContext = new Context();
+        Context initContext = new Context(new VariableContext(), new FunctionContext());
         List<VariableType> lengthArgType = Collections.singletonList(new ArrayType(new IntType(), 1));
         VariableTypeList lengthReturnType =
                 new VariableTypeList(Collections.singletonList(new IntType()));
@@ -565,7 +565,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         Context context = contexts.peek();
         // Check that the function exists in the context
         Identifier id = node.getIdentifier();
-        if (!context.containsKey(id)) {
+        if (!context.getFunctionContext().containsKey(id)) {
             throw new TypeException("Function not defined", id.getRow(), id.getCol());
         }
         id.accept(this);
@@ -579,12 +579,11 @@ public class TypeCheckVisitor implements NodeVisitor {
             argumentTypes.add(argType);
         }
 
-        Type type = context.get(id);
-        if (!(type instanceof FunctionType)) {
+        if (!context.getFunctionContext().containsKey(id)) {
             throw new TypeException(id + " is not a function", id.getRow(), id.getCol());
         }
 
-        FunctionType funcType = (FunctionType) type;
+        FunctionType funcType = (FunctionType) context.getFunctionContext().get(id);
         // Function call don't match arguments AND
 
         // Check call arguments to make sure they match
@@ -669,7 +668,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public void visit(Identifier node) {
         // Check if identifier is in context
-        Type type = contexts.peek().get(node);
+        Type type = contexts.peek().getVariableContext().get(node);
         if (type == null) {
             throw new TypeException("Identifier " + node.getName() + " does not exist in context",
                     node.getRow(), node.getCol());
@@ -908,11 +907,12 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(ProcedureCall node) {
         Context context = contexts.peek();
         Identifier id = node.getIdentifier();
-        if (!context.containsKey(id)) {
+
+        if (!context.getFunctionContext().containsKey(id)) {
             throw new TypeException("Procedure " + id.getName() + " not defined", id.getRow(), id.getCol());
         }
 
-        FunctionType funcType = (FunctionType) context.get(id);
+        FunctionType funcType = (FunctionType) context.getFunctionContext().get(id);
 
         List<VariableType> argumentTypes = funcType.getArgTypes();
         List<Expression> passedArguments = node.getArguments();
@@ -999,7 +999,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         for (FunctionDeclaration funcDec : node.getFunctionDeclarations()) {
             Identifier funcName = funcDec.getIdentifier();
             // Disallow overloading and shadowing
-            if (contexts.peek().get(funcName) != null) {
+            if (contexts.peek().getFunctionContext().get(funcName) != null) {
                 throw new TypeException(funcName.getName() + "declared multiple times",
                         funcName.getRow(), funcName.getCol());
             }
@@ -1061,7 +1061,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             TypedDeclaration td = (TypedDeclaration) global.getVariables().get(0);
 
             // Check to ensure a global has not been declared already
-            if (contexts.peek().containsKey(td.getIdentifier())) {
+            if (contexts.peek().getVariableContext().containsKey(td.getIdentifier())) {
                 throw new TypeException("Global variable " + td.getIdentifier().getName() + " already declared",
                         td.getRow(), td.getCol());
             }
@@ -1201,7 +1201,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(TypedDeclaration node) {
         Identifier identifier = node.getIdentifier();
         Context context = contexts.peek();
-        if (context.containsKey(identifier)) {
+        if (context.getVariableContext().containsKey(identifier)) {
             throw new TypeException("Variable " + identifier.getName() +
                     " already declared in scope", node.getRow(), node.getCol());
         }
@@ -1336,7 +1336,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         for (FunctionDeclaration declaration : declarations) {
             // Error if function already exists in context with different type
             FunctionType existingDeclarationType =
-                    (FunctionType) context.get(declaration.getIdentifier());
+                    (FunctionType) context.getFunctionContext().get(declaration.getIdentifier());
             if (existingDeclarationType != null) {
                 if (!existingDeclarationType.equals(declaration.getFunctionType())) {
                     return declaration.getIdentifier().getName() +
