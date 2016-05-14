@@ -18,15 +18,17 @@ public class DataSegment extends LinkedHashMap<String, List<IRNode>> {
             List<IRNode> values = get(name);
             for (IRNode value : values) {
                 assert value instanceof IRConst || value instanceof IRName;
-                s += "\t\t.long\t";
                 if (value instanceof IRConst) {
+                    s += "\t\t.long\t";
                     s += ((IRConst) value).value();
                 } else {
+                    s += "\t\t.quad\t";
                     s += ((IRName) value).name();
                 }
                 s += "\n";
             }
         }
+        s += "\n";
         return s;
     }
 }
