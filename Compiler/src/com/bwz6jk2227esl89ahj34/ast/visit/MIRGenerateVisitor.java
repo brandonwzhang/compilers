@@ -189,8 +189,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
             variable.accept(this);
             assert generatedNodes.peek() instanceof IRStmt;
             statements.add((IRStmt) generatedNodes.pop());
-            IRTemp temp = new IRTemp(typedDeclaration.getIdentifier().getName());
-            IRMove move = new IRMove(temp, expr);
+            // Accept the identifier to get the expression of the identifier
+            typedDeclaration.getIdentifier().accept(this);
+            assert generatedNodes.peek() instanceof IRExpr;
+            IRMove move = new IRMove((IRExpr) generatedNodes.pop(), expr);
+
             statements.add(move);
             return new IRSeq(statements);
         }
@@ -1097,7 +1100,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         return new IRBinOp(OpType.MUL, expr, new IRConst(Configuration.WORD_SIZE));
     }
 
-    public List<IRStmt> initializeArray(IRTemp parentArrayPointer, IRExpr parentArrayIndex, List<IRExpr> lengths, int index) {
+    public List<IRStmt> initializeArray(IRExpr parentArrayPointer, IRExpr parentArrayIndex, List<IRExpr> lengths, int index) {
         List<IRStmt> statements = new ArrayList<>();
         IRTemp length = new IRTemp(getFreshVariable());
         statements.add(new IRMove(length, lengths.get(index)));
@@ -1147,9 +1150,13 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(TypedDeclaration node) {
+        node.getIdentifier().accept(this);
+        assert generatedNodes.peek() instanceof IRExpr;
+        IRExpr variable = (IRExpr) generatedNodes.pop();
+
         if (node.getArraySizes().size() == 0) {
             // Initialize the variable to 0
-            generatedNodes.push(new IRMove(new IRTemp(node.getIdentifier().getName()), new IRConst(0)));
+            generatedNodes.push(new IRMove(variable, new IRConst(0)));
             return;
         }
         // In the case where TypedDeclaration is part of an assignment, it will be handled separately
@@ -1167,9 +1174,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             statements.add(new IRMove(lengthTemp, lengthExpr));
             lengths.add(lengthTemp);
         }
-        String variableName = node.getIdentifier().getName();
-        IRTemp array = new IRTemp(variableName);
-        statements.addAll(initializeArray(array, null, lengths, 0));
+        statements.addAll(initializeArray(variable, null, lengths, 0));
         generatedNodes.push(new IRSeq(statements));
     }
     public void visit(Unary node) {
