@@ -146,7 +146,7 @@ public class AssemblyProgram {
         if (target.equals("linux")) {
             s += "\t\t.section\t.ctors\n";
         } else if (target.equals("macos")) {
-            s += "\t\t.mod_init_func";
+            s += "\t\t.mod_init_func\n";
         } else {
             throw new RuntimeException("Target " + target + " not supported");
 
