@@ -41,7 +41,6 @@ frame(space:int) {
 
 
 main(args:int[][]) {
-    println("CHUGGA CHUGGA")
     delay()
     clear()
     frame(60)
@@ -70,6 +69,4 @@ main(args:int[][]) {
     clear()
     frame(0)
     delay()
-
-    clear()
 }
