@@ -652,7 +652,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
     public void visit(Null node) {
         // Null is just the pointer to memory location 0
-        generatedNodes.push(new IRMem(new IRConst(0)));
+        generatedNodes.push(new IRConst(0));
     }
 
     public void visit(ObjectField node) {
