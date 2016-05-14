@@ -1012,7 +1012,7 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         // Look for an interface file for this file, doesn't need to exist
         Interface interface4120 = new Interface();
-        String err = InterfaceParser.parseInterface(libPath, moduleName, interface4120);
+        String err = InterfaceParser.parseInterface("", moduleName.substring(0, moduleName.length() - 3), interface4120);
         if (err == null) {
             // No error, so we'll check that the class declarations match the ones in this module
             for (ClassDeclaration cd : interface4120.getClassDeclarations()) {
@@ -1024,7 +1024,13 @@ public class TypeCheckVisitor implements NodeVisitor {
                 // Check Method Declarations match
                 for (MethodDeclaration m : cd.getMethods()) {
                     if (!cd_.getMethods().contains(m)) {
-                        throw new TypeException("Interface contains class methods that do not match"); // TODO loc
+                        throw new TypeException("Module does not define a class method declared in the interface.", node.getRow(), node.getCol()); // TODO loc
+                    }
+                }
+
+                for (MethodDeclaration m_ : cd_.getMethods()) {
+                    if (!cd.getMethods().contains(m_)) {
+                        throw new TypeException("Module contains a class method not declared in the interface.", node.getRow(), node.getCol()); // TODO loc
                     }
                 }
 
