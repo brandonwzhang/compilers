@@ -658,7 +658,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // that the field is a valid field in the object
         Identifier objectClass = ((ClassType) node.getObject().getType()).getIdentifier();
         List<Identifier> fields = classFields.get(objectClass);
-        int fieldIndex = fields.indexOf(node.getField());
+        // Offset by field index plus 1 (for dispatch vector)
+        int fieldIndex = fields.indexOf(node.getField()) + 1;
         assert fieldIndex >= 0;
 
         // Calculate the memory address of this field
@@ -666,7 +667,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         assert generatedNodes.peek() instanceof IRExpr;
         IRExpr object = (IRExpr) generatedNodes.pop();
         IRBinOp fieldAddress = new IRBinOp(OpType.ADD, object,
-                new IRConst(Configuration.WORD_SIZE * fieldIndex));
+                new IRConst(Configuration.WORD_SIZE * (fieldIndex + 1)));
 
         generatedNodes.push(new IRMem(fieldAddress));
     }
