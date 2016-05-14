@@ -95,6 +95,10 @@ public class TypeCheckVisitor implements NodeVisitor {
         return true;
     }
 
+    public Map<Identifier, ClassDeclaration> getClasses() {
+        return classes;
+    }
+
     /**
      * Visits an ArrayIndex node. The arrayRef must type to a VariableType t with
      * at least one bracket, the index must type to int, and the overall type of

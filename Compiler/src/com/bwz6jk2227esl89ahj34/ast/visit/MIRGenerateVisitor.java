@@ -1,4 +1,5 @@
 package com.bwz6jk2227esl89ahj34.ast.visit;
+import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.ast.*;
 import com.bwz6jk2227esl89ahj34.ast.type.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
@@ -945,6 +946,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
 
     public void visit(Program node) {
+        // Construct a typechecker and get its classDeclarations
+        TypeCheckVisitor typechecker = new TypeCheckVisitor(Main.libPath(), name);
+        node.accept(typechecker); // Should not fail because we've typechecked before this
+        this.classes = typechecker.getClasses();
+
         Map<String, IRFuncDecl> functions = new LinkedHashMap<>();
 
         // Populate classes
