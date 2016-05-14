@@ -18,7 +18,7 @@ matcher(t:int[], p:int[], pi:int[], i_:int) : int {
     q:int = 0
 
     while (i <= n) {
-        while (q > 0 & p(q) != t(i-1)) q = pi[q-1]
+        while (q > 0 & p[q] != t[i-1]) q = pi[q-1]
         if (p[q] == t[i-1]) q = q + 1
 
         if (q == m) { return i-m+1 }
