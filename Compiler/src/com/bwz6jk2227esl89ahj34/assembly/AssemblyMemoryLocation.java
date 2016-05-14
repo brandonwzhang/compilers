@@ -10,6 +10,7 @@ public class AssemblyMemoryLocation extends AssemblyExpression {
     public long scale = 1;
     public AssemblyRegister offsetRegister;
     public AssemblyRegister baseRegister;
+    public AssemblyName offsetName;
 
     public AssemblyMemoryLocation(AssemblyRegister baseRegister) {
         this.baseRegister = baseRegister;
@@ -19,6 +20,12 @@ public class AssemblyMemoryLocation extends AssemblyExpression {
                                   long displacement) {
         this.baseRegister = baseRegister;
         this.displacement = displacement;
+    }
+
+    public AssemblyMemoryLocation(AssemblyRegister baseRegister,
+                                  AssemblyName offsetName) {
+        this.baseRegister = baseRegister;
+        this.offsetName = offsetName;
     }
 
     public AssemblyMemoryLocation(AssemblyRegister baseRegister,
@@ -52,10 +59,15 @@ public class AssemblyMemoryLocation extends AssemblyExpression {
 
     @Override
     public String toString() {
+        assert !((displacement == 0) && (offsetName == null)); // can't have both available
+
         // syntax is displacement(base register, offset register, scalar multiplier)
         String s = "";
         if (displacement != 0) {
             s += displacement;
+        }
+        if (offsetName != null) {
+            s += offsetName.getName();
         }
         s += "(";
 

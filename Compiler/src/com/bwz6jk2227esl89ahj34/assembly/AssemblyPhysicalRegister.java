@@ -33,6 +33,9 @@ public class AssemblyPhysicalRegister extends AssemblyRegister {
     public static final AssemblyPhysicalRegister R14 = new AssemblyPhysicalRegister(Register.R14);
     public static final AssemblyPhysicalRegister R15 = new AssemblyPhysicalRegister(Register.R15);
 
+    // neither
+    public static final AssemblyPhysicalRegister RIP = new AssemblyPhysicalRegister(Register.RIP);
+
     // We take out RAX and RDX since we don't want to overwrite return values
     public static final AssemblyPhysicalRegister[] callerSavedRegisters = {
             RCX, RSI, RDI, RSP, R8, R9, R10, R11
@@ -61,7 +64,7 @@ public class AssemblyPhysicalRegister extends AssemblyRegister {
     public enum Register {
         RAX, RBX, RCX, RDX, RBP, RSI, RDI, RSP,
         R8, R9, R10, R11, R12, R13, R14, R15,
-        AL
+        AL, RIP
     }
 
     private Register register;

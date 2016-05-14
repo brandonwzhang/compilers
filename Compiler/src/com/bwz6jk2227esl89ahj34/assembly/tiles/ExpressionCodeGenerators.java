@@ -53,6 +53,17 @@ public class ExpressionCodeGenerators {
         */
         IRName castedRoot = (IRName) root;
 
+        if (castedRoot.isData()) {
+            // Treat it as offset into data segment, and return a temp
+            AssemblyAbstractRegister temp = new AssemblyAbstractRegister();
+            lines.add(new AssemblyInstruction(OpCode.LEAQ,
+                    new AssemblyMemoryLocation(AssemblyPhysicalRegister.RIP, new AssemblyName(castedRoot.name())),
+                    temp)
+            );
+            return temp;
+        }
+        // else treat it as a normal label name
+
         return new AssemblyName(castedRoot.name());
     };
 
