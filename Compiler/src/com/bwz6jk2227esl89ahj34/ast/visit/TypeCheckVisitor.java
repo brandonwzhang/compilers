@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34.ast.visit;
 
+import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.ast.*;
 import com.bwz6jk2227esl89ahj34.ast.parse.Interface;
 import com.bwz6jk2227esl89ahj34.ast.parse.InterfaceParser;
@@ -995,6 +996,29 @@ public class TypeCheckVisitor implements NodeVisitor {
         return false;
     }
 
+    public void checkClassDefinition(ClassDeclaration definition,
+                                     ClassDeclaration declaration,
+                                     Program node) {
+
+        // Check Method Declarations match
+        for (MethodDeclaration m : declaration.getMethods()) {
+            if (!containsMethodDeclaration(definition.getMethods(), m)) {
+                throw new TypeException("Module does not define a class method declared in the interface.", node.getRow(), node.getCol()); // TODO loc
+            }
+        }
+
+        for (MethodDeclaration m : definition.getMethods()) {
+            if (!containsMethodDeclaration(declaration.getMethods(), m)) {
+                throw new TypeException("Module defines a class method not declared in the interface.", node.getRow(), node.getCol()); // TODO loc
+            }
+        }
+
+        // Check inheritance matches
+        if (!declaration.getParentIdentifier().equals(definition.getParentIdentifier())) {
+            throw new TypeException("Interface contains class whose parent does not match", node.getRow(), node.getCol()); // TODO loc
+        }
+    }
+
     /***
      * First, we sweep through the program and put all of the function
      * names in the context with its associated return type into the context
@@ -1016,12 +1040,13 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
 
         // Populate the classes map first incase any functions use objects
-        for (ClassDeclaration classDec : node.getClassDeclarations()) {
-            Identifier className = classDec.getIdentifier();
+        for (ClassDeclaration classDef : node.getClassDeclarations()) {
+            Identifier className = classDef.getIdentifier();
             if (classes.containsKey(className)) {
-                throw new TypeException("Class " + className.getName() + "declared multiple times");
+                checkClassDefinition(classDef, classes.get(className), node);
+            } else {
+                classes.put(className, classDef);
             }
-            classes.put(className, classDec);
         }
 
         // Check that all class parents are valid classes
@@ -1057,44 +1082,38 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         // Look for an interface file for this file, doesn't need to exist
         Interface interface4120 = new Interface();
-        String err = InterfaceParser.parseInterface("", moduleName.substring(0, moduleName.length() - 3), interface4120);
+        String filename = moduleName.substring(0, moduleName.length() - 3);
+        if (filename.contains("/")) {
+            filename = filename.substring(filename.lastIndexOf('/') + 1);
+        }
+        String err = InterfaceParser.parseInterface(Main.libPath(), filename, interface4120);
         if (err == null) {
             // No error, so we'll check that the class declarations match the ones in this module
             for (ClassDeclaration cd : interface4120.getClassDeclarations()) {
                 if (!classes.containsKey(cd.getIdentifier())) {
                     continue;
                 }
-                ClassDeclaration cd_ = classes.get(cd.getIdentifier());
 
-                // Check Method Declarations match
-                for (MethodDeclaration m : cd.getMethods()) {
-                    if (!containsMethodDeclaration(cd_.getMethods(), m)) {
-                        throw new TypeException("Module does not define a class method declared in the interface.", node.getRow(), node.getCol()); // TODO loc
-                    }
-                }
+                ClassDeclaration definition = classes.get(cd.getIdentifier());
+                checkClassDefinition(definition, cd, node);
 
-                for (MethodDeclaration m_ : cd_.getMethods()) {
-                    if (!containsMethodDeclaration(cd.getMethods(), m_)) {
-                        throw new TypeException("Module contains a class method not declared in the interface.", node.getRow(), node.getCol()); // TODO loc
-                    }
-                }
-
-                // Check inheritance matches
-                if (!cd.getParentIdentifier().equals(cd_.getParentIdentifier())) {
-                    throw new TypeException("Interface contains class whose parent does not match"); // TODO loc
-                }
                 // Ignore fields
 
-
-                // Checks pass, so overwrite our existing definition with the interface one (to use that order)
-                classes.put(cd.getIdentifier(), cd);
+                Map<Identifier, MethodDeclaration> methods = new HashMap<>();
+                for (MethodDeclaration md : definition.getMethods()) {
+                    methods.put(md.getFunctionDeclaration().getIdentifier(), md);
+                }
+                List<MethodDeclaration> newMethodList = new ArrayList<>();
+                for (MethodDeclaration md : cd.getMethods()) {
+                    newMethodList.add(methods.get(md.getFunctionDeclaration().getIdentifier()));
+                }
+                definition.setMethods(newMethodList);
             }
 
             // TODO: also check that the function declarations match?
-        }
-        if (!err.contains("not found")) {
+        } else if (!err.contains("not found")) {
             // Some error other than interface file not found
-            throw new TypeException(err);
+            throw new TypeException(err, node.getRow(), node.getCol());
         }
         // Else interface file was not found, ignore and continue
 
