@@ -22,19 +22,24 @@ class Object {
 	}
 
 	equals(o: Object): bool {
-		if (length(o) != length(name)) {
+		if (length(o.name()) != length(name)) {
 			return false
 		}
 
 		i: int = 0
-		while (i < length(o)) {
-			if (o[i] != name[i]) {
+		name_: int[] = o.name()
+		while (i < length(name_)) {
+			if (name_[i] != name[i]) {
 				return false
 			}
 			i = i + 1
 		}
 
 		return true
+	}
+
+	name(): int[] {
+		return name
 	}
 }
 
@@ -76,7 +81,6 @@ class LinkedList {
 			head = n
 			return
 		}
-		n: Node = createNode(o)
 		n.setNext(head)
 		head = n
 	}
@@ -122,6 +126,7 @@ class Hashset {
 			table_[i] = createLinkedList()
 			i = i + 1
 		}
+		table = table_
 		return this
 	}
 
