@@ -10,7 +10,7 @@ public class FunctionContext extends LinkedHashMap<Identifier, Type> {
         super();
     }
 
-    public FunctionContext(Context c) {
+    public FunctionContext(FunctionContext c) {
         super(c);
     }
 }
