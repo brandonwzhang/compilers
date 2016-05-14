@@ -23,6 +23,9 @@ public class TypeCheckVisitor implements NodeVisitor {
     // Type of current class we're type checking
     private Optional<ClassType> currentClassType = Optional.empty();
 
+    // Number of loops we're inside, used for checking Break
+    private int insideLoops = 0;
+
     // Keep a set of parsed interfaces so we don't double-parse
     private Set<String> parsedInterfaces = new HashSet<>();
 
@@ -406,7 +409,11 @@ public class TypeCheckVisitor implements NodeVisitor {
 
     // TODO: check if it occurs inside loop?
     public void visit(Break node) {
+        if (insideLoops <= 0) {
+            throw new TypeException("Break must be inside a loop", node.getRow(), node.getCol());
+        }
 
+        node.setType(new VoidType());
     }
 
     /**
@@ -1327,7 +1334,11 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (blockIsStatement) {
             contexts.push(new Context(contexts.peek()));
         }
+
+        insideLoops++;
         block.accept(this);
+        insideLoops--;
+
         // Blocks should only have either unit or void type
         assert block.getType().isUnit() ||
                 block.getType().isVoid();
