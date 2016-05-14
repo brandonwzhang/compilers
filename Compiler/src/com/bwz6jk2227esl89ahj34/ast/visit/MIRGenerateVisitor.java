@@ -31,15 +31,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
     private Map<Identifier, ClassDeclaration> classes = new HashMap<>();
     // Set of all global variables
     private Map<Identifier, VariableType> globalVariables = new HashMap<>();
+    // Stack of exit labels to break from loops
+    private Stack<IRLabel> exitLabels = new Stack<>();
 
     public MIRGenerateVisitor(String name) {
         this.name = name;
-        generatedNodes = new Stack<>();
-    }
-
-    public MIRGenerateVisitor(String name, Map<Identifier, ClassDeclaration> classes) {
-        this.name = name;
-        this.classes = classes;
         generatedNodes = new Stack<>();
     }
 
@@ -470,7 +466,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(Break node) {
-        // TODO:
+        assert !exitLabels.isEmpty();
+        // We jump to the exit label most inner nested while loop
+        generatedNodes.push(new IRJump(new IRName(exitLabels.peek().name())));
     }
 
     public void visit(CharacterLiteral node) {
@@ -1237,9 +1235,15 @@ public class MIRGenerateVisitor implements NodeVisitor {
         assert generatedNodes.peek() instanceof IRExpr;
         IRExpr guard = (IRExpr)generatedNodes.pop();
 
+        // Push this new exit label on
+        exitLabels.push(exitLabel);
+
         node.getBlock().accept(this);
         assert generatedNodes.peek() instanceof IRStmt;
         IRStmt body = (IRStmt)generatedNodes.pop();
+
+        // Pop the exit label off so nothing outside of the loop can break to it
+        exitLabels.pop();
 
         IRSeq seq = new IRSeq(
                 headLabel,
@@ -1248,6 +1252,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 body,
                 new IRJump(new IRName(headLabel.name())),
                 exitLabel);
+
 
         generatedNodes.push(seq);
     }
