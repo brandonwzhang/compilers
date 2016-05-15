@@ -1117,13 +1117,16 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
         // Else interface file was not found, ignore and continue
 
-
-        // Add all global variables to context
+        // Add all non-array global variables to context
         for (Assignment global : node.getGlobalVariables()) {
             assert global.getVariables().size() == 1;
             assert global.getVariables().get(0) instanceof TypedDeclaration;
             Expression expression = global.getExpression();
             TypedDeclaration td = (TypedDeclaration) global.getVariables().get(0);
+
+            if (td.getDeclarationType() instanceof ArrayType) {
+                continue;
+            }
 
             // Check to ensure a global has not been declared already
             if (contexts.peek().getVariableContext().containsKey(td.getIdentifier())) {
@@ -1151,6 +1154,16 @@ public class TypeCheckVisitor implements NodeVisitor {
                             expression.getRow(), expression.getCol());
                 }
             }
+
+            contexts.peek().put(td.getIdentifier(), td.getDeclarationType());
+        }
+
+        // Visit all of the global variables
+        // Do extra stuff if the variable is an array type
+        for (Assignment global : node.getGlobalVariables()) {
+            Expression expression = global.getExpression();
+            TypedDeclaration td = (TypedDeclaration) global.getVariables().get(0);
+
             // Check arraytype has valid init
             // Size is either a integer, or another global
             if (td.getDeclarationType() instanceof ArrayType) {
@@ -1185,7 +1198,8 @@ public class TypeCheckVisitor implements NodeVisitor {
                 }
             }
 
-            //contexts.peek().put(td.getIdentifier(), td.getDeclarationType());
+            // This variable will get readded when its TypedDeclation is visited
+            contexts.peek().remove(td.getIdentifier(), td.getDeclarationType());
             global.accept(this);
         }
 

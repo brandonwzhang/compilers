@@ -38,4 +38,12 @@ public class Context {
         }
 
     }
+
+    public Type remove(Identifier identifier, Type type) {
+        if (type instanceof VariableType) {
+            return variableContext.remove(identifier);
+        } else {
+            return functionContext.remove(identifier);
+        }
+    }
 }
