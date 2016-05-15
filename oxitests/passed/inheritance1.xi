@@ -15,7 +15,7 @@ class B extends A {
 	}
 
 	b3(n: int): C {
-		x: int = 
+		x: int = 1
 		return new C
 	}
 
