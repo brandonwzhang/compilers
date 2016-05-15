@@ -250,6 +250,8 @@ assignment_lhs_array ::= function_call:fc {: RESULT = fc; RESULT.setLocation(fc)
                        | STRING_LITERAL:s {: RESULT = new StringLiteral(s); RESULT.setLocation(parser.stack.peek()); :}
                        | identifier:i {: RESULT = i; RESULT.setLocation(i); :}
                        | assignment_lhs_array_brackets:a {: RESULT = a; RESULT.setLocation(a); :}
+                       | object_field:o {: RESULT = o; RESULT.setLocation(o); :}
+                       | object_function_call:o {: RESULT = o; RESULT.setLocation(o); :}
                        ;
 
 object_expression ::= identifier:id {: RESULT = id; RESULT.setLocation(id); :}

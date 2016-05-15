@@ -149,6 +149,8 @@ use_block ::= USE identifier:id use_block:u {: u.add(0, new UseStatement(id)); R
 
 class_declaration ::= CLASS identifier:id OPEN_BRACE function_declaration_list:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, new LinkedList<TypedDeclaration>(), methods, Optional.empty()); :}
                     | CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE function_declaration_list:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, new LinkedList<TypedDeclaration>(), methods, Optional.of(id2)); :}
+                    | CLASS identifier:id OPEN_BRACE CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); RESULT = new ClassDeclaration(id, new LinkedList<TypedDeclaration>(), methods, Optional.empty()); :}
+                    | CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); RESULT = new ClassDeclaration(id, new LinkedList<TypedDeclaration>(), methods, Optional.of(id2)); :}
                     ;
 
 interface_body ::= function_declaration_line:fd interface_body:p {: p.part1().add(fd); RESULT = p; :} 

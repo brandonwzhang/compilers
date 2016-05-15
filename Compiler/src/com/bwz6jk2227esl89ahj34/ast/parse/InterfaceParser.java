@@ -48,7 +48,7 @@ public class InterfaceParser
   /** Production table. */
   protected static final short _production_table[][] = 
     unpackFromStrings(new String[] {
-    "\000\037\000\002\002\004\000\002\002\002\000\002\003" +
+    "\000\041\000\002\002\004\000\002\002\002\000\002\003" +
     "\003\000\002\003\003\000\002\006\003\000\002\005\005" +
     "\000\002\005\003\000\002\004\004\000\002\004\004\000" +
     "\002\007\005\000\002\007\003\000\002\010\005\000\002" +
@@ -56,8 +56,9 @@ public class InterfaceParser
     "\003\000\002\013\010\000\002\013\006\000\002\014\003" +
     "\000\002\014\004\000\002\015\004\000\002\015\003\000" +
     "\002\016\005\000\002\016\006\000\002\016\003\000\002" +
-    "\017\007\000\002\017\011\000\002\020\004\000\002\020" +
-    "\004\000\002\020\003\000\002\021\004" });
+    "\017\007\000\002\017\011\000\002\017\006\000\002\017" +
+    "\010\000\002\020\004\000\002\020\004\000\002\020\003" +
+    "\000\002\021\004" });
 
   /** Access to production table. */
   @Override
@@ -66,8 +67,8 @@ public class InterfaceParser
   /** Parse-action table. */
   protected static final short[][] _action_table = 
     unpackFromStrings(new String[] {
-    "\000\072\000\012\002\000\004\000\021\005\056\000\001" +
-    "\002\000\010\002\000\004\012\056\017\001\002\000\004" +
+    "\000\074\000\012\002\000\004\000\021\005\056\000\001" +
+    "\002\000\010\002\000\004\012\056\020\001\002\000\004" +
     "\004\012\001\002\000\004\002\010\001\002\000\010\002" +
     "\uffe9\004\uffe9\056\uffe9\001\002\000\004\002\001\001\002" +
     "\000\014\002\000\004\000\021\005\051\014\056\000\001" +
@@ -76,44 +77,46 @@ public class InterfaceParser
     "\ufffd\057\ufffd\001\002\000\010\002\uffeb\004\uffeb\056\uffeb" +
     "\001\002\000\012\002\000\004\000\021\005\056\000\001" +
     "\002\000\010\002\uffea\004\uffea\056\uffea\001\002\000\004" +
-    "\043\043\001\002\000\004\004\012\001\002\000\010\002" +
-    "\000\004\012\056\017\001\002\000\004\002\uffe3\001\002" +
-    "\000\010\002\000\004\012\056\017\001\002\000\014\002" +
+    "\043\045\001\002\000\004\002\uffe1\001\002\000\004\004" +
+    "\012\001\002\000\010\002\000\004\012\056\020\001\002" +
+    "\000\010\002\000\004\012\056\020\001\002\000\014\002" +
     "\uffef\004\uffef\046\uffef\051\025\056\uffef\001\002\000\004" +
-    "\002\uffe4\001\002\000\012\002\uffee\004\uffee\046\uffee\056" +
-    "\uffee\001\002\000\004\002\uffe5\001\002\000\004\002\uffe6" +
+    "\002\uffe2\001\002\000\012\002\uffee\004\uffee\046\uffee\056" +
+    "\uffee\001\002\000\004\002\uffe3\001\002\000\004\002\uffe4" +
     "\001\002\000\006\045\032\057\031\001\002\000\004\004" +
-    "\012\001\002\000\004\004\012\001\002\000\004\046\036" +
-    "\001\002\000\006\004\012\046\uffec\001\002\000\004\046" +
-    "\uffed\001\002\000\010\002\uffe8\004\uffe8\056\uffe8\001\002" +
-    "\000\004\045\040\001\002\000\004\004\012\001\002\000" +
-    "\004\046\042\001\002\000\010\002\uffe7\004\uffe7\056\uffe7" +
-    "\001\002\000\006\004\012\044\000\001\002\000\004\047" +
-    "\073\001\002\000\004\044\053\001\002\000\004\044\ufff3" +
-    "\001\002\000\006\044\ufff4\050\051\001\002\000\004\044" +
-    "\ufff2\001\002\000\004\004\012\001\002\000\004\044\ufff5" +
-    "\001\002\000\016\002\ufff0\004\ufff0\046\ufff0\047\054\051" +
-    "\ufff0\056\ufff0\001\002\000\010\004\012\012\062\013\060" +
-    "\001\002\000\022\002\000\004\000\041\064\044\000\046" +
-    "\000\050\000\051\000\056\000\001\002\000\016\002\ufff7" +
-    "\004\ufff7\046\ufff7\050\070\051\ufff7\056\ufff7\001\002\000" +
-    "\014\002\ufff1\004\ufff1\046\ufff1\051\ufff1\056\ufff1\001\002" +
-    "\000\022\002\ufffe\004\ufffe\041\ufffe\044\ufffe\046\ufffe\050" +
-    "\ufffe\051\ufffe\056\ufffe\001\002\000\022\002\000\004\000" +
-    "\041\064\044\000\046\000\050\000\051\000\056\000\001" +
-    "\002\000\022\002\uffff\004\uffff\041\uffff\044\uffff\046\uffff" +
-    "\050\uffff\051\uffff\056\uffff\001\002\000\020\002\ufffa\004" +
-    "\ufffa\044\ufffa\046\ufffa\050\ufffa\051\ufffa\056\ufffa\001\002" +
-    "\000\004\042\066\001\002\000\020\002\ufffb\004\ufffb\044" +
-    "\ufffb\046\ufffb\050\ufffb\051\ufffb\056\ufffb\001\002\000\022" +
-    "\002\000\004\000\041\064\044\000\046\000\050\000\051" +
-    "\000\056\000\001\002\000\020\002\ufffc\004\ufffc\044\ufffc" +
-    "\046\ufffc\050\ufffc\051\ufffc\056\ufffc\001\002\000\010\004" +
-    "\012\012\062\013\060\001\002\000\014\002\ufff8\004\ufff8" +
-    "\046\ufff8\051\ufff8\056\ufff8\001\002\000\020\002\ufff9\004" +
-    "\ufff9\044\ufff9\046\ufff9\050\ufff9\051\ufff9\056\ufff9\001\002" +
-    "\000\010\004\012\012\062\013\060\001\002\000\006\044" +
-    "\ufff6\050\ufff6\001\002" });
+    "\012\001\002\000\006\004\012\046\034\001\002\000\004" +
+    "\046\037\001\002\000\010\002\uffe6\004\uffe6\056\uffe6\001" +
+    "\002\000\006\004\012\046\uffec\001\002\000\004\046\uffed" +
+    "\001\002\000\010\002\uffe8\004\uffe8\056\uffe8\001\002\000" +
+    "\004\045\041\001\002\000\006\004\012\046\043\001\002" +
+    "\000\004\046\044\001\002\000\010\002\uffe5\004\uffe5\056" +
+    "\uffe5\001\002\000\010\002\uffe7\004\uffe7\056\uffe7\001\002" +
+    "\000\006\004\012\044\000\001\002\000\004\047\075\001" +
+    "\002\000\004\044\055\001\002\000\004\044\ufff3\001\002" +
+    "\000\006\044\ufff4\050\053\001\002\000\004\044\ufff2\001" +
+    "\002\000\004\004\012\001\002\000\004\044\ufff5\001\002" +
+    "\000\016\002\ufff0\004\ufff0\046\ufff0\047\056\051\ufff0\056" +
+    "\ufff0\001\002\000\010\004\012\012\064\013\062\001\002" +
+    "\000\022\002\000\004\000\041\066\044\000\046\000\050" +
+    "\000\051\000\056\000\001\002\000\016\002\ufff7\004\ufff7" +
+    "\046\ufff7\050\072\051\ufff7\056\ufff7\001\002\000\014\002" +
+    "\ufff1\004\ufff1\046\ufff1\051\ufff1\056\ufff1\001\002\000\022" +
+    "\002\ufffe\004\ufffe\041\ufffe\044\ufffe\046\ufffe\050\ufffe\051" +
+    "\ufffe\056\ufffe\001\002\000\022\002\000\004\000\041\066" +
+    "\044\000\046\000\050\000\051\000\056\000\001\002\000" +
+    "\022\002\uffff\004\uffff\041\uffff\044\uffff\046\uffff\050\uffff" +
+    "\051\uffff\056\uffff\001\002\000\020\002\ufffa\004\ufffa\044" +
+    "\ufffa\046\ufffa\050\ufffa\051\ufffa\056\ufffa\001\002\000\004" +
+    "\042\070\001\002\000\020\002\ufffb\004\ufffb\044\ufffb\046" +
+    "\ufffb\050\ufffb\051\ufffb\056\ufffb\001\002\000\022\002\000" +
+    "\004\000\041\066\044\000\046\000\050\000\051\000\056" +
+    "\000\001\002\000\020\002\ufffc\004\ufffc\044\ufffc\046\ufffc" +
+    "\050\ufffc\051\ufffc\056\ufffc\001\002\000\010\004\012\012" +
+    "\064\013\062\001\002\000\014\002\ufff8\004\ufff8\046\ufff8" +
+    "\051\ufff8\056\ufff8\001\002\000\020\002\ufff9\004\ufff9\044" +
+    "\ufff9\046\ufff9\050\ufff9\051\ufff9\056\ufff9\001\002\000\010" +
+    "\004\012\012\064\013\062\001\002\000\006\044\ufff6\050" +
+    "\ufff6\001\002" });
 
   /** Access to parse-action table. */
   @Override
@@ -122,35 +125,35 @@ public class InterfaceParser
   /** {@code reduce_goto} table. */
   protected static final short[][] _reduce_table = 
     unpackFromStrings(new String[] {
-    "\000\072\000\010\002\006\016\003\021\005\001\001\000" +
-    "\016\002\023\006\015\013\022\014\017\017\021\020\020" +
+    "\000\074\000\010\002\006\016\003\021\005\001\001\000" +
+    "\016\002\023\006\015\013\022\014\020\017\021\020\016" +
     "\001\001\000\004\006\010\001\001\000\002\001\001\000" +
     "\002\001\001\000\002\001\001\000\006\002\006\016\012" +
     "\001\001\000\002\001\001\000\002\001\001\000\006\002" +
     "\006\016\014\001\001\000\002\001\001\000\002\001\001" +
-    "\000\004\006\027\001\001\000\016\002\023\006\015\013" +
-    "\022\014\017\017\021\020\026\001\001\000\002\001\001" +
-    "\000\016\002\023\006\015\013\022\014\017\017\021\020" +
+    "\000\002\001\001\000\004\006\027\001\001\000\016\002" +
+    "\023\006\015\013\022\014\020\017\021\020\026\001\001" +
+    "\000\016\002\023\006\015\013\022\014\020\017\021\020" +
     "\025\001\001\000\002\001\001\000\002\001\001\000\002" +
     "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
-    "\001\000\004\006\036\001\001\000\012\006\015\013\022" +
-    "\014\033\015\032\001\001\000\002\001\001\000\012\006" +
-    "\015\013\022\014\033\015\034\001\001\000\002\001\001" +
-    "\000\002\001\001\000\002\001\001\000\012\006\015\013" +
-    "\022\014\033\015\040\001\001\000\002\001\001\000\002" +
-    "\001\001\000\014\002\047\006\043\010\046\011\045\012" +
-    "\044\001\001\000\002\001\001\000\002\001\001\000\002" +
-    "\001\001\000\002\001\001\000\002\001\001\000\010\006" +
-    "\043\010\046\011\051\001\001\000\002\001\001\000\002" +
-    "\001\001\000\012\003\060\004\055\006\054\007\056\001" +
-    "\001\000\006\002\064\005\071\001\001\000\002\001\001" +
-    "\000\002\001\001\000\002\001\001\000\006\002\064\005" +
-    "\062\001\001\000\002\001\001\000\002\001\001\000\002" +
-    "\001\001\000\002\001\001\000\006\002\064\005\066\001" +
-    "\001\000\002\001\001\000\012\003\060\004\055\006\054" +
-    "\007\070\001\001\000\002\001\001\000\002\001\001\000" +
-    "\010\003\060\004\073\006\054\001\001\000\002\001\001" +
-    "" });
+    "\001\000\004\006\037\001\001\000\012\006\015\013\022" +
+    "\014\034\015\032\001\001\000\002\001\001\000\002\001" +
+    "\001\000\012\006\015\013\022\014\034\015\035\001\001" +
+    "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
+    "\012\006\015\013\022\014\034\015\041\001\001\000\002" +
+    "\001\001\000\002\001\001\000\002\001\001\000\014\002" +
+    "\051\006\045\010\050\011\047\012\046\001\001\000\002" +
+    "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
+    "\001\000\002\001\001\000\010\006\045\010\050\011\053" +
+    "\001\001\000\002\001\001\000\002\001\001\000\012\003" +
+    "\062\004\057\006\056\007\060\001\001\000\006\002\066" +
+    "\005\073\001\001\000\002\001\001\000\002\001\001\000" +
+    "\002\001\001\000\006\002\066\005\064\001\001\000\002" +
+    "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
+    "\001\000\006\002\066\005\070\001\001\000\002\001\001" +
+    "\000\012\003\062\004\057\006\056\007\072\001\001\000" +
+    "\002\001\001\000\002\001\001\000\010\003\062\004\075" +
+    "\006\056\001\001\000\002\001\001" });
 
   /** Access to {@code reduce_goto} table. */
   @Override
@@ -244,7 +247,7 @@ class CUP$InterfaceParser$actions {
         this.parser = parser;
     }
 
-    /** Method with the actual generated action code for actions 0 to 30. */
+    /** Method with the actual generated action code for actions 0 to 32. */
     public final java_cup.runtime.Symbol CUP$InterfaceParser$do_action_part00000000(
             int                        CUP$InterfaceParser$act_num,
             java_cup.runtime.lr_parser CUP$InterfaceParser$parser,
@@ -607,7 +610,34 @@ class CUP$InterfaceParser$actions {
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 27: // interface_body ::= function_declaration_line interface_body 
+        case 27: // class_declaration ::= CLASS identifier OPEN_BRACE CLOSE_BRACE 
+            {
+                ClassDeclaration RESULT = null;
+                int idleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).left;
+                int idright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).right;
+                Identifier id = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).<Identifier> value();
+                 List<MethodDeclaration> methods = new LinkedList<>(); RESULT = new ClassDeclaration(id, new LinkedList<TypedDeclaration>(), methods, Optional.empty()); 
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("class_declaration",13, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-3), CUP$InterfaceParser$stack.peek(), RESULT);
+            }
+            return CUP$InterfaceParser$result;
+
+        /*. . . . . . . . . . . . . . . . . . . .*/
+        case 28: // class_declaration ::= CLASS identifier EXTENDS identifier OPEN_BRACE CLOSE_BRACE 
+            {
+                ClassDeclaration RESULT = null;
+                int idleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-4).left;
+                int idright = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-4).right;
+                Identifier id = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-4).<Identifier> value();
+                int id2left = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).left;
+                int id2right = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).right;
+                Identifier id2 = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-2).<Identifier> value();
+                 List<MethodDeclaration> methods = new LinkedList<>(); RESULT = new ClassDeclaration(id, new LinkedList<TypedDeclaration>(), methods, Optional.of(id2)); 
+                CUP$InterfaceParser$result = parser.getSymbolFactory().newSymbol("class_declaration",13, CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-5), CUP$InterfaceParser$stack.peek(), RESULT);
+            }
+            return CUP$InterfaceParser$result;
+
+        /*. . . . . . . . . . . . . . . . . . . .*/
+        case 29: // interface_body ::= function_declaration_line interface_body 
             {
                 Pair<List<FunctionDeclaration>,List<ClassDeclaration>> RESULT = null;
                 int fdleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
@@ -622,7 +652,7 @@ class CUP$InterfaceParser$actions {
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 28: // interface_body ::= class_declaration interface_body 
+        case 30: // interface_body ::= class_declaration interface_body 
             {
                 Pair<List<FunctionDeclaration>,List<ClassDeclaration>> RESULT = null;
                 int cleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
@@ -637,7 +667,7 @@ class CUP$InterfaceParser$actions {
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 29: // interface_body ::= empty 
+        case 31: // interface_body ::= empty 
             {
                 Pair<List<FunctionDeclaration>,List<ClassDeclaration>> RESULT = null;
                  Pair<List<FunctionDeclaration>, List<ClassDeclaration>> body = new Pair<>(new LinkedList<>(), new LinkedList<>()); RESULT = body; 
@@ -646,7 +676,7 @@ class CUP$InterfaceParser$actions {
             return CUP$InterfaceParser$result;
 
         /*. . . . . . . . . . . . . . . . . . . .*/
-        case 30: // interface ::= use_block interface_body 
+        case 32: // interface ::= use_block interface_body 
             {
                 Interface RESULT = null;
                 int uleft = CUP$InterfaceParser$stack.elementAt(CUP$InterfaceParser$top-1).left;
