@@ -242,8 +242,8 @@ class MdbWidget extends QWidget {
 	    j = 0
 	    while (j < WINSIZE) {
 		co:Color = assign_color(plot[i][j])
-		p.setPen  (qpen   (qcolor (co.r, co.g, co.b)))
-		p.setBrush(qbrush (qcolor (co.r, co.g, co.b)))
+		p.setPen  (qpen   (qcolor (co.getR(), co.getG(), co.getB())))
+		p.setBrush(qbrush (qcolor (co.getR(), co.getG(), co.getB())))
 		p.fillRect(qrect(i,j,2,2), p.brush())
 		j = j + 1
 	    }
@@ -256,6 +256,8 @@ class MdbWidget extends QWidget {
 class Color {
   r,g,b: int
   init(r_: int, g_: int, b_: int): Color { r = r_; g = g_; b = b_; return this}
+  getR(): int { return r } getG(): int { return g } getB(): int { return b }
+  setR(r_: int) { r = r_ } setG(g_: int) { g = g_ } setB(b_: int) { b = b_ }
 }
 
 wheel(i: int): int { // assumes RAMPS = 12
@@ -284,10 +286,11 @@ assign_color(iterations: int): Color {
     s: Color
     if (ramp_start == 0) s = new Color
     else s = base_color(ramp_start)
-    s.r = s.r/2; s.g = s.g/2; s.b = s.b/2
-    r: int = s.r + (e.r - s.r) * index / (RAMPSIZE-1) // interpolate the ramp
-    g: int = s.g + (e.g - s.g) * index / (RAMPSIZE-1)
-    b: int = s.b + (e.b - s.b) * index / (RAMPSIZE-1)
+    s.setR(s.getR()/2); s.setG(s.getG()/2); s.setB(s.getB()/2);
+    //s.r = s.r/2; s.g = s.g/2; s.b = s.b/2
+    r: int = s.getR() + (e.getR() - s.getR()) * index / (RAMPSIZE-1) // interpolate the ramp
+    g: int = s.getG() + (e.getG() - s.getG()) * index / (RAMPSIZE-1)
+    b: int = s.getB() + (e.getB() - s.getB()) * index / (RAMPSIZE-1)
     r = 255 - (255 - r)*(255 - r)/255 // cut-rate gamma correction
     g = 255 - (255 - g)*(255 - g)/255
     b = 255 - (255 - b)*(255 - b)/255
