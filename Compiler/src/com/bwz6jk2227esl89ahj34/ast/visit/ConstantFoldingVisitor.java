@@ -1,6 +1,7 @@
 package com.bwz6jk2227esl89ahj34.ast.visit;
 
 import com.bwz6jk2227esl89ahj34.ast.*;
+import com.bwz6jk2227esl89ahj34.ast.type.Type;
 import com.bwz6jk2227esl89ahj34.util.Util;
 
 import java.math.BigInteger;
@@ -258,7 +259,7 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(Break node) {
-        // TODO
+        // nothing to do because you can't constant fold over a break...
     }
 
     /**
@@ -275,7 +276,12 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(ClassDeclaration node) {
-        // TODO
+        for (TypedDeclaration typedDeclaration : node.getFields()) {
+            typedDeclaration.accept(this);
+        }
+        for (MethodDeclaration methodDeclaration : node.getMethods()) {
+            methodDeclaration.accept(this);
+        }
     }
 
     /**
@@ -365,27 +371,73 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(MethodDeclaration node) {
-        // TODO
+        node.getFunctionDeclaration().accept(this);
     }
 
     public void visit(Null node) {
-        // TODO
+        // do nothing since null cannot be constant folded...
+        stack.push(node);
     }
 
     public void visit(ObjectField node) {
-        // TODO
+        // if currently on LHS of assignment then we add it onto the
+        // stack of assignables
+        if (LHS) {
+            assignableStack.push(node);
+        } else { // otherwise we make the identifier available on the stack
+            stack.push(node);
+        }
     }
 
     public void visit(ObjectFunctionCall node) {
-        // TODO
+
+        // perform constant folding on the object...
+        node.getObject().accept(this);
+        node.setObject(!stack.isEmpty() ? stack.pop() :
+                (Expression) assignableStack.pop());
+
+        // we perform constant folding on the arguments of the function call
+        List<Expression> newArguments = new LinkedList<>();
+        for(Expression e : node.getArguments()) {
+            e.accept(this);
+            assert !stack.isEmpty() || !assignableStack.isEmpty();
+            Expression arg = !stack.isEmpty() ? stack.pop() :
+                    (Expression) assignableStack.pop();
+            newArguments.add(arg);
+        }
+        // then we set the arguments of the function call to the list of
+        // constant folded arguments
+        node.setArguments(new LinkedList<>(newArguments));
+
+        // we make the function call available on the stack
+        if (LHS) {
+            assignableStack.push(node);
+        } else {
+            stack.push(node);
+        }
     }
 
     public void visit(ObjectInstantiation node) {
-        // TODO
+        // if currently on LHS of assignment then we add it onto the
+        // stack of assignables
+        if (LHS) {
+            assignableStack.push(node);
+        } else { // otherwise we make the identifier available on the stack
+            stack.push(node);
+        }
     }
 
     public void visit(ObjectProcedureCall node) {
-        // TODO
+        // we perform constant folding on the arguments of a proc call
+        List<Expression> newArguments = new LinkedList<>();
+        for(Expression e : node.getArguments()) {
+            e.accept(this);
+            assert !stack.isEmpty();
+            newArguments.add(stack.pop());
+        }
+        node.setArguments(new LinkedList<>(newArguments));
+        // a proc call itself is a statement so we do not need to push it
+        // onto the stack
     }
 
     /**
@@ -414,9 +466,15 @@ public class ConstantFoldingVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Program node) {
+        // use blocks + global variables do not have to be constant folded...
+
         for (FunctionDeclaration functionDeclaration :
                 node.getFunctionDeclarations()) {
             functionDeclaration.accept(this);
+        }
+
+        for (ClassDeclaration classDeclaration : node.getClassDeclarations()) {
+            classDeclaration.accept(this);
         }
     }
 
@@ -463,7 +521,13 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(This node) {
-        // TODO
+        // if currently on LHS of assignment then we add it onto the
+        // stack of assignables
+        if (LHS) {
+            assignableStack.push(node);
+        } else { // otherwise we make the identifier available on the stack
+            stack.push(node);
+        }
     }
     /**
      * for a typed declaration, if the declaration involves a fixed size
