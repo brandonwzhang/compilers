@@ -45,7 +45,7 @@ class QApplication {
 }
 
 // Create a QApplication.
-qapplication(origArgs: int[][]): (QApplication, int[][])
+qapplication(origArgs: int[][]): QApplication, int[][]
 
 // A Listener called by applications that are quitting. 
 class AboutToQuitListener {
