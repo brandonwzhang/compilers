@@ -245,6 +245,7 @@ public class AvailableExpressionAnalysis extends DataflowAnalysis{
             // it could return different results
             // TODO: Check if we need to do this
             IRCall call = (IRCall)expr;
+            addSubexprs(call.target(), set);
             for (IRExpr e : call.args()) {
                 addSubexprs(e, set);
             }
