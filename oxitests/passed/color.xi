@@ -3,6 +3,11 @@ use io
 
 class Color {
     r,g,b:int
+    set(r1:int, g1:int, b1:int) {
+        r = r1
+        g = g1
+        b = b1
+    }
 }
 
 class ColoredPoint extends Point {
@@ -14,4 +19,17 @@ class ColoredPoint extends Point {
         col = c
         return this
     }
+}
+
+
+main(args:int[][]) {
+    p:Point = createPoint(5,5)
+    c:Color = new Color
+    c.set(50, 50, 50)
+    cp:ColoredPoint = new ColoredPoint
+
+    x,y = p.coords()
+    cp = cp.initColoredPoint(x, y, c)
+
+
 }

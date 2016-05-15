@@ -24,3 +24,7 @@ class Point {
 createPoint(x:int, y:int): Point {
     return new Point.initPoint(x,y)
 }
+
+main(args:int[][]) {
+    println("nada")
+}
