@@ -193,7 +193,7 @@ public class Tests {
         Util.getDirectoryFiles(testDir + "passed/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .forEach(filename -> {
-                    System.out.println(filename);
+                    System.out.println("\n" + filename);
                     Optional<Program> program = Core.parseFile(filename);
                     if (!program.isPresent()) {
                         return;
@@ -207,7 +207,7 @@ public class Tests {
         Util.getDirectoryFiles(testDir + "failed/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .forEach(filename -> {
-                    System.out.println(filename);
+                    System.out.println("\n" + filename);
                     Optional<Program> program = Core.parseFile(filename);
                     if (!program.isPresent()) {
                         return;
