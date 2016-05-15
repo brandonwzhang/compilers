@@ -1,0 +1,7 @@
+use inheritance_test1
+
+class D {
+	d1()
+	d2(n: int): int
+	d3(b: bool): A
+}
