@@ -13,7 +13,9 @@ public class DataSegment extends LinkedHashMap<String, List<IRNode>> {
         String s = "";
         s += "\t\t.data\n";
         s += "\t\t.align 8\n";
+
         for (String name : keySet()) {
+            s += "\t\t.globl\t" + name + "\n";
             s += name + ":\n";
             List<IRNode> values = get(name);
             for (IRNode value : values) {

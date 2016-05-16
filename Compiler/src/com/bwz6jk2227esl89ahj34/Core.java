@@ -315,24 +315,14 @@ public class Core {
             irRun(file);
         }
 
-        // Get the names of functions defined in files that are imported.
-        List<String> IRfunctionNamesFromUseStatements = new LinkedList<>();
-        if (program.isPresent()) {
-            List<FunctionDeclaration> useFunctionDeclarations =
-                    program.get().getFunctionsFromUseStatement(Main.libPath());
-            for(FunctionDeclaration useFunctionDeclaration : useFunctionDeclarations) {
-                IRfunctionNamesFromUseStatements.add(Util.getIRFunctionName(useFunctionDeclaration));
-            }
-        }
-
         // Instantiate an AssemblyProgram, which processes the ir and prepares
         // the assembly code.
         AssemblyProgram assemblyProgram =
                 new AssemblyProgram(
                         lirRoot,
-                        IRfunctionNamesFromUseStatements,
                         Main.target()
                 );
+
         Util.writeHelper(
                 file,
                 "s",

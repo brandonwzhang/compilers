@@ -12,8 +12,6 @@ import java.util.List;
 public class AssemblyProgram {
     private IRCompUnit compUnit;
     private List<AssemblyFunction> functions = new ArrayList<>();
-    // Holds the names of functions in the interfaces used by this program
-    private List<String> global;
     private String target;
 
 
@@ -21,9 +19,8 @@ public class AssemblyProgram {
      * Generate assembly code for a program
      * @param root IRCompUnit of program
      */
-    public AssemblyProgram(IRCompUnit root, List<String> global, String target) {
+    public AssemblyProgram(IRCompUnit root, String target) {
         compUnit = root;
-        this.global = global;
         this.target = target;
 
         // Get the maximum number of return values and arguments in all functions
@@ -137,9 +134,6 @@ public class AssemblyProgram {
         // Add the functions
         s += "\t\t.text\n";
         for (AssemblyFunction function : functions) {
-            for(String globalName : global) {
-                s+= "\t\t.globl\t" + globalName + "\n";
-            }
             s += function + "\n";
         }
         // Add the .ctors section
