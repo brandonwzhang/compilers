@@ -140,7 +140,7 @@ public class ConditionalConstantAnalysis extends DataflowAnalysis {
                         System.out.println("RHS is: " + RHS);
                         throw new RuntimeException("Please contact jk2227@cornell.edu");
                     }
-                } else if (RHS instanceof IRCall || RHS instanceof IRMem) {
+                } else if (RHS instanceof IRCall || RHS instanceof IRMem || RHS instanceof IRName) {
                     newMap.put(nameLHS, new LatticeBottom());
                 } else { // should not reach here
                     System.out.println("RHS is: "+ RHS);
