@@ -323,8 +323,8 @@ block ::= block_scope:bl {: RESULT = bl; RESULT.setLocation(bl); :}
         ;
 
 // x,y:int 
-typed_declaration_list ::= identifier:id COMMA typed_declaration:td {: List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(0, new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); :}
-              | identifier:id COMMA typed_declaration_list:f {: TypedDeclaration temp = f.get(f.size()-1); f.add(0, new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); :} 
+typed_declaration_list ::= identifier:id COMMA typed_declaration:td {: List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); :}
+              | identifier:id COMMA typed_declaration_list:f {: TypedDeclaration temp = f.get(f.size()-1); f.add(new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); :} 
               ; 
 
 block_list ::= block:b block_list:bl {: bl.getBlocks().add(0, b); RESULT = bl; :}
@@ -366,12 +366,12 @@ use_block ::= USE identifier:id use_block:u {: u.add(0, new UseStatement(id)); R
             ;
 
 field ::= typed_declaration_list:td {: RESULT = td; :}
-         | typed_declaration:td {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(td); RESULT = lst; :}
+         | typed_declaration:td {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(0, td); RESULT = lst; :}
          ;
 
-class_declaration_body ::= field:f class_declaration_body:c {: c.part1().addAll(f); RESULT = c ; :}
-                       | field:f SEMICOLON class_declaration_body:c {: c.part1().addAll(f); RESULT = c ; :}
-                       | function_declaration:f class_declaration_body:c {: c.part2().add(f); RESULT = c; :}
+class_declaration_body ::= field:f class_declaration_body:c {: for(TypedDeclaration td : f) { c.part1().add(0, td); } RESULT = c ; :}
+                       | field:f SEMICOLON class_declaration_body:c {: for(TypedDeclaration td : f) { c.part1().add(0, td); } RESULT = c ; :}
+                       | function_declaration:f class_declaration_body:c {: c.part2().add(0, f); RESULT = c; :}
                        | empty {: Pair<List<TypedDeclaration>, List<FunctionDeclaration>> pair = new Pair<>(new LinkedList<>(), new LinkedList<>()); RESULT = pair; :}
                        ; 
 

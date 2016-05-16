@@ -2600,7 +2600,7 @@ class CUP$Parser$actions {
                 int tdleft = CUP$Parser$stack.peek().left;
                 int tdright = CUP$Parser$stack.peek().right;
                 TypedDeclaration td = CUP$Parser$stack.peek().<TypedDeclaration> value();
-                 List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(0, new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); 
+                 List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("typed_declaration_list",49, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2615,7 +2615,7 @@ class CUP$Parser$actions {
                 int fleft = CUP$Parser$stack.peek().left;
                 int fright = CUP$Parser$stack.peek().right;
                 List<TypedDeclaration> f = CUP$Parser$stack.peek().<List<TypedDeclaration>> value();
-                 TypedDeclaration temp = f.get(f.size()-1); f.add(0, new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); 
+                 TypedDeclaration temp = f.get(f.size()-1); f.add(new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("typed_declaration_list",49, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2909,7 +2909,7 @@ class CUP$Parser$actions {
                 int tdleft = CUP$Parser$stack.peek().left;
                 int tdright = CUP$Parser$stack.peek().right;
                 TypedDeclaration td = CUP$Parser$stack.peek().<TypedDeclaration> value();
-                 List<TypedDeclaration> lst = new LinkedList<>(); lst.add(td); RESULT = lst; 
+                 List<TypedDeclaration> lst = new LinkedList<>(); lst.add(0, td); RESULT = lst; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("field",50, CUP$Parser$stack.peek(), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2924,7 +2924,7 @@ class CUP$Parser$actions {
                 int cleft = CUP$Parser$stack.peek().left;
                 int cright = CUP$Parser$stack.peek().right;
                 Pair<List<TypedDeclaration>,List<FunctionDeclaration>> c = CUP$Parser$stack.peek().<Pair<List<TypedDeclaration>,List<FunctionDeclaration>>> value();
-                 c.part1().addAll(f); RESULT = c ; 
+                 for(TypedDeclaration td : f) { c.part1().add(0, td); } RESULT = c ; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("class_declaration_body",51, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2939,7 +2939,7 @@ class CUP$Parser$actions {
                 int cleft = CUP$Parser$stack.peek().left;
                 int cright = CUP$Parser$stack.peek().right;
                 Pair<List<TypedDeclaration>,List<FunctionDeclaration>> c = CUP$Parser$stack.peek().<Pair<List<TypedDeclaration>,List<FunctionDeclaration>>> value();
-                 c.part1().addAll(f); RESULT = c ; 
+                 for(TypedDeclaration td : f) { c.part1().add(0, td); } RESULT = c ; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("class_declaration_body",51, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -2954,7 +2954,7 @@ class CUP$Parser$actions {
                 int cleft = CUP$Parser$stack.peek().left;
                 int cright = CUP$Parser$stack.peek().right;
                 Pair<List<TypedDeclaration>,List<FunctionDeclaration>> c = CUP$Parser$stack.peek().<Pair<List<TypedDeclaration>,List<FunctionDeclaration>>> value();
-                 c.part2().add(f); RESULT = c; 
+                 c.part2().add(0, f); RESULT = c; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("class_declaration_body",51, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
