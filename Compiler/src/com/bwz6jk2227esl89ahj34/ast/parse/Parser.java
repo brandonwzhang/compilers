@@ -3011,7 +3011,7 @@ class CUP$Parser$actions {
                 int pleft = CUP$Parser$stack.peek().left;
                 int pright = CUP$Parser$stack.peek().right;
                 Triple<List<Assignment>,List<FunctionDeclaration>,List<ClassDeclaration>> p = CUP$Parser$stack.peek().<Triple<List<Assignment>,List<FunctionDeclaration>,List<ClassDeclaration>>> value();
-                 p.getA().addAll(g); RESULT = p; 
+                 for (Assignment ga : g) { p.getA().add(0, ga); } RESULT = p; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("program_body",53, CUP$Parser$stack.elementAt(CUP$Parser$top-1), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;
@@ -3026,7 +3026,7 @@ class CUP$Parser$actions {
                 int pleft = CUP$Parser$stack.peek().left;
                 int pright = CUP$Parser$stack.peek().right;
                 Triple<List<Assignment>,List<FunctionDeclaration>,List<ClassDeclaration>> p = CUP$Parser$stack.peek().<Triple<List<Assignment>,List<FunctionDeclaration>,List<ClassDeclaration>>> value();
-                 p.getA().addAll(g); RESULT = p; 
+                 for (Assignment ga : g) { p.getA().add(0, ga); } RESULT = p; 
                 CUP$Parser$result = parser.getSymbolFactory().newSymbol("program_body",53, CUP$Parser$stack.elementAt(CUP$Parser$top-2), CUP$Parser$stack.peek(), RESULT);
             }
             return CUP$Parser$result;

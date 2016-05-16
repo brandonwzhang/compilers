@@ -379,8 +379,8 @@ class_declaration ::= CLASS identifier:id OPEN_BRACE class_declaration_body:body
                     | CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE class_declaration_body:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body.part2()) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, body.part1(), methods, Optional.of(id2)); :}
                     ;
 
-program_body ::= global_variable:g program_body:p {: p.getA().addAll(g); RESULT = p; :}
-               | global_variable:g SEMICOLON program_body:p {: p.getA().addAll(g); RESULT = p; :}
+program_body ::= global_variable:g program_body:p {: for (Assignment ga : g) { p.getA().add(0, ga); } RESULT = p; :}
+               | global_variable:g SEMICOLON program_body:p {: for (Assignment ga : g) { p.getA().add(0, ga); } RESULT = p; :}
                | function_declaration:fd program_body:p {: p.getB().add(fd); RESULT = p; :} 
                | class_declaration:c program_body:p {: p.getC().add(c); RESULT = p; :}
                | empty {: Triple<List<Assignment>, List<FunctionDeclaration>, List<ClassDeclaration>> body = new Triple<>(new LinkedList<>(), new LinkedList<>(), new LinkedList<>()); RESULT = body; :}
