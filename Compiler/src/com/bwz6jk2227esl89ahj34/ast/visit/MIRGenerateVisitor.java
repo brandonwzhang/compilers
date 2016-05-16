@@ -975,7 +975,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         Map<String, IRFuncDecl> functions = new LinkedHashMap<>();
 
         // Populate dispatchVectors and classFields
-        for (ClassDeclaration cd : node.getClassDeclarations()) {
+        for (ClassDeclaration cd : classes.values()) {
             addDispatchVector(cd);
             addFields(cd);
         }
