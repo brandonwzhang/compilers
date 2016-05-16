@@ -1,0 +1,23 @@
+// File I/O
+
+class FileOutput extends OutputStream {
+    close()
+}
+
+class FileInput extends InputStream {
+    close()
+}
+
+readFile(filename: int[]): FileInput
+	// Open the named file for reading.  Return null on failure.
+
+createFile(filename: int[]): FileOutput
+	// If the file does not exist, create it and return a FileOutput that
+	// will write to the file.  If the file cannot be created, return null.
+
+appendFile(filename: int[]): FileOutput
+	// If the file can be opened, return a FileOutput that appends to it.
+	// Otherwise, return null.
+
+removeFile(filename: int[]): bool
+	// Remove the file and return true if successful
