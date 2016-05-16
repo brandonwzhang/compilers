@@ -43,7 +43,7 @@ public class Core {
         try {
             reader = new FileReader(Main.sourcePath() + file);
         } catch (FileNotFoundException e) {
-            if (!Main.generateAssembly()) {
+            if (!Main.generateExecutable()) {
                 // -a was provided and generateAssembly() will not be called
                 System.out.println(Main.sourcePath() + file + " was not found.");
             }
@@ -331,13 +331,29 @@ public class Core {
         );
     }
 
-    public static void generateExecutable(String file) {
-        generateAssembly(file);
+    public static void generateExecutable(String[] files) {
+        if (files.length == 0) {
+            return;
+        }
+
+        for (String file : files) {
+            generateAssembly(file);
+        }
         // Link and generate executable
-        String fileName = file.substring(0, file.lastIndexOf('.'));
-        ProcessBuilder pb =
-                new ProcessBuilder(Util.rootPath + "/runtime/linkxi.sh", "-o",
-                        fileName, Main.assemblyPath() + "/" + fileName + ".s").inheritIO();
+        List<String> command = new LinkedList<>();
+        command.add(Util.rootPath + "/runtime/linkxi.sh");
+        // Output is the name of the last file passed in
+        command.add("-o");
+        String outputFile = files[files.length - 1];
+        String outputFileName = outputFile.substring(0, outputFile.lastIndexOf('.'));
+        command.add(outputFileName);
+
+        // Add all generated assembly files
+        for (String file : files) {
+            String fileName = file.substring(0, file.lastIndexOf('.'));
+            command.add(Main.assemblyPath() + "/" + fileName + ".s");
+        }
+        ProcessBuilder pb = new ProcessBuilder(command).inheritIO();
         try {
             Process linkProcess = pb.start();
             linkProcess.waitFor();

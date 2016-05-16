@@ -19,7 +19,7 @@ public class Main {
     private static boolean typecheck;
     private static boolean irgen;
     private static boolean irrun;
-    private static boolean generateAssembly = true;
+    private static boolean generateExecutable = true;
     private static boolean reportInitialIR = false;
     private static boolean reportFinalIR = false;
     private static boolean reportInitialCFG = false;
@@ -235,7 +235,7 @@ public class Main {
     }
 
     public static void turnAssemblyGenerationOff(String [] args) {
-        generateAssembly = false;
+        generateExecutable = false;
     }
 
     public static boolean lex() {
@@ -258,8 +258,8 @@ public class Main {
         return irrun;
     }
 
-    public static boolean generateAssembly() {
-        return generateAssembly;
+    public static boolean generateExecutable() {
+        return generateExecutable;
     }
 
     public static boolean reportInitialIR() { return reportInitialIR; }

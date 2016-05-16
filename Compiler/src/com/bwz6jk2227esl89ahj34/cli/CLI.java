@@ -161,9 +161,9 @@ public class CLI {
             }
         }
 
-        // assembly generation
-        if (Main.generateAssembly()) {
-            Arrays.stream(filesArray).forEach(Core::generateExecutable);
+        // Executable generation
+        if (Main.generateExecutable()) {
+            Core.generateExecutable(filesArray);
         }
     }
 
