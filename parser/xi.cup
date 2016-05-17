@@ -264,6 +264,7 @@ object_expression ::= identifier:id {: RESULT = id; RESULT.setLocation(id); :}
                     | object_field:of {: RESULT = of; RESULT.setLocation(of); :}
                     | THIS {: RESULT = new This(); RESULT.setLocation(parser.stack.peek()); :}
                     | identifier:i CAST object_expression:e {: RESULT = new CastedExpression(i, e); :}
+                    | identifier:i CAST OPEN_PAREN object_expression:e CLOSE_PAREN {: RESULT = new CastedExpression(i, e); :}
                     ;
 
 object_function_call ::= object_expression:e PERIOD function_call:fc {: RESULT = new ObjectFunctionCall(fc.getIdentifier(), e, fc.getArguments()); RESULT.setLocation(e); :}
