@@ -211,7 +211,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             return;
         }
         // If RHS is VariableTypeList, we have to handle a multiassign
-        assert expression instanceof FunctionCall;
+        assert (expression instanceof FunctionCall || expression instanceof ObjectFunctionCall);
         assert expression.getType() instanceof VariableTypeList;
         assert variables.size() == ((VariableTypeList) expression.getType()).getVariableTypeList().size();
 
