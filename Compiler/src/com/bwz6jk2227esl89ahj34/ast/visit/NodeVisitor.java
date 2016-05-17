@@ -10,6 +10,7 @@ public interface NodeVisitor {
     void visit(BlockList node);
     void visit(BooleanLiteral node);
     void visit(Break node);
+    void visit(CastedExpression node);
     void visit(CharacterLiteral node);
     void visit(ClassDeclaration node);
     void visit(FunctionCall node);

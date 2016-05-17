@@ -20,6 +20,7 @@ public class ParserSym {
   public static final int BREAK = 13;
   public static final int ELSE = 11;
   public static final int IF = 10;
+  public static final int CAST = 51;
   public static final int NULL = 48;
   public static final int CHARACTER_LITERAL = 4;
   public static final int HIGH_MULT = 41;
@@ -110,7 +111,8 @@ public class ParserSym {
   "PERIOD",
   "NULL",
   "THIS",
-  "FOR"
+  "FOR",
+  "CAST"
   };
 }
 

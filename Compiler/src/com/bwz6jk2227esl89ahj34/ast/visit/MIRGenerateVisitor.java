@@ -471,6 +471,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
         generatedNodes.push(new IRJump(new IRName(exitLabels.peek().name())));
     }
 
+    public void visit(CastedExpression node) {
+        //TODO
+    }
+
     public void visit(CharacterLiteral node) {
         generatedNodes.push(new IRConst((long) node.getValue()));
     }
