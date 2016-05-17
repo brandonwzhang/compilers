@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class CastedExpression extends Expression {
+public class CastedExpression extends Expression implements Assignable {
     Identifier castTo;
     Expression expression;
     public void accept(NodeVisitor v){
