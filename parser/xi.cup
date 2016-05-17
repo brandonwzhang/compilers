@@ -116,6 +116,7 @@ nonterminal Assignment global_variable_assignment;
 
 precedence nonassoc ELSE;
 precedence nonassoc SEMICOLON;
+precedence nonassoc CAST;
 
 start with program;
 
@@ -262,6 +263,7 @@ object_expression ::= identifier:id {: RESULT = id; RESULT.setLocation(id); :}
                     | assignment_lhs_array_brackets:ai {: RESULT = ai; RESULT.setLocation(ai); :} 
                     | object_field:of {: RESULT = of; RESULT.setLocation(of); :}
                     | THIS {: RESULT = new This(); RESULT.setLocation(parser.stack.peek()); :}
+                    | identifier:i CAST object_expression:e {: RESULT = new CastedExpression(i, e); :}
                     ;
 
 object_function_call ::= object_expression:e PERIOD function_call:fc {: RESULT = new ObjectFunctionCall(fc.getIdentifier(), e, fc.getArguments()); RESULT.setLocation(e); :}
