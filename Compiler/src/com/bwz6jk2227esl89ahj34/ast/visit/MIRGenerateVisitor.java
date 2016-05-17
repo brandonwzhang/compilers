@@ -878,15 +878,15 @@ public class MIRGenerateVisitor implements NodeVisitor {
      * Constructs an adjacency list representing the class hierarchy. Parent
      * classes point to their subclasses.
      */
-    private Map<Identifier, List<Identifier>> constructClassHierarchyGraph(List<ClassDeclaration> cds) {
+    private Map<Identifier, List<Identifier>> constructClassHierarchyGraph() {
         Map<Identifier, List<Identifier>> graph = new HashMap<>();
         // First, populate the map with empty lists for each class
-        for (ClassDeclaration cd : cds) {
+        for (ClassDeclaration cd : classes.values()) {
             graph.put(cd.getIdentifier(), new LinkedList<>());
         }
         // Then, determine the direct subclasses for each class by adding each
         // class to its parent's adjacency list
-        for (ClassDeclaration cd : cds) {
+        for (ClassDeclaration cd : classes.values()) {
             if (cd.getParentIdentifier().isPresent()) {
                 graph.get(cd.getParentIdentifier().get()).add(cd.getIdentifier());
             }
@@ -901,7 +901,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
      */
     private List<IRFuncDecl> constructClassInitializationFunctions(List<ClassDeclaration> cds) {
         // We need the class hierarchy to determine the order in which we call functions
-        Map<Identifier, List<Identifier>> hierarchyGraph = constructClassHierarchyGraph(cds);
+        Map<Identifier, List<Identifier>> hierarchyGraph = constructClassHierarchyGraph();
 
         List<IRFuncDecl> functions = new LinkedList<>();
         for (ClassDeclaration cd : cds) {
@@ -1030,7 +1030,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         ctors.add(globalInitializationFunction.name());
         // We only need to call the class initialization functions that won't be
         // called by other initialization functions (the roots of the class hierarchy).
-        Map<Identifier, List<Identifier>> classHierarchy = constructClassHierarchyGraph(node.getClassDeclarations());
+        Map<Identifier, List<Identifier>> classHierarchy = constructClassHierarchyGraph();
         for (ClassDeclaration cd : node.getClassDeclarations()) {
             Identifier identifier = cd.getIdentifier();
             boolean isRoot = true;
