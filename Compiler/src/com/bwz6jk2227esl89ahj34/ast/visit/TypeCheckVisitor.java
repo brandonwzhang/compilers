@@ -420,6 +420,10 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new VoidType());
     }
 
+    public void visit(CastedExpression node) {
+        //TODO
+    }
+
     /**
      * CharacterLiteral has type int.
      * @param node

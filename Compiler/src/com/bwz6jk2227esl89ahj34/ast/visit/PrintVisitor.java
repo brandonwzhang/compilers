@@ -70,6 +70,10 @@ public class PrintVisitor implements NodeVisitor {
         // TODO
     }
 
+    public void visit(CastedExpression node) {
+        //TODO
+    }
+
     public void visit(CharacterLiteral node) {
         printer.printAtom("'" + node.getValue() + "'");
     }

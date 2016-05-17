@@ -262,6 +262,10 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         // nothing to do because you can't constant fold over a break...
     }
 
+    public void visit(CastedExpression node) {
+        //TODO
+    }
+
     /**
      * cast the character literal into its corresponding int value,
      * and add the int value to the list
