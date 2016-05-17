@@ -28,7 +28,7 @@ main(args:int[][]) {
     c.set(50, 50, 50)
     cp:ColoredPoint = new ColoredPoint
 
-    x,y = p.coords()
+    x:int,y:int = p.coords()
     cp = cp.initColoredPoint(x, y, c)
 
 
