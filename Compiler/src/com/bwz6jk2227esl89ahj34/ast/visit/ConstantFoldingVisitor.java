@@ -263,7 +263,13 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(CastedExpression node) {
-        //TODO
+        // if currently on LHS of assignment then we add it onto the
+        // stack of assignables
+        if (LHS) {
+            assignableStack.push(node);
+        } else { // otherwise we make the identifier available on the stack
+            stack.push(node);
+        }
     }
 
     /**
