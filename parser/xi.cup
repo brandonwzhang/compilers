@@ -287,6 +287,7 @@ multiple_assignment_lhs ::= declaration_assignment_lhs:dl COMMA multiple_assignm
 
 assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); RESULT = new Assignment(lst, e); RESULT.setLocation(parser.cur_token); :}// x = expression
              | multiple_assignment_lhs:all GETS function_call:fc {: RESULT = new Assignment(all, fc); RESULT.setLocation(parser.cur_token); :}
+             | multiple_assignment_lhs:all GETS object_function_call:ofc {: RESULT = new Assignment(all, ofc); RESULT.setLocation(parser.cur_token); :}
              ;
 
 if_statement ::= IF OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new IfStatement(e, b, Optional.empty()); RESULT.setLocation(e); :}
