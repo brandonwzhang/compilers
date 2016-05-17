@@ -30,6 +30,7 @@ main(args:int[][]) {
 
     x:int,y:int = p.coords()
     cp = cp.initColoredPoint(x, y, c)
+    println("Color!")
 
 
 }

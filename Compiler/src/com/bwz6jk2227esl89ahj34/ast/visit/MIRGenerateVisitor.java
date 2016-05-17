@@ -1046,7 +1046,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
         // Construct the data segment
         DataSegment data = new DataSegment();
-        for (Identifier classIdentifier : classes.keySet()) {
+        for (ClassDeclaration cd : node.getClassDeclarations()) {
+            Identifier classIdentifier = cd.getIdentifier();
             // Add the dispatch vector
             List<MethodDeclaration> dispatchVector = dispatchVectors.get(classIdentifier);
             List<IRNode> names = new LinkedList<>();
