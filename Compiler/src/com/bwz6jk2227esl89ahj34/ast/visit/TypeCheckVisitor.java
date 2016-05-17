@@ -420,8 +420,43 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.setType(new VoidType());
     }
 
+    private Optional<Type> getCastedType(Identifier id){
+        String className = id.getName();
+        if (className.equals("null")) {
+            return Optional.of(new NullType());
+        }
+        if (className.equals("int")) {
+            return Optional.of(new IntType());
+        }
+        if (className.equals("bool")) {
+            return Optional.of(new BoolType());
+        }
+
+        // Search for valid class type
+        if (classes.containsKey(id)) {
+            return Optional.of(classes.get(id).getType());
+        }
+
+        return Optional.empty();
+    }
+
     public void visit(CastedExpression node) {
-        //TODO
+        // Idea: check wrapped expression is supertype of cast type
+        Expression nestedExpr = node.getExpression();
+        nestedExpr.accept(this);
+
+        Type exprType = nestedExpr.getType();
+        Optional<Type> optionalType = getCastedType(node.getCastTo());
+        if (!optionalType.isPresent()) {
+            throw new TypeException("Casted Type is not valid", node.getRow(), node.getCol());
+        }
+        Type castedType = optionalType.get();
+
+        if (!isSubtype(exprType, castedType)) {
+            throw new TypeException("Not a valid down cast", node.getRow(), node.getCol());
+        }
+
+        node.setType(castedType);
     }
 
     /**
