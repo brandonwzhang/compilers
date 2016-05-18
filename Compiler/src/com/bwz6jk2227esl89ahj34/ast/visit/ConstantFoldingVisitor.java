@@ -372,7 +372,12 @@ public class ConstantFoldingVisitor implements NodeVisitor {
     }
 
     public void visit(InstanceOf node) {
-        //TODO;
+        // constant fold on the expression
+        node.getExpression().accept(this);
+        assert !stack.isEmpty();
+        node.setExpression(stack.pop());
+
+        stack.push(node);
     }
 
     /**
