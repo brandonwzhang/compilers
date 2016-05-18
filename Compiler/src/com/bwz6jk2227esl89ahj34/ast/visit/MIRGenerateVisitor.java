@@ -650,7 +650,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // Loop through super class IDs and see if any of them match to instanceID
         IRExpr numSuperClasses = new IRMem(new IRBinOp(OpType.SUB, temp, new IRConst(Configuration.WORD_SIZE)));
         IRExpr i = new IRTemp(getFreshVariable());
-        stmts.add(new IRMove(i, new IRConst(0)));
+        stmts.add(new IRMove(i, new IRConst(2 * Configuration.WORD_SIZE)));
         IRExpr bool = new IRTemp(getFreshVariable());
         stmts.add(new IRMove(bool, new IRConst(0)));
 
