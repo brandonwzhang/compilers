@@ -6,7 +6,10 @@ main(args:int[][]) {
     c:Animal = new Cat.initialize()
     a.noise()
     d.noise()
-    c.noise() 
+    c.noise()
+
+    b:Dog = Dog#d
+    b.noise()
 }
 
 class Animal {
