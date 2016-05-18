@@ -644,7 +644,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
         // The instanceof class we are comparing to
         Identifier instanceIdentifier = node.getClassName();
-        IRExpr instanceID = new IRMem(new IRName("_I_id_" + instanceIdentifier, true));
+        IRExpr instanceID = new IRMem(new IRName("_I_id_" + instanceIdentifier.getName(), true));
 
         List<IRStmt> stmts = new LinkedList<>();
         // Loop through super class IDs and see if any of them match to instanceID
