@@ -32,9 +32,9 @@ class Cat extends Animal {
 }
 
 main(args:int[][]) {
-	a:Animal = Animal.initialize()
-    d:Animal = Dog.initialize()
-    c:Animal = Cat.initialize()
+	a:Animal = new Animal.initialize()
+    d:Animal = new Dog.initialize()
+    c:Animal = new Cat.initialize()
     a.noise()
     d.noise()
     c.noise() 
