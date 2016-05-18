@@ -11,7 +11,6 @@ class hello {
 
 main(args:int[][]){
     h:hello = new hello
-    println(h.world)
     h.set({"hello world"})
     println(h.world)
 }

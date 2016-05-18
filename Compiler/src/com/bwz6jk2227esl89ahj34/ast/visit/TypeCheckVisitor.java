@@ -18,6 +18,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     private Stack<Context> contexts = new Stack<>();
 
     private Map<Identifier, ClassDeclaration> classes = new HashMap<>();
+    private Set<Identifier> moduleClasses = new HashSet<>();
 
     // Type of the function we're currently type checking
     private FunctionType currentFunctionType;
@@ -851,8 +852,8 @@ public class TypeCheckVisitor implements NodeVisitor {
         node.getObject().accept(this);
         assert node.getObject().getType() instanceof ClassType;
         ClassType classType = (ClassType) node.getObject().getType();
-        // We can only access private fields from methods in the class
-        if (!currentClassType.isPresent() || !currentClassType.get().equals(classType)) {
+        // We can only access private fields from methods in the module
+        if (!moduleClasses.contains(classType.getIdentifier())) {
             throw new TypeException("Cannot access private field", node.getRow(), node.getCol());
         }
         Identifier className = classType.getIdentifier();
@@ -1092,6 +1093,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         // Populate the classes map first incase any functions use objects
         for (ClassDeclaration classDef : node.getClassDeclarations()) {
             Identifier className = classDef.getIdentifier();
+            moduleClasses.add(className);
             if (classes.containsKey(className)) {
                 checkClassDefinition(classDef, classes.get(className), node);
             } else {
