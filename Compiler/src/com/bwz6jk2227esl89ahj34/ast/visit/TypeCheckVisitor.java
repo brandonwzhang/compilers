@@ -1254,14 +1254,13 @@ public class TypeCheckVisitor implements NodeVisitor {
             contexts.peek().remove(td.getIdentifier(), td.getDeclarationType());
             global.accept(this);
         }
+        for (ClassDeclaration classDeclaration : node.getClassDeclarations()) {
+            classDeclaration.accept(this);
+        }
 
         // Second pass typechecks all the function bodies
         for (FunctionDeclaration functionDeclaration : node.getFunctionDeclarations()) {
             functionDeclaration.accept(this);
-        }
-
-        for (ClassDeclaration classDeclaration : node.getClassDeclarations()) {
-            classDeclaration.accept(this);
         }
 
         node.setType(new UnitType());
