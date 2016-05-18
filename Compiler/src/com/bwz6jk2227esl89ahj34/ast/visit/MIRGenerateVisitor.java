@@ -855,17 +855,23 @@ public class MIRGenerateVisitor implements NodeVisitor {
         }
 
         for (MethodDeclaration md : cd.getMethods()) {
-            boolean methodReplaced = false;
+            // Indicates whether this method overwrites a parent method
+            boolean overwrittenMethod = false;
             String methodName = md.getFunctionDeclaration().getIdentifier().getName();
             for (int i = 0; i < dispatchVector.size(); i++) {
                 String existingMethodName =
                         dispatchVector.get(i).getFunctionDeclaration().getIdentifier().getName();
                 if (methodName.equals(existingMethodName)) {
+                    // The parent dispatch vector already contains this method
                     dispatchVector.set(i, md);
-                    methodReplaced = true;
+                    overwrittenMethod = true;
                 }
             }
-            if (!methodReplaced) {
+            // Add a space for implementation-specific information about classes
+            //dispatchVector.add();
+            // If our method overwrote a parent class's method, we don't need
+            // to add it again to the dispatch vector
+            if (!overwrittenMethod) {
                 dispatchVector.add(md);
             }
         }
@@ -904,12 +910,21 @@ public class MIRGenerateVisitor implements NodeVisitor {
         Map<Identifier, List<Identifier>> hierarchyGraph = constructClassHierarchyGraph();
 
         List<IRFuncDecl> functions = new LinkedList<>();
+
         for (ClassDeclaration cd : cds) {
             List<IRStmt> stmts = new LinkedList<>();
+            Identifier identifier = cd.getIdentifier();
+
+            /* Initialize class ID's */
+            IRExpr counter = new IRMem(new IRName("_I_idcounter"));
+            stmts.add(new IRMove(new IRMem(new IRName("_I_id_" + identifier.getName(), true)), counter));
+            IRExpr incrementedCounter = new IRBinOp(OpType.ADD, counter, new IRConst(1));
+            stmts.add(new IRMove(counter, incrementedCounter));
+
+            /* Initialize class sizes */
             // If the class has a parent class, we add the number of fields * WORD_SIZE to
             // the size of the parent class.
             // Otherwise, we add it to WORD_SIZE.
-            Identifier identifier = cd.getIdentifier();
             IRExpr fieldSize = new IRConst(classFields.get(identifier).size() * Configuration.WORD_SIZE);
             // Either the size of the parent or WORD_SIZE for the base size of the object
             IRExpr baseSize = cd.getParentIdentifier().isPresent() ?
@@ -1057,6 +1072,16 @@ public class MIRGenerateVisitor implements NodeVisitor {
             data.put("_I_vt_" + classIdentifier.getName(), names);
             // Add the object size
             data.put("_I_size_" + classIdentifier.getName(), Collections.singletonList(new IRConst(0)));
+            // Add the class ID
+            data.put("_I_id_" + classIdentifier.getName(), Collections.singletonList(new IRConst(0)));
+            // If the module has a "main" function, we need to declare the global class ID counter
+            // in this file. We do this since every module needs to reference this global counter
+            // and we need to enforce that it's only declared once. Since there can only be a single
+            // module with a main function, we choose that module to declare this counter.
+            Identifier mainFunctionIdentifier = new Identifier("_Imain_paai");
+            if (functions.keySet().contains(mainFunctionIdentifier)) {
+                data.put("_I_idcounter", Collections.singletonList(new IRConst(0)));
+            }
         }
         // Add global variables
         for (Identifier globalVariable : globalVariables.keySet()) {
