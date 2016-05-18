@@ -797,7 +797,14 @@ public class TypeCheckVisitor implements NodeVisitor {
     }
 
     public void visit(InstanceOf node) {
-        //TODO;
+        Expression e = node.getExpression();
+        e.accept(this);
+        Identifier instance = node.getClassName();
+        Optional<Type> classType = getCastedType(instance);
+        if (!classType.isPresent()) {
+            throw new TypeException("Not a valid class to check instance of", node.getRow(), node.getCol());
+        }
+        node.setType(new BoolType());
     }
 
     /**
