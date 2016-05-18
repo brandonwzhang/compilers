@@ -75,7 +75,9 @@ HexChar = \\x[2-7][0-9A-E]
 "break"                             { return symbol(ParserSym.BREAK); }
 "for"                               { return symbol(ParserSym.FOR); }
 "#"                                 { return symbol(ParserSym.CAST); }
+"instanceof"                        { return symbol(ParserSym.INSTANCEOF); }
  {Identifier}                       { return symbol(ParserSym.IDENTIFIER, yytext()); }
+
 
  /* literals */
  {DecIntegerLiteralNegativeBound}   { return symbol(ParserSym.NEGATIVE_INT_BOUND); }

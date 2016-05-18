@@ -635,6 +635,10 @@ public class MIRGenerateVisitor implements NodeVisitor {
         generatedNodes.push(new IRSeq(statements));
     }
 
+    public void visit(InstanceOf node) {
+        //TODO;
+    }
+
     public void visit(IntegerLiteral node) {
         long value = Long.parseLong(node.getValue());
         generatedNodes.push(new IRConst(value));

@@ -371,6 +371,10 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         }
     }
 
+    public void visit(InstanceOf node) {
+        //TODO;
+    }
+
     /**
      * add integer literal to stack
      * @param node

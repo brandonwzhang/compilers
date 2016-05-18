@@ -40,7 +40,7 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW, PERIOD, NULL, THIS, FOR, CAST;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW, PERIOD, NULL, THIS, FOR, CAST, INSTANCEOF;
 
 nonterminal Program program;
 
@@ -184,6 +184,7 @@ I ::= K:k {: RESULT = k; RESULT.setLocation(k); :}
     | function_call:fc {: RESULT = fc; RESULT.setLocation(fc); :}
     | I:h OPEN_BRACKET A:a CLOSE_BRACKET {: RESULT = new ArrayIndex(h,a); RESULT.setLocation(h); :}
     | identifier:i CAST K:k {: RESULT = new CastedExpression(i, k); RESULT.setLocation(parser.cur_token); :}
+    | K:k INSTANCEOF identifier:i {: RESULT = new InstanceOf(k, i); RESULT.setLocation(parser.cur_token); :}
     ;
 
 K ::= boolean_literal:b {: RESULT = b; RESULT.setLocation(b); :}
