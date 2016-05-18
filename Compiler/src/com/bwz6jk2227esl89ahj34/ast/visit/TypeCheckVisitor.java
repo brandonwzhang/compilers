@@ -796,6 +796,10 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
     }
 
+    public void visit(InstanceOf node) {
+        //TODO;
+    }
+
     /**
      * IntegerLiteral has type int.
      * @param node

@@ -153,6 +153,10 @@ public class PrintVisitor implements NodeVisitor {
         printer.endList();
     }
 
+    public void visit(InstanceOf node) {
+        //TODO;
+    }
+
     public void visit(IntegerLiteral node) {
         printer.printAtom(node.getValue());
     }

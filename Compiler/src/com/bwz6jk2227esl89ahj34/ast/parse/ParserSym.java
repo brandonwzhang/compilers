@@ -10,6 +10,7 @@ public class ParserSym {
   /* terminals */
   public static final int EXTENDS = 45;
   public static final int NEW = 46;
+  public static final int INSTANCEOF = 52;
   public static final int UNDERSCORE = 40;
   public static final int LT = 22;
   public static final int INTEGER_LITERAL = 5;
@@ -112,7 +113,8 @@ public class ParserSym {
   "NULL",
   "THIS",
   "FOR",
-  "CAST"
+  "CAST",
+  "INSTANCEOF"
   };
 }
 
