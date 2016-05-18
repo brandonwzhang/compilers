@@ -640,9 +640,46 @@ public class MIRGenerateVisitor implements NodeVisitor {
     public void visit(InstanceOf node) {
         node.getExpression().accept(this);
         assert generatedNodes.peek() instanceof IRExpr;
-        IRExpr expr = (IRExpr)generatedNodes.pop();
+        IRExpr temp = (IRExpr)generatedNodes.pop();
 
-        // TODO
+        // The instanceof class we are comparing to
+        Identifier instanceIdentifier = node.getClassName();
+        IRExpr instanceID = new IRMem(new IRName("_I_id_" + instanceIdentifier, true));
+
+        List<IRStmt> stmts = new LinkedList<>();
+        // Loop through super class IDs and see if any of them match to instanceID
+        IRExpr numSuperClasses = new IRMem(new IRBinOp(OpType.SUB, temp, new IRConst(Configuration.WORD_SIZE)));
+        IRExpr i = new IRTemp(getFreshVariable());
+        stmts.add(new IRMove(i, new IRConst(0)));
+        IRExpr bool = new IRTemp(getFreshVariable());
+        stmts.add(new IRMove(bool, new IRConst(0)));
+
+        // Create labels
+        IRLabel headLabel = new IRLabel(getFreshVariable());
+        IRLabel trueLabel = new IRLabel(getFreshVariable());
+        IRLabel exitLabel = new IRLabel(getFreshVariable());
+        // Guard
+        IRExpr guard = new IRBinOp(OpType.LT, i, numSuperClasses);
+        IRCJump cjump = new IRCJump(guard, trueLabel.name(), exitLabel.name());
+        // Body
+        IRExpr superClassID = new IRMem(new IRMem(new IRBinOp(OpType.SUB, temp, i)));
+        IRStmt body = new IRSeq(
+            new IRMove(bool, new IRBinOp(OpType.OR, bool,
+                    new IRBinOp(OpType.EQ,
+                            superClassID, instanceID))
+            ),
+            new IRMove(i, new IRBinOp(OpType.ADD, i, new IRConst(Configuration.WORD_SIZE)))
+        );
+
+        stmts.add(headLabel);
+        stmts.add(cjump);
+        stmts.add(trueLabel);
+        stmts.add(body);
+        stmts.add(new IRJump(new IRName(headLabel.name())));
+        stmts.add(exitLabel);
+
+        IRESeq eseq = new IRESeq(new IRSeq(stmts), bool);
+        generatedNodes.push(eseq);
     }
 
     public void visit(IntegerLiteral node) {
@@ -892,7 +929,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         }
 
         // Add a space for implementation-specific information about classes
-        //dispatchVector.add(new IRName("_I_id_" + cd.getIdentifier().getName(), true));
+        dispatchVector.add(new IRName("_I_id_" + cd.getIdentifier().getName(), true));
 
         for (MethodDeclaration md : cd.getMethods()) {
             Identifier methodIdentifier = md.getFunctionDeclaration().getIdentifier();
