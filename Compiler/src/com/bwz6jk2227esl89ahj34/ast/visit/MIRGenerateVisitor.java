@@ -650,7 +650,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // Loop through super class IDs and see if any of them match to instanceID
         IRExpr numSuperClasses = new IRMem(new IRBinOp(OpType.SUB, temp, new IRConst(Configuration.WORD_SIZE)));
         IRExpr i = new IRTemp(getFreshVariable());
-        stmts.add(new IRMove(i, new IRConst(2 * Configuration.WORD_SIZE)));
+        stmts.add(new IRMove(i, new IRConst(2)));
         IRExpr bool = new IRTemp(getFreshVariable());
         stmts.add(new IRMove(bool, new IRConst(0)));
 
@@ -659,16 +659,17 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRLabel trueLabel = new IRLabel(getFreshVariable());
         IRLabel exitLabel = new IRLabel(getFreshVariable());
         // Guard
-        IRExpr guard = new IRBinOp(OpType.LT, i, numSuperClasses);
+        IRExpr guard = new IRBinOp(OpType.LT, i, numSuperClasses); // while i < numSuperClasses
         IRCJump cjump = new IRCJump(guard, trueLabel.name(), exitLabel.name());
         // Body
-        IRExpr superClassID = new IRMem(new IRMem(new IRBinOp(OpType.SUB, temp, i)));
+        IRExpr superClassID = new IRMem(new IRBinOp(OpType.SUB, temp,
+                new IRBinOp(OpType.MUL, i, new IRConst(Configuration.WORD_SIZE)))); // superClassID = mem[temp - i]
         IRStmt body = new IRSeq(
-            new IRMove(bool, new IRBinOp(OpType.OR, bool,
+            new IRMove(bool, new IRBinOp(OpType.OR, bool, // bool = bool || (superClassID == instanceID)
                     new IRBinOp(OpType.EQ,
                             superClassID, instanceID))
             ),
-            new IRMove(i, new IRBinOp(OpType.ADD, i, new IRConst(Configuration.WORD_SIZE)))
+            new IRMove(i, new IRBinOp(OpType.ADD, i, new IRConst(1))) // i = i + 1
         );
 
         stmts.add(headLabel);
@@ -811,7 +812,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // Add in number of superclass IDs
         stmts.add(new IRMove(
                 new IRMem(new IRBinOp(OpType.SUB, objectTemp, new IRConst(Configuration.WORD_SIZE))),
-                new IRConst(Configuration.WORD_SIZE * superClasses.size())));
+                new IRConst(superClasses.size())));
         // Add in each superclass ID
         for (int i = 0; i < superClasses.size(); i++) {
             stmts.add(new IRMove(
