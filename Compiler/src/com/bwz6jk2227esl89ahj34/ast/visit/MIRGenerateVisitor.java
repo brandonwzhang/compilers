@@ -638,7 +638,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(InstanceOf node) {
-        //TODO;
+        node.getExpression().accept(this);
+        assert generatedNodes.peek() instanceof IRExpr;
+        IRExpr expr = (IRExpr)generatedNodes.pop();
+
+        // TODO
     }
 
     public void visit(IntegerLiteral node) {
@@ -742,11 +746,43 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
     public void visit(ObjectInstantiation node) {
         Identifier classIdentifier = node.getClassIdentifier();
-        IRCall malloc = new IRCall(new IRName("_I_alloc_i"), new IRMem(new IRName("_I_size_" + classIdentifier.getName(), true)));
+
+        // Get all the parents of this class
+        LinkedList<IRName> superClasses = new LinkedList<>();
+        ClassDeclaration cd = classes.get(classIdentifier);
+        superClasses.add(new IRName("_I_id_" + cd.getIdentifier().getName(), true));
+        while (cd.getParentIdentifier().isPresent()) {
+            Identifier parentIdentifier = cd.getParentIdentifier().get();
+            cd = classes.get(parentIdentifier);
+            superClasses.add(new IRName("_I_id_" + cd.getIdentifier().getName(), true));
+        }
+
+        // leave space for superclass IDs to compare with when doing instanceof, as well as number of superclasses
+        IRCall malloc = new IRCall(new IRName("_I_alloc_i"),
+                new IRBinOp(OpType.ADD,
+                        new IRMem(new IRName("_I_size_" + classIdentifier.getName(), true)),
+                        new IRConst(Configuration.WORD_SIZE * (superClasses.size() + 1)))
+        );
+
         List<IRStmt> stmts = new LinkedList<>();
         // Move the result of the call into a temp
         IRTemp objectTemp = new IRTemp(getFreshVariable());
         stmts.add(new IRMove(objectTemp, malloc));
+        // Shift the object pointer to index 0
+        stmts.add(new IRMove(objectTemp, new IRBinOp(OpType.ADD,
+                objectTemp, new IRConst(Configuration.WORD_SIZE * (superClasses.size() + 1)))));
+        // Add in number of superclass IDs
+        stmts.add(new IRMove(
+                new IRMem(new IRBinOp(OpType.SUB, objectTemp, new IRConst(Configuration.WORD_SIZE))),
+                new IRConst(Configuration.WORD_SIZE * superClasses.size())));
+        // Add in each superclass ID
+        for (int i = 0; i < superClasses.size(); i++) {
+            stmts.add(new IRMove(
+                    new IRMem(new IRBinOp(OpType.SUB, objectTemp, new IRConst(Configuration.WORD_SIZE * (i+1)))),
+                    superClasses.get(i)
+            ));
+        }
+
         // Add dispatch vector to first slot of object
         stmts.add(new IRMove(new IRMem(objectTemp), new IRName("_I_vt_" + classIdentifier.getName(), true)));
         generatedNodes.push(new IRESeq(new IRSeq(stmts), objectTemp));
@@ -856,7 +892,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         }
 
         // Add a space for implementation-specific information about classes
-        dispatchVector.add(new IRName("_I_id_" + cd.getIdentifier().getName(), true));
+        //dispatchVector.add(new IRName("_I_id_" + cd.getIdentifier().getName(), true));
 
         for (MethodDeclaration md : cd.getMethods()) {
             Identifier methodIdentifier = md.getFunctionDeclaration().getIdentifier();
