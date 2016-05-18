@@ -24,7 +24,9 @@ public class MIRGenerateVisitor implements NodeVisitor {
     // Counter to append to label strings.
     private long labelCounter = 0;
     // Map from class name to dispatch vector
-    private Map<Identifier, List<MethodDeclaration>> dispatchVectors = new HashMap<>();
+    private Map<Identifier, List<IRName>> dispatchVectors = new HashMap<>();
+    // Keeps track of the index of each method in the dispatch vectors
+    private Map<Identifier, Map<Identifier, Integer>> methodIndices = new HashMap<>();
     // Map from class name to fields in a consistent order
     private Map<Identifier, List<Identifier>> classFields = new HashMap<>();
     // Map from class name to class
@@ -691,15 +693,11 @@ public class MIRGenerateVisitor implements NodeVisitor {
      * Returns the index of the method in the dispatch vector. Returns -1 if not found.
      */
     private int getMethodIndex(Identifier objectClass, Identifier methodIdentifier) {
-        int methodIndex = -1;
-        List<MethodDeclaration> dispatchVector = dispatchVectors.get(objectClass);
-        assert dispatchVector != null;
-        for (int i = 0; i < dispatchVector.size(); i++) {
-            MethodDeclaration md = dispatchVector.get(i);
-            if (md.getFunctionDeclaration().getIdentifier().equals(methodIdentifier)) {
-                methodIndex = i;
-                break;
-            }
+        Map<Identifier, Integer> indices = methodIndices.get(objectClass);
+        assert indices != null;
+        Integer methodIndex = indices.get(methodIdentifier);
+        if (methodIndex == null) {
+            return -1;
         }
         return methodIndex;
     }
@@ -845,39 +843,38 @@ public class MIRGenerateVisitor implements NodeVisitor {
             // The dispatch vector for this class has already been computed
             return;
         }
-        List<MethodDeclaration> dispatchVector = new LinkedList<>();
+        List<IRName> dispatchVector = new LinkedList<>();
+        Map<Identifier, Integer> indices = new HashMap<>();
 
         if (cd.getParentIdentifier().isPresent()) {
             Identifier parentIdentifier = cd.getParentIdentifier().get();
             addDispatchVector(classes.get(parentIdentifier));
             // Add all the parent class's methods to the dispatch vector
             dispatchVector.addAll(dispatchVectors.get(parentIdentifier));
+            // Add all the parent class's method indices
+            indices.putAll(methodIndices.get(parentIdentifier));
         }
 
+        // Add a space for implementation-specific information about classes
+        dispatchVector.add(new IRName("_I_id_" + cd.getIdentifier().getName(), true));
+
         for (MethodDeclaration md : cd.getMethods()) {
-            // Indicates whether this method overwrites a parent method
-            boolean overwrittenMethod = false;
-            String methodName = md.getFunctionDeclaration().getIdentifier().getName();
-            for (int i = 0; i < dispatchVector.size(); i++) {
-                String existingMethodName =
-                        dispatchVector.get(i).getFunctionDeclaration().getIdentifier().getName();
-                if (methodName.equals(existingMethodName)) {
-                    // The parent dispatch vector already contains this method
-                    dispatchVector.set(i, md);
-                    overwrittenMethod = true;
-                }
-            }
-            // Add a space for implementation-specific information about classes
-            //dispatchVector.add();
-            // If our method overwrote a parent class's method, we don't need
-            // to add it again to the dispatch vector
-            if (!overwrittenMethod) {
-                dispatchVector.add(md);
+            Identifier methodIdentifier = md.getFunctionDeclaration().getIdentifier();
+            if (indices.keySet().contains(methodIdentifier)) {
+                // The parent dispatch vector already contains this method
+                int index = indices.get(methodIdentifier);
+                dispatchVector.set(index, new IRName(Util.getIRMethodName(md), true));
+            } else {
+                // This method is not in the parent class, so we need to add it
+                // on top of the parent dispatch vector
+                indices.put(methodIdentifier, dispatchVector.size());
+                dispatchVector.add(new IRName(Util.getIRMethodName(md), true));
             }
         }
 
         // Add this class's dispatch vector to the map
         dispatchVectors.put(cd.getIdentifier(), dispatchVector);
+        methodIndices.put(cd.getIdentifier(), indices);
     }
 
     /**
@@ -916,7 +913,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             Identifier identifier = cd.getIdentifier();
 
             /* Initialize class ID's */
-            IRExpr counter = new IRMem(new IRName("_I_idcounter"));
+            IRExpr counter = new IRMem(new IRName("_I_idcounter", true));
             stmts.add(new IRMove(new IRMem(new IRName("_I_id_" + identifier.getName(), true)), counter));
             IRExpr incrementedCounter = new IRBinOp(OpType.ADD, counter, new IRConst(1));
             stmts.add(new IRMove(counter, incrementedCounter));
@@ -1064,12 +1061,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
         for (ClassDeclaration cd : node.getClassDeclarations()) {
             Identifier classIdentifier = cd.getIdentifier();
             // Add the dispatch vector
-            List<MethodDeclaration> dispatchVector = dispatchVectors.get(classIdentifier);
-            List<IRNode> names = new LinkedList<>();
-            for (MethodDeclaration md : dispatchVector) {
-                names.add(new IRName(Util.getIRMethodName(md)));
-            }
-            data.put("_I_vt_" + classIdentifier.getName(), names);
+            List<IRNode> dispatchVector = new LinkedList<>(dispatchVectors.get(classIdentifier));
+            data.put("_I_vt_" + classIdentifier.getName(), dispatchVector);
             // Add the object size
             data.put("_I_size_" + classIdentifier.getName(), Collections.singletonList(new IRConst(0)));
             // Add the class ID
@@ -1078,8 +1071,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             // in this file. We do this since every module needs to reference this global counter
             // and we need to enforce that it's only declared once. Since there can only be a single
             // module with a main function, we choose that module to declare this counter.
-            Identifier mainFunctionIdentifier = new Identifier("_Imain_paai");
-            if (functions.keySet().contains(mainFunctionIdentifier)) {
+            if (functions.keySet().contains("_Imain_paai")) {
                 data.put("_I_idcounter", Collections.singletonList(new IRConst(0)));
             }
         }
