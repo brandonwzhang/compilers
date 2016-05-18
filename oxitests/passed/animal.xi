@@ -1,17 +1,25 @@
 use io
 
+main(args:int[][]) {
+	a:Animal = new Animal.initialize()
+    d:Animal = new Dog.initialize()
+    c:Animal = new Cat.initialize()
+    a.noise()
+    d.noise()
+    c.noise() 
+}
+
 class Animal {
 	noise() {
       println("Hello world!")
 	}
 
-	initialize() {
+	initialize():Animal {
 	  return this 
 	}
 }
 
 class Dog extends Animal {
-	
 	noise() {
 	  bark() 
 	} 
@@ -29,13 +37,4 @@ class Cat extends Animal {
 	meow() {
 	  println("meow")
 	}
-}
-
-main(args:int[][]) {
-	a:Animal = new Animal.initialize()
-    d:Animal = new Dog.initialize()
-    c:Animal = new Cat.initialize()
-    a.noise()
-    d.noise()
-    c.noise() 
 }

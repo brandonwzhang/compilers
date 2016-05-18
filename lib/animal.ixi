@@ -1,12 +1,15 @@
 class Animal {
 	noise()
-	initialize() 
+	initialize():Animal
 }
 
 class Dog extends Animal {
+    noise()
 	bark()
 }
 
 class Cat extends Animal {
+    noise()
 	meow()
 }
+
