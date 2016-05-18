@@ -434,7 +434,7 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         // Search for valid class type
         if (classes.containsKey(id)) {
-            return Optional.of(classes.get(id).getType());
+            return Optional.of(new ClassType(id));
         }
 
         return Optional.empty();
@@ -452,7 +452,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         }
         Type castedType = optionalType.get();
 
-        if (!isSubtype(exprType, castedType)) {
+        if (!isSubtype(castedType, exprType)) {
             throw new TypeException("Not a valid down cast", node.getRow(), node.getCol());
         }
 
