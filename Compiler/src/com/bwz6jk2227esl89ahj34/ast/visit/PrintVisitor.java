@@ -201,13 +201,6 @@ public class PrintVisitor implements NodeVisitor {
             useStatement.accept(this);
         }
         printer.endList();
-        // adding this in to parse classes as well
-        printer.startList();
-        for (ClassDeclaration classDec : node.getClassDeclarations()) {
-            classDec.accept(this);
-        }
-        printer.endList();
-        // end parsing class declarations
         printer.startList();
         for (FunctionDeclaration funcDec : node.getFunctionDeclarations()) {
             funcDec.accept(this);
