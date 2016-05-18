@@ -650,7 +650,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // Loop through super class IDs and see if any of them match to instanceID
         IRExpr numSuperClasses = new IRMem(new IRBinOp(OpType.SUB, temp, new IRConst(Configuration.WORD_SIZE)));
         IRExpr i = new IRTemp(getFreshVariable());
-        stmts.add(new IRMove(i, new IRConst(2)));
+        stmts.add(new IRMove(i, new IRConst(0)));
         IRExpr bool = new IRTemp(getFreshVariable());
         stmts.add(new IRMove(bool, new IRConst(0)));
 
@@ -663,7 +663,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRCJump cjump = new IRCJump(guard, trueLabel.name(), exitLabel.name());
         // Body
         IRExpr superClassID = new IRMem(new IRBinOp(OpType.SUB, temp,
-                new IRBinOp(OpType.MUL, i, new IRConst(Configuration.WORD_SIZE)))); // superClassID = mem[temp - i]
+                new IRBinOp(OpType.MUL, new IRBinOp(OpType.ADD, i, new IRConst(2)), new IRConst(Configuration.WORD_SIZE)))); // superClassID = mem[temp - i]
         IRStmt body = new IRSeq(
             new IRMove(bool, new IRBinOp(OpType.OR, bool, // bool = bool || (superClassID == instanceID)
                     new IRBinOp(OpType.EQ,
