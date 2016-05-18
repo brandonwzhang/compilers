@@ -472,7 +472,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(CastedExpression node) {
-        //TODO
+        // just visit the wrapped expression
+        node.getExpression().accept(this);
     }
 
     public void visit(CharacterLiteral node) {
