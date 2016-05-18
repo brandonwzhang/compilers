@@ -8,8 +8,10 @@ main(args:int[][]) {
     d.noise()
     c.noise()
 
-    b:Dog = Dog#d
-    b.noise()
+    //b:Dog = d
+    Dog#d.bark()
+    //b:Dog = Dog#d
+    //b.noise()
 }
 
 class Animal {
