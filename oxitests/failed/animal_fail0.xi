@@ -1,4 +1,5 @@
 use io
+use animal
 
 main(args:int[][]) {
 	a:Animal = new Animal.initialize()
@@ -8,10 +9,7 @@ main(args:int[][]) {
     d.noise()
     c.noise()
 
-    //b:Dog = d
-    Dog#d.bark()
-    b:Dog = Dog#d
-    b.noise()
+    d.bark() // this fails which is why introduced downcasting
 }
 
 class Animal {

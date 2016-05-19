@@ -1,4 +1,5 @@
 use io
+use animal
 
 main(args:int[][]) {
 	a:Animal = new Animal.initialize()
@@ -8,10 +9,8 @@ main(args:int[][]) {
     d.noise()
     c.noise()
 
-    //b:Dog = d
-    Dog#d.bark()
-    b:Dog = Dog#d
-    b.noise()
+    Dog#a.noise() // this should fail because 
+                  // a is an Animal and cannot be casted down to a Dog
 }
 
 class Animal {
