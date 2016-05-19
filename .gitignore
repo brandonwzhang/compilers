@@ -11,4 +11,5 @@ vm/*
 *.dot
 *.png
 *.pdf
+*.out
 *~
