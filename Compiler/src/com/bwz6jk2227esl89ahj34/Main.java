@@ -114,17 +114,6 @@ public class Main {
             Collections.addAll(Tests.exclude, exclude);
             System.out.println("\nDEBUG: Excluding: " + Tests.exclude.toString());
 
-            try {
-               //Tests2.parseTests();
-            } catch (Exception ef) {
-                ef.printStackTrace();
-            }
-
-            //Tests.typeCheckTests();
-            //Tests.constantFoldTests();
-            //Tests.mirGenTests();
-            //Tests.irGenTests();
-            //Tests.irRunTests();
             Tests.regressionTest();
         }
     }
