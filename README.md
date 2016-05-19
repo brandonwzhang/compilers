@@ -20,7 +20,7 @@ To specify a folder containing interface `.ixi` files:
 ```
 xic -libpath <path> <filename>
 ```
-To compile and link multiple files, pass all of the file names to `xic`.
+To compile and link multiple files, pass all of the files to `xic`.
 
 To view all options:
 ```
@@ -29,7 +29,7 @@ xic --help
 
 
 ### Advanced
-We use the following optimizations:
+We support the following optimizations:
 * `cse` Common Subexpression Elimination
 * `cf` Constant Folding
 * `uce` Unreachable Code Elimination
