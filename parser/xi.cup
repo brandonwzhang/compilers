@@ -393,8 +393,7 @@ program_body ::= global_variable:g program_body:p {: for (Assignment ga : g) { p
                ; 
 
 
-global_variable_assignable ::= identifier:id {: RESULT = id; RESULT.setLocation(parser.cur_token); :}
-                 | typed_declaration_no_size:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
+global_variable_assignable ::= typed_declaration_no_size:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
                  ;
 
 global_variable_assignment ::= global_variable_assignable:a GETS expression:e {:  RESULT = new Assignment(a, e); RESULT.setLocation(parser.cur_token); :}// x = expression
