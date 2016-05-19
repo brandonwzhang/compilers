@@ -28,6 +28,7 @@ We use the following optimizations:
 * `dce` Dead Code Elimination
 * `cp` Constant Propagation
 * `copy` Copy Propagation
+
 To compile with no optimizations, pass `-O`. To compile with only specified
 optimizations on, pass `-O<opt>` for each optimization. To turn specified
 optimizations off, pass `-O-no-<opt>` for each optimization.
