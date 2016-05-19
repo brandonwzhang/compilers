@@ -23,7 +23,7 @@ public class RegisterAllocator {
      */
     public static List<AssemblyLine> translate(List<AssemblyLine> lines) {
 
-        if (Main.optimizationOn(OptimizationType.COPY)) {
+        if (Main.optimizationOn(OptimizationType.DCE)) {
             Optimization.removeDeadCode(lines);
         }
 
