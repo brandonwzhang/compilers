@@ -7,7 +7,6 @@ import com.bwz6jk2227esl89ahj34.ir.IRTemp;
 
 import java.util.List;
 
-//TODO: rename to something better later
 public class NontrivialStatementTile extends StatementTile {
     List<String> tempLabels;
     public NontrivialStatementTile(IRNode pattern, CodeGenerator codeGenerator) {

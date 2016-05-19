@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 
-//TODO: remove the exceptions for over/underflow
 public class ConstantFoldingVisitor implements NodeVisitor {
     private Stack<Expression> stack; //while the visitor visits, it will push to
                                  // or pop from the stack an appropriate
@@ -566,7 +565,6 @@ public class ConstantFoldingVisitor implements NodeVisitor {
         }
         node.setArraySizes(newArraySizeList);
 
-        //TODO test
         // then we make the typed declaration available on the stack if it
         // is on the LHS of an assignment
         if (LHS) {

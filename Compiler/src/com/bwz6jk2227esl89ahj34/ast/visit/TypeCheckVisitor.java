@@ -1054,19 +1054,19 @@ public class TypeCheckVisitor implements NodeVisitor {
         // Check Method Declarations match
         for (MethodDeclaration m : declaration.getMethods()) {
             if (!containsMethodDeclaration(definition.getMethods(), m)) {
-                throw new TypeException("Module does not define a class method declared in the interface.", node.getRow(), node.getCol()); // TODO loc
+                throw new TypeException("Module does not define a class method declared in the interface.", node.getRow(), node.getCol());
             }
         }
 
         for (MethodDeclaration m : definition.getMethods()) {
             if (!containsMethodDeclaration(declaration.getMethods(), m)) {
-                throw new TypeException("Module defines a class method not declared in the interface.", node.getRow(), node.getCol()); // TODO loc
+                throw new TypeException("Module defines a class method not declared in the interface.", node.getRow(), node.getCol());
             }
         }
 
         // Check inheritance matches
         if (!declaration.getParentIdentifier().equals(definition.getParentIdentifier())) {
-            throw new TypeException("Interface contains class whose parent does not match", node.getRow(), node.getCol()); // TODO loc
+            throw new TypeException("Interface contains class whose parent does not match", node.getRow(), node.getCol());
         }
     }
 
@@ -1460,7 +1460,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         // Read in each interface's use blocks recursively
         for(UseStatement use : interface69.getUseBlock()) {
             if (addInterface(libPath, use.getIdentifier().getName(), context) != null) {
-                throw new TypeException(error); // TODO: minorly sketched out by these 3 lines
+                throw new TypeException(error);
             }
         }
 
