@@ -817,7 +817,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
         for (int i = 0; i < superClasses.size(); i++) {
             stmts.add(new IRMove(
                     new IRMem(new IRBinOp(OpType.SUB, objectTemp, new IRConst(Configuration.WORD_SIZE * (i+1)))),
-                    superClasses.get(i)
+                    new IRMem(superClasses.get(i))
             ));
         }
 
