@@ -64,7 +64,6 @@ public class CLI {
             if (args[i].charAt(0) == '-') {
                 String optionName = args[i];
 
-                // TODO: document that --report-opts prevents other options from running
                 if (args[i].equals("--report-opts")) {
                     for (OptimizationType opt : OptimizationType.SUPPORTED_OPTIMIZATIONS) {
                         System.out.println(opt.toString());

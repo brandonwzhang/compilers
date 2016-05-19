@@ -67,7 +67,6 @@ public class ExpressionCodeGenerators {
         return binopHelper(castedRoot.opType(), e1, e2, lines);
     };
 
-    //TODO: test
     public static ExpressionTile.CodeGenerator mem234 = (root, lines) -> {
       /*
          Handles mem2 - mem5, hence the name
@@ -95,7 +94,6 @@ public class ExpressionCodeGenerators {
         }
     };
 
-    //TODO: test
     public static ExpressionTile.CodeGenerator mem5 = (root, lines) -> {
         /*
           Handles mem6

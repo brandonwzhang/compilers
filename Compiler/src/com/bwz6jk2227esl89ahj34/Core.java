@@ -240,8 +240,6 @@ public class Core {
      * Runs the Xi program by interpreting the IR.
      */
     public static void irRun(String file) {
-        // TODO: lower the IR (use irGen instead of mirGen)
-
         Optional<FileReader> reader =
                 Util.getFileReader(
                         Main.diagnosticPath(),
@@ -341,7 +339,7 @@ public class Core {
         }
         // Link and generate executable
         List<String> command = new LinkedList<>();
-        command.add(Util.rootPath + "/runtime/linkxi.sh");
+        command.add(Util.rootPath + "/QtXi/linkqt.sh");
         // Output is the name of the last file passed in
         command.add("-o");
         command.add(Main.outputFile());

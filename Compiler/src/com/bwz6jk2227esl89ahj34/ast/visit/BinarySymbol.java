@@ -7,7 +7,6 @@ import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import java.math.BigInteger;
 import java.util.*;
 
-//TODO: remove the exceptions for over/underflow
 public class BinarySymbol {
     static BinaryOperator[] int_binary_operator_int = new BinaryOperator[] {
             BinaryOperator.PLUS, BinaryOperator.MINUS, BinaryOperator.TIMES, BinaryOperator.DIVIDE, BinaryOperator.MODULO,
