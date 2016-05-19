@@ -13,6 +13,12 @@ public class ExpressionCodeGenerators {
                 CONST(i)
              */
         IRConst castedRoot = (IRConst) root;
+        long value = castedRoot.value();
+        if (value >= 2147483648l) {
+            AssemblyAbstractRegister temp = new AssemblyAbstractRegister();
+            lines.add(new AssemblyInstruction(OpCode.MOVQ, new AssemblyImmediate(value), temp));
+            return temp;
+        }
         return new AssemblyImmediate(castedRoot.value());
     };
 
