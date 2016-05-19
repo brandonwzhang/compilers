@@ -125,9 +125,13 @@ public class CLI {
 
         String[] filesArray = files.toArray(new String[files.size()]);
 
-        // options with two dashes operate on filenames
+        // options with two dashes operate on files
         for (String optionName : optionArgsMap.keySet()) {
             if (optionName.contains("--")) {
+                if (optionName.equals("--optcfg") || optionName.equals("--optir")) {
+                    // these two options have two dashes but do not operate on files
+                    continue;
+                }
                 optionArgsMap.put(optionName, filesArray);
             }
         }

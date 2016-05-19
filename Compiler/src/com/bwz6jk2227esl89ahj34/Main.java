@@ -97,6 +97,10 @@ public class Main {
                       "Report the control-flow graph at the specified phase of optimization.",
                       phase -> reportCFG(phase[0]),
                       1);
+        cli.addOption("--report-opts",
+                      "Print the list of supported optimizations. If this option is provided, nothing else is run.",
+                      array -> {},
+                      0);
         cli.addOption("-a",
                       "Turn off assembly code generation.",
                       Main::turnAssemblyGenerationOff,
