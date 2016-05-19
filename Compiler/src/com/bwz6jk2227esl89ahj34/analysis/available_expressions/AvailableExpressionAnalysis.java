@@ -243,8 +243,8 @@ public class AvailableExpressionAnalysis extends DataflowAnalysis{
         if (expr instanceof IRCall) {
             // We don't add the call itself to the set of subexpressions because
             // it could return different results
-            // TODO: Check if we need to do this
             IRCall call = (IRCall)expr;
+            addSubexprs(call.target(), set);
             for (IRExpr e : call.args()) {
                 addSubexprs(e, set);
             }

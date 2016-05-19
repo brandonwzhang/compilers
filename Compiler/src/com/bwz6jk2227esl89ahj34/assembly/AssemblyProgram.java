@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34.assembly;
 
+import com.bwz6jk2227esl89ahj34.ir.DataSegment;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.IRFuncDecl;
 import lombok.Data;
@@ -9,21 +10,24 @@ import java.util.List;
 
 @Data
 public class AssemblyProgram {
+    private IRCompUnit compUnit;
     private List<AssemblyFunction> functions = new ArrayList<>();
-    // Holds the names of functions in the interfaces used by this program
-    private List<String> global;
+    private String target;
+
 
     /**
-     * Generate abstract assembly code for a program
+     * Generate assembly code for a program
      * @param root IRCompUnit of program
-     * @return
      */
-    public AssemblyProgram(IRCompUnit root, List<String> global, String target) {
-
-        this.global = global;
+    public AssemblyProgram(IRCompUnit root, String target) {
+        compUnit = root;
+        this.target = target;
 
         // Get the maximum number of return values and arguments in all functions
         for (String functionName : root.functions().keySet()) {
+            if (functionName.startsWith("_I_init")) {
+                continue;
+            }
             AssemblyFunction.maxNumReturnValues =
                     Math.max(AssemblyFunction.maxNumReturnValues, numReturnValues(functionName));
             AssemblyFunction.maxNumArguments =
@@ -37,7 +41,7 @@ public class AssemblyProgram {
     }
 
     /**
-     * Returns the number of return values for a given function
+     * Returns the number of arguments for a given function
      */
     public static int numArguments(String functionName) {
         int numArguments = 0;
@@ -76,7 +80,20 @@ public class AssemblyProgram {
                 i++;
             }
             numArguments++;
-            i++;
+
+            if (types.charAt(i) == 'o') {
+                i++;
+                int classNameLength = 0;
+                while (Character.isDigit(types.charAt(i))) {
+                    classNameLength *= 10;
+                    classNameLength += Integer.parseInt("" + types.charAt(i));
+                    i++;
+                }
+                i += classNameLength;
+
+            } else {
+                i++;
+            }
         }
 
         return numArguments;
@@ -90,11 +107,11 @@ public class AssemblyProgram {
         int lastUnderscore = functionName.lastIndexOf('_');
         String returnTypes = functionName.substring(lastUnderscore + 1);
 
-        if (returnTypes.contains("p")) {
+        if (returnTypes.charAt(0) == 'p') {
             // example: main(args: int[][]) -> _Imain_paai
             numReturnValues = 0;
 
-        } else if (!returnTypes.contains("t")) {
+        } else if (!(returnTypes.charAt(0) == 't')) {
             // example: unparseInt(n: int): int[] -> _IunparseInt_aii
             numReturnValues = 1;
 
@@ -112,12 +129,25 @@ public class AssemblyProgram {
     @Override
     public String toString() {
         String s = "";
+        // Add the data segment
+        s += compUnit.data();
+        // Add the functions
         s += "\t\t.text\n";
         for (AssemblyFunction function : functions) {
-            for(String globalName : global) {
-                s+= "\t\t.globl\t" + globalName + "\n";
-            }
             s += function + "\n";
+        }
+        // Add the .ctors section
+        if (target.equals("linux")) {
+            s += "\t\t.section\t.ctors\n";
+        } else if (target.equals("macos")) {
+            s += "\t\t.mod_init_func\n";
+        } else {
+            throw new RuntimeException("Target " + target + " not supported");
+
+        }
+        s += "\t\t.align 4\n";
+        for (String functionName : compUnit.ctors()) {
+            s += "\t\t.quad\t" + functionName + "\n";
         }
         return s;
     }

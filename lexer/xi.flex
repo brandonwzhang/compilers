@@ -67,7 +67,17 @@ HexChar = \\x[2-7][0-9A-E]
 "true"                              { return symbol(ParserSym.TRUE); }
 "false"                             { return symbol(ParserSym.FALSE); }
 "length"                            { return symbol(ParserSym.LENGTH); }
+"class"                             { return symbol(ParserSym.CLASS); }
+"extends"                           { return symbol(ParserSym.EXTENDS); }
+"new"                               { return symbol(ParserSym.NEW); }
+"null"                              { return symbol(ParserSym.NULL); }
+"this"                              { return symbol(ParserSym.THIS); }
+"break"                             { return symbol(ParserSym.BREAK); }
+"for"                               { return symbol(ParserSym.FOR); }
+"#"                                 { return symbol(ParserSym.CAST); }
+"instanceof"                        { return symbol(ParserSym.INSTANCEOF); }
  {Identifier}                       { return symbol(ParserSym.IDENTIFIER, yytext()); }
+
 
  /* literals */
  {DecIntegerLiteralNegativeBound}   { return symbol(ParserSym.NEGATIVE_INT_BOUND); }
@@ -111,6 +121,7 @@ HexChar = \\x[2-7][0-9A-E]
  "&"      { return symbol(ParserSym.AND); }
  "|"      { return symbol(ParserSym.OR); }
  "="        { return symbol(ParserSym.GETS); }
+ "."      { return symbol(ParserSym.PERIOD); }
 
 
     /* comments */

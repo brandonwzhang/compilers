@@ -1,50 +1,42 @@
 # Compilers
-Compiler for the Xi Programming Language
+Compiler for the
+[Xi](http://www.cs.cornell.edu/courses/cs4120/2016sp/project/oolang.pdf)
+Programming Language
+
+In addition to the features mentioned in the language specification, we also
+support downcasting `TargetClass#Expression`, `instanceof`, and for-loops.
+Example usage of all of these features can be found in `examples/hashtable.xi`.
 
 ## Building
-With Apache Ant installed and the `JAVA_HOME` environment variable set, run the `xic-build` script:
-```
-./xic-build
-```
-
+With Apache Ant installed and the `JAVA_HOME` environment variable set, run the
+`xic-build` script.
 
 ## Running
 To compile a Xi program:
 ```
-./xic <filename>
+xic <filename>
 ```
 To specify a folder containing interface `.ixi` files:
 ```
-./xic -libpath <path> <filename>
+xic -libpath <path> <filename>
 ```
+To compile and link multiple files, pass all of the files to `xic`.
+
 To view all options:
 ```
-./xic --help
+xic --help
 ```
 
 
 ### Advanced
-To run our test suite, include the flag `--tests`.
-To run in debug mode, include the flag `--debug`.
-<!--To modify the test mode behaviors, go to the if(tests){} block in Main. These-->
-<!--behaviors will run regardless of and in addition to any options that you-->
-<!--provide normally.  Test methods will read in all of the .xi files inside their-->
-<!--respective directories (for example, irGenTests() will read in all of the Xi-->
-<!--files in ir/irrgen).-->
+We support the following optimizations:
+* `cse` Common Subexpression Elimination
+* `cf` Constant Folding
+* `uce` Unreachable Code Elimination
+* `dce` Dead Code Elimination
+* `cp` Constant Propagation
+* `copy` Copy Propagation
 
-
-<!--If certain tests are crashing the test suite and you want to exclude them-->
-<!--temporarily, add the name of the file (without the file extension) to the-->
-<!--line String[] exclude = {};-->
-<!--This line is the first line inside the if(tests){} block in Main.-->
-
-<!--In debug mode, you will receive additional print statements to the console-->
-<!--that inform you of things like reading and writing files.-->
-<!--MIR files (extension .mir) are written.-->
-
-<!--To change irrun to interpret the MIR instead of the LIR,-->
-<!--go to the method irRun() in Core and change the line:-->
-<!--Optional<FileReader> reader = Util.getFileReader(diagnosticPath, file.substring(0, file.length() - 2) + "ir");-->
-<!--to:-->
-<!--Optional<FileReader> reader = Util.getFileReader(diagnosticPath, file.substring(0, file.length() - 2) + "mir");-->
-<!--Note: if you do this, you will probably want to run debug mode so that the .mir files actually get written.-->
+To compile with no optimizations, pass `-O`. To compile with only specified
+optimizations on, pass `-O<opt>` for each optimization. To turn specified
+optimizations off, pass `-O-no-<opt>` for each optimization.

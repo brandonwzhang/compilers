@@ -1,0 +1,16 @@
+class C {
+	
+}
+
+class A {
+	a1()
+	a2(): int
+	a3(): C
+}
+
+class B extends A {
+	b1()
+	b2(): bool
+	b3(n: int): C
+	b4(n: int): C, int
+}

@@ -1,8 +1,9 @@
 package com.bwz6jk2227esl89ahj34.ast.visit;
+import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.ast.*;
-import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
-import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
+import com.bwz6jk2227esl89ahj34.ast.type.*;
 import com.bwz6jk2227esl89ahj34.ir.*;
+import com.bwz6jk2227esl89ahj34.ir.DataSegment;
 import com.bwz6jk2227esl89ahj34.ir.IRBinOp.OpType;
 import com.bwz6jk2227esl89ahj34.ir.interpret.Configuration;
 import com.bwz6jk2227esl89ahj34.util.Util;
@@ -18,8 +19,22 @@ public class MIRGenerateVisitor implements NodeVisitor {
     private Stack<IRNode> generatedNodes;
     // The name of the program
     private String name;
+    // Current class we're inside of
+    private Optional<Identifier> currentClassID = Optional.empty();
     // Counter to append to label strings.
     private long labelCounter = 0;
+    // Map from class name to dispatch vector
+    private Map<Identifier, List<IRName>> dispatchVectors = new HashMap<>();
+    // Keeps track of the index of each method in the dispatch vectors
+    private Map<Identifier, Map<Identifier, Integer>> methodIndices = new HashMap<>();
+    // Map from class name to fields in a consistent order
+    private Map<Identifier, List<Identifier>> classFields = new HashMap<>();
+    // Map from class name to class
+    private Map<Identifier, ClassDeclaration> classes = new HashMap<>();
+    // Set of all global variables
+    private Map<Identifier, VariableType> globalVariables = new HashMap<>();
+    // Stack of exit labels to break from loops
+    private Stack<IRLabel> exitLabels = new Stack<>();
 
     public MIRGenerateVisitor(String name) {
         this.name = name;
@@ -68,51 +83,34 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrTemp,
                 new IRConst(Configuration.WORD_SIZE)), IRMem.MemType.IMMUTABLE);
 
+        IRExpr result = new IRMem( new IRBinOp(
+                OpType.ADD,
+                new IRBinOp(OpType.MUL, indexTemp, new IRConst(Configuration.WORD_SIZE)),
+                arrTemp
+        ));
+
         // Check for out of bounds index
-        IRTemp result = new IRTemp(getFreshVariable());
         IRLabel trueLabel = new IRLabel(getFreshVariable());
         IRLabel falseLabel = new IRLabel(getFreshVariable());
         IRLabel exitLabel = new IRLabel(getFreshVariable());
 
-        // Make a copy of these so we don't end up with duplicate labels
-        IRTemp indexCopyTemp = new IRTemp(getFreshVariable());
-        IRMove moveIndexCopyToTemp = new IRMove(indexCopyTemp, indexTemp);
-
         IRCJump cjump = new IRCJump( // index < length && index >= 0
                 new IRBinOp(OpType.AND,
                         new IRBinOp(OpType.LT, indexTemp, length),
-                        new IRBinOp(OpType.GEQ, indexCopyTemp, new IRConst(0))),
+                        new IRBinOp(OpType.GEQ, indexTemp, new IRConst(0))),
                 trueLabel.name(),
                 falseLabel.name()
         );
 
-        // Make a copy of these so we don't end up with duplicate labels
-        IRTemp arrayCopyTemp = new IRTemp(getFreshVariable());
-        IRMove moveArrayCopyToTemp = new IRMove(arrayCopyTemp, arrTemp);
-
-        IRTemp indexCopyCopyTemp = new IRTemp(getFreshVariable());
-        IRMove moveIndexCopyCopyToTemp = new IRMove(indexCopyCopyTemp, indexTemp);
-
-        // Get mem location
         IRSeq trueBody = new IRSeq(
-                // get actual element
-                new IRMove(result, new IRMem( new IRBinOp(
-                        OpType.ADD,
-                        new IRBinOp(OpType.MUL, indexCopyCopyTemp, new IRConst(Configuration.WORD_SIZE)),
-                        arrayCopyTemp//arrayCopy
-                ))),
-                // Jump to exit
                 new IRJump(new IRName(exitLabel.name()))
         );
 
-        IRMove outOfBoundsCall = new IRMove(result, new IRCall(new IRName("_I_outOfBounds_p")));
+        IRExp outOfBoundsCall = new IRExp(new IRCall(new IRName("_I_outOfBounds_p")));
 
         IRSeq seq = new IRSeq(
                 moveArrToTemp,
-                moveArrayCopyToTemp,
                 moveIndexToTemp,
-                moveIndexCopyToTemp,
-                moveIndexCopyCopyToTemp,
                 cjump,
                 trueLabel,
                 trueBody,
@@ -149,12 +147,12 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // Call to malloc
         IRCall malloc = new IRCall(new IRName("_I_alloc_i"), new IRConst(Configuration.WORD_SIZE * (length + 1)));
         IRMove storeArrayPtr = new IRMove(new IRTemp(array), malloc);
-        // TODO make first index of malloc's return IMMUTABLE IRMem
 
         // Save length in MEM(array)
         IRMove saveLength = new IRMove(new IRMem(new IRTemp(array)), new IRConst(length));
         // Shift array up to 0th index
-        IRMove shift = new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD, new IRTemp(array), new IRConst(Configuration.WORD_SIZE)));
+        IRMove shift = new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD,
+                new IRTemp(array), new IRConst(Configuration.WORD_SIZE)));
 
         stmts.add(storeArrayPtr);
         stmts.add(saveLength);
@@ -163,11 +161,13 @@ public class MIRGenerateVisitor implements NodeVisitor {
         // Put elements into array spaces
         for (IRExpr e : arrayElements) {
             stmts.add(new IRMove(new IRMem(new IRTemp(array)), e)); // put array element in
-            stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD, new IRTemp(array), new IRConst(Configuration.WORD_SIZE)))); // add 8 to array pointer
+            stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.ADD,
+                    new IRTemp(array), new IRConst(Configuration.WORD_SIZE)))); // add 8 to array pointer
         }
 
         // Move array pointer back to index 0
-        stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.SUB, new IRTemp(array), new IRConst(Configuration.WORD_SIZE * length))));
+        stmts.add(new IRMove(new IRTemp(array), new IRBinOp(OpType.SUB,
+                new IRTemp(array), new IRConst(Configuration.WORD_SIZE * length))));
 
         IRSeq seq = new IRSeq(stmts);
         IRESeq eseq = new IRESeq(seq, new IRTemp(array));
@@ -184,86 +184,16 @@ public class MIRGenerateVisitor implements NodeVisitor {
             // handle them separately
             TypedDeclaration typedDeclaration = (TypedDeclaration) variable;
             List<IRStmt> statements = new ArrayList<>();
-            if (typedDeclaration.getArraySizeList().size() > 0) {
-                variable.accept(this);
-                assert generatedNodes.peek() instanceof IRStmt;
-                statements.add((IRStmt) generatedNodes.pop());
-            }
-            IRTemp temp = new IRTemp(typedDeclaration.getIdentifier().getName());
-            IRMove move = new IRMove(temp, expr);
+            variable.accept(this);
+            assert generatedNodes.peek() instanceof IRStmt;
+            statements.add((IRStmt) generatedNodes.pop());
+            // Accept the identifier to get the expression of the identifier
+            typedDeclaration.getIdentifier().accept(this);
+            assert generatedNodes.peek() instanceof IRExpr;
+            IRMove move = new IRMove((IRExpr) generatedNodes.pop(), expr);
+
             statements.add(move);
             return new IRSeq(statements);
-        } else if (variable instanceof ArrayIndex) {
-            // If arrayindex on LHS, we need to handle out of bounds setting
-            ((ArrayIndex) variable).getArrayRef().accept(this);
-            assert generatedNodes.peek() instanceof IRExpr;
-            IRExpr array = (IRExpr)generatedNodes.pop();
-
-            IRTemp arrTemp = new IRTemp(getFreshVariable());
-            IRMove moveArrToTemp = new IRMove(arrTemp, array);
-
-            ((ArrayIndex) variable).getIndex().accept(this);
-            assert generatedNodes.peek() instanceof IRExpr;
-            IRExpr index = (IRExpr)generatedNodes.pop();
-
-            IRTemp indexTemp = new IRTemp(getFreshVariable());
-            IRMove moveIndexToTemp = new IRMove(indexTemp, index);
-
-            IRMem length = new IRMem(new IRBinOp(OpType.SUB, arrTemp, new IRConst(Configuration.WORD_SIZE)));
-
-            // Check for out of bounds index
-            IRLabel trueLabel = new IRLabel(getFreshVariable());
-            IRLabel falseLabel = new IRLabel(getFreshVariable());
-            IRLabel exitLabel = new IRLabel(getFreshVariable());
-
-            // Make a copy of these so we don't end up with duplicate labels
-            IRTemp indexCopyTemp = new IRTemp(getFreshVariable());
-            IRMove moveIndexCopyToTemp = new IRMove(indexCopyTemp, indexTemp);
-
-            IRCJump cjump = new IRCJump( // index < length && index >= 0
-                    new IRBinOp(OpType.AND,
-                            new IRBinOp(OpType.LT, indexTemp, length),
-                            new IRBinOp(OpType.GEQ, indexCopyTemp, new IRConst(0))),
-                    trueLabel.name(),
-                    falseLabel.name()
-            );
-
-            // Make a copy of these so we don't end up with duplicate labels
-            IRTemp arrCopyTemp = new IRTemp(getFreshVariable());
-            IRMove moveArrCopyToTemp = new IRMove(arrCopyTemp, arrTemp);
-
-            IRTemp indexCopyCopyTemp = new IRTemp(getFreshVariable());
-            IRMove moveIndexCopyCopyToTemp = new IRMove(indexCopyCopyTemp, indexCopyTemp);
-
-            // move expr into location
-            IRMem location = new IRMem(new IRBinOp(OpType.ADD,
-                    arrCopyTemp,
-                    new IRBinOp(OpType.MUL, indexCopyCopyTemp, new IRConst(Configuration.WORD_SIZE))
-            ));
-            IRSeq trueBody = new IRSeq(
-                    // get actual element
-                    new IRMove(location, expr),
-                    // jump to exit
-                    new IRJump(new IRName(exitLabel.name()))
-            );
-
-            IRExp outOfBoundsCall = new IRExp(new IRCall(new IRName("_I_outOfBounds_p")));
-
-            IRSeq seq = new IRSeq(
-                    moveArrToTemp,
-                    moveArrCopyToTemp,
-                    moveIndexToTemp,
-                    moveIndexCopyToTemp,
-                    moveIndexCopyCopyToTemp,
-                    cjump,
-                    trueLabel,
-                    trueBody,
-                    falseLabel,
-                    outOfBoundsCall,
-                    exitLabel
-            );
-
-            return seq;
         }
         variable.accept(this);
         assert generatedNodes.peek() instanceof IRExpr;
@@ -283,7 +213,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             return;
         }
         // If RHS is VariableTypeList, we have to handle a multiassign
-        assert expression instanceof FunctionCall;
+        assert (expression instanceof FunctionCall || expression instanceof ObjectFunctionCall);
         assert expression.getType() instanceof VariableTypeList;
         assert variables.size() == ((VariableTypeList) expression.getType()).getVariableTypeList().size();
 
@@ -365,8 +295,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
         IRMove moveRightToTemp = new IRMove(rightTemp, right);
 
         // array addition case
-        if (optype == OpType.ADD && ((VariableType)node.getLeft().getType()).getNumBrackets() > 0) {
-            assert ((VariableType)node.getRight().getType()).getNumBrackets() > 0;
+        if (optype == OpType.ADD && node.getLeft().getType() instanceof ArrayType) {
+            assert node.getRight().getType() instanceof ArrayType;
             // get length of operands
             IRMem leftLength = new IRMem(new IRBinOp(OpType.SUB, leftTemp, new IRConst(Configuration.WORD_SIZE)));
             IRMem rightLength = new IRMem(new IRBinOp(OpType.SUB, rightTemp, new IRConst(Configuration.WORD_SIZE)));
@@ -520,7 +450,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
 
     // not sure about this
     public void visit(BlockList node) {
-        List<Block> blockList = node.getBlockList();
+        List<Block> blockList = node.getBlocks();
         List<IRStmt> stmtList = new ArrayList<>();
 
         for (Block block : blockList) {
@@ -537,11 +467,39 @@ public class MIRGenerateVisitor implements NodeVisitor {
         generatedNodes.push(new IRConst(node.getValue() ? 1l : 0l));
     }
 
+    public void visit(Break node) {
+        assert !exitLabels.isEmpty();
+        // We jump to the exit label most inner nested while loop
+        generatedNodes.push(new IRJump(new IRName(exitLabels.peek().name())));
+    }
+
+    public void visit(CastedExpression node) {
+        // just visit the wrapped expression
+        node.getExpression().accept(this);
+    }
+
     public void visit(CharacterLiteral node) {
         generatedNodes.push(new IRConst((long) node.getValue()));
     }
 
+    public void visit(ClassDeclaration node) {
+        // Handled in visit(Program node)
+    }
+
     public void visit(FunctionCall node) {
+        // If we're inside a class, check if the function called is a method
+        if (currentClassID.isPresent()) {
+            Identifier className = currentClassID.get();
+            int methodIndex = getMethodIndex(className, node.getIdentifier());
+            if (methodIndex >= 0) {
+                // Generate a ObjectFunctionCall if we're calling a method
+                ObjectFunctionCall objectFunctionCall =
+                        new ObjectFunctionCall(node.getIdentifier(),
+                                new This(new ClassType(currentClassID.get())), node.getArguments());
+                objectFunctionCall.accept(this);
+                return;
+            }
+        }
         List<IRExpr> arguments = new ArrayList<>();
         List<VariableType> argTypeList = new ArrayList<>();
         // Store all arguments in a list
@@ -587,7 +545,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
     public void visit(FunctionDeclaration node) {
         // If we have a procedure, we need to make sure the last statement is return
         if (node.getFunctionType().getReturnTypeList().getVariableTypeList().isEmpty()) {
-            List<Block> blocks = node.getBlockList().getBlockList();
+            List<Block> blocks = node.getBlockList().getBlocks();
             if (blocks.isEmpty() || !(blocks.get(blocks.size() - 1) instanceof ReturnStatement)) {
                 blocks.add(new ReturnStatement(new LinkedList<>()));
             }
@@ -597,8 +555,8 @@ public class MIRGenerateVisitor implements NodeVisitor {
         assert generatedNodes.peek() instanceof IRSeq;
         IRSeq body = (IRSeq) generatedNodes.pop();
         List<IRStmt> fullBody = new ArrayList<>();
-        for (int i = 0; i < node.getArgList().size(); i++) {
-            IRTemp varTemp = new IRTemp(node.getArgList().get(i).getName());
+        for (int i = 0; i < node.getArgumentIdentifiers().size(); i++) {
+            IRTemp varTemp = new IRTemp(node.getArgumentIdentifiers().get(i).getName());
             fullBody.add(new IRMove(varTemp, new IRTemp(Configuration.ABSTRACT_ARG_PREFIX + i)));
         }
         fullBody.addAll(body.stmts());
@@ -608,9 +566,29 @@ public class MIRGenerateVisitor implements NodeVisitor {
     }
 
     public void visit(Identifier node) {
+        // if we're inside a class, check if there's a local variable
+        if (currentClassID.isPresent()) {
+            // if classFields contains the field, simplify to "this.field", and visit
+            Identifier className = currentClassID.get();
+            List<Identifier> fields = classFields.get(className);
+            int index = fields.indexOf(node);
+            if (index != -1) {
+                ObjectField thisdot = new ObjectField(new This(new ClassType(currentClassID.get())), node);
+                thisdot.accept(this);
+                return;
+            }
+        }
+        // else we could be 1) not inside a class 2) using a variable that's not an instance var
         // use the identifier as the name of the temp
+        // If the identifier is a global variable, we have to return its memory location
+        if (globalVariables.containsKey(node)) {
+            generatedNodes.push(new IRMem(
+                    new IRName(Util.getIRGlobalVariableName(node, globalVariables.get(node)), true)));
+            return;
+        }
         generatedNodes.push(new IRTemp(node.getName()));
     }
+
     public void visit(IfStatement node) {
         node.getGuard().accept(this);
         assert generatedNodes.peek() instanceof IRExpr;
@@ -659,12 +637,245 @@ public class MIRGenerateVisitor implements NodeVisitor {
         generatedNodes.push(new IRSeq(statements));
     }
 
+    public void visit(InstanceOf node) {
+        node.getExpression().accept(this);
+        assert generatedNodes.peek() instanceof IRExpr;
+        IRExpr temp = (IRExpr)generatedNodes.pop();
+
+        // The instanceof class we are comparing to
+        Identifier instanceIdentifier = node.getClassName();
+        IRExpr instanceID = new IRMem(new IRName("_I_id_" + instanceIdentifier.getName(), true));
+
+        List<IRStmt> stmts = new LinkedList<>();
+        // Loop through super class IDs and see if any of them match to instanceID
+        IRExpr numSuperClasses = new IRMem(new IRBinOp(OpType.SUB, temp, new IRConst(Configuration.WORD_SIZE)));
+        IRExpr i = new IRTemp(getFreshVariable());
+        stmts.add(new IRMove(i, new IRConst(0)));
+        IRExpr bool = new IRTemp(getFreshVariable());
+        stmts.add(new IRMove(bool, new IRConst(0)));
+
+        // Create labels
+        IRLabel headLabel = new IRLabel(getFreshVariable());
+        IRLabel trueLabel = new IRLabel(getFreshVariable());
+        IRLabel exitLabel = new IRLabel(getFreshVariable());
+        // Guard
+        IRExpr guard = new IRBinOp(OpType.LT, i, numSuperClasses); // while i < numSuperClasses
+        IRCJump cjump = new IRCJump(guard, trueLabel.name(), exitLabel.name());
+        // Body
+        IRExpr superClassID = new IRMem(new IRBinOp(OpType.SUB, temp,
+                scaleByWordSize(new IRBinOp(OpType.ADD, i, new IRConst(2))))); // superClassID = mem[temp - i]
+        IRStmt body = new IRSeq(
+            new IRMove(bool, new IRBinOp(OpType.OR, bool, // bool = bool || (superClassID == instanceID)
+                    new IRBinOp(OpType.EQ,
+                            superClassID, instanceID))
+            ),
+            new IRMove(i, new IRBinOp(OpType.ADD, i, new IRConst(1))) // i = i + 1
+        );
+
+        stmts.add(headLabel);
+        stmts.add(cjump);
+        stmts.add(trueLabel);
+        stmts.add(body);
+        stmts.add(new IRJump(new IRName(headLabel.name())));
+        stmts.add(exitLabel);
+
+        IRESeq eseq = new IRESeq(new IRSeq(stmts), bool);
+        generatedNodes.push(eseq);
+    }
+
     public void visit(IntegerLiteral node) {
         long value = Long.parseLong(node.getValue());
         generatedNodes.push(new IRConst(value));
     }
 
+    public void visit(MethodDeclaration node) {
+        FunctionDeclaration fd = node.getFunctionDeclaration();
+        // Add the "this" argument to the list of arguments
+        fd.getArgumentIdentifiers().add(0, new Identifier("this"));
+
+        fd.accept(this);
+        assert generatedNodes.peek() instanceof IRFuncDecl;
+        IRFuncDecl funcDecl = (IRFuncDecl) generatedNodes.pop();
+        // Replace the function name with the method name
+        IRFuncDecl methodDecl = new IRFuncDecl(Util.getIRMethodName(node), funcDecl.body());
+        generatedNodes.push(methodDecl);
+    }
+
+    public void visit(Null node) {
+        // Null is just the pointer to memory location 0
+        generatedNodes.push(new IRConst(0));
+    }
+
+    public void visit(ObjectField node) {
+        // Find the index of this field in the object
+        // from typechecking, we are guaranteed that the object class is correct, and
+        // that the field is a valid field in the object
+        Identifier objectClass = ((ClassType) node.getObject().getType()).getIdentifier();
+        List<Identifier> fields = classFields.get(objectClass);
+        ClassDeclaration cd = classes.get(objectClass);
+        // Either the size of the parent or WORD_SIZE for the base size of the object
+        IRExpr baseOffset = cd.getParentIdentifier().isPresent() ?
+                new IRMem(new IRName("_I_size_" + cd.getParentIdentifier().get().getName(), true)) :
+                new IRConst(Configuration.WORD_SIZE);
+        int fieldIndex = fields.indexOf(node.getField());
+        assert fieldIndex >= 0;
+        // Add the index of the field to the base offset
+        IRExpr fieldOffset = new IRBinOp(OpType.ADD, baseOffset, new IRConst(fieldIndex * Configuration.WORD_SIZE));
+
+        // Calculate the memory address of this field
+        node.getObject().accept(this);
+        assert generatedNodes.peek() instanceof IRExpr;
+        IRExpr object = (IRExpr) generatedNodes.pop();
+        IRBinOp fieldAddress = new IRBinOp(OpType.ADD, object, fieldOffset);
+
+        generatedNodes.push(new IRMem(fieldAddress));
+    }
+
+    /**
+     * Returns the index of the method in the dispatch vector. Returns -1 if not found.
+     */
+    private int getMethodIndex(Identifier objectClass, Identifier methodIdentifier) {
+        Map<Identifier, Integer> indices = methodIndices.get(objectClass);
+        assert indices != null;
+        Integer methodIndex = indices.get(methodIdentifier);
+        if (methodIndex == null) {
+            return -1;
+        }
+        return methodIndex;
+    }
+
+    public void visit(ObjectFunctionCall node) {
+        // First, move the object into a temp
+        node.getObject().accept(this);
+        assert generatedNodes.peek() instanceof IRExpr;
+        IRExpr object = (IRExpr) generatedNodes.pop();
+
+        IRTemp objectTemp = new IRTemp(getFreshVariable());
+        IRMove move = new IRMove(objectTemp, object);
+
+        // Store all arguments in a list
+        List<IRExpr> arguments = new ArrayList<>();
+        // Add "this" to the argument list
+        arguments.add(objectTemp);
+        List<VariableType> argTypeList = new ArrayList<>();
+        for (Expression expression : node.getArguments()) {
+            assert expression.getType() instanceof VariableType;
+            argTypeList.add((VariableType) expression.getType());
+            expression.accept(this);
+            assert generatedNodes.peek() instanceof IRExpr;
+            IRExpr argument = (IRExpr) generatedNodes.pop();
+            arguments.add(argument);
+        }
+
+        IRMem dispatchVectorAddress = new IRMem(objectTemp);
+        assert node.getObject().getType() instanceof ClassType;
+        Identifier objectClass = ((ClassType) node.getObject().getType()).getIdentifier();
+        int methodIndex = getMethodIndex(objectClass, node.getIdentifier());
+        assert methodIndex >= 0;
+        IRExpr method = new IRMem(new IRBinOp(OpType.ADD, dispatchVectorAddress,
+                new IRConst(Configuration.WORD_SIZE * methodIndex)));
+
+
+        // Pass the function name and arguments to an IRCall
+        IRCall call = new IRCall(method, arguments);
+        IRESeq eseq = new IRESeq(move, call);
+        generatedNodes.push(eseq);
+    }
+
+    public void visit(ObjectInstantiation node) {
+        Identifier classIdentifier = node.getClassIdentifier();
+
+        // Get all the parents of this class
+        LinkedList<IRName> superClasses = new LinkedList<>();
+        ClassDeclaration cd = classes.get(classIdentifier);
+        superClasses.add(new IRName("_I_id_" + cd.getIdentifier().getName(), true));
+        while (cd.getParentIdentifier().isPresent()) {
+            Identifier parentIdentifier = cd.getParentIdentifier().get();
+            cd = classes.get(parentIdentifier);
+            superClasses.add(new IRName("_I_id_" + cd.getIdentifier().getName(), true));
+        }
+
+        // leave space for superclass IDs to compare with when doing instanceof, as well as number of superclasses
+        IRCall malloc = new IRCall(new IRName("_I_alloc_i"),
+                new IRBinOp(OpType.ADD,
+                        new IRMem(new IRName("_I_size_" + classIdentifier.getName(), true)),
+                        new IRConst(Configuration.WORD_SIZE * (superClasses.size() + 1)))
+        );
+
+        List<IRStmt> stmts = new LinkedList<>();
+        // Move the result of the call into a temp
+        IRTemp objectTemp = new IRTemp(getFreshVariable());
+        stmts.add(new IRMove(objectTemp, malloc));
+        // Shift the object pointer to index 0
+        stmts.add(new IRMove(objectTemp, new IRBinOp(OpType.ADD,
+                objectTemp, new IRConst(Configuration.WORD_SIZE * (superClasses.size() + 1)))));
+        // Add in number of superclass IDs
+        stmts.add(new IRMove(
+                new IRMem(new IRBinOp(OpType.SUB, objectTemp, new IRConst(Configuration.WORD_SIZE))),
+                new IRConst(superClasses.size())));
+        // Add in each superclass ID
+        for (int i = 0; i < superClasses.size(); i++) {
+            stmts.add(new IRMove(
+                    new IRMem(new IRBinOp(OpType.SUB, objectTemp, new IRConst(Configuration.WORD_SIZE * (i + 2)))),
+                    new IRMem(superClasses.get(i))
+            ));
+        }
+
+        // Add dispatch vector to first slot of object
+        stmts.add(new IRMove(new IRMem(objectTemp), new IRName("_I_vt_" + classIdentifier.getName(), true)));
+        generatedNodes.push(new IRESeq(new IRSeq(stmts), objectTemp));
+    }
+
+    public void visit(ObjectProcedureCall node) {
+        // First, move the object into a temp
+        node.getObject().accept(this);
+        assert generatedNodes.peek() instanceof IRExpr;
+        IRExpr object = (IRExpr) generatedNodes.pop();
+
+        IRTemp objectTemp = new IRTemp(getFreshVariable());
+        IRMove move = new IRMove(objectTemp, object);
+
+        // Store all arguments in a list
+        List<IRExpr> arguments = new ArrayList<>();
+        // Add "this" to the argument list
+        arguments.add(objectTemp);
+        List<VariableType> argTypeList = new ArrayList<>();
+        for (Expression expression : node.getArguments()) {
+            assert expression.getType() instanceof VariableType;
+            argTypeList.add((VariableType) expression.getType());
+            expression.accept(this);
+            assert generatedNodes.peek() instanceof IRExpr;
+            IRExpr argument = (IRExpr) generatedNodes.pop();
+            arguments.add(argument);
+        }
+
+        IRMem dispatchVectorAddress = new IRMem(objectTemp);
+        Identifier objectClass = ((ClassType) node.getObject().getType()).getIdentifier();
+        int methodIndex = getMethodIndex(objectClass, node.getIdentifier());
+        IRExpr method = new IRMem(new IRBinOp(OpType.ADD, dispatchVectorAddress,
+                new IRConst(Configuration.WORD_SIZE * methodIndex)));
+
+
+        // Pass the function name and arguments to an IRCall
+        IRCall call = new IRCall(method, arguments);
+        IRSeq seq = new IRSeq(move, new IRExp(call));
+        generatedNodes.push(seq);
+    }
+
     public void visit(ProcedureCall node) {
+        // If we're inside a class, check if the procedure called is a method
+        if (currentClassID.isPresent()) {
+            Identifier className = currentClassID.get();
+            int methodIndex = getMethodIndex(className, node.getIdentifier());
+            if (methodIndex >= 0) {
+                // Generate a ObjectProcedureCall if we're calling a method
+                ObjectProcedureCall objectProcedureCall =
+                        new ObjectProcedureCall(node.getIdentifier(),
+                                new This(new ClassType(currentClassID.get())), node.getArguments());
+                objectProcedureCall.accept(this);
+                return;
+            }
+        }
         List<IRExpr> arguments = new ArrayList<>();
         List<VariableType> argTypeList = new ArrayList<>();
         // Store all arguments in a list
@@ -686,17 +897,266 @@ public class MIRGenerateVisitor implements NodeVisitor {
         generatedNodes.push(new IRExp(call));
     }
 
+    private void addFields(ClassDeclaration cd) {
+        List<Identifier> fields = new LinkedList<>();
+
+        for (TypedDeclaration td : cd.getFields()) {
+            Identifier field = td.getIdentifier();
+            fields.add(field);
+        }
+
+        // Add this class's fields to the map
+        classFields.put(cd.getIdentifier(), fields);
+    }
+
+    /**
+     * Creates the dispatch vector for a class and adds it to dispatchVectors
+     */
+    private void addDispatchVector(ClassDeclaration cd) {
+        if (dispatchVectors.containsKey(cd.getIdentifier())) {
+            // The dispatch vector for this class has already been computed
+            return;
+        }
+        List<IRName> dispatchVector = new LinkedList<>();
+        Map<Identifier, Integer> indices = new HashMap<>();
+
+        if (cd.getParentIdentifier().isPresent()) {
+            Identifier parentIdentifier = cd.getParentIdentifier().get();
+            addDispatchVector(classes.get(parentIdentifier));
+            // Add all the parent class's methods to the dispatch vector
+            dispatchVector.addAll(dispatchVectors.get(parentIdentifier));
+            // Add all the parent class's method indices
+            indices.putAll(methodIndices.get(parentIdentifier));
+        }
+
+        // Add a space for implementation-specific information about classes
+        dispatchVector.add(new IRName("_I_id_" + cd.getIdentifier().getName(), true));
+
+        for (MethodDeclaration md : cd.getMethods()) {
+            Identifier methodIdentifier = md.getFunctionDeclaration().getIdentifier();
+            if (indices.keySet().contains(methodIdentifier)) {
+                // The parent dispatch vector already contains this method
+                int index = indices.get(methodIdentifier);
+                dispatchVector.set(index, new IRName(Util.getIRMethodName(md), true));
+            } else {
+                // This method is not in the parent class, so we need to add it
+                // on top of the parent dispatch vector
+                indices.put(methodIdentifier, dispatchVector.size());
+                dispatchVector.add(new IRName(Util.getIRMethodName(md), true));
+            }
+        }
+
+        // Add this class's dispatch vector to the map
+        dispatchVectors.put(cd.getIdentifier(), dispatchVector);
+        methodIndices.put(cd.getIdentifier(), indices);
+    }
+
+    /**
+     * Constructs an adjacency list representing the class hierarchy. Parent
+     * classes point to their subclasses.
+     */
+    private Map<Identifier, List<Identifier>> constructClassHierarchyGraph() {
+        Map<Identifier, List<Identifier>> graph = new HashMap<>();
+        // First, populate the map with empty lists for each class
+        for (ClassDeclaration cd : classes.values()) {
+            graph.put(cd.getIdentifier(), new LinkedList<>());
+        }
+        // Then, determine the direct subclasses for each class by adding each
+        // class to its parent's adjacency list
+        for (ClassDeclaration cd : classes.values()) {
+            if (cd.getParentIdentifier().isPresent()) {
+                graph.get(cd.getParentIdentifier().get()).add(cd.getIdentifier());
+            }
+        }
+        return graph;
+    }
+
+    /**
+     * Construct the functions to initialize the size of each class.
+     * Each class calls the initialization for its subclasses after it has been
+     * initialized.
+     */
+    private List<IRFuncDecl> constructClassInitializationFunctions(List<ClassDeclaration> cds) {
+        // We need the class hierarchy to determine the order in which we call functions
+        Map<Identifier, List<Identifier>> hierarchyGraph = constructClassHierarchyGraph();
+
+        List<IRFuncDecl> functions = new LinkedList<>();
+
+        for (ClassDeclaration cd : cds) {
+            List<IRStmt> stmts = new LinkedList<>();
+            Identifier identifier = cd.getIdentifier();
+
+            /* Initialize class ID's */
+            IRExpr counter = new IRMem(new IRName("_I_idcounter", true));
+            stmts.add(new IRMove(new IRMem(new IRName("_I_id_" + identifier.getName(), true)), counter));
+            IRExpr incrementedCounter = new IRBinOp(OpType.ADD, counter, new IRConst(1));
+            stmts.add(new IRMove(counter, incrementedCounter));
+
+            /* Initialize class sizes */
+            // If the class has a parent class, we add the number of fields * WORD_SIZE to
+            // the size of the parent class.
+            // Otherwise, we add it to WORD_SIZE.
+            IRExpr fieldSize = new IRConst(classFields.get(identifier).size() * Configuration.WORD_SIZE);
+            // Either the size of the parent or WORD_SIZE for the base size of the object
+            IRExpr baseSize = cd.getParentIdentifier().isPresent() ?
+                    new IRMem(new IRName("_I_size_" + cd.getParentIdentifier().get().getName(), true)) :
+                    new IRConst(Configuration.WORD_SIZE);
+            IRExpr size = new IRBinOp(OpType.ADD, fieldSize, baseSize);
+            stmts.add(new IRMove(new IRMem(new IRName("_I_size_" + identifier.getName(), true)), size));
+
+            // We need to call the initialization functions for subclasses
+            List<Identifier> subclasses = hierarchyGraph.get(identifier);
+            for (Identifier subclass : subclasses) {
+                stmts.add(new IRExp(new IRCall(new IRName("_I_init_" + subclass.getName()))));
+            }
+            stmts.add(new IRReturn());
+
+            // Add the function to the list
+            functions.add(new IRFuncDecl("_I_init_" + identifier.getName(), new IRSeq(stmts)));
+        }
+
+        return functions;
+    }
+
+    /**
+     * Construct the function to initialize all global variables
+     */
+    private IRFuncDecl constructGlobalInitializationFunction(List<Assignment> assignments) {
+        List<IRStmt> stmts = new LinkedList<>();
+        // First initialize all ints, bools, and classes
+        for (Assignment assignment : assignments) {
+            assert assignment.getVariables().size() == 1;
+            assert assignment.getVariables().get(0) instanceof TypedDeclaration;
+            TypedDeclaration td = (TypedDeclaration) assignment.getVariables().get(0);
+            if (td.getDeclarationType() instanceof ArrayType) {
+                // Ignore arrays for now
+                continue;
+            }
+            assignment.accept(this);
+            assert generatedNodes.peek() instanceof IRStmt;
+            stmts.add((IRStmt) generatedNodes.pop());
+        }
+        // Initialize all arrays after in case they rely on values of ints
+        for (Assignment assignment : assignments) {
+            assert assignment.getVariables().size() == 1;
+            assert assignment.getVariables().get(0) instanceof TypedDeclaration;
+            TypedDeclaration td = (TypedDeclaration) assignment.getVariables().get(0);
+            if (!(td.getDeclarationType() instanceof ArrayType)) {
+                // All other types have been initialized already
+                continue;
+            }
+            if (td.getArraySizes().size() > 0) {
+                // We only accept the TypedDeclaration since we don't want to set it
+                // to null
+                td.accept(this);
+            } else {
+                // Otherwise, we set it to null
+                assignment.accept(this);
+            }
+            assert generatedNodes.peek() instanceof IRStmt;
+            stmts.add((IRStmt) generatedNodes.pop());
+        }
+        stmts.add(new IRReturn());
+        return new IRFuncDecl("_I_init_" + name, new IRSeq(stmts));
+    }
+
+
     public void visit(Program node) {
+        // Construct a typechecker and get its classDeclarations
+        TypeCheckVisitor typechecker = new TypeCheckVisitor(Main.libPath(), name);
+        node.accept(typechecker); // Should not fail because we've typechecked before this
+        this.classes = typechecker.getClasses();
+
         Map<String, IRFuncDecl> functions = new LinkedHashMap<>();
-        // Go through all function declarations
-        for (FunctionDeclaration fd : node.getFunctionDeclarationList()) {
+
+        // Populate dispatchVectors and classFields
+        for (ClassDeclaration cd : classes.values()) {
+            addDispatchVector(cd);
+            addFields(cd);
+        }
+
+        // Add all global variables to the globalVariables set
+        for (Assignment global : node.getGlobalVariables()) {
+            assert global.getVariables().size() == 1;
+            assert global.getVariables().get(0) instanceof TypedDeclaration;
+            TypedDeclaration td = (TypedDeclaration) global.getVariables().get(0);
+            globalVariables.put(td.getIdentifier(), td.getDeclarationType());
+        }
+
+        // Add methods to functions map
+        for (ClassDeclaration cd : node.getClassDeclarations()) {
+            // set the currentClassID in case we use instance variables later
+            currentClassID = Optional.of(cd.getIdentifier());
+            for (MethodDeclaration md : cd.getMethods()) {
+                md.accept(this);
+                assert generatedNodes.peek() instanceof IRFuncDecl;
+                functions.put(Util.getIRMethodName(md), (IRFuncDecl) generatedNodes.pop());
+            }
+            currentClassID = Optional.empty();
+        }
+
+        // Add functions to functions map
+        for (FunctionDeclaration fd : node.getFunctionDeclarations()) {
             fd.accept(this);
             assert generatedNodes.peek() instanceof IRFuncDecl;
             functions.put(Util.getIRFunctionName(fd), (IRFuncDecl) generatedNodes.pop());
         }
 
-        root = new IRCompUnit(name, functions);
-        generatedNodes.push(root);
+        // Construct all of the initialization functions
+        List<IRFuncDecl> classInitializationFunctions = constructClassInitializationFunctions(node.getClassDeclarations());
+        for (IRFuncDecl funcDecl : classInitializationFunctions) {
+            functions.put(funcDecl.name(), funcDecl);
+        }
+        IRFuncDecl globalInitializationFunction = constructGlobalInitializationFunction(node.getGlobalVariables());
+        functions.put(globalInitializationFunction.name(), globalInitializationFunction);
+
+        // Add initializtion functions to the ctors list
+        List<String> ctors = new LinkedList<>();
+        // We always need to call the global initialization function
+        ctors.add(globalInitializationFunction.name());
+        // We only need to call the class initialization functions that won't be
+        // called by other initialization functions (the roots of the class hierarchy).
+        Map<Identifier, List<Identifier>> classHierarchy = constructClassHierarchyGraph();
+        for (ClassDeclaration cd : node.getClassDeclarations()) {
+            Identifier identifier = cd.getIdentifier();
+            boolean isRoot = true;
+            for (List<Identifier> subclasses : classHierarchy.values()) {
+                if (subclasses.contains(identifier)) {
+                    isRoot = false;
+                }
+            }
+            if (isRoot) {
+                ctors.add("_I_init_" + identifier.getName());
+            }
+        }
+
+        // Construct the data segment
+        DataSegment data = new DataSegment();
+        for (ClassDeclaration cd : node.getClassDeclarations()) {
+            Identifier classIdentifier = cd.getIdentifier();
+            // Add the dispatch vector
+            List<IRNode> dispatchVector = new LinkedList<>(dispatchVectors.get(classIdentifier));
+            data.put("_I_vt_" + classIdentifier.getName(), dispatchVector);
+            // Add the object size
+            data.put("_I_size_" + classIdentifier.getName(), Collections.singletonList(new IRConst(0)));
+            // Add the class ID
+            data.put("_I_id_" + classIdentifier.getName(), Collections.singletonList(new IRConst(0)));
+            // If the module has a "main" function, we need to declare the global class ID counter
+            // in this file. We do this since every module needs to reference this global counter
+            // and we need to enforce that it's only declared once. Since there can only be a single
+            // module with a main function, we choose that module to declare this counter.
+            if (functions.keySet().contains("_Imain_paai")) {
+                data.put("_I_idcounter", Collections.singletonList(new IRConst(0)));
+            }
+        }
+        // Add global variables
+        for (Identifier globalVariable : globalVariables.keySet()) {
+            data.put(Util.getIRGlobalVariableName(globalVariable, globalVariables.get(globalVariable)),
+                    Collections.singletonList(new IRConst(0)));
+        }
+
+        root = new IRCompUnit(name, functions, ctors, data);
+        assert generatedNodes.empty();
     }
 
     public void visit(ReturnStatement node) {
@@ -731,11 +1191,12 @@ public class MIRGenerateVisitor implements NodeVisitor {
         ArrayLiteral arrayliteral = new ArrayLiteral(chars);
         arrayliteral.accept(this);
     }
+
     public IRBinOp scaleByWordSize(IRExpr expr) {
         return new IRBinOp(OpType.MUL, expr, new IRConst(Configuration.WORD_SIZE));
     }
 
-    public List<IRStmt> initializeArray(IRTemp parentArrayPointer, IRExpr parentArrayIndex, List<IRExpr> lengths, int index) {
+    public List<IRStmt> initializeArray(IRExpr parentArrayPointer, IRExpr parentArrayIndex, List<IRExpr> lengths, int index) {
         List<IRStmt> statements = new ArrayList<>();
         IRTemp length = new IRTemp(getFreshVariable());
         statements.add(new IRMove(length, lengths.get(index)));
@@ -780,17 +1241,25 @@ public class MIRGenerateVisitor implements NodeVisitor {
         return statements;
     }
 
+    public void visit(This node) {
+        generatedNodes.push(new IRTemp("this"));
+    }
+
     public void visit(TypedDeclaration node) {
-        if (node.getArraySizeList().size() == 0) {
-            // If we don't need to initialize an array, do nothing
-            generatedNodes.push(new IRExp(new IRConst(0)));
+        node.getIdentifier().accept(this);
+        assert generatedNodes.peek() instanceof IRExpr;
+        IRExpr variable = (IRExpr) generatedNodes.pop();
+
+        if (node.getArraySizes().size() == 0) {
+            // Initialize the variable to 0
+            generatedNodes.push(new IRMove(variable, new IRConst(0)));
             return;
         }
         // In the case where TypedDeclaration is part of an assignment, it will be handled separately
         // We only concern with a standalone declaration here (x:int[], y:bool[4], z:int, etc)
         // We'll store the pointer to the initialized array in the temp of the variable name
         // else do nothing
-        List<Expression> arraySizeList = node.getArraySizeList();
+        List<Expression> arraySizeList = node.getArraySizes();
         List<IRExpr> lengths = new ArrayList<>();
         List<IRStmt> statements = new ArrayList<>();
         for (Expression arraySize : arraySizeList) {
@@ -801,9 +1270,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             statements.add(new IRMove(lengthTemp, lengthExpr));
             lengths.add(lengthTemp);
         }
-        String variableName = node.getIdentifier().getName();
-        IRTemp array = new IRTemp(variableName);
-        statements.addAll(initializeArray(array, null, lengths, 0));
+        statements.addAll(initializeArray(variable, null, lengths, 0));
         generatedNodes.push(new IRSeq(statements));
     }
     public void visit(Unary node) {
@@ -869,9 +1336,15 @@ public class MIRGenerateVisitor implements NodeVisitor {
         assert generatedNodes.peek() instanceof IRExpr;
         IRExpr guard = (IRExpr)generatedNodes.pop();
 
+        // Push this new exit label on
+        exitLabels.push(exitLabel);
+
         node.getBlock().accept(this);
         assert generatedNodes.peek() instanceof IRStmt;
         IRStmt body = (IRStmt)generatedNodes.pop();
+
+        // Pop the exit label off so nothing outside of the loop can break to it
+        exitLabels.pop();
 
         IRSeq seq = new IRSeq(
                 headLabel,
@@ -880,6 +1353,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
                 body,
                 new IRJump(new IRName(headLabel.name())),
                 exitLabel);
+
 
         generatedNodes.push(seq);
     }

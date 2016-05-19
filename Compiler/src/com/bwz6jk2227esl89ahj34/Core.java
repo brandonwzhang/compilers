@@ -43,6 +43,10 @@ public class Core {
         try {
             reader = new FileReader(Main.sourcePath() + file);
         } catch (FileNotFoundException e) {
+            if (!Main.generateExecutable()) {
+                // -a was provided and generateAssembly() will not be called
+                System.out.println(Main.sourcePath() + file + " was not found.");
+            }
             return;
         }
 
@@ -144,7 +148,7 @@ public class Core {
     public static Optional<Program> typeCheck(String file, Program program) {
 
         List<String> lines = new ArrayList<>();
-        NodeVisitor visitor = new TypeCheckVisitor(Main.libPath());
+        NodeVisitor visitor = new TypeCheckVisitor(Main.libPath(), file);
         boolean typed = false;
         try {
             program.accept(visitor);
@@ -186,7 +190,7 @@ public class Core {
             NodeVisitor cfv = new ConstantFoldingVisitor();
             program.accept(cfv);
             // annotate the new nodes with types
-            NodeVisitor tcv = new TypeCheckVisitor(Main.libPath());
+            NodeVisitor tcv = new TypeCheckVisitor(Main.libPath(), file);
             program.accept(tcv);
         }
 
@@ -236,8 +240,6 @@ public class Core {
      * Runs the Xi program by interpreting the IR.
      */
     public static void irRun(String file) {
-        // TODO: lower the IR (use irGen instead of mirGen)
-
         Optional<FileReader> reader =
                 Util.getFileReader(
                         Main.diagnosticPath(),
@@ -311,24 +313,14 @@ public class Core {
             irRun(file);
         }
 
-        // Get the names of functions defined in files that are imported.
-        List<String> IRfunctionNamesFromUseStatements = new LinkedList<>();
-        if (program.isPresent()) {
-            List<FunctionDeclaration> useFunctionDeclarations =
-                    program.get().getFunctionsFromUseStatement(Main.libPath());
-            for(FunctionDeclaration useFunctionDeclaration : useFunctionDeclarations) {
-                IRfunctionNamesFromUseStatements.add(Util.getIRFunctionName(useFunctionDeclaration));
-            }
-        }
-
         // Instantiate an AssemblyProgram, which processes the ir and prepares
         // the assembly code.
         AssemblyProgram assemblyProgram =
                 new AssemblyProgram(
                         lirRoot,
-                        IRfunctionNamesFromUseStatements,
                         Main.target()
                 );
+
         Util.writeHelper(
                 file,
                 "s",
@@ -337,13 +329,27 @@ public class Core {
         );
     }
 
-    public static void generateExecutable(String file) {
-        generateAssembly(file);
+    public static void generateExecutable(String[] files) {
+        if (files.length == 0) {
+            return;
+        }
+
+        for (String file : files) {
+            generateAssembly(file);
+        }
         // Link and generate executable
-        String fileName = file.substring(0, file.lastIndexOf('.'));
-        ProcessBuilder pb =
-                new ProcessBuilder(Util.rootPath + "/runtime/linkxi.sh", "-o",
-                        fileName, Main.assemblyPath() + "/" + fileName + ".s").inheritIO();
+        List<String> command = new LinkedList<>();
+        command.add(Util.rootPath + "/runtime/linkxi.sh");
+        // Output is the name of the last file passed in
+        command.add("-o");
+        command.add(Main.outputFile());
+
+        // Add all generated assembly files
+        for (String file : files) {
+            String fileName = file.substring(0, file.lastIndexOf('.'));
+            command.add(Main.assemblyPath() + "/" + fileName + ".s");
+        }
+        ProcessBuilder pb = new ProcessBuilder(command).inheritIO();
         try {
             Process linkProcess = pb.start();
             linkProcess.waitFor();

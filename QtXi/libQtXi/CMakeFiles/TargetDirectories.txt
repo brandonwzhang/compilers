@@ -1,0 +1,2 @@
+/Users/owen/projects/CS4120/pa/pa7/pa7/QtXi/libQtXi/CMakeFiles/QtXi.dir
+/Users/owen/projects/CS4120/pa/pa7/pa7/QtXi/libQtXi/CMakeFiles/makebindings.dir

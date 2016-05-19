@@ -45,9 +45,9 @@ public class Tests {
             String fileName = file.substring(0, file.lastIndexOf('.'));
 
             String[] irNoOptCommand = {Util.rootPath + "/xic", "-libpath",
-                    Util.rootPath + "/lib", "--irrun", "-O", "tests/" + file};
+                    Util.rootPath + "/lib", "--irrun", "-target", "macos", "-O", "tests/" + file};
             String[] optCommand = {Util.rootPath + "/xic", "-libpath",
-                    Util.rootPath + "/lib", "tests/" + file};
+                    Util.rootPath + "/lib", "-target", "macos", "-o", "tests/" + fileName, "tests/" + file};
             String[] assemblyCommand = {"./tests/" + fileName};
             // Run the IR and executable and print the outputs
             System.out.println("***************" + file + "***************");
@@ -182,16 +182,18 @@ public class Tests {
     public static void typeCheckTests() {
 
         Main.turnTypeCheckDiagnosticsOn(null);
-        Main.setLibPath("typecheck/lib");
+        String testDir = "oxitests/";
+        Main.setLibPath("lib");
 
         System.out.println("\n================Typecheck Tests================");
 
-        Main.setSourcePath("typecheck/passtests");
-        Main.setDiagnosticPath("typecheck/passtests/diagnostics");
+        Main.setSourcePath(testDir + "passed");
+        Main.setDiagnosticPath(testDir + "passed/diagnostics");
         System.out.println("\n================Passed Tests================");
-        Util.getDirectoryFiles("typecheck/passtests/").stream()
+        Util.getDirectoryFiles(testDir + "passed/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .forEach(filename -> {
+                    System.out.println("\n" + filename);
                     Optional<Program> program = Core.parseFile(filename);
                     if (!program.isPresent()) {
                         return;
@@ -199,12 +201,13 @@ public class Tests {
                     Core.typeCheck(filename, program.get());
                 });
 
-        Main.setSourcePath("typecheck/failtests");
-        Main.setDiagnosticPath("typecheck/failtests/diagnostics");
+        Main.setSourcePath(testDir + "failed");
+        Main.setDiagnosticPath(testDir + "failed/diagnostics");
         System.out.println("\n================Failed Tests================");
-        Util.getDirectoryFiles("typecheck/failtests/").stream()
+        Util.getDirectoryFiles(testDir + "failed/").stream()
                 .filter(filename -> filename.contains(".xi"))
                 .forEach(filename -> {
+                    System.out.println("\n" + filename);
                     Optional<Program> program = Core.parseFile(filename);
                     if (!program.isPresent()) {
                         return;

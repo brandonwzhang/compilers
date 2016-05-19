@@ -64,7 +64,6 @@ public class CLI {
             if (args[i].charAt(0) == '-') {
                 String optionName = args[i];
 
-                // TODO: document that --report-opts prevents other options from running
                 if (args[i].equals("--report-opts")) {
                     for (OptimizationType opt : OptimizationType.SUPPORTED_OPTIMIZATIONS) {
                         System.out.println(opt.toString());
@@ -161,17 +160,26 @@ public class CLI {
             }
         }
 
-        // assembly generation
-        Arrays.stream(filesArray).forEach(Core::generateExecutable);
+        // Executable generation
+        if (Main.generateExecutable()) {
+            Core.generateExecutable(filesArray);
+        }
     }
 
     /**
      * Print all of the options and their descriptions
      */
     public void printOptions() {
+        int maxOptionLenth = 0;
         for (String option : options.keySet()) {
-            System.out.println(option + "\t\t" +
-                    options.get(option).description);
+            if (option.length() > maxOptionLenth) {
+                maxOptionLenth = option.length();
+            }
+        }
+        for (String option : options.keySet()) {
+            String line = String.format("%-" + (maxOptionLenth + 4) + "s %s",
+                    option, options.get(option).description);
+            System.out.println(line);
         }
     }
 

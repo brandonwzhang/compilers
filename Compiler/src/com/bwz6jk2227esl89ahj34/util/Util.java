@@ -4,9 +4,11 @@ import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyComment;
 import com.bwz6jk2227esl89ahj34.assembly.AssemblyLine;
 import com.bwz6jk2227esl89ahj34.ast.FunctionDeclaration;
-import com.bwz6jk2227esl89ahj34.ast.FunctionType;
+import com.bwz6jk2227esl89ahj34.ast.Identifier;
+import com.bwz6jk2227esl89ahj34.ast.parse.Parser;
+import com.bwz6jk2227esl89ahj34.ast.type.*;
+import com.bwz6jk2227esl89ahj34.ast.MethodDeclaration;
 import com.bwz6jk2227esl89ahj34.ast.parse.ParserSym;
-import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.analysis.CFGIR;
 import com.bwz6jk2227esl89ahj34.ir.IRCompUnit;
 import com.bwz6jk2227esl89ahj34.ir.IRSeq;
@@ -95,8 +97,18 @@ public class Util {
         put(ParserSym.USE, "use");
         put(ParserSym.UNDERSCORE, "_");
         put(ParserSym.error, "error:");
-                put(ParserSym.NEGATIVE_INT_BOUND, "negative_int_bound");
-                put(ParserSym.LENGTH, "length");
+        put(ParserSym.NEGATIVE_INT_BOUND, "negative_int_bound");
+        put(ParserSym.LENGTH, "length");
+        put(ParserSym.CLASS, "class");
+        put(ParserSym.EXTENDS, "extends");
+        put(ParserSym.NEW,"new");
+                put(ParserSym.PERIOD, ".");
+                put(ParserSym.NULL, "null");
+                put(ParserSym.THIS, "this");
+                put(ParserSym.BREAK, "break");
+                put(ParserSym.FOR, "for");
+                put(ParserSym.CAST, "#");
+                put(ParserSym.INSTANCEOF, "instanceof");
     }};
 
     /**
@@ -336,22 +348,33 @@ public class Util {
         }
     }
 
-    public static String getTypeString(VariableType type) {
-        String typeString = "";
-        switch (type.getPrimitiveType()) {
-            case BOOL:
-                typeString = "b";
-                break;
-            case INT:
-                typeString = "i";
-                break;
-            default:
-                throw new RuntimeException("Invalid type");
+    private static String getBaseTypeString(BaseType type) {
+        if (type instanceof IntType) {
+            return "i";
+        } else if (type instanceof BoolType) {
+            return "b";
+        } else {
+            ClassType classType = (ClassType) type;
+            String className = classType.getIdentifier().getName();
+            return "o" + className.length() + className;
         }
-        for (int i = 0; i < type.getNumBrackets(); i++) {
+    }
+
+    private static String getTypeString(VariableType type) {
+        if (!(type instanceof ArrayType)) {
+            return getBaseTypeString((BaseType) type);
+        }
+
+        ArrayType arrayType = (ArrayType) type;
+        String typeString = getBaseTypeString(arrayType.getBaseType());
+        for (int i = 0; i < arrayType.getNumBrackets(); i++) {
             typeString = "a" + typeString;
         }
         return typeString;
+    }
+
+    public static String getIRGlobalVariableName(Identifier identifier, VariableType type) {
+        return "_I_g_" + identifier.getName() + "_" + getTypeString(type);
     }
 
     public static String getIRFunctionName(FunctionDeclaration node) {
@@ -371,12 +394,21 @@ public class Util {
         }
 
         String arg = "";
-        List<VariableType> argList = funcType.getArgTypeList();
+        List<VariableType> argList = funcType.getArgTypes();
         for (VariableType type : argList) {
             arg += getTypeString(type);
         }
         irName += ret + arg;
         return irName;
+    }
+
+    public static String getIRMethodName(MethodDeclaration node) {
+        FunctionDeclaration functionDeclaration = node.getFunctionDeclaration();
+        Identifier newIdentifier =
+                new Identifier(node.getClassIdentifier().getName() + "$" + functionDeclaration.getIdentifier().getName());
+        FunctionDeclaration newFunctionDeclaration = new FunctionDeclaration(newIdentifier,
+                functionDeclaration.getFunctionType(), functionDeclaration.getArgumentIdentifiers(), functionDeclaration.getBlockList());
+        return getIRFunctionName(newFunctionDeclaration);
     }
 
     public static List<AssemblyLine> removeComments(List<AssemblyLine> lst) {

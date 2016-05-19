@@ -1,0 +1,2 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libQtXi.a  CMakeFiles/QtXi.dir/bindqt.cpp.o CMakeFiles/QtXi.dir/gcpin.cpp.o CMakeFiles/QtXi.dir/xiqobjectholder.cpp.o CMakeFiles/QtXi.dir/xiqwrapperfactory.cpp.o CMakeFiles/QtXi.dir/xiqproxywidgets.cpp.o CMakeFiles/QtXi.dir/xiqslot.cpp.o CMakeFiles/QtXi.dir/moc_xiqslot.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libQtXi.a

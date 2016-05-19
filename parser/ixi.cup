@@ -1,13 +1,25 @@
-package com.bwz6jk2227esl89ahj34;
-import com.bwz6jk2227esl89ahj34.AST.*;
-import edu.cornell.cs.cs4120.util.CodeWriterSExpPrinter;
-import java_cup.runtime.Symbol;
+package com.bwz6jk2227esl89ahj34.ast.parse;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import com.bwz6jk2227esl89ahj34.ast.*;
+import com.bwz6jk2227esl89ahj34.ast.type.FunctionType;
+import com.bwz6jk2227esl89ahj34.ast.Identifier;
+import com.bwz6jk2227esl89ahj34.ast.type.IntType;
+import com.bwz6jk2227esl89ahj34.ast.type.BoolType;
+import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
+import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
+import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
+import com.bwz6jk2227esl89ahj34.ast.parse.Interface;
+import com.bwz6jk2227esl89ahj34.util.Util;
+import com.bwz6jk2227esl89ahj34.util.prettyprint.Pair;
+import com.bwz6jk2227esl89ahj34.ast.type.*;
+import java_cup.runtime.Symbol;
 import java.io.FileReader;
-import java.util.*;
-import java.util.AbstractMap.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+
+
 
 class InterfaceParser;
 
@@ -17,11 +29,10 @@ parser code {:
      * Parses an interface file and adds the declarations to a given list
      * @param libPath       a String of the path to the interface files
      * @param interfaceName a String of the name of the interface
-     * @param declarations  a List<FunctionDeclaration> to store the parsed function declarations that must be empty
+     * @param inter A reference to an interface that gets set by this function 
      * @return              a String of the error or null if no error
      */
-    public static String parseInterface(String libPath, String interfaceName, List<FunctionDeclaration> declarations) {
-        assert(declarations.size() == 0);
+    public static String parseInterface(String libPath, String interfaceName, Interface inter) {
         try {
             FileReader reader = new FileReader(libPath + interfaceName + ".ixi");
             Lexer lexer = new Lexer(reader);
@@ -31,7 +42,7 @@ parser code {:
                 // Encountered parsing error, return error message
                 return parser.syntaxErrMessage;
             }
-            declarations.addAll((List<FunctionDeclaration>) result.value);
+            inter.set((Interface) result.value); 
         } catch(Exception e) {
             return "Interface " + interfaceName + " not found";
         }
@@ -62,13 +73,14 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW, PERIOD, NULL, THIS, FOR, CAST, INSTANCEOF;
 
 nonterminal empty;
 
 nonterminal PrimitiveType primitive_type;
 nonterminal VariableType var_type;
 nonterminal Integer array_no_size_type;
+nonterminal Identifier identifier;
 
 nonterminal List<VariableType> function_declaration_return_types;
 nonterminal SimpleEntry<Identifier, VariableType> function_declaration_argument_single;
@@ -79,25 +91,36 @@ nonterminal FunctionDeclaration function_declaration;
 nonterminal FunctionDeclaration function_declaration_line;
 nonterminal List<FunctionDeclaration> function_declaration_list;
 
-start with function_declaration_list;
+nonterminal List<UseStatement> use_block;
+
+nonterminal ClassDeclaration class_declaration; 
+nonterminal Pair<List<FunctionDeclaration>, List<ClassDeclaration>> interface_body;
+
+nonterminal Interface interface;
+
+start with interface;
 empty ::= ;
 
-primitive_type ::= INT {: RESULT = PrimitiveType.INT; :}
-                 | BOOL {: RESULT = PrimitiveType.BOOL; :}
+primitive_type ::= INT {: RESULT = new IntType(); :}
+                 | BOOL {: RESULT = new BoolType(); :}
                  ;
+
+identifier ::= IDENTIFIER:id {: RESULT = new Identifier(id); RESULT.setLocation(parser.stack.peek()); :}
+             ;
 
 array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type:anst {: RESULT = anst + 1; :}
                      | empty {: RESULT = 0; :}
                      ;
 
-var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new VariableType(pt, anst); :}
+var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = VariableType.construct(pt, anst); :}
+           | identifier:class_name array_no_size_type:anst {: RESULT = VariableType.construct(new ClassType(class_name), anst); :}
        ;
 
 function_declaration_return_types ::= var_type:t COMMA function_declaration_return_types:lst {: lst.add(0,t); RESULT = lst; :}
        | var_type:t  {: List<VariableType> lst = new LinkedList<>(); lst.add(0, t); RESULT = lst; :}
        ;
 
-function_declaration_argument_single ::= IDENTIFIER:i COLON var_type:t {: RESULT = new SimpleEntry<Identifier, VariableType>(new Identifier(i), t); :}
+function_declaration_argument_single ::= identifier:i COLON var_type:t {: RESULT = new SimpleEntry<Identifier, VariableType>(i, t); :}
                                        ;
 
 function_declaration_argument_list ::= function_declaration_argument_single:fdas COMMA function_declaration_argument_list:lst {: lst.add(0, fdas); RESULT = lst; :}
@@ -108,8 +131,8 @@ function_declaration_argument ::= function_declaration_argument_list:lst {: RESU
                                 | empty {: RESULT = new LinkedList<>(); :}
                                 ;
 
-function_declaration ::= IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(t)), args, null); :}
-                       | IDENTIFIER:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(new Identifier(id), new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, null); :}
+function_declaration ::= identifier:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN COLON function_declaration_return_types:t {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(t)), args, null); :}
+                       | identifier:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, null); :}
                        ;
 
 function_declaration_line ::= function_declaration:fd {: RESULT = fd; :}
@@ -118,3 +141,25 @@ function_declaration_line ::= function_declaration:fd {: RESULT = fd; :}
 function_declaration_list ::= function_declaration_line:fd function_declaration_list:lst {: lst.add(0, fd); RESULT = lst; :}
                             | function_declaration_line:fd {: RESULT = new LinkedList<FunctionDeclaration>(); RESULT.add(fd); :}
                             ;
+
+use_block ::= USE identifier:id use_block:u {: u.add(0, new UseStatement(id)); RESULT = u; RESULT.get(0).setLocation(id); :}
+            | USE identifier:id SEMICOLON use_block:u {: u.add(0, new UseStatement(id)); RESULT = u; RESULT.get(0).setLocation(id); :}
+            | empty   {: RESULT = new LinkedList<UseStatement>(); :}
+            ;
+
+class_declaration ::= CLASS identifier:id OPEN_BRACE function_declaration_list:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, new LinkedList<TypedDeclaration>(), methods, Optional.empty()); :}
+                    | CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE function_declaration_list:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, new LinkedList<TypedDeclaration>(), methods, Optional.of(id2)); :}
+                    | CLASS identifier:id OPEN_BRACE CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); RESULT = new ClassDeclaration(id, new LinkedList<TypedDeclaration>(), methods, Optional.empty()); :}
+                    | CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); RESULT = new ClassDeclaration(id, new LinkedList<TypedDeclaration>(), methods, Optional.of(id2)); :}
+                    ;
+
+interface_body ::= function_declaration_line:fd interface_body:p {: p.part1().add(fd); RESULT = p; :} 
+               | class_declaration:c interface_body:p {: p.part2().add(c); RESULT = p; :}
+               | empty {: Pair<List<FunctionDeclaration>, List<ClassDeclaration>> body = new Pair<>(new LinkedList<>(), new LinkedList<>()); RESULT = body; :}
+               ; 
+               
+interface ::= use_block:u interface_body:ib {: RESULT = new Interface(u, ib.part1(), ib.part2()); :}
+          ;
+
+
+

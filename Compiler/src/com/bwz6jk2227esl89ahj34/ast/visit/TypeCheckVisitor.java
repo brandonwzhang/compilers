@@ -1,6 +1,8 @@
 package com.bwz6jk2227esl89ahj34.ast.visit;
 
+import com.bwz6jk2227esl89ahj34.Main;
 import com.bwz6jk2227esl89ahj34.ast.*;
+import com.bwz6jk2227esl89ahj34.ast.parse.Interface;
 import com.bwz6jk2227esl89ahj34.ast.parse.InterfaceParser;
 import com.bwz6jk2227esl89ahj34.ast.type.*;
 
@@ -9,35 +11,97 @@ import java.util.*;
 public class TypeCheckVisitor implements NodeVisitor {
     // Path to interface files
     private String libPath;
+    // Name of the current file
+    private String moduleName;
 
     // Maintain a stack of contexts (identifier -> type map) for scoping
-    private Stack<Context> contexts;
+    private Stack<Context> contexts = new Stack<>();
 
-    // Local variable that stores current function in scope with a stack, used for return statements
+    private Map<Identifier, ClassDeclaration> classes = new HashMap<>();
+    private Set<Identifier> moduleClasses = new HashSet<>();
+
+    // Type of the function we're currently type checking
     private FunctionType currentFunctionType;
+    // Type of current class we're type checking
+    private Optional<ClassType> currentClassType = Optional.empty();
 
-    // Final types, for ease of checking equality
-    private final VariableType UNIT_TYPE = new VariableType(PrimitiveType.UNIT, 0);
-    private final VariableType VOID_TYPE = new VariableType(PrimitiveType.VOID, 0);
-    private final VariableType INT_TYPE = new VariableType(PrimitiveType.INT, 0);
-    private final VariableType BOOL_TYPE = new VariableType(PrimitiveType.BOOL, 0);
+    // Number of loops we're inside, used for checking Break
+    private int insideLoops = 0;
+
+    // Keep a set of parsed interfaces so we don't double-parse
+    private Set<String> parsedInterfaces = new HashSet<>();
 
     /**
      * Constructor for TypeCheckVisitor
      * @param libPath the directory for where to find the interface files.
      */
-    public TypeCheckVisitor(String libPath) {
-        contexts = new Stack<>();
+    public TypeCheckVisitor(String libPath, String fileName) {
         // initialize first context with length function, int[] -> int
         // when it should take bool[]. We handle this later below
-        Context initContext = new Context();
-        List<VariableType> lengthArgType = Collections.singletonList(new VariableType(PrimitiveType.INT, 1));
+        Context initContext = new Context(new VariableContext(), new FunctionContext());
+        List<VariableType> lengthArgType = Collections.singletonList(new ArrayType(new IntType(), 1));
         VariableTypeList lengthReturnType =
-                new VariableTypeList(Collections.singletonList(new VariableType(PrimitiveType.INT, 0)));
+                new VariableTypeList(Collections.singletonList(new IntType()));
         initContext.put(new Identifier("length"), new FunctionType(lengthArgType, lengthReturnType));
         contexts.push(initContext);
 
         this.libPath = libPath;
+        this.moduleName = fileName;
+    }
+
+    /**
+     * Check if a given type is a valid function type
+     */
+    private boolean isValidFunctionType(Type type) {
+        if (!(type instanceof FunctionType)) {
+            return false;
+        }
+        // check if all args are valid variableTypes
+        FunctionType functionType = (FunctionType) type;
+        for (VariableType variableType : functionType.getArgTypes()) {
+            if (!isValidVariableType(variableType)) {
+                return false;
+            }
+        }
+        // check if all return types are valid variableTypes
+        for (VariableType variableType : functionType.getReturnTypeList().getVariableTypeList()) {
+            if (!isValidVariableType(variableType)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if a given type is either an int, bool, unit, void or a class
+     * that has been declared
+     */
+    private boolean isValidVariableType(Type type) {
+        if (!(type instanceof VariableType)) {
+            return false;
+        }
+
+        if (!(type instanceof ClassType || type instanceof ArrayType)) {
+            return true;
+        }
+        ClassType classType;
+        if (type instanceof ClassType) {
+            classType = (ClassType) type;
+        } else {
+            ArrayType arrayType = (ArrayType) type;
+            if (!(arrayType.getBaseType() instanceof ClassType)) {
+                return true;
+            }
+            classType = (ClassType) arrayType.getBaseType();
+        }
+        if (!classes.containsKey(classType.getIdentifier())) {
+            return false;
+        }
+        return true;
+    }
+
+    public Map<Identifier, ClassDeclaration> getClasses() {
+        return classes;
     }
 
     /**
@@ -47,22 +111,28 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(ArrayIndex node) {
+        // visit subExpressions
         Expression arrayRef = node.getArrayRef();
         Expression index = node.getIndex();
         arrayRef.accept(this);
         index.accept(this);
 
-        if (!index.getType().equals(INT_TYPE)) {
+        if (!index.getType().isInt()) {
             throw new TypeException("Index is not an integer", index.getRow(), index.getCol());
         }
 
         Type type = arrayRef.getType();
-        assert type instanceof VariableType;
-        VariableType arrayType = (VariableType) type;
-        if(arrayType.getNumBrackets() < 1) {
-            throw new TypeException("Indexed element must be an array of at least dimension 1", arrayRef.getRow(), arrayRef.getCol());
+        if (!(type instanceof ArrayType)) {
+            throw new TypeException("Indexed element must be an array of at least dimension 1",
+                    arrayRef.getRow(), arrayRef.getCol());
         }
-        node.setType(new VariableType(arrayType.getPrimitiveType(), arrayType.getNumBrackets() - 1));
+        ArrayType arrayType = (ArrayType) type;
+        int newNumBrackets = arrayType.getNumBrackets() - 1;
+        if (newNumBrackets == 0) {
+            node.setType(arrayType.getBaseType());
+            return;
+        }
+        node.setType(new ArrayType(arrayType.getBaseType(), newNumBrackets));
     }
 
     /**
@@ -74,7 +144,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(ArrayLiteral node) {
         // Empty array case ({})
         if (node.getValues().size() == 0) {
-            node.setType(new VariableType(PrimitiveType.INT, 1));
+            node.setType(new ArrayType(new IntType(), 1));
             return;
         }
 
@@ -115,7 +185,50 @@ public class TypeCheckVisitor implements NodeVisitor {
         assert firstType instanceof VariableType;
 
         VariableType type = (VariableType) firstType;
-        node.setType(new VariableType(type.getPrimitiveType(), type.getNumBrackets() + 1));
+        if (type instanceof ArrayType) {
+            // If we have an array of arrays, we increment numBrackets by 1
+            ArrayType arrayType = (ArrayType) type;
+            node.setType(new ArrayType(arrayType.getBaseType(), arrayType.getNumBrackets() + 1));
+            return;
+        }
+        node.setType(new ArrayType((BaseType) type, 1));
+    }
+
+    /**
+     * Checks if type is a subtype of superType
+     */
+    private boolean isSubtype(Type type, Type superType) {
+        // Unit is a supertype of everything
+        if (superType instanceof UnitType) {
+            return true;
+        }
+        // Reflexivity of subtype
+        if (type.equals(superType)) {
+            return true;
+        }
+        // Null is a subtype of everything but int and bool
+        if (type.equals(new NullType()) && !(superType.isBool() || superType.isInt())) {
+            return true;
+        }
+        if (!(type instanceof ClassType && superType instanceof ClassType)) {
+            // Only a class can be a subtype of another class
+            return false;
+        }
+        // At this point we need to check if type is a strict subtype of superType
+        ClassType classType = (ClassType) type;
+        ClassType superClassType = (ClassType) superType;
+        ClassDeclaration classDecl = classes.get(classType.getIdentifier());
+        ClassDeclaration superClassDecl = classes.get(superClassType.getIdentifier());
+
+        // Check if any ancestors of type equals superType
+        while (classDecl.getParentIdentifier().isPresent()) {
+            Identifier parentIdentifier = classDecl.getParentIdentifier().get();
+            classDecl = classes.get(parentIdentifier);
+            if (classDecl.getIdentifier().equals(superClassDecl.getIdentifier())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -155,16 +268,15 @@ public class TypeCheckVisitor implements NodeVisitor {
 
                 Type rightType = rhs.getVariableTypeList().get(i);
 
-                assert leftType instanceof VariableType;
+                assert leftType instanceof VariableType || leftType.equals(new UnitType());
 
-                if (!leftType.equals(UNIT_TYPE) && !leftType.equals(rightType)) {
+                if (!isSubtype(rightType, leftType)) {
                     throw new TypeException("Type on left hand must match type on right hand", expression.getRow(), expression.getCol());
                 }
             }
 
         } else if (variables.size() > 1) {
             throw new TypeException("Expression only evaluates to single value", expression.getRow(), expression.getCol());
-
         } else if (variables.size() == 1 &&
                 !(variables.get(0) instanceof Underscore)) {
             Assignable leftExpression = variables.get(0);
@@ -174,7 +286,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             if (leftExpression instanceof TypedDeclaration) {
                 leftType = ((TypedDeclaration) leftExpression).getDeclarationType();
             }
-            if (!leftType.equals(expression.getType())) {
+            if (!isSubtype(expression.getType(), leftType)) {
                 throw new TypeException("Types on LHS and RHS must match", expression.getRow(), expression.getCol());
             }
         } else if (variables.size() == 1 && variables.get(0) instanceof Underscore
@@ -182,7 +294,7 @@ public class TypeCheckVisitor implements NodeVisitor {
             throw new TypeException("Expected Function Call", expression.getRow(), expression.getCol());
         }
 
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /**
@@ -223,29 +335,45 @@ public class TypeCheckVisitor implements NodeVisitor {
             righttype = (VariableType)right.getType();
         }
 
+        /*
+            For == and !=, both sides can be nullable (arraytype, classtype, nulltype),
+            but we can't have only one be nullable.
+         */
+        BinaryOperator binop = node.getOp();
+        if (binop == BinaryOperator.EQUAL || binop == BinaryOperator.NOT_EQUAL) {
+            if (lefttype.isNullable()) {
+                if (righttype.isNullable()) {
+                    node.setType(new BoolType());
+                    return;
+                }
+                else {
+                    throw new TypeException("Both operands for == or != need to be Objects or Null", left.getRow(), left.getCol());
+                }
+            }
+        }
 
+        // Check that left and right types are cooperative
         if (!lefttype.equals(righttype)) {
             throw new TypeException("Operands must be the same valid type", left.getRow(), left.getCol());
         }
-        BinaryOperator binop = node.getOp();
-        boolean isInteger = lefttype.equals(INT_TYPE);
-        boolean isBool = lefttype.equals(BOOL_TYPE);
+        boolean isInteger = lefttype.isInt();
+        boolean isBool = lefttype.isBool();
 
         boolean valid_int_binary_operator_int = BinarySymbol.INT_BINARY_OPERATOR_INT.contains(binop) && isInteger;
         boolean valid_int_binary_operator_bool = BinarySymbol.INT_BINARY_OPERATOR_BOOL.contains(binop) && isInteger;
         boolean valid_bool_binary_operator_bool = BinarySymbol.BOOL_BINARY_OPERATOR_BOOL.contains(binop) && isBool;
 
         if (valid_int_binary_operator_int) {
-            node.setType(new VariableType(PrimitiveType.INT, 0));
+            node.setType(new IntType());
         } else if (valid_int_binary_operator_bool) {
-            node.setType(new VariableType(PrimitiveType.BOOL, 0));
+            node.setType(new BoolType());
         } else if (valid_bool_binary_operator_bool) {
-            node.setType(new VariableType(PrimitiveType.BOOL, 0));
+            node.setType(new BoolType());
         } else if (BinarySymbol.ARRAY_BINARY_OPERATOR_BOOL.contains(binop) && !isBool && !isInteger) {
-            node.setType(new VariableType(PrimitiveType.BOOL, 0));
+            node.setType(new BoolType());
         } else if (binop.equals(BinaryOperator.PLUS) && !isBool && !isInteger) {
             assert lefttype instanceof VariableType;
-            node.setType(new VariableType(lefttype.getPrimitiveType(), lefttype.getNumBrackets()));
+            node.setType(lefttype);
         } else {
             throw new TypeException("Invalid binary operation", left.getRow(), left.getCol());
         }
@@ -258,14 +386,15 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(BlockList node) {
+        // create new context (copy of current)
         contexts.push(new Context(contexts.peek()));
-        List<Block> blockList = node.getBlockList();
+        List<Block> blockList = node.getBlocks();
         for (Block block : blockList) {
             block.accept(this);
         }
         int size = blockList.size();
         if (size == 0) {
-            node.setType(new VariableType(PrimitiveType.UNIT, 0));
+            node.setType(new UnitType());
         } else {
             Type lastType = blockList.get(size - 1).getType();
             node.setType(lastType);
@@ -278,7 +407,56 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(BooleanLiteral node) {
-        node.setType(new VariableType(PrimitiveType.BOOL, 0));
+        node.setType(new BoolType());
+    }
+
+    /**
+     * Set to unit if it's inside a loop.
+     */
+    public void visit(Break node) {
+        if (insideLoops <= 0) {
+            throw new TypeException("Break must be inside a loop", node.getRow(), node.getCol());
+        }
+        node.setType(new VoidType());
+    }
+
+    private Optional<Type> getCastedType(Identifier id){
+        String className = id.getName();
+        if (className.equals("null")) {
+            return Optional.of(new NullType());
+        }
+        if (className.equals("int")) {
+            return Optional.of(new IntType());
+        }
+        if (className.equals("bool")) {
+            return Optional.of(new BoolType());
+        }
+
+        // Search for valid class type
+        if (classes.containsKey(id)) {
+            return Optional.of(new ClassType(id));
+        }
+
+        return Optional.empty();
+    }
+
+    public void visit(CastedExpression node) {
+        // Idea: check wrapped expression is supertype of cast type
+        Expression nestedExpr = node.getExpression();
+        nestedExpr.accept(this);
+
+        Type exprType = nestedExpr.getType();
+        Optional<Type> optionalType = getCastedType(node.getCastTo());
+        if (!optionalType.isPresent()) {
+            throw new TypeException("Casted Type is not valid", node.getRow(), node.getCol());
+        }
+        Type castedType = optionalType.get();
+
+        if (!isSubtype(castedType, exprType)) {
+            throw new TypeException("Not a valid down cast", node.getRow(), node.getCol());
+        }
+
+        node.setType(castedType);
     }
 
     /**
@@ -286,16 +464,107 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(CharacterLiteral node) {
-        node.setType(new VariableType(PrimitiveType.INT, 0));
+        node.setType(new IntType());
+    }
+
+    /**
+     * Returns the type of the field in a given class. Returns null if field
+     * cannot be found.
+     */
+    private VariableType getFieldType(Identifier fieldName, ClassDeclaration cd) {
+        for (TypedDeclaration td : cd.getFields()) {
+            if (td.getIdentifier().equals(fieldName)) {
+                return td.getDeclarationType();
+            }
+        }
+        // Since all fields are private, if we don't find it in this class, we
+        // cannot look in parent classes
+        return null;
+    }
+
+    /**
+     * Returns the type of the method in a given class. Returns null if method
+     * cannot be found.
+     */
+    private FunctionType getMethodType(Identifier methodName, ClassDeclaration cd) {
+        assert cd != null;
+        for (MethodDeclaration md : cd.getMethods()) {
+            if (md.getFunctionDeclaration().getIdentifier().equals(methodName)) {
+                return md.getFunctionDeclaration().getFunctionType();
+            }
+        }
+        // At this point the method was not found in this class, so we look in
+        // parent classes
+        if (!cd.getParentIdentifier().isPresent()) {
+            // There is no parent, so this method does not exist
+            return null;
+        }
+        return getMethodType(methodName, classes.get(cd.getParentIdentifier().get()));
+    }
+
+    public void visit(ClassDeclaration node) {
+        contexts.push(new Context(contexts.peek()));
+        currentClassType = Optional.of(new ClassType(node.getIdentifier()));
+
+        for (TypedDeclaration td : node.getFields()) {
+            // Accept the typed declaration to add it to the context
+            td.accept(this);
+        }
+
+        ClassDeclaration currentClass = node;
+        Map<Identifier, FunctionType> seenMethods = new HashMap<>();
+        Set<Identifier> currentClassMethods = new HashSet<>();
+        
+        while (true) {
+            for (MethodDeclaration md : currentClass.getMethods()) {
+                FunctionDeclaration fd = md.getFunctionDeclaration();
+                Identifier id = fd.getIdentifier();
+
+                // check for duplicate methods in a single class
+                if (currentClassMethods.contains(id)) {
+                    throw new TypeException("Method " + fd.getIdentifier().getName() + " declared multiple times in class",
+                            fd.getRow(), fd.getCol());
+                }
+
+                // check for overriding methods and make sure the types match
+                if (seenMethods.containsKey(id) && !fd.getFunctionType().equals(seenMethods.get(id))) {
+                    throw new TypeException("Overloading method " + id.getName() + " does not have the proper type.",
+                            fd.getRow(), fd.getCol());
+                }
+
+                currentClassMethods.add(id);
+                seenMethods.put(id, fd.getFunctionType());
+            }
+
+            currentClassMethods.clear();    // reset before next superclass
+
+            if (currentClass.getParentIdentifier().isPresent()) {
+                // repeat for the next superclass
+                currentClass = classes.get(currentClass.getParentIdentifier().get());
+            } else {
+                break;
+            }
+        }
+
+        // add all the methods seen in this class and superclasses to the context
+        for (Identifier id : seenMethods.keySet()) {
+            contexts.peek().put(id, seenMethods.get(id));
+        }
+
+        for (MethodDeclaration md : node.getMethods()) {
+            md.accept(this);
+        }
+
+        node.setType(new UnitType());
+        currentClassType = Optional.empty();
+        contexts.pop();
     }
 
     /**
      * Checks that the given BlockList is guaranteed to return by the end
-     * @param blockList
-     * @return
      */
     public static boolean checkFunctionBlockList(BlockList blockList) {
-        Block lastBlock = blockList.getBlockList().get(blockList.getBlockList().size() - 1);
+        Block lastBlock = blockList.getBlocks().get(blockList.getBlocks().size() - 1);
 
         if (lastBlock instanceof ReturnStatement) {
             // Guaranteed to return at the end
@@ -340,11 +609,9 @@ public class TypeCheckVisitor implements NodeVisitor {
 
     /**
      * Checks that top level return statements only occur at the end of the BlockList
-     * @param blockList
-     * @return
      */
     public static boolean checkProcedureBlockList(BlockList blockList) {
-        List<Block> blocks = blockList.getBlockList();
+        List<Block> blocks = blockList.getBlocks();
         // Iterate until last element to make sure none of them are return statements
         for (int i = 0; i < blocks.size() - 1; i++) {
             if (blocks.get(i) instanceof ReturnStatement) {
@@ -362,12 +629,14 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public void visit(FunctionCall node) {
         Context context = contexts.peek();
+        // Check that the function exists in the context
         Identifier id = node.getIdentifier();
-        if (!context.containsKey(id)) {
+        if (!context.getFunctionContext().containsKey(id)) {
             throw new TypeException("Function not defined", id.getRow(), id.getCol());
         }
-        id.accept(this);
+        id.setType(context.getFunctionContext().get(id));
 
+        // Gather argument types
         List<VariableType> argumentTypes = new ArrayList<>();
         for (Expression argument : node.getArguments()) {
             argument.accept(this);
@@ -376,27 +645,41 @@ public class TypeCheckVisitor implements NodeVisitor {
             argumentTypes.add(argType);
         }
 
-        Type type = context.get(id);
-        if (!(type instanceof FunctionType)) {
+        if (!context.getFunctionContext().containsKey(id)) {
             throw new TypeException(id + " is not a function", id.getRow(), id.getCol());
         }
 
-        FunctionType thisFuncType = (FunctionType) type;
-        FunctionType funcType = new FunctionType(argumentTypes, thisFuncType.getReturnTypeList());
+        FunctionType funcType = (FunctionType) context.getFunctionContext().get(id);
         // Function call don't match arguments AND
-        // Not a valid length call...
-        if (!thisFuncType.equals(funcType) && 
-                !(id.getName().equals("length")
-                && argumentTypes.size() == 1 && argumentTypes.get(0).getNumBrackets() > 0)) {
-            throw new TypeException("Argument types do not match with function definition", id.getRow(), id.getCol());
+
+        // Check call arguments to make sure they match
+        // We need to handle length calls as a special case since they can take multiple types
+        if (id.getName().equals("length")) {
+            if (!(argumentTypes.size() == 1 && argumentTypes.get(0) instanceof ArrayType)) {
+                throw new TypeException("Argument types do not match with function definition", id.getRow(), id.getCol());
+            }
+        } else {
+            // Check that the correct number of arguments are passed
+            if (argumentTypes.size() != funcType.getArgTypes().size()) {
+                throw new TypeException("Incorrect number of arguments passed to " + node.getIdentifier().getName(),
+                        node.getRow(), node.getCol());
+            }
+            for (int i = 0; i < argumentTypes.size(); i++) {
+                VariableType callArgumentType = argumentTypes.get(i);
+                VariableType argumentType = funcType.getArgTypes().get(i);
+                if (!isSubtype(callArgumentType, argumentType)) {
+                    throw new TypeException("Argument types do not match with function definition",
+                            id.getRow(), id.getCol());
+                }
+            }
         }
 
-        if (thisFuncType.getReturnTypeList().getVariableTypeList().size() > 1) {
-            node.setType(thisFuncType.getReturnTypeList());
-        } else if (thisFuncType.getReturnTypeList().getVariableTypeList().size() == 0) {
+        if (funcType.getReturnTypeList().getVariableTypeList().size() > 1) {
+            node.setType(funcType.getReturnTypeList());
+        } else if (funcType.getReturnTypeList().getVariableTypeList().size() == 0) {
             throw new TypeException("Procedure calls cannot be used as an expression", id.getRow(), id.getCol());
         } else {
-            node.setType(thisFuncType.getReturnTypeList().getVariableTypeList().get(0));
+            node.setType(funcType.getReturnTypeList().getVariableTypeList().get(0));
         }
     }
 
@@ -407,11 +690,15 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(FunctionDeclaration node) {
+        if (!isValidFunctionType(node.getFunctionType())) {
+            throw new TypeException("Invalid function type", node.getRow(), node.getCol());
+        }
         currentFunctionType = node.getFunctionType();
-        List<Identifier> argList = node.getArgList();
-        List<VariableType> argTypeList = currentFunctionType.getArgTypeList();
+        List<Identifier> argList = node.getArgumentIdentifiers();
+        List<VariableType> argTypeList = currentFunctionType.getArgTypes();
         assert argList.size() == argTypeList.size();
 
+        // create new context containing arguments
         Context newContext = new Context(contexts.peek());
         for (int i = 0; i < argList.size(); i++) {
             newContext.put(argList.get(i), argTypeList.get(i));
@@ -435,8 +722,8 @@ public class TypeCheckVisitor implements NodeVisitor {
             }
         }
 
-        assert blockList.getType().equals(UNIT_TYPE) || blockList.getType().equals(VOID_TYPE);
-        node.setType(UNIT_TYPE);
+        assert blockList.getType().equals(new UnitType()) || blockList.getType().equals(new VoidType());
+        node.setType(new UnitType());
     }
 
     /**
@@ -447,11 +734,14 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public void visit(Identifier node) {
         // Check if identifier is in context
-        Type type = contexts.peek().get(node);
+        Type type = contexts.peek().getVariableContext().get(node);
         if (type == null) {
-            throw new TypeException("Identifier does not exist in context", node.getRow(), node.getCol());
+                throw new TypeException("Identifier " + node.getName() + " does not exist in context",
+                        node.getRow(), node.getCol());
+
         }
         node.setType(type);
+
     }
 
     /**
@@ -462,9 +752,10 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(IfStatement node) {
+        // check guard
         Expression guard = node.getGuard();
         guard.accept(this);
-        if (!guard.getType().equals(BOOL_TYPE)) {
+        if (!guard.getType().isBool()) {
             throw new TypeException("If statement guard must be of type bool", guard.getRow(), guard.getCol());
         }
 
@@ -488,7 +779,8 @@ public class TypeCheckVisitor implements NodeVisitor {
             // We need create and pop a new context if the block is just a statement
             if (falseBlockIsStatement) {
                 if (falseBlock.get() instanceof ReturnStatement) {
-                    throw new TypeException("Single return statement encountered in false block", falseBlock.get().getRow(), falseBlock.get().getCol());
+                    throw new TypeException("Single return statement encountered in false block",
+                            falseBlock.get().getRow(), falseBlock.get().getCol());
                 }
                 contexts.push(new Context(contexts.peek()));
             }
@@ -496,13 +788,24 @@ public class TypeCheckVisitor implements NodeVisitor {
             if (falseBlockIsStatement) {
                 contexts.pop();
             }
-            PrimitiveType r1 = ((VariableType) trueBlock.getType()).getPrimitiveType();
-            PrimitiveType r2 = ((VariableType) falseBlock.get().getType()).getPrimitiveType();
+            Type r1 = trueBlock.getType();
+            Type r2 = falseBlock.get().getType();
             // If has type void iff both blocks have type void
-            node.setType(new VariableType(lub(r1,r2), 0));
+            node.setType(lub(r1, r2));
         } else {
-            node.setType(new VariableType(PrimitiveType.UNIT, 0));
+            node.setType(new UnitType());
         }
+    }
+
+    public void visit(InstanceOf node) {
+        Expression e = node.getExpression();
+        e.accept(this);
+        Identifier instance = node.getClassName();
+        Optional<Type> classType = getCastedType(instance);
+        if (!classType.isPresent()) {
+            throw new TypeException("Not a valid class to check instance of", node.getRow(), node.getCol());
+        }
+        node.setType(new BoolType());
     }
 
     /**
@@ -510,7 +813,171 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(IntegerLiteral node) {
-        node.setType(new VariableType(PrimitiveType.INT, 0));
+        node.setType(new IntType());
+    }
+
+    /**
+     * MethodDeclaration has the type of its wrapped FunctionDeclaration
+     */
+    public void visit(MethodDeclaration node) {
+        // Check that the function declaration wrapped in this method is typed
+        FunctionDeclaration fd = node.getFunctionDeclaration();
+
+        // Make sure no argument names clash with class fields
+        Identifier className = node.getClassIdentifier();
+        assert classes.containsKey(className);
+        ClassDeclaration cd = classes.get(className);
+        List<Identifier> args = fd.getArgumentIdentifiers();
+        for (TypedDeclaration td : cd.getFields()) {
+            if (args.contains(td.getIdentifier())) {
+                throw new TypeException("Method arguments may not shadow class fields", node.getRow(), node.getCol());
+            }
+        }
+
+        fd.accept(this);
+        node.setType(fd.getType());
+    }
+
+    /**
+     * Null always has NullType
+     */
+    public void visit(Null node) {
+        node.setType(new NullType());
+    }
+
+    /**
+     * The type of an object's field is specified in the object's ClassDeclaration
+     */
+    public void visit(ObjectField node) {
+        node.getObject().accept(this);
+        assert node.getObject().getType() instanceof ClassType;
+        ClassType classType = (ClassType) node.getObject().getType();
+        // We can only access private fields from methods in the module
+        if (!moduleClasses.contains(classType.getIdentifier())) {
+            throw new TypeException("Cannot access private field", node.getRow(), node.getCol());
+        }
+        Identifier className = classType.getIdentifier();
+        ClassDeclaration cd = classes.get(className);
+        Identifier fieldName = node.getField();
+        // Get the type for this field
+        VariableType type = getFieldType(fieldName, cd);
+        if (type == null) {
+            throw new TypeException("Class " + className.getName() + " does not contain field " + fieldName.getName(),
+                    fieldName.getRow(), fieldName.getCol());
+        }
+        node.setType(type);
+    }
+
+    /**
+     * The dispatch vector is used to find the location of the method
+     */
+    public void visit(ObjectFunctionCall node) {
+        node.getObject().accept(this);
+        assert node.getObject().getType() instanceof ClassType;
+        Identifier className = ((ClassType) node.getObject().getType()).getIdentifier();
+        ClassDeclaration cd = classes.get(className);
+
+        // Extract the types for tha passed arguments
+        List<VariableType> argumentTypes = new ArrayList<>();
+        for (Expression argument : node.getArguments()) {
+            argument.accept(this);
+            assert argument.getType() instanceof VariableType;
+            VariableType argType = (VariableType) argument.getType();
+            argumentTypes.add(argType);
+        }
+
+        Identifier methodName = node.getIdentifier();
+        FunctionType funcType = getMethodType(methodName, cd);
+        if (funcType == null) {
+            throw new TypeException("Class " + className.getName() + " does not contain method " + methodName.getName(),
+                    methodName.getRow(), methodName.getCol());
+        }
+
+        // Check that the correct number of arguments are passed
+        if (argumentTypes.size() != funcType.getArgTypes().size()) {
+            throw new TypeException("Incorrect number of arguments passed to " + node.getIdentifier().getName(),
+                    node.getRow(), node.getCol());
+        }
+
+        // Check call arguments to make sure they match
+        for (int i = 0; i < argumentTypes.size(); i++) {
+            VariableType callArgumentType = argumentTypes.get(i);
+            VariableType argumentType = funcType.getArgTypes().get(i);
+            if (!isSubtype(callArgumentType, argumentType)) {
+                throw new TypeException("Argument types do not match with function definition",
+                        methodName.getRow(), methodName.getCol());
+            }
+        }
+
+        if (funcType.getReturnTypeList().getVariableTypeList().size() > 1) {
+            node.setType(funcType.getReturnTypeList());
+        } else if (funcType.getReturnTypeList().getVariableTypeList().size() == 0) {
+            throw new TypeException("Procedure calls cannot be used as an expression",
+                    methodName.getRow(), methodName.getCol());
+        } else {
+            node.setType(funcType.getReturnTypeList().getVariableTypeList().get(0));
+        }
+    }
+
+    /**
+     * Has the type of the class that was specified
+     */
+    public void visit(ObjectInstantiation node) {
+        Type classtype = new ClassType(node.getClassIdentifier());
+        if (!isValidVariableType(classtype)) {
+            throw new TypeException ("Invalid class type", node.getRow(), node.getCol());
+        }
+        // Set the type to the class
+        node.setType(classtype);
+    }
+
+    /**
+     * Dispatch vector is used to find location of the method
+     */
+    public void visit(ObjectProcedureCall node) {
+        node.getObject().accept(this);
+        assert node.getObject().getType() instanceof ClassType;
+        Identifier className = ((ClassType) node.getObject().getType()).getIdentifier();
+        ClassDeclaration cd = classes.get(className);
+
+        // Extract the types for tha passed arguments
+        List<VariableType> argumentTypes = new ArrayList<>();
+        for (Expression argument : node.getArguments()) {
+            argument.accept(this);
+            assert argument.getType() instanceof VariableType;
+            VariableType argType = (VariableType) argument.getType();
+            argumentTypes.add(argType);
+        }
+
+        Identifier methodName = node.getIdentifier();
+        FunctionType funcType = getMethodType(methodName, cd);
+        if (funcType == null) {
+            throw new TypeException("Class " + className.getName() + " does not contain method " + methodName.getName(),
+                    methodName.getRow(), methodName.getCol());
+        }
+
+        // Check that the correct number of arguments are passed
+        if (argumentTypes.size() != funcType.getArgTypes().size()) {
+            throw new TypeException("Incorrect number of arguments passed to " + node.getIdentifier().getName(),
+                    node.getRow(), node.getCol());
+        }
+
+        // Check call arguments to make sure they match
+        for (int i = 0; i < argumentTypes.size(); i++) {
+            VariableType callArgumentType = argumentTypes.get(i);
+            VariableType argumentType = funcType.getArgTypes().get(i);
+            if (!isSubtype(callArgumentType, argumentType)) {
+                throw new TypeException("Argument types do not match with function definition",
+                        methodName.getRow(), methodName.getCol());
+            }
+        }
+
+        if (funcType.getReturnTypeList().getVariableTypeList().size() > 0) {
+            throw new TypeException("You cannot call a function with a return " +
+                    "value as a procedure.", methodName.getRow(), methodName.getCol());
+        } else {
+            node.setType(new UnitType());
+        }
     }
 
     /**
@@ -523,32 +990,88 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(ProcedureCall node) {
         Context context = contexts.peek();
         Identifier id = node.getIdentifier();
-        if (!context.containsKey(id)) {
+
+        if (!context.getFunctionContext().containsKey(id)) {
             throw new TypeException("Procedure " + id.getName() + " not defined", id.getRow(), id.getCol());
         }
 
-        List<VariableType> argumentTypes = ((FunctionType) context.get(id)).getArgTypeList();
+        FunctionType funcType = (FunctionType) context.getFunctionContext().get(id);
+
+        List<VariableType> argumentTypes = funcType.getArgTypes();
         List<Expression> passedArguments = node.getArguments();
         if (passedArguments.size() != argumentTypes.size()) {
-            throw new TypeException("Too many arguments passed to " + id, id.getRow(), id.getCol());
+            throw new TypeException("Incorrect number of arguments passed to " + id, id.getRow(), id.getCol());
         }
+
         for (int i = 0; i < passedArguments.size(); i++) {
             Expression argument = passedArguments.get(i);
             argument.accept(this);
             assert argument.getType() instanceof VariableType;
             VariableType argType = (VariableType) argument.getType();
-            if (!argType.equals(argumentTypes.get(i))) {
+            if (!isSubtype(argType, argumentTypes.get(i))) {
                 throw new TypeException("Argument types do not match procedure definition", id.getRow(), id.getCol());
             }
         }
 
-        FunctionType funcType = new FunctionType(argumentTypes, new VariableTypeList(new ArrayList<>()));
-        if (!funcType.equals(context.get(id))) {
-            throw new TypeException("You cannot call a method with a return " +
+        if (funcType.getReturnTypeList().getVariableTypeList().size() > 0) {
+            throw new TypeException("You cannot call a function with a return " +
                     "value as a procedure.", id.getRow(), id.getCol());
         }
 
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
+    }
+
+    /**
+     * Throws a TypeException if it encounters a cyclic inheritance
+     */
+    private void checkCyclicInheritance(ClassDeclaration cd) {
+        Set<Identifier> seenClasses = new HashSet<>();
+        ClassDeclaration currentClassDec = cd;
+        while (currentClassDec.getParentIdentifier().isPresent()) {
+            Identifier className = currentClassDec.getIdentifier();
+            if (seenClasses.contains(className)) {
+                throw new TypeException("Encountered cyclic inheritance in class " + className.getName(),
+                        className.getRow(), className.getCol());
+            }
+            seenClasses.add(className);
+            currentClassDec = classes.get(currentClassDec.getParentIdentifier().get());
+        }
+    }
+
+    public boolean containsMethodDeclaration(List<MethodDeclaration> methods, MethodDeclaration m_) {
+        for (MethodDeclaration m : methods) {
+            FunctionDeclaration fd = m.getFunctionDeclaration();
+            FunctionDeclaration fd_ = m_.getFunctionDeclaration();
+            if (m.getClassIdentifier().equals(m_.getClassIdentifier())
+                    && fd.getFunctionType().equals(fd_.getFunctionType())
+                    && fd.getIdentifier().equals(fd_.getIdentifier())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void checkClassDefinition(ClassDeclaration definition,
+                                     ClassDeclaration declaration,
+                                     Program node) {
+
+        // Check Method Declarations match
+        for (MethodDeclaration m : declaration.getMethods()) {
+            if (!containsMethodDeclaration(definition.getMethods(), m)) {
+                throw new TypeException("Module does not define a class method declared in the interface.", node.getRow(), node.getCol());
+            }
+        }
+
+        for (MethodDeclaration m : definition.getMethods()) {
+            if (!containsMethodDeclaration(declaration.getMethods(), m)) {
+                throw new TypeException("Module defines a class method not declared in the interface.", node.getRow(), node.getCol());
+            }
+        }
+
+        // Check inheritance matches
+        if (!declaration.getParentIdentifier().equals(definition.getParentIdentifier())) {
+            throw new TypeException("Interface contains class whose parent does not match", node.getRow(), node.getCol());
+        }
     }
 
     /***
@@ -566,11 +1089,43 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Program node) {
-        // First pass collects all function types, adds to context
-        for (FunctionDeclaration funcDec : node.getFunctionDeclarationList()) {
+        // Add function declarations from interface files
+        for (UseStatement useStatement : node.getUseBlock()) {
+            useStatement.accept(this);
+        }
+
+        // Populate the classes map first incase any functions use objects
+        for (ClassDeclaration classDef : node.getClassDeclarations()) {
+            Identifier className = classDef.getIdentifier();
+            moduleClasses.add(className);
+            if (classes.containsKey(className)) {
+                checkClassDefinition(classDef, classes.get(className), node);
+            } else {
+                classes.put(className, classDef);
+            }
+        }
+
+        // Check that all class parents are valid classes
+        for (ClassDeclaration classDec : classes.values()) {
+            if (classDec.getParentIdentifier().isPresent()) {
+                Identifier parentIdentifier = classDec.getParentIdentifier().get();
+                if (!classes.containsKey(parentIdentifier)) {
+                    throw new TypeException("Class " + parentIdentifier.getName() + " does not exist",
+                            parentIdentifier.getRow(), parentIdentifier.getCol());
+                }
+            }
+        }
+
+        // Make sure there's no cyclic inheritance
+        for (ClassDeclaration classDec : node.getClassDeclarations()) {
+            checkCyclicInheritance(classDec);
+        }
+
+        // Add all functions to the initial context
+        for (FunctionDeclaration funcDec : node.getFunctionDeclarations()) {
             Identifier funcName = funcDec.getIdentifier();
             // Disallow overloading and shadowing
-            if (contexts.peek().get(funcName) != null) {
+            if (contexts.peek().getFunctionContext().get(funcName) != null) {
                 throw new TypeException(funcName.getName() + "declared multiple times",
                         funcName.getRow(), funcName.getCol());
             }
@@ -580,17 +1135,139 @@ public class TypeCheckVisitor implements NodeVisitor {
             funcName.setType(funcType);
         }
 
-        // Add function declarations from interface files
-        for (UseStatement useStatement : node.getUseBlock()) {
-            useStatement.accept(this);
+
+        // Look for an interface file for this file, doesn't need to exist
+        Interface interface4120 = new Interface();
+        String filename = moduleName.substring(0, moduleName.length() - 3);
+        if (filename.contains("/")) {
+            filename = filename.substring(filename.lastIndexOf('/') + 1);
+        }
+        String err = InterfaceParser.parseInterface(Main.libPath(), filename, interface4120);
+        if (err == null) {
+            // No error, so we'll check that the class declarations match the ones in this module
+            for (ClassDeclaration cd : interface4120.getClassDeclarations()) {
+                if (!classes.containsKey(cd.getIdentifier())) {
+                    continue;
+                }
+
+                ClassDeclaration definition = classes.get(cd.getIdentifier());
+                checkClassDefinition(definition, cd, node);
+
+                // Ignore fields
+
+                Map<Identifier, MethodDeclaration> methods = new HashMap<>();
+                for (MethodDeclaration md : definition.getMethods()) {
+                    methods.put(md.getFunctionDeclaration().getIdentifier(), md);
+                }
+                List<MethodDeclaration> newMethodList = new ArrayList<>();
+                for (MethodDeclaration md : cd.getMethods()) {
+                    newMethodList.add(methods.get(md.getFunctionDeclaration().getIdentifier()));
+                }
+                definition.setMethods(newMethodList);
+            }
+
+            // TODO: also check that the function declarations match?
+        } else if (!err.contains("not found")) {
+            // Some error other than interface file not found
+            throw new TypeException(err, node.getRow(), node.getCol());
+        }
+        // Else interface file was not found, ignore and continue
+
+        // Add all non-array global variables to context
+        for (Assignment global : node.getGlobalVariables()) {
+            assert global.getVariables().size() == 1;
+            assert global.getVariables().get(0) instanceof TypedDeclaration;
+            Expression expression = global.getExpression();
+            TypedDeclaration td = (TypedDeclaration) global.getVariables().get(0);
+
+            if (td.getDeclarationType() instanceof ArrayType) {
+                continue;
+            }
+
+            // Check to ensure a global has not been declared already
+            if (contexts.peek().getVariableContext().containsKey(td.getIdentifier())) {
+                throw new TypeException("Global variable " + td.getIdentifier().getName() + " already declared",
+                        td.getRow(), td.getCol());
+            }
+            // Check integer globals
+            if (td.getDeclarationType().equals(new IntType())) {
+                if (!(expression instanceof IntegerLiteral)) {
+                    throw new TypeException("Global integer variables can only be initialized to literals",
+                            expression.getRow(), expression.getCol());
+                }
+            }
+            // Check boolean globals
+            if (td.getDeclarationType().equals(new BoolType())) {
+                if (!(expression instanceof BooleanLiteral)) {
+                    throw new TypeException("Global boolean variables can only be initialized to literals",
+                            expression.getRow(), expression.getCol());
+                }
+            }
+            // Check object globals initialized to null
+            if (td.getDeclarationType() instanceof ClassType) {
+                if (!(expression instanceof Null)) {
+                    throw new TypeException("Global object variables can only be initialized to null",
+                            expression.getRow(), expression.getCol());
+                }
+            }
+
+            contexts.peek().put(td.getIdentifier(), td.getDeclarationType());
+        }
+
+        // Visit all of the global variables
+        // Do extra stuff if the variable is an array type
+        for (Assignment global : node.getGlobalVariables()) {
+            Expression expression = global.getExpression();
+            TypedDeclaration td = (TypedDeclaration) global.getVariables().get(0);
+
+            // Check arraytype has valid init
+            // Size is either a integer, or another global
+            if (td.getDeclarationType() instanceof ArrayType) {
+                if (!(expression instanceof Null)) {
+                    throw new TypeException("Global array variables can only be initialized to null",
+                            expression.getRow(), expression.getCol());
+                }
+                // Check each size init is an integer or another global that is an integer
+                for (Expression size : td.getArraySizes()) {
+                    if (size instanceof IntegerLiteral) {
+                        continue;
+                    }
+                    if (size instanceof Identifier) {
+                        Identifier sizeIdentifier = (Identifier) size;
+                        for (Assignment otherGlobal : node.getGlobalVariables()) {
+                            assert otherGlobal.getVariables().size() == 1;
+                            assert otherGlobal.getVariables().get(0) instanceof TypedDeclaration;
+                            TypedDeclaration otherTd = (TypedDeclaration) otherGlobal.getVariables().get(0);
+                            if (otherTd.getIdentifier().equals(sizeIdentifier)) {
+                                if (!otherTd.getDeclarationType().equals(new IntType())) {
+                                    throw new TypeException("Array size must be an int",
+                                            sizeIdentifier.getRow(), sizeIdentifier.getCol());
+                                }
+                                break;
+                            }
+
+                        }
+                        continue;
+                    }
+                    throw new TypeException("Array sizes can only be initialized to integer literals or other global variables",
+                            size.getRow(), size.getCol());
+                }
+            }
+
+            // This variable will get readded when its TypedDeclation is visited
+            contexts.peek().remove(td.getIdentifier(), td.getDeclarationType());
+            global.accept(this);
+        }
+        for (ClassDeclaration classDeclaration : node.getClassDeclarations()) {
+            classDeclaration.accept(this);
         }
 
         // Second pass typechecks all the function bodies
-        for (FunctionDeclaration functionDeclaration : node.getFunctionDeclarationList()) {
+        for (FunctionDeclaration functionDeclaration : node.getFunctionDeclarations()) {
             functionDeclaration.accept(this);
         }
 
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /***
@@ -620,12 +1297,12 @@ public class TypeCheckVisitor implements NodeVisitor {
             // Expression must have a VariableType
             assert expression.getType() instanceof VariableType;
             VariableType type = (VariableType) expression.getType();
-            if (!functionReturnTypes.get(i).equals(type)) {
+            if (!isSubtype(type, functionReturnTypes.get(i))) {
                 throw new TypeException("Return values do not match types in function declaration",
                         expression.getRow(), expression.getCol());
             }
         }
-        node.setType(new VariableType(PrimitiveType.VOID, 0));
+        node.setType(new VoidType());
     }
 
     /***
@@ -633,7 +1310,18 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(StringLiteral node) {
-        node.setType(new VariableType(PrimitiveType.INT, 1));
+        node.setType(new ArrayType(new IntType(), 1));
+    }
+
+    public void visit(This node) {
+        // "this" variable always has the type of the class it's used in
+        // If "this" is used outside of a class, we throw an exception
+        if (!currentClassType.isPresent()) {
+            throw new TypeException("'this' cannot be used outside of a class declaration",
+                    node.getRow(), node.getCol());
+        }
+        node.setType(currentClassType.get());
+        return;
     }
 
     /***
@@ -646,16 +1334,20 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(TypedDeclaration node) {
         Identifier identifier = node.getIdentifier();
         Context context = contexts.peek();
-        if (context.containsKey(identifier)) {
+        if (context.getVariableContext().containsKey(identifier)) {
             throw new TypeException("Variable " + identifier.getName() +
                     " already declared in scope", node.getRow(), node.getCol());
         }
+        VariableType type = node.getDeclarationType();
+        if (!isValidVariableType(type)) {
+            throw new TypeException("Invalid type", node.getRow(), node.getCol());
+        }
         context.put(identifier, node.getDeclarationType());
         identifier.accept(this);
-        for (Expression expression : node.getArraySizeList()) {
+        for (Expression expression : node.getArraySizes()) {
             expression.accept(this);
         }
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /***
@@ -672,12 +1364,12 @@ public class TypeCheckVisitor implements NodeVisitor {
         expression.accept(this);
 
         UnaryOperator unop = node.getOp();
-        if (expression.getType().equals(INT_TYPE) && unop ==
+        if (expression.getType().isInt() && unop ==
                 UnaryOperator.MINUS) {
-            node.setType(new VariableType(PrimitiveType.INT, 0));
-        } else if (expression.getType().equals(BOOL_TYPE) && unop ==
+            node.setType(new IntType());
+        } else if (expression.getType().isBool() && unop ==
                 UnaryOperator.NOT) {
-            node.setType(new VariableType(PrimitiveType.BOOL, 0));
+            node.setType(new BoolType());
         } else {
             throw new TypeException("Invalid unary operator",
                     node.getRow(), node.getCol());
@@ -689,7 +1381,7 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @param node
      */
     public void visit(Underscore node) {
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /***
@@ -706,7 +1398,7 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (error != null) {
             throw new TypeException(error, node.getRow(), node.getCol());
         }
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /**
@@ -720,7 +1412,7 @@ public class TypeCheckVisitor implements NodeVisitor {
     public void visit(WhileStatement node) {
         Expression guard = node.getGuard();
         guard.accept(this);
-        if (!guard.getType().equals(BOOL_TYPE)) {
+        if (!guard.getType().isBool()) {
             throw new TypeException("While statement guard must be of type bool",
                     guard.getRow(), guard.getCol());
         }
@@ -731,16 +1423,20 @@ public class TypeCheckVisitor implements NodeVisitor {
         if (blockIsStatement) {
             contexts.push(new Context(contexts.peek()));
         }
+
+        insideLoops++;
         block.accept(this);
+        insideLoops--;
+
         // Blocks should only have either unit or void type
-        assert block.getType().equals(UNIT_TYPE) ||
-                block.getType().equals(VOID_TYPE);
+        assert block.getType().isUnit() ||
+                block.getType().isVoid();
         if (blockIsStatement) {
             // Pop off the context for the statement
             contexts.pop();
         }
 
-        node.setType(new VariableType(PrimitiveType.UNIT, 0));
+        node.setType(new UnitType());
     }
 
     /**
@@ -752,13 +1448,32 @@ public class TypeCheckVisitor implements NodeVisitor {
      */
     public String addInterface(String libPath, String interfaceName,
                                Context context) {
-        List<FunctionDeclaration> declarations = new LinkedList<>();
+        // If we already parsed this interface, ignore
+        if (parsedInterfaces.contains(interfaceName)) {
+            return "";
+        }
+        parsedInterfaces.add(interfaceName);
+
+        Interface interface69 = new Interface();
         String error = InterfaceParser.parseInterface(libPath,
-                interfaceName, declarations);
+                interfaceName, interface69);
+        if (error != null) {
+            return error;
+        }
+
+        // Read in each interface's use blocks recursively
+        for(UseStatement use : interface69.getUseBlock()) {
+            if (addInterface(libPath, use.getIdentifier().getName(), context) != null) {
+                throw new TypeException(error);
+            }
+        }
+
+        // Read in each function declaration, add to context
+        List<FunctionDeclaration> declarations = interface69.getFunctionDeclarations();
         for (FunctionDeclaration declaration : declarations) {
             // Error if function already exists in context with different type
             FunctionType existingDeclarationType =
-                    (FunctionType) context.get(declaration.getIdentifier());
+                    (FunctionType) context.getFunctionContext().get(declaration.getIdentifier());
             if (existingDeclarationType != null) {
                 if (!existingDeclarationType.equals(declaration.getFunctionType())) {
                     return declaration.getIdentifier().getName() +
@@ -770,6 +1485,12 @@ public class TypeCheckVisitor implements NodeVisitor {
             // Add the declaration to the context otherwise
             context.put(declaration.getIdentifier(), declaration.getFunctionType());
         }
+
+        // Save all classes
+        for (ClassDeclaration cd : interface69.getClassDeclarations()) {
+            classes.put(cd.getIdentifier(), cd);
+        }
+
         return error;
     }
 
@@ -783,14 +1504,14 @@ public class TypeCheckVisitor implements NodeVisitor {
      * @return the output of the function lub as specified in the Xi Type Spec
      *
      */
-    public PrimitiveType lub(PrimitiveType one, PrimitiveType two) {
-        assert one == PrimitiveType.UNIT || one == PrimitiveType.VOID;
-        assert two == PrimitiveType.UNIT || two == PrimitiveType.VOID;
+    public Type lub(Type one, Type two) {
+        assert one.isUnit() || one.isVoid();
+        assert two.isUnit() || two.isVoid();
 
-        if (one == PrimitiveType.UNIT || two == PrimitiveType.UNIT) {
-            return PrimitiveType.UNIT;
+        if (one.isUnit() || two.isVoid()) {
+            return new UnitType();
         } else {
-            return PrimitiveType.VOID;
+            return new VoidType();
         }
     }
 }

@@ -1,10 +1,10 @@
 package com.bwz6jk2227esl89ahj34.ast.parse;
 
 import com.bwz6jk2227esl89ahj34.ast.*;
-import com.bwz6jk2227esl89ahj34.ast.type.PrimitiveType;
-import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
-import com.bwz6jk2227esl89ahj34.ast.type.VariableTypeList;
+import com.bwz6jk2227esl89ahj34.ast.type.*;
 import com.bwz6jk2227esl89ahj34.util.Util;
+import com.bwz6jk2227esl89ahj34.util.prettyprint.Pair;
+import com.bwz6jk2227esl89ahj34.util.Triple;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
@@ -40,7 +40,7 @@ terminal INT, BOOL;
 terminal IF, ELSE, WHILE, BREAK, RETURN, USE, PLUS, MINUS, TIMES,
   DIVIDE, MODULO, NOT, LT, LEQ, GT, GEQ, AND, OR, EQUAL, NOT_EQUAL, GETS,
   OPEN_BRACKET, CLOSE_BRACKET, OPEN_PAREN, CLOSE_PAREN, OPEN_BRACE, CLOSE_BRACE,
-  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH;
+  COLON, COMMA, SEMICOLON, UNDERSCORE, HIGH_MULT, NEGATIVE_INT_BOUND, LENGTH, CLASS, EXTENDS, NEW, PERIOD, NULL, THIS, FOR, CAST, INSTANCEOF;
 
 nonterminal Program program;
 
@@ -60,6 +60,7 @@ nonterminal Expression F;
 nonterminal Expression G;
 nonterminal Expression H;
 nonterminal Expression I;
+nonterminal Expression K;
 
 nonterminal BooleanLiteral boolean_literal;
 nonterminal ArrayLiteral array_literal;
@@ -86,6 +87,7 @@ nonterminal Assignment assignment;
 nonterminal IfStatement if_statement;
 nonterminal WhileStatement while_statement;
 nonterminal ReturnStatement return_statement;
+nonterminal BlockList for_loop; 
 nonterminal Block block;
 nonterminal BlockList block_list;
 nonterminal BlockList block_scope;
@@ -98,12 +100,23 @@ nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_arg
 nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_argument;
 
 nonterminal FunctionDeclaration function_declaration;
-nonterminal List<FunctionDeclaration> function_declaration_list;
 
 nonterminal ProcedureCall procedure_call;
+nonterminal List<TypedDeclaration> typed_declaration_list; 
+nonterminal List<TypedDeclaration> field; 
+nonterminal Pair<List<TypedDeclaration>, List<FunctionDeclaration>> class_declaration_body;
+nonterminal ClassDeclaration class_declaration; 
+nonterminal Triple<List<Assignment>, List<FunctionDeclaration>, List<ClassDeclaration>> program_body;
+nonterminal Expression object_expression; 
+nonterminal ObjectFunctionCall object_function_call; 
+nonterminal ObjectField object_field; 
+nonterminal List<Assignment> global_variable; 
+nonterminal Assignable global_variable_assignable;
+nonterminal Assignment global_variable_assignment;
 
 precedence nonassoc ELSE;
 precedence nonassoc SEMICOLON;
+precedence nonassoc CAST;
 
 start with program;
 
@@ -118,7 +131,7 @@ minus_list ::= MINUS minus_list:m {: RESULT = new Unary(UnaryOperator.MINUS, m);
              ;
 
 not_list ::= NOT not_list:n {: RESULT = new Unary(UnaryOperator.NOT, n); RESULT.setLocation(n); :}
-           |NOT H:h {: RESULT = new Unary(UnaryOperator.NOT, h); RESULT.setLocation(h); :}
+           | NOT H:h {: RESULT = new Unary(UnaryOperator.NOT, h); RESULT.setLocation(h); :}
            ;
 
 boolean_literal ::= TRUE  {: RESULT = new BooleanLiteral(true); RESULT.setLocation(parser.stack.peek()); :}
@@ -163,17 +176,27 @@ G ::= H:h {: RESULT = h; RESULT.setLocation(h); :}
     ;
 
 H ::= I:i {: RESULT = i; RESULT.setLocation(i); :}
-    | function_call:fc {: RESULT = fc; RESULT.setLocation(fc); :}
-    | H:h OPEN_BRACKET A:a CLOSE_BRACKET {: RESULT = new ArrayIndex(h,a); RESULT.setLocation(h); :}
+    | H:i PERIOD function_call:fc {: RESULT = new ObjectFunctionCall(fc.getIdentifier(), i, fc.getArguments()); RESULT.setLocation(i); :}
+    | H:i PERIOD identifier:id {: RESULT = new ObjectField(i, id); RESULT.setLocation(i); :}
     ;
 
-I ::= boolean_literal:b {: RESULT = b; RESULT.setLocation(b); :}
+I ::= K:k {: RESULT = k; RESULT.setLocation(k); :}
+    | function_call:fc {: RESULT = fc; RESULT.setLocation(fc); :}
+    | I:h OPEN_BRACKET A:a CLOSE_BRACKET {: RESULT = new ArrayIndex(h,a); RESULT.setLocation(h); :}
+    | identifier:i CAST K:k {: RESULT = new CastedExpression(i, k); RESULT.setLocation(parser.cur_token); :}
+    | K:k INSTANCEOF identifier:i {: RESULT = new InstanceOf(k, i); RESULT.setLocation(parser.cur_token); :}
+    ;
+
+K ::= boolean_literal:b {: RESULT = b; RESULT.setLocation(b); :}
     | INTEGER_LITERAL:i {: RESULT = new IntegerLiteral(i); RESULT.setLocation(parser.stack.peek()); :}
     | OPEN_PAREN A:a CLOSE_PAREN {: RESULT = a; RESULT.setLocation(parser.cur_token); :}
     | identifier: i {: RESULT = i; RESULT.setLocation(parser.cur_token); :}
     | STRING_LITERAL:s {: RESULT = new StringLiteral(s); RESULT.setLocation(parser.stack.peek()); :}
     | CHARACTER_LITERAL:c {: RESULT = new CharacterLiteral(c); RESULT.setLocation(parser.stack.peek()); :}
     | array_literal:al {: RESULT = al; RESULT.setLocation(al); :}
+    | NEW identifier:i {: RESULT = new ObjectInstantiation(i); RESULT.setLocation(i); :}
+    | NULL {: RESULT = new Null(); RESULT.setLocation(parser.stack.peek()); :}
+    | THIS {: RESULT = new This(); RESULT.setLocation(parser.stack.peek()); :}
     ;
 
 
@@ -193,33 +216,35 @@ array_literal ::= OPEN_BRACE expression_list:lst CLOSE_BRACE {: RESULT = new Arr
                 | OPEN_BRACE CLOSE_BRACE {: RESULT = new ArrayLiteral(new LinkedList<>()); RESULT.setLocation(parser.cur_token); :}
                 ;
 
-primitive_type ::= INT {: RESULT = PrimitiveType.INT; :}
-                 | BOOL {: RESULT = PrimitiveType.BOOL; :}
+primitive_type ::= INT {: RESULT = new IntType(); :}
+                 | BOOL {: RESULT = new BoolType(); :}
                  ;
 
 array_size_type ::= OPEN_BRACKET expression:e CLOSE_BRACKET array_size_type:ast {: ast.getKey().add(0, e); RESULT = ast; :}
                   | array_no_size_type:anst {: RESULT = new SimpleEntry<List<Expression>, Integer>(new LinkedList<>(), anst); :}
                   ;
 
-array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type:anst {: RESULT = anst + 1; :}
+array_no_size_type ::= OPEN_BRACKET CLOSE_BRACKET array_no_size_type:anst {: RESULT = anst + 1;:}
                      | empty {: RESULT = 0; :}
                      ;
 
-var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = new VariableType(pt, anst); :}
+var_type ::= primitive_type:pt array_no_size_type: anst {: RESULT = VariableType.construct(pt, anst); :}
+           | identifier:class_name array_no_size_type:anst {: RESULT = VariableType.construct(new ClassType(class_name), anst); :}
        ;
 
 
-typed_declaration_no_size ::= identifier:id COLON primitive_type:t array_no_size_type:ast {: RESULT = new TypedDeclaration(id, new VariableType(t, ast), new LinkedList<Expression>()); RESULT.setLocation(parser.cur_token); :} //x:int
+typed_declaration_no_size ::= identifier:id COLON primitive_type:t array_no_size_type:ast {: RESULT = new TypedDeclaration(id, VariableType.construct(t, ast), new LinkedList<Expression>()); RESULT.setLocation(parser.cur_token); :} //x:int
+                            | identifier:id COLON identifier:class_name array_no_size_type:ast {: RESULT = new TypedDeclaration(id, VariableType.construct(new ClassType(class_name), ast), new LinkedList<Expression>()); RESULT.setLocation(parser.cur_token); :}
                     ;
 
-typed_declaration ::= identifier:id COLON primitive_type:t array_size_type:ast {: RESULT = new TypedDeclaration(id, new VariableType(t, ast.getKey().size() + ast.getValue()), ast.getKey()); RESULT.setLocation(parser.cur_token); :} //x:int
+typed_declaration ::= identifier:id COLON primitive_type:t array_size_type:ast {: RESULT = new TypedDeclaration(id, VariableType.construct(t, ast.getKey().size() + ast.getValue()), ast.getKey()); RESULT.setLocation(parser.cur_token); :} //x:int
+                    | identifier:id COLON identifier:class_name array_size_type:ast {: RESULT = new TypedDeclaration(id, VariableType.construct(new ClassType(class_name), ast.getKey().size() + ast.getValue()), ast.getKey()); RESULT.setLocation(parser.cur_token); :} //x:int
                     ;
 
 function_call ::= identifier:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(id, lst); RESULT.setLocation(id); :}//f(x,y,z,...)
                 | identifier:id OPEN_PAREN CLOSE_PAREN {: RESULT = new FunctionCall(id, new LinkedList<Expression>()); RESULT.setLocation(id); :} // f()
                 | LENGTH:id OPEN_PAREN expression_list:lst CLOSE_PAREN {: RESULT = new FunctionCall(new Identifier("length"), lst); RESULT.setLocation(parser.cur_token); :}
                 ;
-
 
 assignment_lhs_array_brackets ::= assignment_lhs_array:a OPEN_BRACKET expression:e CLOSE_BRACKET {: RESULT = new ArrayIndex(a,e); RESULT.setLocation(a); :}
                                 ;
@@ -228,14 +253,34 @@ assignment_lhs_array ::= function_call:fc {: RESULT = fc; RESULT.setLocation(fc)
                        | STRING_LITERAL:s {: RESULT = new StringLiteral(s); RESULT.setLocation(parser.stack.peek()); :}
                        | identifier:i {: RESULT = i; RESULT.setLocation(i); :}
                        | assignment_lhs_array_brackets:a {: RESULT = a; RESULT.setLocation(a); :}
+                       | object_field:o {: RESULT = o; RESULT.setLocation(o); :}
+                       | object_function_call:o {: RESULT = o; RESULT.setLocation(o); :}
                        ;
 
+object_expression ::= identifier:id {: RESULT = id; RESULT.setLocation(id); :}
+                    | NEW identifier:id {: RESULT = new ObjectInstantiation(id); RESULT.setLocation(id); :}
+                    | function_call:fc {: RESULT = fc;  RESULT.setLocation(fc); :}
+                    | object_function_call:ofc {: RESULT = ofc;RESULT.setLocation(ofc); :}
+                    | assignment_lhs_array_brackets:ai {: RESULT = ai; RESULT.setLocation(ai); :} 
+                    | object_field:of {: RESULT = of; RESULT.setLocation(of); :}
+                    | THIS {: RESULT = new This(); RESULT.setLocation(parser.stack.peek()); :}
+                    | identifier:i CAST object_expression:e {: RESULT = new CastedExpression(i, e); :}
+                    | identifier:i CAST OPEN_PAREN object_expression:e CLOSE_PAREN {: RESULT = new CastedExpression(i, e); :}
+                    ;
+
+object_function_call ::= object_expression:e PERIOD function_call:fc {: RESULT = new ObjectFunctionCall(fc.getIdentifier(), e, fc.getArguments()); RESULT.setLocation(e); :}
+                       ; 
+
+object_field ::= object_expression:e PERIOD identifier:id {: RESULT = new ObjectField(e, id); RESULT.setLocation(e); :}
+               ; 
 
 assignment_lhs ::= identifier:id {: RESULT = id; RESULT.setLocation(parser.cur_token); :}
                  | assignment_lhs_array_brackets:a {: RESULT = a; RESULT.setLocation(parser.cur_token); :}
                  | typed_declaration_no_size:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
                  | function_call:fc {: RESULT = fc; RESULT.setLocation(parser.cur_token); :}
                  | UNDERSCORE {: RESULT = new Underscore(); RESULT.setLocation(parser.cur_token); :}
+                 | object_function_call:ofc {: RESULT = ofc; RESULT.setLocation(parser.cur_token); :}
+                 | object_field:o {: RESULT = o; :}
                  ;
 
 declaration_assignment_lhs ::= typed_declaration_no_size:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
@@ -247,6 +292,7 @@ multiple_assignment_lhs ::= declaration_assignment_lhs:dl COMMA multiple_assignm
 
 assignment ::= assignment_lhs:al GETS expression:e {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); RESULT = new Assignment(lst, e); RESULT.setLocation(parser.cur_token); :}// x = expression
              | multiple_assignment_lhs:all GETS function_call:fc {: RESULT = new Assignment(all, fc); RESULT.setLocation(parser.cur_token); :}
+             | multiple_assignment_lhs:all GETS object_function_call:ofc {: RESULT = new Assignment(all, ofc); RESULT.setLocation(parser.cur_token); :}
              ;
 
 if_statement ::= IF OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT = new IfStatement(e, b, Optional.empty()); RESULT.setLocation(e); :}
@@ -259,12 +305,18 @@ while_statement ::= WHILE OPEN_PAREN expression:e CLOSE_PAREN block:b {: RESULT 
 return_statement ::= RETURN expression_list:lst {: RESULT = new ReturnStatement(lst); RESULT.setLocation(parser.cur_token); :}
                    ;
 
+for_loop ::= FOR OPEN_PAREN assignment_lhs:al GETS expression:e SEMICOLON expression:t SEMICOLON statement:s CLOSE_PAREN  block:b {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); List<Block> blocks = new LinkedList<Block>(); blocks.add(new Assignment(lst, e)); List<Block> body_blocks = new LinkedList<>(); body_blocks.add(b); body_blocks.add(s); BlockList body = new BlockList(body_blocks); blocks.add(new WhileStatement(t, body)); RESULT = new BlockList(blocks); RESULT.setLocation(parser.cur_token); :}
+                     | FOR OPEN_PAREN assignment_lhs:al GETS expression:e SEMICOLON expression:t CLOSE_PAREN  block:b {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); List<Block> blocks = new LinkedList<Block>(); blocks.add(new Assignment(lst, e)); blocks.add(new WhileStatement(t, b)); RESULT = new BlockList(blocks); RESULT.setLocation(parser.cur_token); :}
+                     ; 
+
 statement_no_semicolon ::= if_statement:s {: RESULT = s; RESULT.setLocation(s); :}
                          | while_statement:s {: RESULT = s; RESULT.setLocation(s); :}
                          | procedure_call:pc {: RESULT = pc; RESULT.setLocation(pc); :}
                          | typed_declaration:td {: RESULT = td; RESULT.setLocation(td); :}
                          | assignment:a {: RESULT = a; RESULT.setLocation(a); :}
                          | return_statement:r {: RESULT = r; RESULT.setLocation(r); :}
+                         | object_expression:e PERIOD procedure_call:pc {: RESULT = new ObjectProcedureCall(pc.getIdentifier(), e, pc.getArguments()); RESULT.setLocation(e); :}
+                         | BREAK {: RESULT = new Break(); RESULT.setLocation(parser.cur_token); :}
                          ;
 
 //this should be okay since semicolon doesn't actually matter
@@ -276,8 +328,15 @@ block ::= block_scope:bl {: RESULT = bl; RESULT.setLocation(bl); :}
         | statement:s {: RESULT = s; RESULT.setLocation(s); :}
         ;
 
-block_list ::= block:b block_list:bl {: bl.getBlockList().add(0, b); RESULT = bl; RESULT.setLocation(b); :}
+// x,y:int 
+typed_declaration_list ::= identifier:id COMMA typed_declaration:td {: List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); :}
+              | identifier:id COMMA typed_declaration_list:f {: TypedDeclaration temp = f.get(f.size()-1); f.add(new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); :} 
+              ; 
+
+block_list ::= block:b block_list:bl {: bl.getBlocks().add(0, b); RESULT = bl; :}
+             | typed_declaration_list:f block_list:bl {: for(TypedDeclaration td : f) { bl.getBlocks().add(0, td); } RESULT = bl; :}
              | RETURN {: List<Block> bl = new LinkedList<>(); bl.add(0,new ReturnStatement(new LinkedList<>())); RESULT = new BlockList(bl); :}
+             | for_loop:f block_list:bl {: bl.getBlocks().add(0, f); RESULT = bl; :}
              | empty  {: List<Block> bl = new LinkedList<>(); RESULT = new BlockList(bl); :}
              ;
 
@@ -303,10 +362,6 @@ function_declaration ::= identifier:id OPEN_PAREN function_declaration_argument:
                        | identifier:id OPEN_PAREN function_declaration_argument:argPairs CLOSE_PAREN OPEN_BRACE block_list:fb CLOSE_BRACE {: List<Identifier> args = new LinkedList<>(); List<VariableType> argTypes = new LinkedList<>(); for (SimpleEntry<Identifier, VariableType> se : argPairs) { args.add(se.getKey()); argTypes.add(se.getValue()); } RESULT = new FunctionDeclaration(id, new FunctionType(argTypes, new VariableTypeList(new LinkedList<>())), args, fb); RESULT.setLocation(id); :}
                        ;
 
-function_declaration_list ::= function_declaration:fd function_declaration_list:lst {: lst.add(0, fd); RESULT = lst; :}
-                            | function_declaration:fd {: List<FunctionDeclaration> lst = new LinkedList<FunctionDeclaration>(); lst.add(0,fd); RESULT = lst; :}
-                            ;
-
 procedure_call ::= identifier:id OPEN_PAREN expression_list:elist CLOSE_PAREN {: RESULT = new ProcedureCall(id, elist); RESULT.setLocation(id); :} //f(x,y,z,...)
                  | identifier:id OPEN_PAREN CLOSE_PAREN {: RESULT = new ProcedureCall(id, new LinkedList<Expression>()); RESULT.setLocation(id); :}// f()
                  ;
@@ -316,7 +371,39 @@ use_block ::= USE identifier:id use_block:u {: u.add(0, new UseStatement(id)); R
             | empty   {: RESULT = new LinkedList<UseStatement>(); :}
             ;
 
+field ::= typed_declaration_list:td {: RESULT = td; :}
+         | typed_declaration:td {: List<TypedDeclaration> lst = new LinkedList<>(); lst.add(0, td); RESULT = lst; :}
+         ;
 
-program ::= use_block:u function_declaration_list:l   {: RESULT = new Program(u,l); RESULT.setLocation(parser.cur_token); :}
+class_declaration_body ::= field:f class_declaration_body:c {: for(TypedDeclaration td : f) { c.part1().add(0, td); } RESULT = c ; :}
+                       | field:f SEMICOLON class_declaration_body:c {: for(TypedDeclaration td : f) { c.part1().add(0, td); } RESULT = c ; :}
+                       | function_declaration:f class_declaration_body:c {: c.part2().add(0, f); RESULT = c; :}
+                       | empty {: Pair<List<TypedDeclaration>, List<FunctionDeclaration>> pair = new Pair<>(new LinkedList<>(), new LinkedList<>()); RESULT = pair; :}
+                       ; 
+
+class_declaration ::= CLASS identifier:id OPEN_BRACE class_declaration_body:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body.part2()) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, body.part1(), methods, Optional.empty()); :}
+                    | CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE class_declaration_body:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body.part2()) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, body.part1(), methods, Optional.of(id2)); :}
+                    ;
+
+program_body ::= global_variable:g program_body:p {: for (Assignment ga : g) { p.getA().add(0, ga); } RESULT = p; :}
+               | global_variable:g SEMICOLON program_body:p {: for (Assignment ga : g) { p.getA().add(0, ga); } RESULT = p; :}
+               | function_declaration:fd program_body:p {: p.getB().add(fd); RESULT = p; :} 
+               | class_declaration:c program_body:p {: p.getC().add(c); RESULT = p; :}
+               | empty {: Triple<List<Assignment>, List<FunctionDeclaration>, List<ClassDeclaration>> body = new Triple<>(new LinkedList<>(), new LinkedList<>(), new LinkedList<>()); RESULT = body; :}
+               ; 
+
+
+global_variable_assignable ::= typed_declaration_no_size:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
+                 ;
+
+global_variable_assignment ::= global_variable_assignable:a GETS expression:e {:  RESULT = new Assignment(a, e); RESULT.setLocation(parser.cur_token); :}// x = expression
+                             ; 
+
+global_variable ::= typed_declaration_list:lst {: List<Assignment> assignments = new LinkedList<>(); for (TypedDeclaration td : lst) { if (td.getDeclarationType() instanceof IntType) { assignments.add(new Assignment(td, new IntegerLiteral("0"))); } else if (td.getDeclarationType() instanceof BoolType) { assignments.add(new Assignment(td, new BooleanLiteral(false))); } else { assignments.add(new Assignment(td, new Null())); } } RESULT = assignments; :} 
+                  | global_variable_assignment:a {: List<Assignment> assignables = new LinkedList<>(); assignables.add(a); RESULT = assignables; :}
+                  | typed_declaration:td {:  List<Assignment> assignments = new LinkedList<>(); if (td.getDeclarationType() instanceof IntType) { assignments.add(new Assignment(td, new IntegerLiteral("0"))); } else if (td.getDeclarationType() instanceof BoolType) { assignments.add(new Assignment(td, new BooleanLiteral(false))); } else { assignments.add(new Assignment(td, new Null())); } RESULT = assignments; :}
+                  ; 
+
+program ::= use_block:u program_body:b {: RESULT = new Program(u, b.getA(), b.getB(), b.getC()); RESULT.setLocation(parser.cur_token); :}
           | error
           ;

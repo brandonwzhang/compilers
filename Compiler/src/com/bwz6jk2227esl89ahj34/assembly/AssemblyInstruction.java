@@ -1,5 +1,6 @@
 package com.bwz6jk2227esl89ahj34.assembly;
 
+import com.bwz6jk2227esl89ahj34.ir.IRName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -28,6 +29,11 @@ public class AssemblyInstruction extends AssemblyLine {
     }
     @Override
     public String toString() {
+        // special case for method dispatching
+        if (opCode.equals(OpCode.CALLQ) && !(args.get(0) instanceof AssemblyName)) {
+            return "callq\t" + "*" + args.get(0);
+        }
+
         String s = opCode.toString().toLowerCase() + "\t";
         for (int i = 0; i < args.size(); i++) {
             s += args.get(i);

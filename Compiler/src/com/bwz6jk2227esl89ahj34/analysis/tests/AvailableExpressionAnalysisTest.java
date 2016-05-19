@@ -49,7 +49,5 @@ public class AvailableExpressionAnalysisTest {
         IRExpr e5_ = new IRMem(e4_);
         Assert.assertTrue(analysis.exprEquals(e5, e5_));
 
-        // TODO tests for call and failing tests for mem
-
     }
 }

@@ -1,6 +1,5 @@
 package com.bwz6jk2227esl89ahj34.ast;
 
-import com.bwz6jk2227esl89ahj34.ast.parse.InterfaceParser;
 import com.bwz6jk2227esl89ahj34.ast.visit.NodeVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,16 +12,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class Program extends Node {
     private List<UseStatement> useBlock;
-    private List<FunctionDeclaration> functionDeclarationList;
+    private List<Assignment> globalVariables;
+    private List<FunctionDeclaration> functionDeclarations;
+    private List<ClassDeclaration> classDeclarations;
 
     public void accept(NodeVisitor v){ v.visit(this); }
-
-    public List<FunctionDeclaration> getFunctionsFromUseStatement(String libPath) {
-        List<FunctionDeclaration> declarations = new LinkedList<>();
-        for (UseStatement useStatement : useBlock) {
-            String error = InterfaceParser.parseInterface(libPath,
-                    useStatement.getIdentifier().getName(), declarations);
-        }
-        return declarations;
-    }
 }

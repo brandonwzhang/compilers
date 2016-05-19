@@ -1,9 +1,11 @@
 package com.bwz6jk2227esl89ahj34.ast.visit;
 
 import com.bwz6jk2227esl89ahj34.ast.*;
+import com.bwz6jk2227esl89ahj34.ast.type.ArrayType;
 import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import com.bwz6jk2227esl89ahj34.util.prettyprint.CodeWriterSExpPrinter;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class PrintVisitor implements NodeVisitor {
@@ -55,7 +57,7 @@ public class PrintVisitor implements NodeVisitor {
     }
 
     public void visit(BlockList node) {
-        for(Block b : node.getBlockList()){
+        for(Block b : node.getBlocks()){
             b.accept(this);
         }
     }
@@ -64,8 +66,31 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom(node.getValue().toString());
     }
 
+    public void visit(Break node) {
+        // TODO
+    }
+
+    public void visit(CastedExpression node) {
+        //TODO
+    }
+
     public void visit(CharacterLiteral node) {
         printer.printAtom("'" + node.getValue() + "'");
+    }
+
+    // TODO: i keep getting mismatched blocks....
+    public void visit(ClassDeclaration node) {
+        printer.startList();
+        printer.printAtom("class");
+        node.getIdentifier().accept(this);
+       // for (TypedDeclaration field : node.getFields()) {
+       //     field.accept(this);
+       // }
+       // for (MethodDeclaration method : node.getMethods()) {
+       //     method.accept(this);
+       // }
+        printer.endList();
+
     }
 
     public void visit(FunctionCall node) {
@@ -81,11 +106,11 @@ public class PrintVisitor implements NodeVisitor {
         printer.startList();
         node.getIdentifier().accept(this);
         printer.startList();
-        List<Identifier> argList = node.getArgList();
-        List<VariableType> argTypeList = node.getFunctionType().getArgTypeList();
+        List<Identifier> argList = node.getArgumentIdentifiers();
+        List<VariableType> argTypeList = node.getFunctionType().getArgTypes();
         List<VariableType> returnTypeList = node.getFunctionType()
                 .getReturnTypeList().getVariableTypeList();
-        for(int i = 0; i < node.getArgList().size(); i++){
+        for(int i = 0; i < node.getArgumentIdentifiers().size(); i++){
             printer.startList();
             argList.get(i).accept(this);
             printType(argTypeList.get(i));
@@ -128,8 +153,36 @@ public class PrintVisitor implements NodeVisitor {
         printer.endList();
     }
 
+    public void visit(InstanceOf node) {
+        //TODO;
+    }
+
     public void visit(IntegerLiteral node) {
         printer.printAtom(node.getValue());
+    }
+
+    public void visit(MethodDeclaration node) {
+        node.getFunctionDeclaration().accept(this);
+    }
+
+    public void visit(Null node) {
+        printer.printAtom("null");
+    }
+
+    public void visit(ObjectField node) {
+        // TODO
+    }
+
+    public void visit(ObjectFunctionCall node) {
+        // TODO
+    }
+
+    public void visit(ObjectInstantiation node) {
+        // TODO
+    }
+
+    public void visit(ObjectProcedureCall node) {
+        // TODO
     }
 
     public void visit(ProcedureCall node) {
@@ -149,7 +202,7 @@ public class PrintVisitor implements NodeVisitor {
         }
         printer.endList();
         printer.startList();
-        for (FunctionDeclaration funcDec : node.getFunctionDeclarationList()) {
+        for (FunctionDeclaration funcDec : node.getFunctionDeclarations()) {
             funcDec.accept(this);
         }
         printer.endList();
@@ -169,14 +222,23 @@ public class PrintVisitor implements NodeVisitor {
         printer.printAtom("\"" + node.getValue() + "\"");
     }
 
+    public void visit(This node) {
+        //TODO
+    }
 
     public void printType(VariableType node) {
-        for(int i = 0; i < node.getNumBrackets(); i++) {
+        if (!(node instanceof ArrayType)) {
+            printer.printAtom(node.toString());
+            return;
+        }
+
+        ArrayType arrayType = (ArrayType) node;
+        for(int i = 0; i < arrayType.getNumBrackets(); i++) {
             printer.startList();
             printer.printAtom("[]");
         }
-        printer.printAtom(node.getPrimitiveType().toString());
-        for(int j = 0; j < node.getNumBrackets(); j++) {
+        printer.printAtom(arrayType.getBaseType().toString());
+        for(int j = 0; j < arrayType.getNumBrackets(); j++) {
             printer.endList();
         }
     }
@@ -184,21 +246,30 @@ public class PrintVisitor implements NodeVisitor {
     public void visit(TypedDeclaration node) {
         printer.startList();
         node.getIdentifier().accept(this);
-        for(int i = 0; i < node.getDeclarationType().getNumBrackets(); i++) {
+
+        VariableType type = node.getDeclarationType();
+
+        if (!(type instanceof ArrayType)) {
+            printer.printAtom(type.toString());
+            return;
+        }
+
+        ArrayType arrayType = (ArrayType) type;
+        for(int i = 0; i < arrayType.getNumBrackets(); i++) {
             printer.startList();
             printer.printAtom("[]");
         }
 
-        printer.printAtom(node.getDeclarationType().getPrimitiveType().toString());
+        printer.printAtom(arrayType.getBaseType().toString());
 
-        int numArrayEmpty = node.getDeclarationType().getNumBrackets() -
-                node.getArraySizeList().size();
+        int numArrayEmpty = arrayType.getNumBrackets() -
+                node.getArraySizes().size();
         for(int j = 0; j < numArrayEmpty; j++) {
             printer.endList();
         }
 
-        for(int k = node.getArraySizeList().size()-1; k >= 0; k--) {
-            node.getArraySizeList().get(k).accept(this);
+        for(int k = node.getArraySizes().size()-1; k >= 0; k--) {
+            node.getArraySizes().get(k).accept(this);
             printer.endList();
         }
 

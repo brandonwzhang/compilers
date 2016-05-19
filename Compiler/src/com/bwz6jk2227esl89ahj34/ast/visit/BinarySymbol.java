@@ -7,7 +7,6 @@ import com.bwz6jk2227esl89ahj34.ast.type.VariableType;
 import java.math.BigInteger;
 import java.util.*;
 
-//TODO: remove the exceptions for over/underflow
 public class BinarySymbol {
     static BinaryOperator[] int_binary_operator_int = new BinaryOperator[] {
             BinaryOperator.PLUS, BinaryOperator.MINUS, BinaryOperator.TIMES, BinaryOperator.DIVIDE, BinaryOperator.MODULO,
@@ -31,9 +30,6 @@ public class BinarySymbol {
     static final Set<BinaryOperator> INT_BINARY_OPERATOR_BOOL = new LinkedHashSet<>(Arrays.asList(int_binary_operator_bool));
     static final Set<BinaryOperator> BOOL_BINARY_OPERATOR_BOOL = new LinkedHashSet<>(Arrays.asList(bool_binary_operator_bool));
     static final Set<BinaryOperator> ARRAY_BINARY_OPERATOR_BOOL = new LinkedHashSet<>(Arrays.asList(array_binary_operator_bool));
-
-    private static final VariableType INT_TYPE = new VariableType(PrimitiveType.INT, 0);
-    private static final VariableType BOOL_TYPE = new VariableType(PrimitiveType.BOOL, 0);
 
     /**
      * precondition: the code has already gone through the
