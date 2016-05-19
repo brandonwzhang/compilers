@@ -1,5 +1,6 @@
 use point
 use io
+use conv
 
 class Color {
     r,g,b:int
@@ -30,6 +31,7 @@ main(args:int[][]) {
 
     x:int,y:int = p.coords()
     cp = cp.initColoredPoint(x, y, c)
+    println(unparseInt(x) + ", " + unparseInt(y))
     println("Color!")
 
 
