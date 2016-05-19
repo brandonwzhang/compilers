@@ -9,6 +9,8 @@ class B extends A {
 class C extends B{
 
 }
+class X {
+}
 
 main(args:int[][]){
 
@@ -21,5 +23,8 @@ main(args:int[][]){
     }
     if (c instanceof A) {
         println("S W A G");
+    }
+    if (c instanceof X) {
+        println("ERROR")
     }
 }
