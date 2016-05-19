@@ -2,6 +2,9 @@ use io
 use animal
 
 main(args:int[][]) {
+    // Hello world!
+    // Bark
+    // meow
 	a:Animal = new Animal.initialize()
     d:Animal = new Dog.initialize()
     c:Animal = new Cat.initialize()

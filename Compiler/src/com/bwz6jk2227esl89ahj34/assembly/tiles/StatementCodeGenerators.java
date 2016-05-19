@@ -36,8 +36,9 @@ public class StatementCodeGenerators {
 
         assert !(dst instanceof AssemblyImmediate);
 
-        if (src instanceof AssemblyMemoryLocation && dst instanceof AssemblyMemoryLocation) {
-            // We cannot move from memory location to memory location directly
+        if ((src instanceof AssemblyMemoryLocation && dst instanceof AssemblyMemoryLocation) ||
+                (src instanceof AssemblyImmediate && dst instanceof AssemblyMemoryLocation)) {
+            // We cannot move from memory location to memory location directly, or immediate to memory
             AssemblyAbstractRegister register = new AssemblyAbstractRegister();
             lines.add(new AssemblyInstruction(OpCode.MOVQ, src, register));
             lines.add(new AssemblyInstruction(OpCode.MOVQ, register, dst));

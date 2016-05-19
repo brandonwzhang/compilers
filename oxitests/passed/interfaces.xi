@@ -20,4 +20,6 @@ main(args: int[][]) {
 		frog: DatBoi = hereCome()
 		println("nice2")
 	}
+    // DOES NOT RUN BY ITSELF
 }
+

@@ -44,4 +44,7 @@ main(args: int[][]) {
     if (objA instanceof C) {
         println("FAILED")
     }
+    // 4120
+    // 4120
+    // 4121
 }

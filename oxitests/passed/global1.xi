@@ -10,4 +10,7 @@ main(args: int[][]) {
 
 	hell: int = real_course + 1	
 	println(unparseInt(hell))
+    // 3110
+    // 4120
+    // 4121
 }

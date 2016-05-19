@@ -12,6 +12,8 @@ main(args: int[][]) {
 	println(unparseInt(course + real_course + zero - one + one)) //7231
 	print(jihun.name() + "'s favorite course is CS ")
 	println(unparseInt(jihun.favoriteCourse()))
+    // 7231
+    // jihun's favorite course is CS 3110
 }
 
 class Student {

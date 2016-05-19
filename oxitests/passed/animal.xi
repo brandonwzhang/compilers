@@ -12,6 +12,12 @@ main(args:int[][]) {
     Dog#d.bark()
     b:Dog = Dog#d
     b.noise()
+
+    // Hello world!
+    // bark
+    // meow
+    // bark
+    // bark
 }
 
 class Animal {

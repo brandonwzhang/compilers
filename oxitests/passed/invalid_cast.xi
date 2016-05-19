@@ -44,4 +44,9 @@ main(args: int[][]) {
     println(unparseInt(objC.getA()))
     println(unparseInt(objC.getB()))
     println(unparseInt(objC.getC()))
+
+    // 4120
+    // 4120
+    // 4121
+    // unspecified
 }

@@ -2,6 +2,8 @@ use point
 use io
 use conv
 
+// Must be compiled with point.xi
+
 class Color {
     r,g,b:int
     set(r1:int, g1:int, b1:int) {
@@ -34,5 +36,6 @@ main(args:int[][]) {
     println(unparseInt(x) + ", " + unparseInt(y))
     println("Color!")
 
-
+    // 5, 5
+    // Color!
 }

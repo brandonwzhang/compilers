@@ -1,4 +1,18 @@
 use io
+use conv
+
+main(args:int[][]) {
+    if (b()) {
+        a()
+    }
+    s:Student = new Student.init("eric780", 780)
+    c(s);
+    println(unparseInt(d(s.id())));
+    // a
+    // eric780
+    // 781
+
+}
 
 a() {
 	println("a")

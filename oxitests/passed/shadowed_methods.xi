@@ -24,4 +24,7 @@ main(args: int[][]) {
 	obj.foo()
 	obj.foo2()
 	bar()
+    // A.bar()
+    // A.bar()
+    // global bar
 }
