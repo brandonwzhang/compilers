@@ -12,6 +12,7 @@ public class Main {
     private static String libPath = "./";
     private static String assemblyPath = "./";
     private static String target = "linux";
+    private static String outputFile = "a.out";
     private static boolean debug;
     private static boolean tests;
     private static boolean lex;
@@ -31,9 +32,9 @@ public class Main {
     public static void main(String[] args) {
         CLI cli = new CLI();
         /*
-            The order in which these options are added is the same as which
-            they will be executed (but options can be provided in any order
-            when calling xic
+           The order in which these options are added is the same as which
+           they will be executed (but options can be provided in any order
+           when calling xic
          */
         cli.addOption("--debug",
                       "Turns on debug mode.",
@@ -93,13 +94,17 @@ public class Main {
                       phase -> reportIR(phase[0]),
                       1);
         cli.addOption("--optcfg",
-                "Report the control-flow graph at the specified phase of optimization.",
-                phase -> reportCFG(phase[0]),
-                1);
+                      "Report the control-flow graph at the specified phase of optimization.",
+                      phase -> reportCFG(phase[0]),
+                      1);
         cli.addOption("-a",
-                "Turn off assembly code generation.",
-                Main::turnAssemblyGenerationOff,
-                0);
+                      "Turn off assembly code generation.",
+                      Main::turnAssemblyGenerationOff,
+                      0);
+        cli.addOption("-o",
+                      "Specify output file name",
+                      file -> setOutputFile(file[0]),
+                      1);
 
         cli.execute(args);
 
@@ -174,6 +179,10 @@ public class Main {
         target = os;
     }
 
+    public static void setOutputFile(String file) {
+        outputFile = file;
+    }
+
     public static String sourcePath() {
         return sourcePath;
     }
@@ -192,6 +201,10 @@ public class Main {
 
     public static String target() {
         return target;
+    }
+
+    public static String outputFile() {
+        return outputFile;
     }
 
     /**

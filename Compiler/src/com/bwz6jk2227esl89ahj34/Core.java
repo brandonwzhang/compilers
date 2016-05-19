@@ -344,9 +344,7 @@ public class Core {
         command.add(Util.rootPath + "/runtime/linkxi.sh");
         // Output is the name of the last file passed in
         command.add("-o");
-        String outputFile = files[files.length - 1];
-        String outputFileName = outputFile.substring(0, outputFile.lastIndexOf('.'));
-        command.add(outputFileName);
+        command.add(Main.outputFile());
 
         // Add all generated assembly files
         for (String file : files) {
