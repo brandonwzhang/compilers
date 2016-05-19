@@ -6,7 +6,7 @@ main(args:int[][]) {
     d:Animal = new Dog.initialize()
     c:Animal = new Cat.initialize()
     
-    if (a instanceof Animal) {
+    if (a instanceof Animal & !(a instanceof Dog) & !(a instanceof Cat)) {
       a.noise() 
     } else {
       println("uhoh")
@@ -23,7 +23,6 @@ main(args:int[][]) {
     } else {
       println("uhoh")
     }
-    
 }
 
 class Animal {
