@@ -10,6 +10,7 @@ main(args:int[][]) {
     c.noise()
 
     Dog#c.noise() // Cat is not a Dog although they are both Animals
+                 // however we let this compile since Java also permits it
 }
 
 class Animal {

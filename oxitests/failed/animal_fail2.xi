@@ -9,8 +9,8 @@ main(args:int[][]) {
     d.noise()
     c.noise()
 
-    Dog#a.noise() // this should fail because 
-                  // a is an Animal and cannot be casted down to a Dog
+    b:Dog = Dog#d
+    Animal#b.noise() // cannot upcast
 }
 
 class Animal {
