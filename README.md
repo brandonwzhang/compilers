@@ -1,5 +1,9 @@
 # Compilers
-Compiler for the Xi Programming Language
+Compiler for the
+[Xi](http://www.cs.cornell.edu/courses/cs4120/2016sp/project/oolang.pdf)
+Programming Language
+
+In addition to the features mentioned in the language specification, we also support downcasting `TargetClass#Expression`, `instanceof`, and for-loops. Example usage of all of these features can be found in `hashtable.xi`.
 
 ## Building
 With Apache Ant installed and the `JAVA_HOME` environment variable set, run the
@@ -14,6 +18,8 @@ To specify a folder containing interface `.ixi` files:
 ```
 xic -libpath <path> <filename>
 ```
+To compile and link multiple files, pass all of the file names to `xic`.
+
 To view all options:
 ```
 xic --help
