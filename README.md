@@ -1,5 +1,5 @@
 # ogc
-The OG Compiler for the
+A compiler for the
 [Xi](http://www.cs.cornell.edu/courses/cs4120/2016sp/project/oolang.pdf)
 Programming Language
 
@@ -9,7 +9,7 @@ Example usage of all of these features can be found in `examples/hashtable.xi`.
 
 ## Building
 With Apache Ant installed and the `JAVA_HOME` environment variable set, run the
-`ogc-build` script.
+`ogc-build` script. If building for the first time, ensure you have an internet connection.
 
 ## Running
 To compile a Xi program:
