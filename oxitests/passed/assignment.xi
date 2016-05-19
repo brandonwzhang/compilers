@@ -16,4 +16,5 @@ main(args:int[][]) {
     a:A = new A
     a.make("hello world");
     println(a.string())
+    // hello world
 }

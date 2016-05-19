@@ -30,4 +30,5 @@ main(args:int[][]) {
 
     a:A = new A.make(0,0,0)
     a.foo();
+    // tada!
 }

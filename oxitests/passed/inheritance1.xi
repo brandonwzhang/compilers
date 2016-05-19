@@ -21,5 +21,3 @@ class B extends A {
 
 	b4(n: int): C, int {
 		return new C, 4120
-	}
-}
