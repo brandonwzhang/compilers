@@ -339,7 +339,7 @@ public class Core {
         }
         // Link and generate executable
         List<String> command = new LinkedList<>();
-        command.add(Util.rootPath + "/QtXi/linkqt.sh");
+        command.add(Util.rootPath + "/runtime/linkxi.sh");
         // Output is the name of the last file passed in
         command.add("-o");
         command.add(Main.outputFile());
