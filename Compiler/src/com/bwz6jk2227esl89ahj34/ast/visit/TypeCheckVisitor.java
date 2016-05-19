@@ -923,8 +923,12 @@ public class TypeCheckVisitor implements NodeVisitor {
      * Has the type of the class that was specified
      */
     public void visit(ObjectInstantiation node) {
+        Type classtype = new ClassType(node.getClassIdentifier());
+        if (!isValidVariableType(classtype)) {
+            throw new TypeException ("Invalid class type", node.getRow(), node.getCol());
+        }
         // Set the type to the class
-        node.setType(new ClassType(node.getClassIdentifier()));
+        node.setType(classtype);
     }
 
     /**
