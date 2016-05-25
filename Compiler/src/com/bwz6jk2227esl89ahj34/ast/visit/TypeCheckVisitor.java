@@ -564,6 +564,9 @@ public class TypeCheckVisitor implements NodeVisitor {
      * Checks that the given BlockList is guaranteed to return by the end
      */
     public static boolean checkFunctionBlockList(BlockList blockList) {
+        if (blockList.getBlocks().size() == 0) {
+            return false;
+        }
         Block lastBlock = blockList.getBlocks().get(blockList.getBlocks().size() - 1);
 
         if (lastBlock instanceof ReturnStatement) {
