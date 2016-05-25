@@ -1057,7 +1057,7 @@ public class MIRGenerateVisitor implements NodeVisitor {
             stmts.add((IRStmt) generatedNodes.pop());
         }
         stmts.add(new IRReturn());
-        return new IRFuncDecl("_I_init_" + name, new IRSeq(stmts));
+        return new IRFuncDecl("_I_init_" + name.replace('-', '$'), new IRSeq(stmts));
     }
 
 
