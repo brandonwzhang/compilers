@@ -564,6 +564,9 @@ public class TypeCheckVisitor implements NodeVisitor {
      * Checks that the given BlockList is guaranteed to return by the end
      */
     public static boolean checkFunctionBlockList(BlockList blockList) {
+        if (blockList.getBlocks().size() == 0) {
+            return false;
+        }
         Block lastBlock = blockList.getBlocks().get(blockList.getBlocks().size() - 1);
 
         if (lastBlock instanceof ReturnStatement) {
@@ -1138,7 +1141,12 @@ public class TypeCheckVisitor implements NodeVisitor {
 
         // Look for an interface file for this file, doesn't need to exist
         Interface interface4120 = new Interface();
-        String filename = moduleName.substring(0, moduleName.length() - 3);
+        String filename;
+        if (moduleName.contains(".")) {
+            filename = moduleName.substring(0, moduleName.length() - 3);
+        } else {
+            filename = moduleName;
+        }
         if (filename.contains("/")) {
             filename = filename.substring(filename.lastIndexOf('/') + 1);
         }
@@ -1164,6 +1172,10 @@ public class TypeCheckVisitor implements NodeVisitor {
                     newMethodList.add(methods.get(md.getFunctionDeclaration().getIdentifier()));
                 }
                 definition.setMethods(newMethodList);
+            }
+
+            for (UseStatement useStatement : interface4120.getUseBlock()) {
+                useStatement.accept(this);
             }
 
             // TODO: also check that the function declarations match?

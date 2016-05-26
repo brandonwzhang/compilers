@@ -87,7 +87,7 @@ nonterminal Assignment assignment;
 nonterminal IfStatement if_statement;
 nonterminal WhileStatement while_statement;
 nonterminal ReturnStatement return_statement;
-nonterminal BlockList for_loop; 
+nonterminal BlockList for_loop;
 nonterminal Block block;
 nonterminal BlockList block_list;
 nonterminal BlockList block_scope;
@@ -102,15 +102,15 @@ nonterminal List<SimpleEntry<Identifier, VariableType>> function_declaration_arg
 nonterminal FunctionDeclaration function_declaration;
 
 nonterminal ProcedureCall procedure_call;
-nonterminal List<TypedDeclaration> typed_declaration_list; 
-nonterminal List<TypedDeclaration> field; 
+nonterminal List<TypedDeclaration> typed_declaration_list;
+nonterminal List<TypedDeclaration> field;
 nonterminal Pair<List<TypedDeclaration>, List<FunctionDeclaration>> class_declaration_body;
-nonterminal ClassDeclaration class_declaration; 
+nonterminal ClassDeclaration class_declaration;
 nonterminal Triple<List<Assignment>, List<FunctionDeclaration>, List<ClassDeclaration>> program_body;
-nonterminal Expression object_expression; 
-nonterminal ObjectFunctionCall object_function_call; 
-nonterminal ObjectField object_field; 
-nonterminal List<Assignment> global_variable; 
+nonterminal Expression object_expression;
+nonterminal ObjectFunctionCall object_function_call;
+nonterminal ObjectField object_field;
+nonterminal List<Assignment> global_variable;
 nonterminal Assignable global_variable_assignable;
 nonterminal Assignment global_variable_assignment;
 
@@ -261,7 +261,7 @@ object_expression ::= identifier:id {: RESULT = id; RESULT.setLocation(id); :}
                     | NEW identifier:id {: RESULT = new ObjectInstantiation(id); RESULT.setLocation(id); :}
                     | function_call:fc {: RESULT = fc;  RESULT.setLocation(fc); :}
                     | object_function_call:ofc {: RESULT = ofc;RESULT.setLocation(ofc); :}
-                    | assignment_lhs_array_brackets:ai {: RESULT = ai; RESULT.setLocation(ai); :} 
+                    | assignment_lhs_array_brackets:ai {: RESULT = ai; RESULT.setLocation(ai); :}
                     | object_field:of {: RESULT = of; RESULT.setLocation(of); :}
                     | THIS {: RESULT = new This(); RESULT.setLocation(parser.stack.peek()); :}
                     | identifier:i CAST object_expression:e {: RESULT = new CastedExpression(i, e); :}
@@ -269,10 +269,10 @@ object_expression ::= identifier:id {: RESULT = id; RESULT.setLocation(id); :}
                     ;
 
 object_function_call ::= object_expression:e PERIOD function_call:fc {: RESULT = new ObjectFunctionCall(fc.getIdentifier(), e, fc.getArguments()); RESULT.setLocation(e); :}
-                       ; 
+                       ;
 
 object_field ::= object_expression:e PERIOD identifier:id {: RESULT = new ObjectField(e, id); RESULT.setLocation(e); :}
-               ; 
+               ;
 
 assignment_lhs ::= identifier:id {: RESULT = id; RESULT.setLocation(parser.cur_token); :}
                  | assignment_lhs_array_brackets:a {: RESULT = a; RESULT.setLocation(parser.cur_token); :}
@@ -307,7 +307,7 @@ return_statement ::= RETURN expression_list:lst {: RESULT = new ReturnStatement(
 
 for_loop ::= FOR OPEN_PAREN assignment_lhs:al GETS expression:e SEMICOLON expression:t SEMICOLON statement:s CLOSE_PAREN  block:b {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); List<Block> blocks = new LinkedList<Block>(); blocks.add(new Assignment(lst, e)); List<Block> body_blocks = new LinkedList<>(); body_blocks.add(b); body_blocks.add(s); BlockList body = new BlockList(body_blocks); blocks.add(new WhileStatement(t, body)); RESULT = new BlockList(blocks); RESULT.setLocation(parser.cur_token); :}
                      | FOR OPEN_PAREN assignment_lhs:al GETS expression:e SEMICOLON expression:t CLOSE_PAREN  block:b {: List<Assignable> lst = new LinkedList<>(); lst.add(0, al); List<Block> blocks = new LinkedList<Block>(); blocks.add(new Assignment(lst, e)); blocks.add(new WhileStatement(t, b)); RESULT = new BlockList(blocks); RESULT.setLocation(parser.cur_token); :}
-                     ; 
+                     ;
 
 statement_no_semicolon ::= if_statement:s {: RESULT = s; RESULT.setLocation(s); :}
                          | while_statement:s {: RESULT = s; RESULT.setLocation(s); :}
@@ -328,14 +328,15 @@ block ::= block_scope:bl {: RESULT = bl; RESULT.setLocation(bl); :}
         | statement:s {: RESULT = s; RESULT.setLocation(s); :}
         ;
 
-// x,y:int 
+// x,y:int
 typed_declaration_list ::= identifier:id COMMA typed_declaration:td {: List<TypedDeclaration> f = new LinkedList<>(); f.add(td); f.add(new TypedDeclaration(id, td.getDeclarationType(), td.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); :}
-              | identifier:id COMMA typed_declaration_list:f {: TypedDeclaration temp = f.get(f.size()-1); f.add(new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); :} 
-              ; 
+              | identifier:id COMMA typed_declaration_list:f {: TypedDeclaration temp = f.get(f.size()-1); f.add(new TypedDeclaration(id, temp.getDeclarationType(), temp.getArraySizes())); RESULT = f; RESULT.get(0).setLocation(id); :}
+              ;
 
 block_list ::= block:b block_list:bl {: bl.getBlocks().add(0, b); RESULT = bl; :}
              | typed_declaration_list:f block_list:bl {: for(TypedDeclaration td : f) { bl.getBlocks().add(0, td); } RESULT = bl; :}
              | RETURN {: List<Block> bl = new LinkedList<>(); bl.add(0,new ReturnStatement(new LinkedList<>())); RESULT = new BlockList(bl); :}
+             | RETURN SEMICOLON {: List<Block> bl = new LinkedList<>(); bl.add(0,new ReturnStatement(new LinkedList<>())); RESULT = new BlockList(bl); :}
              | for_loop:f block_list:bl {: bl.getBlocks().add(0, f); RESULT = bl; :}
              | empty  {: List<Block> bl = new LinkedList<>(); RESULT = new BlockList(bl); :}
              ;
@@ -379,7 +380,7 @@ class_declaration_body ::= field:f class_declaration_body:c {: for(TypedDeclarat
                        | field:f SEMICOLON class_declaration_body:c {: for(TypedDeclaration td : f) { c.part1().add(0, td); } RESULT = c ; :}
                        | function_declaration:f class_declaration_body:c {: c.part2().add(0, f); RESULT = c; :}
                        | empty {: Pair<List<TypedDeclaration>, List<FunctionDeclaration>> pair = new Pair<>(new LinkedList<>(), new LinkedList<>()); RESULT = pair; :}
-                       ; 
+                       ;
 
 class_declaration ::= CLASS identifier:id OPEN_BRACE class_declaration_body:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body.part2()) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, body.part1(), methods, Optional.empty()); :}
                     | CLASS identifier:id EXTENDS identifier:id2 OPEN_BRACE class_declaration_body:body CLOSE_BRACE {: List<MethodDeclaration> methods = new LinkedList<>(); for(FunctionDeclaration fd : body.part2()) { methods.add(new MethodDeclaration(id, fd)); } RESULT = new ClassDeclaration(id, body.part1(), methods, Optional.of(id2)); :}
@@ -387,22 +388,22 @@ class_declaration ::= CLASS identifier:id OPEN_BRACE class_declaration_body:body
 
 program_body ::= global_variable:g program_body:p {: for (Assignment ga : g) { p.getA().add(0, ga); } RESULT = p; :}
                | global_variable:g SEMICOLON program_body:p {: for (Assignment ga : g) { p.getA().add(0, ga); } RESULT = p; :}
-               | function_declaration:fd program_body:p {: p.getB().add(fd); RESULT = p; :} 
+               | function_declaration:fd program_body:p {: p.getB().add(fd); RESULT = p; :}
                | class_declaration:c program_body:p {: p.getC().add(c); RESULT = p; :}
                | empty {: Triple<List<Assignment>, List<FunctionDeclaration>, List<ClassDeclaration>> body = new Triple<>(new LinkedList<>(), new LinkedList<>(), new LinkedList<>()); RESULT = body; :}
-               ; 
+               ;
 
 
 global_variable_assignable ::= typed_declaration_no_size:td {: RESULT = td; RESULT.setLocation(parser.cur_token); :}
                  ;
 
 global_variable_assignment ::= global_variable_assignable:a GETS expression:e {:  RESULT = new Assignment(a, e); RESULT.setLocation(parser.cur_token); :}// x = expression
-                             ; 
+                             ;
 
-global_variable ::= typed_declaration_list:lst {: List<Assignment> assignments = new LinkedList<>(); for (TypedDeclaration td : lst) { if (td.getDeclarationType() instanceof IntType) { assignments.add(new Assignment(td, new IntegerLiteral("0"))); } else if (td.getDeclarationType() instanceof BoolType) { assignments.add(new Assignment(td, new BooleanLiteral(false))); } else { assignments.add(new Assignment(td, new Null())); } } RESULT = assignments; :} 
+global_variable ::= typed_declaration_list:lst {: List<Assignment> assignments = new LinkedList<>(); for (TypedDeclaration td : lst) { if (td.getDeclarationType() instanceof IntType) { assignments.add(new Assignment(td, new IntegerLiteral("0"))); } else if (td.getDeclarationType() instanceof BoolType) { assignments.add(new Assignment(td, new BooleanLiteral(false))); } else { assignments.add(new Assignment(td, new Null())); } } RESULT = assignments; :}
                   | global_variable_assignment:a {: List<Assignment> assignables = new LinkedList<>(); assignables.add(a); RESULT = assignables; :}
                   | typed_declaration:td {:  List<Assignment> assignments = new LinkedList<>(); if (td.getDeclarationType() instanceof IntType) { assignments.add(new Assignment(td, new IntegerLiteral("0"))); } else if (td.getDeclarationType() instanceof BoolType) { assignments.add(new Assignment(td, new BooleanLiteral(false))); } else { assignments.add(new Assignment(td, new Null())); } RESULT = assignments; :}
-                  ; 
+                  ;
 
 program ::= use_block:u program_body:b {: RESULT = new Program(u, b.getA(), b.getB(), b.getC()); RESULT.setLocation(parser.cur_token); :}
           | error
