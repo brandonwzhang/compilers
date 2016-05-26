@@ -1,5 +1,5 @@
-# ogc 
-A compiler for the
+# Compilers
+Compiler for the
 [Xi](http://www.cs.cornell.edu/courses/cs4120/2016sp/project/oolang.pdf)
 Programming Language
 
@@ -9,23 +9,22 @@ Example usage of all of these features can be found in `examples/hashtable.xi`.
 
 ## Building
 With Apache Ant installed and the `JAVA_HOME` environment variable set, run the
-`ogc-build` script. If building for the first time, ensure you have an internet
-connection.
+`xic-build` script.
 
 ## Running
 To compile a Xi program:
 ```
-ogc <filename>
+xic <filename>
 ```
 To specify a folder containing interface `.ixi` files:
 ```
-ogc -libpath <path> <filename>
+xic -libpath <path> <filename>
 ```
-To compile and link multiple files, pass all of the files to `ogc`.
+To compile and link multiple files, pass all of the files to `xic`.
 
 To view all options:
 ```
-ogc --help
+xic --help
 ```
 
 

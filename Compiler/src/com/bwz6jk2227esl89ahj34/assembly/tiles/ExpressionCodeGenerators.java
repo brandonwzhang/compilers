@@ -188,8 +188,8 @@ public class ExpressionCodeGenerators {
                 // restore RDX, RAX
                 AssemblyPhysicalRegister.saveToStack(lines, AssemblyFunction.getScratchSpaceOffset(),
                         AssemblyPhysicalRegister.RAX, AssemblyPhysicalRegister.RDX);
+                lines.add(new AssemblyInstruction(OpCode.MOVQ, new AssemblyImmediate(0), AssemblyPhysicalRegister.RDX));
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, left, AssemblyPhysicalRegister.RAX));
-                lines.add(new AssemblyInstruction(OpCode.CQO));
                 AssemblyRegister right_ = makeTemp(right, lines);
                 lines.add(new AssemblyInstruction(OpCode.IDIVQ, right_));
                 lines.add(new AssemblyInstruction(OpCode.MOVQ, AssemblyPhysicalRegister.RAX, t));

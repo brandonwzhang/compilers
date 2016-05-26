@@ -336,7 +336,6 @@ typed_declaration_list ::= identifier:id COMMA typed_declaration:td {: List<Type
 block_list ::= block:b block_list:bl {: bl.getBlocks().add(0, b); RESULT = bl; :}
              | typed_declaration_list:f block_list:bl {: for(TypedDeclaration td : f) { bl.getBlocks().add(0, td); } RESULT = bl; :}
              | RETURN {: List<Block> bl = new LinkedList<>(); bl.add(0,new ReturnStatement(new LinkedList<>())); RESULT = new BlockList(bl); :}
-             | RETURN SEMICOLON {: List<Block> bl = new LinkedList<>(); bl.add(0,new ReturnStatement(new LinkedList<>())); RESULT = new BlockList(bl); :}
              | for_loop:f block_list:bl {: bl.getBlocks().add(0, f); RESULT = bl; :}
              | empty  {: List<Block> bl = new LinkedList<>(); RESULT = new BlockList(bl); :}
              ;
